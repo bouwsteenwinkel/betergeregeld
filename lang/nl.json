@@ -21,5 +21,20 @@
 	"Controleer je e-mail": "Controleer je e-mail",
 	"We hebben een bevestigingslink gestuurd naar": "We hebben een bevestigingslink gestuurd naar",
 	"Klik erop om je account te activeren. De link is 24 uur geldig.": "Klik erop om je account te activeren. De link is 24 uur geldig.",
-	"Deze verificatielink is ongeldig of verlopen.": "Deze verificatielink is ongeldig of verlopen."
+	"Deze verificatielink is ongeldig of verlopen.": "Deze verificatielink is ongeldig of verlopen.",
+	"IBAN check": "IBAN-check",
+	"IBAN": "IBAN",
+	"Naam rekeninghouder": "Naam rekeninghouder",
+	"Controleer": "Controleer",
+	"Controleer of een IBAN technisch geldig is en bekijk risico-indicatoren.": "Controleer of een IBAN technisch geldig is en bekijk risico-indicatoren.",
+	"Technisch geldig": "Technisch geldig",
+	"Ongeldig": "Ongeldig",
+	"Risico-indicatoren": "Risico-indicatoren",
+	"Geen risico-indicatoren gevonden.": "Geen risico-indicatoren gevonden.",
+	"iban.risk_invalid": "IBAN is technisch ongeldig (mod-97 faalt).",
+	"iban.risk_short_name": "Naam is opvallend kort.",
+	"iban.risk_company": "Bedrijfsnaam-indicator gevonden (BV/NV/GmbH/etc.).",
+	"iban.risk_name_mismatch": "Naamstructuur wijkt af (mogelijke mismatch-indicator).",
+	"iban.risk_suspicious_name": "Verdachte naamwaarde (test/dummy/onbekend).",
+	"iban.disclaimer": "Deze tool doet alleen technische validatie en heuristische risicochecks. Er is geen live verbinding met banken."
 }

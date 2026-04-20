@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -29,4 +30,9 @@ Route::prefix('{locale}')
 		Route::post('/logout', [LoginController::class, 'logout'])
 			->middleware('auth')
 			->name('logout');
+
+		Route::prefix('tools')->name('tools.')->group(function () {
+			Route::get('/iban-check', [IbanCheckController::class, 'show'])->name('iban-check');
+			Route::post('/iban-check', [IbanCheckController::class, 'check'])->name('iban-check.check');
+		});
 	});
