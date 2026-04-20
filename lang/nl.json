@@ -3,6 +3,7 @@
 	"Uitloggen": "Uitloggen",
 	"E-mail": "E-mail",
 	"Wachtwoord": "Wachtwoord",
+	"Wachtwoord bevestigen": "Wachtwoord bevestigen",
 	"Onthoud mij": "Onthoud mij",
 	"Ingelogd als": "Ingelogd als",
 	"Rol": "Rol",
@@ -10,5 +11,15 @@
 	"Slimme tools, beter geregeld.": "Slimme tools, beter geregeld.",
 	"app_tagline": ":app is je software-partner voor praktische online tools, gratis te gebruiken, met betaalde uitbreidingen voor wie meer nodig heeft.",
 	"De combinatie van e-mail en wachtwoord klopt niet.": "De combinatie van e-mail en wachtwoord klopt niet.",
-	"Dit account is niet actief.": "Dit account is niet actief."
+	"Dit account is niet actief.": "Dit account is niet actief.",
+	"Account aanmaken": "Account aanmaken",
+	"Naam / bedrijf": "Naam / bedrijf",
+	"Minimaal 10 tekens.": "Minimaal 10 tekens.",
+	"Al een account?": "Al een account?",
+	"Nog geen account?": "Nog geen account?",
+	"Bevestig je e-mailadres": "Bevestig je e-mailadres",
+	"Controleer je e-mail": "Controleer je e-mail",
+	"We hebben een bevestigingslink gestuurd naar": "We hebben een bevestigingslink gestuurd naar",
+	"Klik erop om je account te activeren. De link is 24 uur geldig.": "Klik erop om je account te activeren. De link is 24 uur geldig.",
+	"Deze verificatielink is ongeldig of verlopen.": "Deze verificatielink is ongeldig of verlopen."
 }

@@ -8,6 +8,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -34,6 +35,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Tenant extends Model
 {
+	use HasUuids;
+
 	protected $table = 'tenants';
 	protected $keyType = 'string';
 	public $incrementing = false;

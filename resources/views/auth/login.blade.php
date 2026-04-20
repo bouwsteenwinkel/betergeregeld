@@ -38,6 +38,11 @@
 				class="w-full rounded-[var(--radius-control)] bg-[color:var(--color-ink)] text-white font-semibold px-4 py-3 hover:opacity-90 transition">
 				{{ __('Inloggen') }}
 			</button>
+
+			<p class="text-sm text-center text-[color:var(--color-ink-muted)]">
+				{{ __('Nog geen account?') }}
+				<a href="{{ route('register') }}" class="underline hover:no-underline">{{ __('Account aanmaken') }}</a>
+			</p>
 		</form>
 	</div>
 @endsection
