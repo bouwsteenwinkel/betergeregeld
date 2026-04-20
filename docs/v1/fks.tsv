@@ -1,0 +1,33 @@
+﻿table_name	constraint_name	column_name	referenced_table_name	referenced_column_name	update_rule	delete_rule
+cases	fk_cases_user	assigned_to	users	id	CASCADE	SET NULL
+cases	fk_cases_order	order_id	orders	id	CASCADE	CASCADE
+cases	fk_cases_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+case_events	fk_case_events_case	case_id	cases	id	CASCADE	CASCADE
+case_events	fk_case_events_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+cmp_consents	fk_cmp_consents_domain	domain_id	cmp_domains	id	RESTRICT	RESTRICT
+cmp_consent_logs	fk_cmp_logs_domain	domain_id	cmp_domains	id	RESTRICT	RESTRICT
+contact_messages	fk_contact_user	user_id	users	id	RESTRICT	SET NULL
+evidence	fk_evidence_case	case_id	cases	id	CASCADE	CASCADE
+evidence	fk_evidence_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+loss_cases	fk_loss_cases_order	order_id	loss_orders	id	RESTRICT	CASCADE
+loss_returns	fk_loss_returns_order	order_id	loss_orders	id	RESTRICT	CASCADE
+loss_shipments	fk_loss_shipments_order	order_id	loss_orders	id	RESTRICT	CASCADE
+orders	fk_orders_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+payments	fk_payments_order	order_id	orders	id	CASCADE	CASCADE
+payments	fk_payments_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+pdf_merge_events	fk_pdf_merge_events_session	session_id	pdf_merge_sessions	id	RESTRICT	SET NULL
+pdf_merge_events	fk_pdf_merge_events_job	job_id	pdf_merge_jobs	id	RESTRICT	SET NULL
+pdf_merge_jobs	fk_pdf_merge_jobs_session	session_id	pdf_merge_sessions	id	RESTRICT	CASCADE
+pdf_merge_job_files	fk_pdf_merge_job_files_job	job_id	pdf_merge_jobs	id	RESTRICT	CASCADE
+plan_features	plan_features_ibfk_1	plan_id	plans	id	RESTRICT	RESTRICT
+returns	fk_returns_order	order_id	orders	id	CASCADE	CASCADE
+returns	fk_returns_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+shipments	fk_shipments_order	order_id	orders	id	CASCADE	CASCADE
+shipments	fk_shipments_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+tenant_api_keys	fk_api_keys_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+tenant_subscriptions	tenant_subscriptions_ibfk_1	plan_id	plans	id	RESTRICT	RESTRICT
+users	fk_users_tenant	tenant_id	tenants	id	CASCADE	CASCADE
+user_sessions	fk_user_sessions_user	user_id	users	id	RESTRICT	CASCADE
+user_twofa	fk_user_twofa_user	user_id	users	id	RESTRICT	CASCADE
+user_twofa_backup_codes	fk_backup_user	user_id	users	id	RESTRICT	CASCADE
+user_twofa_trusted_devices	fk_trusted_user	user_id	users	id	RESTRICT	CASCADE

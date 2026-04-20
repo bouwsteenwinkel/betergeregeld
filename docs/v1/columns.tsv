@@ -1,0 +1,516 @@
+﻿table_name	column_name	column_type	is_nullable	column_default	column_key	extra	IFNULL(column_comment,'')
+audit_log	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+audit_log	created_at	datetime	NO	NULL	MUL		
+audit_log	event	varchar(60)	NO	NULL	MUL		
+audit_log	entity_type	varchar(60)	YES	NULL	MUL		
+audit_log	entity_id	bigint(20) unsigned	YES	NULL			
+audit_log	page_uri	varchar(255)	NO	NULL			
+audit_log	ip	varchar(45)	NO	NULL			
+audit_log	user_agent	varchar(255)	NO	NULL			
+audit_log	session_id	varchar(128)	NO	NULL			
+audit_log	meta_json	longtext	NO	NULL			
+audit_log	meta_hash	char(64)	NO	NULL			
+cases	id	char(36)	NO	NULL	PRI		
+cases	tenant_id	char(36)	NO	NULL	MUL		
+cases	order_id	char(36)	NO	NULL	MUL		
+cases	case_type	varchar(30)	NO	NULL			
+cases	status	varchar(30)	NO	'open'			
+cases	severity	varchar(10)	NO	'low'			
+cases	confidence	decimal(4,3)	NO	0.000			
+cases	auto_decision	varchar(40)	YES	NULL			
+cases	reason_code	varchar(60)	YES	NULL			
+cases	summary	varchar(255)	YES	NULL			
+cases	assigned_to	char(36)	YES	NULL	MUL		
+cases	created_at	datetime	NO	current_timestamp()			
+cases	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+case_events	id	char(36)	NO	NULL	PRI		
+case_events	tenant_id	char(36)	NO	NULL	MUL		
+case_events	case_id	char(36)	NO	NULL	MUL		
+case_events	ts	datetime	NO	current_timestamp()			
+case_events	actor	varchar(20)	NO	'system'			
+case_events	channel	varchar(20)	NO	'api'			
+case_events	event_type	varchar(30)	NO	'note'			
+case_events	message	text	YES	NULL			
+case_events	payload	longtext	YES	NULL			
+cmp_branding	id	int(11)	NO	NULL	PRI	auto_increment	
+cmp_branding	tenant_key	varchar(64)	NO	NULL	UNI		
+cmp_branding	branding_json	longtext	NO	NULL			
+cmp_branding	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+cmp_categories	id	int(11)	NO	NULL	PRI	auto_increment	
+cmp_categories	tenant_key	varchar(64)	NO	NULL	MUL		
+cmp_categories	key	varchar(32)	NO	NULL			
+cmp_categories	is_required	tinyint(1)	NO	0			
+cmp_categories	is_enabled	tinyint(1)	NO	1			
+cmp_categories	sort_order	int(11)	NO	100			
+cmp_categories	created_at	datetime	NO	current_timestamp()			
+cmp_categories	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+cmp_consents	id	bigint(20)	NO	NULL	PRI	auto_increment	
+cmp_consents	tenant_key	varchar(64)	NO	NULL	MUL		
+cmp_consents	domain_id	int(11)	NO	NULL	MUL		
+cmp_consents	consent_id	char(36)	NO	NULL			
+cmp_consents	policy_version	int(11)	NO	1			
+cmp_consents	status	enum('accepted','rejected','custom')	NO	NULL			
+cmp_consents	choices_json	longtext	NO	NULL			
+cmp_consents	first_seen_at	datetime	NO	current_timestamp()			
+cmp_consents	last_updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+cmp_consents	expires_at	datetime	NO	NULL			
+cmp_consent_logs	id	bigint(20)	NO	NULL	PRI	auto_increment	
+cmp_consent_logs	tenant_key	varchar(64)	NO	NULL	MUL		
+cmp_consent_logs	domain_id	int(11)	NO	NULL	MUL		
+cmp_consent_logs	consent_id	char(36)	NO	NULL			
+cmp_consent_logs	event	enum('created','updated','withdrawn')	NO	NULL			
+cmp_consent_logs	policy_version	int(11)	NO	NULL			
+cmp_consent_logs	choices_json	longtext	NO	NULL			
+cmp_consent_logs	ip_hash	char(64)	YES	NULL			
+cmp_consent_logs	ua_hash	char(64)	YES	NULL			
+cmp_consent_logs	created_at	datetime	NO	current_timestamp()			
+cmp_domains	id	int(11)	NO	NULL	PRI	auto_increment	
+cmp_domains	tenant_key	varchar(64)	NO	NULL	MUL		
+cmp_domains	domain	varchar(255)	NO	NULL	MUL		
+cmp_domains	is_primary	tinyint(1)	NO	0			
+cmp_domains	status	enum('active','disabled')	NO	'active'			
+cmp_domains	created_at	datetime	NO	current_timestamp()			
+cmp_domains	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+cmp_policy	id	int(11)	NO	NULL	PRI	auto_increment	
+cmp_policy	tenant_key	varchar(64)	NO	NULL	UNI		
+cmp_policy	policy_version	int(11)	NO	1			
+cmp_policy	config_hash	char(64)	NO	NULL			
+cmp_policy	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+cmp_scripts	id	int(11)	NO	NULL	PRI	auto_increment	
+cmp_scripts	tenant_key	varchar(64)	NO	NULL	MUL		
+cmp_scripts	category_key	varchar(32)	NO	NULL			
+cmp_scripts	name	varchar(128)	NO	NULL			
+cmp_scripts	script_type	enum('src','inline')	NO	NULL			
+cmp_scripts	src_url	varchar(512)	YES	NULL			
+cmp_scripts	inline_code	mediumtext	YES	NULL			
+cmp_scripts	attributes_json	longtext	YES	NULL			
+cmp_scripts	is_enabled	tinyint(1)	NO	1			
+cmp_scripts	sort_order	int(11)	NO	100			
+cmp_scripts	created_at	datetime	NO	current_timestamp()			
+cmp_scripts	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+cmp_texts	id	int(11)	NO	NULL	PRI	auto_increment	
+cmp_texts	tenant_key	varchar(64)	NO	NULL	MUL		
+cmp_texts	lang	varchar(8)	NO	NULL			
+cmp_texts	text_key	varchar(64)	NO	NULL			
+cmp_texts	text_value	text	NO	NULL			
+cmp_texts	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+contact_messages	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+contact_messages	public_id	char(16)	NO	NULL	UNI		
+contact_messages	created_at	datetime	NO	NULL	MUL		
+contact_messages	status	varchar(30)	NO	'new'	MUL		
+contact_messages	name	varchar(120)	NO	NULL			
+contact_messages	email	varchar(190)	NO	NULL	MUL		
+contact_messages	topic	varchar(100)	YES	NULL			
+contact_messages	website	varchar(255)	YES	NULL			
+contact_messages	company	varchar(190)	YES	NULL			
+contact_messages	phone	varchar(60)	YES	NULL			
+contact_messages	cms_platform	varchar(80)	YES	NULL			
+contact_messages	traffic	varchar(40)	YES	NULL			
+contact_messages	needs_json	longtext	YES	NULL			
+contact_messages	subject	varchar(190)	NO	NULL			
+contact_messages	message	text	NO	NULL			
+contact_messages	ip	varchar(45)	NO	NULL			
+contact_messages	user_agent	varchar(255)	NO	NULL			
+contact_messages	referer	varchar(255)	YES	NULL			
+contact_messages	page_uri	varchar(255)	NO	NULL			
+contact_messages	session_id	varchar(128)	NO	NULL			
+contact_messages	payload_hash	char(64)	NO	NULL			
+contact_messages	payload_json	longtext	NO	NULL			
+contact_messages	user_id	bigint(20) unsigned	YES	NULL	MUL		
+email_verify_tokens	user_id	char(36)	NO	NULL	PRI		
+email_verify_tokens	token_hash	varchar(255)	NO	NULL			
+email_verify_tokens	sent_at	datetime	NO	NULL			
+email_verify_tokens	expires_at	datetime	NO	NULL			
+evidence	id	char(36)	NO	NULL	PRI		
+evidence	tenant_id	char(36)	NO	NULL	MUL		
+evidence	case_id	char(36)	NO	NULL	MUL		
+evidence	kind	varchar(30)	NO	NULL			
+evidence	uri	varchar(255)	YES	NULL			
+evidence	hash_sha256	char(64)	YES	NULL			
+evidence	captured_at	datetime	YES	NULL			
+evidence	meta	longtext	YES	NULL			
+evidence	created_at	datetime	NO	current_timestamp()			
+lego_color_map	bl_color_id	int(11)	NO	NULL	PRI		
+lego_color_map	rb_color_id	int(11)	NO	NULL			
+lego_element_map	element_id	bigint(20)	NO	NULL	PRI		
+lego_element_map	part_num	varchar(32)	YES	NULL			
+lego_element_map	rb_part_num	varchar(32)	YES	NULL			
+lego_element_map	rb_color_id	int(11)	YES	NULL			
+lego_element_map	bl_color_id	int(11)	YES	NULL			
+lego_element_map	color_name	varchar(64)	YES	NULL			
+lego_element_map	rb_name	varchar(255)	YES	NULL			
+lego_element_map	rb_part_img_url	text	YES	NULL			
+lego_element_map	rb_part_img_local	varchar(255)	YES	NULL			
+lego_element_map	rb_cached_at	datetime	YES	NULL			
+lego_element_map	created_at	datetime	YES	NULL			
+lego_element_map	updated_at	datetime	YES	NULL			
+lego_element_map	rb_color_name	varchar(64)	YES	NULL			
+lego_rb_colors	rb_color_id	int(11)	NO	NULL	PRI		
+lego_rb_colors	name	varchar(100)	NO	NULL			
+lego_rb_colors	rgb	char(6)	YES	NULL			
+lego_rb_colors	is_trans	tinyint(1)	YES	NULL			
+lego_rb_colors	updated_at	datetime	YES	NULL			
+loss_cases	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+loss_cases	tenant_id	varchar(64)	NO	NULL	MUL		
+loss_cases	order_id	bigint(20) unsigned	NO	NULL	MUL		
+loss_cases	case_type	varchar(32)	NO	NULL	MUL		
+loss_cases	status	varchar(16)	NO	'open'			
+loss_cases	delta_g	int(11)	YES	NULL			
+loss_cases	threshold_g	int(11)	YES	NULL			
+loss_cases	severity	tinyint(4)	NO	1			
+loss_cases	meta_json	longtext	YES	NULL			
+loss_cases	last_seen_at	timestamp	NO	current_timestamp()			
+loss_cases	created_at	timestamp	NO	current_timestamp()			
+loss_cases	updated_at	timestamp	NO	current_timestamp()		on update current_timestamp()	
+loss_orders	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+loss_orders	tenant_id	varchar(64)	NO	NULL	MUL		
+loss_orders	external_id	varchar(64)	NO	NULL			
+loss_orders	platform	varchar(32)	NO	NULL	MUL		
+loss_orders	currency	char(3)	NO	'EUR'			
+loss_orders	gross_amount	decimal(12,2)	NO	0.00			
+loss_orders	ordered_at	datetime	YES	NULL			
+loss_orders	customer_ref	varchar(64)	YES	NULL			
+loss_orders	country_ship	char(2)	YES	NULL			
+loss_orders	created_at	timestamp	NO	current_timestamp()			
+loss_orders	updated_at	timestamp	NO	current_timestamp()		on update current_timestamp()	
+loss_returns	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+loss_returns	tenant_id	varchar(64)	NO	NULL	MUL		
+loss_returns	order_id	bigint(20) unsigned	NO	NULL	MUL		
+loss_returns	return_weight_g	int(11)	NO	NULL			
+loss_returns	received_at	timestamp	NO	current_timestamp()			
+loss_returns	updated_at	timestamp	NO	current_timestamp()		on update current_timestamp()	
+loss_shipments	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+loss_shipments	tenant_id	varchar(64)	NO	NULL	MUL		
+loss_shipments	order_id	bigint(20) unsigned	NO	NULL	MUL		
+loss_shipments	packed_weight_g	int(11)	NO	NULL			
+loss_shipments	box_id	varchar(64)	YES	NULL			
+loss_shipments	packed_at	timestamp	NO	current_timestamp()			
+loss_shipments	updated_at	timestamp	NO	current_timestamp()		on update current_timestamp()	
+loss_tenant_settings	tenant_id	char(36)	NO	NULL	PRI		
+loss_tenant_settings	has_orders	tinyint(1)	NO	1			
+loss_tenant_settings	has_packed_weight	tinyint(1)	NO	0			
+loss_tenant_settings	has_return_weight	tinyint(1)	NO	0			
+loss_tenant_settings	has_shipments	tinyint(1)	NO	0			
+loss_tenant_settings	has_payments	tinyint(1)	NO	0			
+loss_tenant_settings	packed_missing_after_hours	int(11)	NO	48			
+loss_tenant_settings	packed_outlier_enabled	tinyint(1)	NO	1			
+loss_tenant_settings	packed_outlier_low_ratio	decimal(6,3)	NO	0.400			
+loss_tenant_settings	packed_outlier_high_ratio	decimal(6,3)	NO	2.500			
+loss_tenant_settings	packed_outlier_min_median_g	int(11)	NO	50			
+loss_tenant_settings	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+loss_tenant_settings	created_at	datetime	NO	current_timestamp()			
+orders	id	char(36)	NO	NULL	PRI		
+orders	tenant_id	char(36)	NO	NULL	MUL		
+orders	external_id	varchar(80)	NO	NULL			
+orders	platform	varchar(40)	NO	NULL			
+orders	currency	char(3)	NO	'EUR'			
+orders	gross_amount	decimal(12,2)	NO	0.00			
+orders	customer_ref	varchar(80)	YES	NULL			
+orders	country_ship	varchar(2)	YES	NULL			
+orders	status	varchar(30)	NO	'created'			
+orders	ordered_at	datetime	YES	NULL			
+orders	created_at	datetime	NO	current_timestamp()			
+orders	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+payments	id	char(36)	NO	NULL	PRI		
+payments	tenant_id	char(36)	NO	NULL	MUL		
+payments	order_id	char(36)	NO	NULL	MUL		
+payments	provider	varchar(30)	NO	NULL			
+payments	provider_ref	varchar(120)	YES	NULL			
+payments	status	varchar(20)	NO	'paid'			
+payments	gross	decimal(12,2)	NO	0.00			
+payments	fee	decimal(12,2)	NO	0.00			
+payments	net	decimal(12,2)	NO	0.00			
+payments	paid_at	datetime	YES	NULL			
+payments	created_at	datetime	NO	current_timestamp()			
+payments	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+pdf_merge_dailystats	stat_date	date	NO	NULL	PRI		
+pdf_merge_dailystats	uploads_ok	int(11)	NO	0			
+pdf_merge_dailystats	uploads_bytes	bigint(20)	NO	0			
+pdf_merge_dailystats	uploads_files	bigint(20)	NO	0			
+pdf_merge_dailystats	merges_started	int(11)	NO	0			
+pdf_merge_dailystats	merges_success	int(11)	NO	0			
+pdf_merge_dailystats	merges_error	int(11)	NO	0			
+pdf_merge_dailystats	merges_blocked	int(11)	NO	0			
+pdf_merge_dailystats	merges_input_bytes	bigint(20)	NO	0			
+pdf_merge_dailystats	merges_output_bytes	bigint(20)	NO	0			
+pdf_merge_dailystats	downloads	int(11)	NO	0			
+pdf_merge_dailystats	downloads_bytes	bigint(20)	NO	0			
+pdf_merge_dailystats	jobs_watermark	int(11)	NO	0			
+pdf_merge_dailystats	jobs_page_numbers	int(11)	NO	0			
+pdf_merge_dailystats	inputs_encrypted	int(11)	NO	0			
+pdf_merge_dailystats	inputs_heic	int(11)	NO	0			
+pdf_merge_dailystats	inputs_tiff	int(11)	NO	0			
+pdf_merge_dailystats	inputs_webp	int(11)	NO	0			
+pdf_merge_dailystats	quality_small	int(11)	NO	0			
+pdf_merge_dailystats	quality_normal	int(11)	NO	0			
+pdf_merge_dailystats	quality_best	int(11)	NO	0			
+pdf_merge_dailystats	tool_imagick	int(11)	NO	0			
+pdf_merge_dailystats	tool_magick	int(11)	NO	0			
+pdf_merge_dailystats	tool_mixed	int(11)	NO	0			
+pdf_merge_dailystats	tool_none	int(11)	NO	0			
+pdf_merge_dailystats	large_events	int(11)	NO	0			
+pdf_merge_dailystats	sum_output_ratio	double	NO	0			
+pdf_merge_dailystats	cnt_output_ratio	int(11)	NO	0			
+pdf_merge_dailystats	sum_total_ms	bigint(20)	NO	0			
+pdf_merge_dailystats	cnt_total_ms	int(11)	NO	0			
+pdf_merge_dailystats	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+pdf_merge_events	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+pdf_merge_events	created_at	datetime	NO	NULL	MUL		
+pdf_merge_events	session_id	bigint(20) unsigned	YES	NULL	MUL		
+pdf_merge_events	job_id	bigint(20) unsigned	YES	NULL	MUL		
+pdf_merge_events	event	varchar(64)	NO	NULL	MUL		
+pdf_merge_events	stage	varchar(32)	YES	NULL			
+pdf_merge_events	tool	varchar(32)	YES	NULL			
+pdf_merge_events	ok	tinyint(1)	NO	1			
+pdf_merge_events	bytes	bigint(20) unsigned	YES	NULL			
+pdf_merge_events	files_count	int(10) unsigned	YES	NULL			
+pdf_merge_events	ms	int(10) unsigned	YES	NULL			
+pdf_merge_events	meta_json	mediumtext	YES	NULL			
+pdf_merge_jobs	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+pdf_merge_jobs	session_id	bigint(20) unsigned	NO	NULL	MUL		
+pdf_merge_jobs	created_at	datetime	NO	NULL	MUL		
+pdf_merge_jobs	started_at	datetime	YES	NULL			
+pdf_merge_jobs	finished_at	datetime	YES	NULL			
+pdf_merge_jobs	status	enum('started','success','error','blocked')	NO	'started'	MUL		
+pdf_merge_jobs	input_files_count	int(10) unsigned	NO	0			
+pdf_merge_jobs	input_total_bytes	bigint(20) unsigned	NO	0			
+pdf_merge_jobs	input_pdf_count	int(10) unsigned	NO	0			
+pdf_merge_jobs	input_image_count	int(10) unsigned	NO	0			
+pdf_merge_jobs	input_pages_total	int(10) unsigned	YES	NULL			
+pdf_merge_jobs	largest_input_file_bytes	bigint(20) unsigned	NO	0			
+pdf_merge_jobs	has_heic	tinyint(1)	NO	0			
+pdf_merge_jobs	has_tiff	tinyint(1)	NO	0			
+pdf_merge_jobs	has_webp	tinyint(1)	NO	0			
+pdf_merge_jobs	has_encrypted_pdf	tinyint(1)	NO	0			
+pdf_merge_jobs	preset	enum('small','normal','best')	NO	'normal'			
+pdf_merge_jobs	dpi	smallint(5) unsigned	NO	200			
+pdf_merge_jobs	autorotate	tinyint(1)	NO	1			
+pdf_merge_jobs	page_numbers	tinyint(1)	NO	0			
+pdf_merge_jobs	page_numbers_pos	varchar(16)	YES	NULL			
+pdf_merge_jobs	page_number_fmt	varchar(16)	YES	NULL			
+pdf_merge_jobs	watermark	tinyint(1)	NO	0			
+pdf_merge_jobs	watermark_len	tinyint(3) unsigned	NO	0			
+pdf_merge_jobs	watermark_angle	smallint(6)	YES	NULL			
+pdf_merge_jobs	watermark_opacity	decimal(4,3)	YES	NULL			
+pdf_merge_jobs	optimize_pdf	tinyint(1)	NO	1			
+pdf_merge_jobs	gs_pdfsettings	varchar(16)	YES	NULL			
+pdf_merge_jobs	convert_tool_used	enum('none','imagick','magick','mixed')	NO	'none'			
+pdf_merge_jobs	output_bytes	bigint(20) unsigned	NO	0			
+pdf_merge_jobs	output_ratio	decimal(7,4)	YES	NULL			
+pdf_merge_jobs	output_pages	int(10) unsigned	YES	NULL			
+pdf_merge_jobs	upload_ms	int(10) unsigned	YES	NULL			
+pdf_merge_jobs	convert_ms	int(10) unsigned	YES	NULL			
+pdf_merge_jobs	merge_ms	int(10) unsigned	YES	NULL			
+pdf_merge_jobs	total_ms	int(10) unsigned	YES	NULL			
+pdf_merge_jobs	downloaded	tinyint(1)	NO	0	MUL		
+pdf_merge_jobs	downloaded_at	datetime	YES	NULL			
+pdf_merge_jobs	is_large_event	tinyint(1)	NO	0	MUL		
+pdf_merge_jobs	large_reason	varchar(64)	YES	NULL			
+pdf_merge_jobs	error_code	varchar(64)	YES	NULL			
+pdf_merge_jobs	error_stage	enum('upload','convert','merge','download','limits','unknown')	YES	NULL			
+pdf_merge_jobs	error_tool	enum('imagick','ghostscript','magick','php','unknown')	YES	NULL			
+pdf_merge_jobs	error_message	varchar(255)	YES	NULL			
+pdf_merge_jobs	meta_json	mediumtext	YES	NULL			
+pdf_merge_job_files	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+pdf_merge_job_files	job_id	bigint(20) unsigned	NO	NULL	MUL		
+pdf_merge_job_files	created_at	datetime	NO	NULL			
+pdf_merge_job_files	stored_name	varchar(255)	NO	NULL			
+pdf_merge_job_files	original_name	varchar(255)	YES	NULL			
+pdf_merge_job_files	ext	varchar(10)	YES	NULL			
+pdf_merge_job_files	kind	enum('pdf','image')	NO	'pdf'	MUL		
+pdf_merge_job_files	bytes	bigint(20) unsigned	NO	0			
+pdf_merge_job_files	converted_to_pdf	tinyint(1)	NO	0			
+pdf_merge_job_files	convert_tool	enum('none','imagick','magick')	NO	'none'			
+pdf_merge_sessions	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+pdf_merge_sessions	guest_token	varchar(64)	NO	NULL	UNI		
+pdf_merge_sessions	created_at	datetime	NO	NULL	MUL		
+pdf_merge_sessions	last_seen_at	datetime	NO	NULL	MUL		
+pdf_merge_sessions	ip_hash	char(64)	NO	NULL			
+pdf_merge_sessions	ua_hash	char(64)	NO	NULL			
+pdf_merge_sessions	country_code	char(2)	YES	NULL	MUL		
+pdf_merge_sessions	region_code	varchar(8)	YES	NULL			
+pdf_merge_sessions	asn	int(10) unsigned	YES	NULL	MUL		
+pdf_merge_sessions	as_org	varchar(128)	YES	NULL			
+pdf_merge_sessions	first_referrer	varchar(255)	YES	NULL			
+plans	id	int(11)	NO	NULL	PRI	auto_increment	
+plans	plan_key	varchar(64)	NO	NULL	UNI		
+plans	name	varchar(100)	NO	NULL			
+plans	price_monthly	decimal(10,2)	NO	NULL			
+plans	price_yearly	decimal(10,2)	YES	NULL			
+plans	trial_days	int(11)	NO	14			
+plans	is_active	tinyint(1)	NO	1			
+plans	created_at	datetime	YES	current_timestamp()			
+plan_features	id	int(11)	NO	NULL	PRI	auto_increment	
+plan_features	plan_id	int(11)	NO	NULL	MUL		
+plan_features	feature_key	varchar(64)	NO	NULL			
+plan_features	value	varchar(255)	YES	NULL			
+returns	id	char(36)	NO	NULL	PRI		
+returns	tenant_id	char(36)	NO	NULL	MUL		
+returns	order_id	char(36)	NO	NULL	MUL		
+returns	return_weight_g	int(11)	YES	NULL			
+returns	returned_at	datetime	YES	NULL			
+returns	carrier	varchar(30)	YES	NULL			
+returns	tracking_code	varchar(80)	YES	NULL			
+returns	video_uri	varchar(255)	YES	NULL			
+returns	created_at	datetime	NO	current_timestamp()			
+returns	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+shipments	id	char(36)	NO	NULL	PRI		
+shipments	tenant_id	char(36)	NO	NULL	MUL		
+shipments	order_id	char(36)	NO	NULL	MUL		
+shipments	packed_weight_g	int(11)	YES	NULL			
+shipments	box_id	varchar(60)	YES	NULL			
+shipments	packed_at	datetime	YES	NULL			
+shipments	carrier	varchar(30)	YES	NULL			
+shipments	tracking_code	varchar(80)	YES	NULL			
+shipments	video_uri	varchar(255)	YES	NULL			
+shipments	created_at	datetime	NO	current_timestamp()			
+shipments	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+shipping_rates	id	int(10) unsigned	NO	NULL	PRI	auto_increment	
+shipping_rates	carrier	varchar(50)	NO	NULL	MUL		
+shipping_rates	service	varchar(80)	NO	NULL			
+shipping_rates	zone	varchar(50)	NO	NULL			
+shipping_rates	weight_from_g	int(10) unsigned	NO	NULL			
+shipping_rates	weight_to_g	int(10) unsigned	NO	NULL			
+shipping_rates	price_ex	decimal(10,2)	NO	NULL			
+shipping_rates	currency	char(3)	NO	'EUR'			
+shipping_rates	handling_ex	decimal(10,2)	NO	0.00			
+shipping_rates	active	tinyint(1)	NO	1	MUL		
+shipping_rates	sort_order	int(11)	NO	100			
+shipping_rates	source_label	varchar(120)	YES	NULL			
+shipping_rates	source_url	varchar(255)	YES	NULL			
+shipping_rates	valid_from	date	YES	NULL			
+shipping_rates	valid_to	date	YES	NULL			
+shipping_rates	created_at	datetime	NO	current_timestamp()			
+shipping_rates	updated_at	datetime	YES	NULL		on update current_timestamp()	
+shipping_surcharges	id	int(10) unsigned	NO	NULL	PRI	auto_increment	
+shipping_surcharges	carrier	varchar(50)	NO	NULL	MUL		
+shipping_surcharges	name	varchar(500)	NO	'0'			
+shipping_surcharges	service	varchar(80)	NO	''			
+shipping_surcharges	zone	varchar(50)	NO	''			
+shipping_surcharges	amount_ex	decimal(10,2)	NO	0.00			
+shipping_surcharges	currency	char(3)	NO	'EUR'			
+shipping_surcharges	rule_text	varchar(500)	NO	''			
+shipping_surcharges	active	tinyint(1)	NO	1	MUL		
+shipping_surcharges	sort_order	int(11)	NO	100			
+shipping_surcharges	source_label	varchar(120)	NO	''			
+shipping_surcharges	source_url	varchar(255)	NO	''			
+shipping_surcharges	valid_from	date	NO	'0000-00-00'			
+shipping_surcharges	valid_to	date	NO	'0000-00-00'			
+shipping_surcharges	created_at	datetime	NO	current_timestamp()			
+shipping_surcharges	updated_at	datetime	YES	NULL		on update current_timestamp()	
+tenants	id	char(36)	NO	NULL	PRI		
+tenants	name	varchar(120)	NO	NULL			
+tenants	plan	varchar(20)	NO	'free'	MUL		
+tenants	is_active	tinyint(1)	NO	1	MUL		
+tenants	created_at	datetime	NO	current_timestamp()			
+tenants	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+tenant_api_keys	id	char(36)	NO	NULL	PRI		
+tenant_api_keys	tenant_id	char(36)	NO	NULL	MUL		
+tenant_api_keys	name	varchar(80)	NO	NULL			
+tenant_api_keys	key_hash	varchar(255)	NO	NULL			
+tenant_api_keys	scopes	varchar(255)	NO	'import:orders,import:payments'			
+tenant_api_keys	is_active	tinyint(1)	NO	1			
+tenant_api_keys	last_used_at	datetime	YES	NULL			
+tenant_api_keys	created_at	datetime	NO	current_timestamp()			
+tenant_api_keys	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+tenant_subscriptions	id	int(11)	NO	NULL	PRI	auto_increment	
+tenant_subscriptions	tenant_key	varchar(64)	NO	NULL			
+tenant_subscriptions	plan_id	int(11)	NO	NULL	MUL		
+tenant_subscriptions	status	enum('trial','active','canceled','expired')	NO	NULL			
+tenant_subscriptions	trial_ends_at	datetime	YES	NULL			
+tenant_subscriptions	current_period_ends_at	datetime	YES	NULL			
+tenant_subscriptions	created_at	datetime	YES	current_timestamp()			
+tool_diff_saves	id	int(10) unsigned	NO	NULL	PRI	auto_increment	
+tool_diff_saves	user_id	char(36)	NO	NULL	MUL		
+tool_diff_saves	title	varchar(120)	NO	''			
+tool_diff_saves	left_text	mediumtext	NO	NULL			
+tool_diff_saves	right_text	mediumtext	NO	NULL			
+tool_diff_saves	created_at	datetime	NO	current_timestamp()			
+tool_diff_saves	updated_at	datetime	YES	NULL			
+tool_events	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+tool_events	tool	varchar(50)	NO	NULL	MUL		
+tool_events	event	varchar(50)	NO	NULL			
+tool_events	session_id	varchar(64)	NO	NULL	MUL		
+tool_events	meta_json	longtext	YES	NULL			
+tool_events	created_at	datetime	NO	current_timestamp()			
+users	id	char(36)	NO	NULL	PRI		
+users	tenant_id	char(36)	NO	NULL	MUL		
+users	email	varchar(190)	NO	NULL			
+users	password_hash	varchar(255)	NO	NULL			
+users	role	varchar(30)	NO	'admin'			
+users	is_active	tinyint(1)	NO	1	MUL		
+users	last_login_at	datetime	YES	NULL			
+users	created_at	datetime	NO	current_timestamp()			
+users	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+users	status	varchar(20)	NO	'pending'			
+users	email_verified_at	datetime	YES	NULL			
+user_acquisition	user_id	char(36)	NO	NULL	PRI		
+user_acquisition	tenant_id	char(36)	NO	NULL	MUL		
+user_acquisition	first_seen_at	datetime	YES	NULL			
+user_acquisition	registered_at	datetime	NO	NULL			
+user_acquisition	landing_url	varchar(2048)	YES	NULL	MUL		
+user_acquisition	referrer_url	varchar(2048)	YES	NULL	MUL		
+user_acquisition	utm_source	varchar(120)	YES	NULL			
+user_acquisition	utm_medium	varchar(120)	YES	NULL			
+user_acquisition	utm_campaign	varchar(200)	YES	NULL	MUL		
+user_acquisition	utm_term	varchar(200)	YES	NULL			
+user_acquisition	utm_content	varchar(200)	YES	NULL			
+user_acquisition	gclid	varchar(120)	YES	NULL			
+user_acquisition	fbclid	varchar(120)	YES	NULL			
+user_acquisition	last_landing_url	varchar(2048)	YES	NULL			
+user_acquisition	last_referrer_url	varchar(2048)	YES	NULL			
+user_acquisition	last_utm_source	varchar(120)	YES	NULL			
+user_acquisition	last_utm_medium	varchar(120)	YES	NULL			
+user_acquisition	last_utm_campaign	varchar(200)	YES	NULL			
+user_acquisition	last_utm_term	varchar(200)	YES	NULL			
+user_acquisition	last_utm_content	varchar(200)	YES	NULL			
+user_acquisition	last_gclid	varchar(120)	YES	NULL			
+user_acquisition	last_fbclid	varchar(120)	YES	NULL			
+user_acquisition	registered_from_tool	varchar(120)	YES	NULL			
+user_acquisition	ip_hash	char(64)	YES	NULL			
+user_acquisition	ua_hash	char(64)	YES	NULL			
+user_acquisition	country_code	char(2)	YES	NULL			
+user_acquisition	region_code	varchar(10)	YES	NULL			
+user_acquisition	city	varchar(100)	YES	NULL			
+user_acquisition	created_at	datetime	NO	current_timestamp()			
+user_acquisition	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+user_events	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+user_events	tenant_id	char(36)	NO	NULL	MUL		
+user_events	user_id	char(36)	YES	NULL	MUL		
+user_events	event	varchar(80)	NO	NULL			
+user_events	page_url	varchar(2048)	YES	NULL			
+user_events	meta_json	longtext	YES	NULL			
+user_events	ip_hash	char(64)	YES	NULL			
+user_events	ua_hash	char(64)	YES	NULL			
+user_events	created_at	datetime	NO	current_timestamp()			
+user_events	country_code	char(2)	YES	NULL			
+user_events	region_code	varchar(10)	YES	NULL			
+user_events	city	varchar(100)	YES	NULL			
+user_sessions	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+user_sessions	created_at	datetime	NO	NULL			
+user_sessions	revoked_at	datetime	YES	NULL			
+user_sessions	user_id	char(36)	NO	NULL	MUL		
+user_sessions	session_id	varchar(128)	NO	NULL	UNI		
+user_sessions	ip	varchar(45)	NO	NULL			
+user_sessions	user_agent	varchar(255)	NO	NULL			
+user_twofa	user_id	char(36)	NO	NULL	PRI		
+user_twofa	enabled	tinyint(1)	NO	0			
+user_twofa	secret_enc	varbinary(255)	YES	NULL			
+user_twofa	confirmed_at	datetime	YES	NULL			
+user_twofa	last_used_counter	bigint(20)	YES	NULL			
+user_twofa	created_at	datetime	NO	current_timestamp()			
+user_twofa	updated_at	datetime	NO	current_timestamp()		on update current_timestamp()	
+user_twofa_backup_codes	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+user_twofa_backup_codes	user_id	char(36)	NO	NULL	MUL		
+user_twofa_backup_codes	code_hash	varchar(255)	NO	NULL			
+user_twofa_backup_codes	used_at	datetime	YES	NULL			
+user_twofa_backup_codes	created_at	datetime	NO	current_timestamp()			
+user_twofa_trusted_devices	id	bigint(20) unsigned	NO	NULL	PRI	auto_increment	
+user_twofa_trusted_devices	user_id	char(36)	NO	NULL	MUL		
+user_twofa_trusted_devices	selector	char(12)	NO	NULL	UNI		
+user_twofa_trusted_devices	token_hash	char(64)	NO	NULL			
+user_twofa_trusted_devices	user_agent	varchar(255)	NO	NULL			
+user_twofa_trusted_devices	ip	varchar(45)	NO	NULL			
+user_twofa_trusted_devices	expires_at	datetime	NO	NULL	MUL		
+user_twofa_trusted_devices	created_at	datetime	NO	current_timestamp()			
+user_twofa_trusted_devices	revoked_at	datetime	YES	NULL			
