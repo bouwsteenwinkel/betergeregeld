@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -25,11 +27,20 @@ Route::prefix('{locale}')
 
 			Route::get('/verify/{user}/{token}', [VerifyEmailController::class, 'verify'])
 				->name('verify.email');
+
+			Route::get('/2fa/challenge', [TwoFactorChallengeController::class, 'show'])->name('2fa.challenge');
+			Route::post('/2fa/challenge', [TwoFactorChallengeController::class, 'verify']);
 		});
 
 		Route::post('/logout', [LoginController::class, 'logout'])
 			->middleware('auth')
 			->name('logout');
+
+		Route::middleware('auth')->group(function () {
+			Route::get('/settings/2fa', [TwoFactorSettingsController::class, 'show'])->name('settings.2fa');
+			Route::post('/settings/2fa/enable', [TwoFactorSettingsController::class, 'enable'])->name('settings.2fa.enable');
+			Route::post('/settings/2fa/disable', [TwoFactorSettingsController::class, 'disable'])->name('settings.2fa.disable');
+		});
 
 		Route::prefix('tools')->name('tools.')->group(function () {
 			Route::get('/iban-check', [IbanCheckController::class, 'show'])->name('iban-check');

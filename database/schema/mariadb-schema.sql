@@ -212,42 +212,6 @@ CREATE TABLE `cmp_texts` (
   KEY `idx_tenant_lang` (`tenant_key`,`lang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `contact_messages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `contact_messages` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(16) NOT NULL,
-  `created_at` datetime NOT NULL,
-  `status` varchar(30) NOT NULL DEFAULT 'new',
-  `name` varchar(120) NOT NULL,
-  `email` varchar(190) NOT NULL,
-  `topic` varchar(100) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `company` varchar(190) DEFAULT NULL,
-  `phone` varchar(60) DEFAULT NULL,
-  `cms_platform` varchar(80) DEFAULT NULL,
-  `traffic` varchar(40) DEFAULT NULL,
-  `needs_json` longtext DEFAULT NULL,
-  `subject` varchar(190) NOT NULL,
-  `message` text NOT NULL,
-  `ip` varchar(45) NOT NULL,
-  `user_agent` varchar(255) NOT NULL,
-  `referer` varchar(255) DEFAULT NULL,
-  `page_uri` varchar(255) NOT NULL,
-  `session_id` varchar(128) NOT NULL,
-  `payload_hash` char(64) NOT NULL,
-  `payload_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`payload_json`)),
-  `user_id` bigint(20) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_public_id` (`public_id`),
-  KEY `idx_created_at` (`created_at`),
-  KEY `idx_status` (`status`),
-  KEY `idx_email` (`email`),
-  KEY `idx_user_id` (`user_id`),
-  CONSTRAINT `fk_contact_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `email_verify_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -420,6 +384,16 @@ CREATE TABLE `loss_tenant_settings` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1057,7 +1031,7 @@ DROP TABLE IF EXISTS `user_twofa`;
 CREATE TABLE `user_twofa` (
   `user_id` char(36) NOT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT 0,
-  `secret_enc` varbinary(255) DEFAULT NULL,
+  `secret_enc` blob DEFAULT NULL,
   `confirmed_at` datetime DEFAULT NULL,
   `last_used_counter` bigint(20) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
@@ -1233,3 +1207,8 @@ DELIMITER ;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
+/*M!999999\- enable the sandbox mode */ 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (1,'2026_04_20_215618_alter_user_twofa_secret_enc_to_blob',1);
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;

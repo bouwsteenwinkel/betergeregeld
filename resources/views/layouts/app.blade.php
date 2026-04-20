@@ -33,6 +33,7 @@
 					@endforeach
 				</div>
 				@auth
+					<a href="{{ route('settings.2fa') }}" class="text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">2FA</a>
 					<span class="text-[color:var(--color-ink-muted)]">{{ Auth::user()->email }}</span>
 					<form method="POST" action="{{ route('logout') }}">
 						@csrf

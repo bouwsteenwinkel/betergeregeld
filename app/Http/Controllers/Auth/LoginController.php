@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserSession;
+use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,8 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
+	public function __construct(private readonly TwoFactorService $tfa) {}
+
 	public function show(): View
 	{
 		return view('auth.login');
@@ -24,10 +27,12 @@ class LoginController extends Controller
 			'password' => ['required', 'string'],
 		]);
 
-		if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+		$remember = $request->boolean('remember');
+
+		if (! Auth::attempt($credentials, $remember)) {
 			return back()
 				->withInput($request->only('email'))
-				->withErrors(['email' => 'De combinatie van e-mail en wachtwoord klopt niet.']);
+				->withErrors(['email' => __('De combinatie van e-mail en wachtwoord klopt niet.')]);
 		}
 
 		$user = Auth::user();
@@ -37,7 +42,14 @@ class LoginController extends Controller
 
 			return back()
 				->withInput($request->only('email'))
-				->withErrors(['email' => 'Dit account is niet actief.']);
+				->withErrors(['email' => __('Dit account is niet actief.')]);
+		}
+
+		if ($this->tfa->isEnabled($user)) {
+			Auth::logout();
+			$request->session()->put('2fa.user_id', $user->id);
+			$request->session()->put('2fa.remember', $remember);
+			return redirect(route('2fa.challenge'));
 		}
 
 		$request->session()->regenerate();

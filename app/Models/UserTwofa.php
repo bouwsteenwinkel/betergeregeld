@@ -42,10 +42,11 @@ class UserTwofa extends Model
 	];
 
 	protected $fillable = [
+		'user_id',
 		'enabled',
 		'secret_enc',
 		'confirmed_at',
-		'last_used_counter'
+		'last_used_counter',
 	];
 
 	public function user()
