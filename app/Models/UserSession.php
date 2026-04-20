@@ -39,11 +39,12 @@ class UserSession extends Model
 	];
 
 	protected $fillable = [
+		'created_at',
 		'revoked_at',
 		'user_id',
 		'session_id',
 		'ip',
-		'user_agent'
+		'user_agent',
 	];
 
 	public function user()
