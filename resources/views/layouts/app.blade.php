@@ -11,20 +11,35 @@
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col">
+	@php
+		$currentLocale = app()->getLocale();
+		$pathParts = explode('/', ltrim(request()->path(), '/'));
+		$pathTail = count($pathParts) > 1 ? '/' . implode('/', array_slice($pathParts, 1)) : '';
+	@endphp
+
 	<header class="border-b border-[color:var(--color-line)]">
 		<div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
 			<a href="{{ route('home') }}" class="text-lg font-bold tracking-tight">
 				{{ config('app.name') }}
 			</a>
 			<nav class="flex items-center gap-5 text-sm">
+				<div class="flex items-center gap-2 text-[color:var(--color-ink-muted)]">
+					@foreach (\App\Http\Middleware\SetLocale::SUPPORTED as $loc)
+						<a href="/{{ $loc }}{{ $pathTail }}"
+							class="uppercase {{ $loc === $currentLocale ? 'text-[color:var(--color-ink)] font-semibold' : 'hover:text-[color:var(--color-ink)]' }}">
+							{{ $loc }}
+						</a>
+						@if (! $loop->last)<span class="opacity-40">/</span>@endif
+					@endforeach
+				</div>
 				@auth
 					<span class="text-[color:var(--color-ink-muted)]">{{ Auth::user()->email }}</span>
 					<form method="POST" action="{{ route('logout') }}">
 						@csrf
-						<button type="submit" class="underline hover:no-underline">Uitloggen</button>
+						<button type="submit" class="underline hover:no-underline">{{ __('Uitloggen') }}</button>
 					</form>
 				@else
-					<a href="{{ route('login') }}" class="underline hover:no-underline">Inloggen</a>
+					<a href="{{ route('login') }}" class="underline hover:no-underline">{{ __('Inloggen') }}</a>
 				@endauth
 			</nav>
 		</div>
@@ -36,7 +51,7 @@
 
 	<footer class="border-t border-[color:var(--color-line)]">
 		<div class="max-w-[1400px] mx-auto px-6 py-6 text-sm text-[color:var(--color-ink-muted)]">
-			&copy; {{ date('Y') }} {{ config('app.name') }} — software-partner.
+			&copy; {{ date('Y') }} {{ config('app.name') }} — {{ __('software-partner') }}.
 		</div>
 	</footer>
 </body>

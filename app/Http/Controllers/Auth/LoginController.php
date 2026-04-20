@@ -52,7 +52,7 @@ class LoginController extends Controller
 			'created_at' => now(),
 		]);
 
-		return redirect()->intended('/');
+		return redirect()->intended(route('home'));
 	}
 
 	public function logout(Request $request): RedirectResponse
@@ -71,6 +71,6 @@ class LoginController extends Controller
 				->update(['revoked_at' => now()]);
 		}
 
-		return redirect('/');
+		return redirect(route('home'));
 	}
 }
