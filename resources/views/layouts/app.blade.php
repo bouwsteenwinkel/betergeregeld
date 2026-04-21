@@ -95,6 +95,7 @@
 					<h3 class="font-semibold mb-4 text-sm tracking-wide uppercase text-[color:var(--color-on-dark-soft)]">{{ __('Tools') }}</h3>
 					<ul class="space-y-2 text-sm text-[color:var(--color-on-dark-muted)]">
 						<li><a href="/{{ $currentLocale }}/tools/iban-check" class="hover:text-white">IBAN check</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/vat-check" class="hover:text-white">{{ __('VAT check') }}</a></li>
 					</ul>
 				</div>
 				<div>
