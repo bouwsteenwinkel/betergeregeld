@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -31,7 +32,7 @@ use Illuminate\Notifications\Notifiable;
  * @property Collection|UserTwofaBackupCode[] $user_twofa_backup_codes
  * @property Collection|UserTwofaTrustedDevice[] $user_twofa_trusted_devices
  */
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasName
 {
 	use HasUuids, Notifiable;
 
