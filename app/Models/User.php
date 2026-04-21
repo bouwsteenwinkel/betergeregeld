@@ -42,6 +42,11 @@ class User extends Authenticatable implements FilamentUser
 			&& $this->is_active;
 	}
 
+	public function getFilamentName(): string
+	{
+		return $this->email ?? 'user';
+	}
+
 	protected $table = 'users';
 	protected $keyType = 'string';
 	public $incrementing = false;
