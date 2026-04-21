@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
@@ -42,6 +43,8 @@ Route::prefix('{locale}')
 			->name('logout');
 
 		Route::middleware('auth')->group(function () {
+			Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 			Route::get('/settings/2fa', [TwoFactorSettingsController::class, 'show'])->name('settings.2fa');
 			Route::post('/settings/2fa/enable', [TwoFactorSettingsController::class, 'enable'])->name('settings.2fa.enable');
 			Route::post('/settings/2fa/disable', [TwoFactorSettingsController::class, 'disable'])->name('settings.2fa.disable');

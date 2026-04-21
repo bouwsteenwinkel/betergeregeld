@@ -48,7 +48,7 @@
 				</div>
 
 				@auth
-					<a href="{{ route('settings.2fa') }}" class="hidden lg:inline text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">2FA</a>
+					<a href="{{ route('dashboard') }}" class="text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] font-medium">{{ __('Dashboard') }}</a>
 					<span class="hidden lg:inline text-[color:var(--color-ink-muted)] text-xs">{{ Auth::user()->email }}</span>
 					<form method="POST" action="{{ route('logout') }}">
 						@csrf
