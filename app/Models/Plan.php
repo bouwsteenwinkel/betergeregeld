@@ -36,17 +36,25 @@ class Plan extends Model
 		'price_monthly' => 'float',
 		'price_yearly' => 'float',
 		'trial_days' => 'int',
-		'is_active' => 'bool'
+		'is_active' => 'bool',
+		'sort_order' => 'int',
 	];
 
 	protected $fillable = [
+		'product',
 		'plan_key',
 		'name',
 		'price_monthly',
 		'price_yearly',
 		'trial_days',
-		'is_active'
+		'is_active',
+		'sort_order',
 	];
+
+	public function scopeProduct($q, string $product)
+	{
+		return $q->where('product', $product);
+	}
 
 	public function plan_features()
 	{

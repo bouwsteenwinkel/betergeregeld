@@ -47,11 +47,15 @@ Route::prefix('{locale}')
 		});
 
 		Route::prefix('tools')->name('tools.')->group(function () {
-			Route::get('/iban-check', [IbanCheckController::class, 'show'])->name('iban-check');
-			Route::post('/iban-check', [IbanCheckController::class, 'check'])->name('iban-check.check');
+			Route::middleware('tool.limit:iban')->group(function () {
+				Route::get('/iban-check', [IbanCheckController::class, 'show'])->name('iban-check');
+				Route::post('/iban-check', [IbanCheckController::class, 'check'])->name('iban-check.check');
+			});
 
-			Route::get('/vat-check', [VatCheckController::class, 'show'])->name('vat-check');
-			Route::post('/vat-check', [VatCheckController::class, 'check'])->name('vat-check.check');
+			Route::middleware('tool.limit:vies')->group(function () {
+				Route::get('/vat-check', [VatCheckController::class, 'show'])->name('vat-check');
+				Route::post('/vat-check', [VatCheckController::class, 'check'])->name('vat-check.check');
+			});
 		});
 
 		Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');

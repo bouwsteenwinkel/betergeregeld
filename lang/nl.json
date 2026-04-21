@@ -102,6 +102,16 @@
 	"vat.err_server": "Er ging iets mis bij het controleren.",
 	"vat.disclaimer": "VIES is de officiële EU-dienst voor BTW-validatie. Een 'geldig' resultaat bevestigt alleen dat het nummer op dit moment is geregistreerd — niet de juistheid van adres- of bedrijfsgegevens.",
 
+	"Je daglimiet zit erop": "Je daglimiet zit erop",
+	"checks per dag zonder account": "checks per dag zonder account",
+	"checks per dag op je huidige plan": "checks per dag op je huidige plan",
+	"Upgrade naar Pro voor hogere limieten en extra features.": "Upgrade naar Pro voor hogere limieten en extra features.",
+	"Maak gratis een account voor hogere limieten, of upgrade voor onbeperkt gebruik.": "Maak gratis een account voor hogere limieten, of upgrade voor onbeperkt gebruik.",
+	"Bekijk plannen": "Bekijk plannen",
+	"Of bekijk de plannen": "Of bekijk de plannen",
+	"Nog :n check(s) vandaag": "Nog :n check(s) vandaag",
+	"meer met account": "meer met een account",
+
 	"Twee-staps verificatie": "Twee-staps verificatie",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Voer de 6-cijferige code uit je authenticator-app in.",
 	"Code": "Code",

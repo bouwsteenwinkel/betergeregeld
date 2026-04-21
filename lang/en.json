@@ -102,6 +102,16 @@
 	"vat.err_server": "Something went wrong while checking.",
 	"vat.disclaimer": "VIES is the EU's official VAT validation service. A 'valid' result only confirms that the number is currently registered — it does not verify address or company details.",
 
+	"Je daglimiet zit erop": "You've hit your daily limit",
+	"checks per dag zonder account": "checks per day without an account",
+	"checks per dag op je huidige plan": "checks per day on your current plan",
+	"Upgrade naar Pro voor hogere limieten en extra features.": "Upgrade to Pro for higher limits and extra features.",
+	"Maak gratis een account voor hogere limieten, of upgrade voor onbeperkt gebruik.": "Create a free account for higher limits, or upgrade for unlimited use.",
+	"Bekijk plannen": "View plans",
+	"Of bekijk de plannen": "Or view the plans",
+	"Nog :n check(s) vandaag": "{1} 1 check left today|[2,*] :n checks left today",
+	"meer met account": "more with an account",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

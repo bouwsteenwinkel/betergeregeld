@@ -32,7 +32,10 @@ class TenantSubscription extends Model
 	protected $casts = [
 		'plan_id' => 'int',
 		'trial_ends_at' => 'datetime',
-		'current_period_ends_at' => 'datetime'
+		'current_period_ends_at' => 'datetime',
+		'current_period_starts_at' => 'datetime',
+		'cancel_at' => 'datetime',
+		'seats' => 'int',
 	];
 
 	protected $fillable = [
@@ -40,7 +43,10 @@ class TenantSubscription extends Model
 		'plan_id',
 		'status',
 		'trial_ends_at',
-		'current_period_ends_at'
+		'current_period_starts_at',
+		'current_period_ends_at',
+		'cancel_at',
+		'seats',
 	];
 
 	public function plan()

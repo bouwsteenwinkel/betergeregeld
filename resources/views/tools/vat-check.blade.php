@@ -24,6 +24,7 @@
 
 <section class="py-16">
 	<div class="max-w-[900px] mx-auto px-6">
+		@include('tools._usage')
 		<form method="POST" action="{{ route('tools.vat-check.check') }}" class="card space-y-5">
 			@csrf
 			<div>
