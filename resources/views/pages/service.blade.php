@@ -15,74 +15,85 @@
 @section('description', $lead)
 
 @section('content')
-<div class="bg-[#f5f7fb]">
-	<div class="max-w-[1100px] mx-auto px-4 py-10 sm:py-14">
 
-		<nav class="text-sm text-[color:var(--color-ink-muted)] mb-6">
-			<a href="{{ route('home') }}" class="hover:text-[color:var(--color-ink)]">{{ __('Home') }}</a>
-			<span class="mx-2">/</span>
-			<a href="/{{ $locale }}/diensten" class="hover:text-[color:var(--color-ink)]">{{ $isEn ? 'Services' : 'Diensten' }}</a>
-			<span class="mx-2">/</span>
-			<span>{{ $h1 }}</span>
+<section class="section-dark relative overflow-hidden">
+	<div class="absolute inset-0 grid-pattern opacity-40"></div>
+	<div class="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[color:var(--color-accent)] opacity-10 blur-3xl"></div>
+
+	<div class="relative max-w-[1100px] mx-auto px-6 py-20">
+		<nav class="text-sm text-[color:var(--color-on-dark-soft)] mb-8 flex items-center gap-2">
+			<a href="{{ route('home') }}" class="hover:text-white">{{ __('Home') }}</a>
+			<span class="opacity-40">/</span>
+			<a href="/{{ $locale }}/diensten" class="hover:text-white">{{ $isEn ? 'Services' : 'Diensten' }}</a>
+			<span class="opacity-40">/</span>
+			<span class="text-[color:var(--color-on-dark-muted)]">{{ $h1 }}</span>
 		</nav>
 
-		<div class="inline-block mb-4">
-			<span class="inline-flex items-center px-3 py-1 rounded-full border border-[color:var(--color-line)] bg-white text-xs font-bold text-[color:var(--color-ink-muted)]">{{ $pill }}</span>
-		</div>
+		<span class="pill pill-dark mb-5">{{ $service['badge'] }} · {{ $pill }}</span>
+		<h1 class="display-1 mb-6 max-w-4xl">{{ $h1 }}</h1>
+		<p class="text-lg sm:text-xl text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-3xl mb-8">{{ $lead }}</p>
 
-		<h1 class="text-4xl sm:text-5xl font-bold tracking-tight mb-5">{{ $h1 }}</h1>
-		<p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed mb-8 max-w-3xl">{{ $lead }}</p>
-
-		<div class="flex flex-wrap gap-3 mb-10">
-			<a href="/{{ $locale }}/contact?topic={{ urlencode($slug) }}" class="rounded-[var(--radius-control)] bg-[color:var(--color-ink)] text-white font-semibold px-5 py-3 hover:opacity-90 transition">
+		<div class="flex flex-wrap gap-3">
+			<a href="/{{ $locale }}/contact?topic={{ urlencode($slug) }}" class="btn-accent">
 				{{ $isEn ? 'Plan a call' : 'Plan een gesprek' }}
+				<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
 			</a>
-			<a href="/{{ $locale }}/diensten" class="rounded-[var(--radius-control)] bg-white text-[color:var(--color-ink)] border border-[color:var(--color-line)] font-semibold px-5 py-3 hover:bg-gray-50 transition">
-				{{ $isEn ? 'View all services' : 'Bekijk alle diensten' }}
-			</a>
+			<a href="/{{ $locale }}/diensten" class="btn-ghost-light">{{ $isEn ? 'All services' : 'Alle diensten' }}</a>
 		</div>
+	</div>
+</section>
 
-		<section class="bg-white border border-[color:var(--color-line)] rounded-[var(--radius-card)] p-8 shadow-[var(--shadow-soft)] mb-8">
-			<h2 class="text-2xl font-bold mb-4">{{ $isEn ? 'What you get' : 'Wat je krijgt' }}</h2>
-			<ul class="space-y-3">
+<section class="py-20">
+	<div class="max-w-[1100px] mx-auto px-6 grid lg:grid-cols-[2fr_1fr] gap-12">
+		<div>
+			<span class="pill pill-teal mb-3">{{ $isEn ? 'What you get' : 'Wat je krijgt' }}</span>
+			<h2 class="display-2 mb-8">{{ $isEn ? 'Concrete outcomes, clearly scoped.' : 'Concrete resultaten, duidelijk afgebakend.' }}</h2>
+			<ul class="space-y-4">
 				@foreach ($bullets as $b)
-					<li class="flex items-start gap-3">
-						<span class="shrink-0 w-6 h-6 rounded-full bg-[color:var(--color-ink)] text-white text-xs font-bold inline-flex items-center justify-center mt-0.5">✓</span>
-						<span class="text-[color:var(--color-ink-muted)] leading-relaxed">{{ $b }}</span>
+					<li class="flex items-start gap-4">
+						<span class="shrink-0 w-8 h-8 rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent-hover)] inline-flex items-center justify-center mt-0.5">
+							<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						</span>
+						<span class="text-[color:var(--color-ink)] leading-relaxed pt-0.5">{{ $b }}</span>
 					</li>
 				@endforeach
 			</ul>
-		</section>
+		</div>
 
-		<section class="bg-white border border-[color:var(--color-line)] rounded-[var(--radius-card)] p-8 shadow-[var(--shadow-soft)] mb-8">
-			<h2 class="text-2xl font-bold mb-4">{{ $isEn ? 'How we work' : 'Onze aanpak' }}</h2>
-			<ol class="grid md:grid-cols-3 gap-4">
-				@foreach ([
-					['nl' => '1. Korte intake', 'en' => '1. Short intake', 'd_nl' => 'Eerst inventariseren we kort wat er al staat en wat het doel is.', 'd_en' => 'First we briefly inventory what\'s there and what the goal is.'],
-					['nl' => '2. Praktische aanpak', 'en' => '2. Practical approach', 'd_nl' => 'We komen met een concrete aanpak met scope, prioriteiten en vervolgstappen.', 'd_en' => 'We come with a concrete approach with scope, priorities and next steps.'],
-					['nl' => '3. Uitvoering & uitleg', 'en' => '3. Execution & explanation', 'd_nl' => 'We voeren uit, leggen uit wat we doen en zorgen dat je grip houdt.', 'd_en' => 'We execute, explain what we do and make sure you stay in control.'],
-				] as $st)
-					<li class="bg-gray-50 rounded-[var(--radius-control)] p-5 border border-[color:var(--color-line)]">
-						<h3 class="font-bold mb-2">{{ $isEn ? $st['en'] : $st['nl'] }}</h3>
-						<p class="text-sm text-[color:var(--color-ink-muted)]">{{ $isEn ? $st['d_en'] : $st['d_nl'] }}</p>
-					</li>
-				@endforeach
-			</ol>
-		</section>
-
-		<section class="bg-white border border-[color:var(--color-line)] rounded-[var(--radius-card)] p-8 shadow-[var(--shadow-soft)]">
-			<h2 class="text-2xl font-bold mb-3">{{ $ctaTitle }}</h2>
-			<p class="text-[color:var(--color-ink-muted)] leading-relaxed mb-5">{{ $ctaText }}</p>
-			<div class="flex flex-wrap gap-3">
-				<a href="/{{ $locale }}/contact?topic={{ urlencode($slug) }}" class="rounded-[var(--radius-control)] bg-[color:var(--color-ink)] text-white font-semibold px-5 py-3 hover:opacity-90 transition">
+		<aside class="lg:pt-12">
+			<div class="card">
+				<h3 class="font-bold mb-3">{{ $ctaTitle }}</h3>
+				<p class="text-sm text-[color:var(--color-ink-muted)] mb-5 leading-relaxed">{{ $ctaText }}</p>
+				<a href="/{{ $locale }}/contact?topic={{ urlencode($slug) }}" class="btn-accent w-full justify-center">
 					{{ $isEn ? 'Contact us' : 'Neem contact op' }}
 				</a>
-				<a href="/{{ $locale }}/diensten" class="rounded-[var(--radius-control)] bg-white text-[color:var(--color-ink)] border border-[color:var(--color-line)] font-semibold px-5 py-3 hover:bg-gray-50 transition">
-					{{ $isEn ? 'View all services' : 'Bekijk alle diensten' }}
-				</a>
+				<div class="mt-5 pt-5 border-t border-[color:var(--color-line)] text-xs text-[color:var(--color-ink-soft)] space-y-1">
+					<div><a href="mailto:info@betergeregeld.com" class="hover:text-[color:var(--color-ink)]">info@betergeregeld.com</a></div>
+					<div><a href="tel:+31352011729" class="hover:text-[color:var(--color-ink)]">+31 35 201 1729</a></div>
+				</div>
 			</div>
-		</section>
-
+		</aside>
 	</div>
-</div>
+</section>
+
+<section class="bg-[color:var(--color-surface)] py-20">
+	<div class="max-w-[1100px] mx-auto px-6">
+		<span class="pill pill-ink mb-3">{{ $isEn ? 'How we work' : 'Onze aanpak' }}</span>
+		<h2 class="display-2 mb-12">{{ $isEn ? 'Three steps.' : 'In drie stappen.' }}</h2>
+		<div class="grid md:grid-cols-3 gap-5">
+			@foreach ([
+				['n' => '01', 't_nl' => 'Korte intake',          't_en' => 'Short intake',        'd_nl' => 'We inventariseren kort wat er al staat en wat het doel is.', 'd_en' => 'We briefly inventory what\'s there and what the goal is.'],
+				['n' => '02', 't_nl' => 'Praktische aanpak',     't_en' => 'Practical approach',   'd_nl' => 'Concrete aanpak met scope, prioriteiten en vervolgstappen.', 'd_en' => 'Concrete approach with scope, priorities and next steps.'],
+				['n' => '03', 't_nl' => 'Uitvoering & uitleg',   't_en' => 'Execution & explanation','d_nl' => 'We voeren uit, leggen uit en zorgen dat je grip houdt.',      'd_en' => 'We execute, explain and keep you in control.'],
+			] as $st)
+				<div class="card">
+					<div class="text-4xl font-black text-[color:var(--color-accent)] mb-3 leading-none">{{ $st['n'] }}</div>
+					<h3 class="font-bold mb-2">{{ $isEn ? $st['t_en'] : $st['t_nl'] }}</h3>
+					<p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed">{{ $isEn ? $st['d_en'] : $st['d_nl'] }}</p>
+				</div>
+			@endforeach
+		</div>
+	</div>
+</section>
+
 @endsection
