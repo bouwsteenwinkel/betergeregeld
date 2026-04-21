@@ -53,6 +53,7 @@ class ContactMessage extends Model
 
 	protected $fillable = [
 		'public_id',
+		'created_at',
 		'status',
 		'name',
 		'email',

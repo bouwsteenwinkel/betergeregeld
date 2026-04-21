@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Middleware\SetLocale;
@@ -47,4 +49,11 @@ Route::prefix('{locale}')
 			Route::get('/iban-check', [IbanCheckController::class, 'show'])->name('iban-check');
 			Route::post('/iban-check', [IbanCheckController::class, 'check'])->name('iban-check.check');
 		});
+
+		Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');
+		Route::get('/diensten/{slug}', [ServiceController::class, 'show'])->name('services.show');
+
+		Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+		Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+		Route::get('/contact/sent', [ContactController::class, 'sent'])->name('contact.sent');
 	});
