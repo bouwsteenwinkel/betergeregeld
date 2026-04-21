@@ -11,7 +11,12 @@ use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
+use App\Http\Controllers\Tools\DiffController;
+use App\Http\Controllers\Tools\FaviconGeneratorController;
 use App\Http\Controllers\Tools\IbanCheckController;
+use App\Http\Controllers\Tools\IpLookupController;
+use App\Http\Controllers\Tools\JsonFormatterController;
+use App\Http\Controllers\Tools\PostcodeCheckController;
 use App\Http\Controllers\Tools\VatCheckController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +74,28 @@ Route::prefix('{locale}')
 			Route::middleware('tool.limit:vies')->group(function () {
 				Route::get('/vat-check', [VatCheckController::class, 'show'])->name('vat-check');
 				Route::post('/vat-check', [VatCheckController::class, 'check'])->name('vat-check.check');
+			});
+
+			Route::middleware('tool.limit:postcode')->group(function () {
+				Route::get('/postcode-check', [PostcodeCheckController::class, 'show'])->name('postcode-check');
+				Route::post('/postcode-check', [PostcodeCheckController::class, 'check'])->name('postcode-check.check');
+			});
+
+			Route::middleware('tool.limit:ip_lookup')->group(function () {
+				Route::get('/ip-lookup', [IpLookupController::class, 'show'])->name('ip-lookup');
+			});
+
+			Route::get('/json-formatter', [JsonFormatterController::class, 'show'])->name('json-formatter');
+			Route::post('/json-formatter', [JsonFormatterController::class, 'run'])->name('json-formatter.run');
+
+			Route::get('/diff', [DiffController::class, 'show'])->name('diff');
+			Route::post('/diff', [DiffController::class, 'compare'])->name('diff.compare');
+
+			Route::middleware('tool.limit:favicon')->group(function () {
+				Route::get('/favicon-generator', [FaviconGeneratorController::class, 'show'])->name('favicon-generator');
+				Route::post('/favicon-generator', [FaviconGeneratorController::class, 'generate'])->name('favicon-generator.generate');
+				Route::get('/favicon-generator/result/{key}', [FaviconGeneratorController::class, 'result'])->name('favicon-generator.result');
+				Route::get('/favicon-generator/download/{key}/{what}', [FaviconGeneratorController::class, 'download'])->name('favicon-generator.download');
 			});
 		});
 

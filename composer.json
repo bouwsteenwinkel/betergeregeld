@@ -12,6 +12,7 @@
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.2",
+        "maxmind-db/reader": "^1.13",
         "mollie/laravel-mollie": "^4.1",
         "pragmarx/google2fa": "^9.0",
         "pragmarx/google2fa-qrcode": "^3.0"

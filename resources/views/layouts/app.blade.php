@@ -97,6 +97,11 @@
 					<ul class="space-y-2 text-sm text-[color:var(--color-on-dark-muted)]">
 						<li><a href="/{{ $currentLocale }}/tools/iban-check" class="hover:text-white">IBAN check</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/vat-check" class="hover:text-white">{{ __('VAT check') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/postcode-check" class="hover:text-white">{{ __('Postcode check') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/ip-lookup" class="hover:text-white">{{ __('IP lookup') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/json-formatter" class="hover:text-white">JSON formatter</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/diff" class="hover:text-white">{{ __('Diff checker') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/favicon-generator" class="hover:text-white">{{ __('Favicon generator') }}</a></li>
 					</ul>
 				</div>
 				<div>
