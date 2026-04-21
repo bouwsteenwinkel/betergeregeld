@@ -3,10 +3,10 @@
 @section('title', __('IBAN check') . ' — ' . config('app.name'))
 
 @section('content')
-	<div class="max-w-2xl">
-		<h1 class="text-3xl font-bold mb-2">{{ __('IBAN check') }}</h1>
-		<p class="text-[color:var(--color-ink-muted)] mb-8">
-			{{ __('Controleer of een IBAN technisch geldig is en bekijk risico-indicatoren.') }}
+	<div class="max-w-2xl mx-auto px-4 py-10">
+		<h1 class="text-3xl font-bold mb-2">{{ __('IBAN naamcheck & risico-analyse') }}</h1>
+		<p class="text-[color:var(--color-ink-muted)] mb-8 leading-relaxed">
+			{{ __('Controleer of een IBAN geldig is en detecteer mogelijke risico\'s op basis van naam en structuur.') }}
 		</p>
 
 		<form method="POST" action="{{ route('tools.iban-check.check') }}"
@@ -34,7 +34,7 @@
 
 			<button type="submit"
 				class="rounded-[var(--radius-control)] bg-[color:var(--color-ink)] text-white font-semibold px-5 py-3 hover:opacity-90 transition">
-				{{ __('Controleer') }}
+				{{ __('Controleer IBAN') }}
 			</button>
 		</form>
 

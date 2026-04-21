@@ -16,6 +16,7 @@ Route::prefix('{locale}')
 	->middleware(SetLocale::class)
 	->group(function () {
 		Route::get('/', fn () => view('welcome'))->name('home');
+		Route::get('/over', fn () => view('pages.about'))->name('about');
 
 		Route::middleware('guest')->group(function () {
 			Route::get('/login', [LoginController::class, 'show'])->name('login');
