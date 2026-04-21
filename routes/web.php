@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\IbanCheckController;
@@ -60,6 +61,8 @@ Route::prefix('{locale}')
 
 		Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');
 		Route::get('/diensten/{slug}', [ServiceController::class, 'show'])->name('services.show');
+
+		Route::get('/prijzen', [PricingController::class, 'show'])->name('pricing');
 
 		Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 		Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
