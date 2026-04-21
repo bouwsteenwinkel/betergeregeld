@@ -16,6 +16,7 @@ use App\Http\Controllers\Tools\FaviconGeneratorController;
 use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Controllers\Tools\IpLookupController;
 use App\Http\Controllers\Tools\JsonFormatterController;
+use App\Http\Controllers\Tools\PdfMergeController;
 use App\Http\Controllers\Tools\PostcodeCheckController;
 use App\Http\Controllers\Tools\SpeedTestController;
 use App\Http\Controllers\Tools\VatCheckController;
@@ -114,6 +115,15 @@ Route::prefix('{locale}')
 				Route::get('/speedtest', [SpeedTestController::class, 'show'])->name('speedtest');
 			});
 			Route::post('/speedtest/record', [SpeedTestController::class, 'record'])->name('speedtest.record');
+
+			Route::middleware('tool.limit:pdf_merge')->group(function () {
+				Route::get('/pdf-merge', [PdfMergeController::class, 'show'])->name('pdf-merge');
+				Route::post('/pdf-merge/upload', [PdfMergeController::class, 'upload'])->name('pdf-merge.upload');
+				Route::delete('/pdf-merge/file/{fileId}', [PdfMergeController::class, 'remove'])->name('pdf-merge.remove');
+				Route::post('/pdf-merge/merge', [PdfMergeController::class, 'merge'])->name('pdf-merge.merge');
+				Route::get('/pdf-merge/download/{key}', [PdfMergeController::class, 'download'])->name('pdf-merge.download');
+				Route::post('/pdf-merge/reset', [PdfMergeController::class, 'reset'])->name('pdf-merge.reset');
+			});
 		});
 
 		Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');
