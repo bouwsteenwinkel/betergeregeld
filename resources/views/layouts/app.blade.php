@@ -102,6 +102,7 @@
 						<li><a href="/{{ $currentLocale }}/tools/json-formatter" class="hover:text-white">JSON formatter</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/diff" class="hover:text-white">{{ __('Diff checker') }}</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/favicon-generator" class="hover:text-white">{{ __('Favicon generator') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/speedtest" class="hover:text-white">{{ __('Speedtest') }}</a></li>
 					</ul>
 				</div>
 				<div>
@@ -131,5 +132,7 @@
 			</div>
 		</div>
 	</footer>
+
+	@stack('scripts')
 </body>
 </html>

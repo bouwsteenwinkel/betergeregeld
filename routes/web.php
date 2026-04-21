@@ -17,6 +17,7 @@ use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Controllers\Tools\IpLookupController;
 use App\Http\Controllers\Tools\JsonFormatterController;
 use App\Http\Controllers\Tools\PostcodeCheckController;
+use App\Http\Controllers\Tools\SpeedTestController;
 use App\Http\Controllers\Tools\VatCheckController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,14 @@ Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
 
 // Webhooks live outside the locale prefix and must not use CSRF.
 Route::post('/webhooks/mollie', [WebhookController::class, 'mollie'])->name('webhooks.mollie');
+
+// Speedtest data endpoints live outside locale/CSRF — they carry raw bytes
+// and are throttled per IP to protect the server from abuse.
+Route::middleware('throttle:speedtest')->group(function () {
+	Route::get('/tools/speedtest/ping', [SpeedTestController::class, 'ping'])->name('tools.speedtest.ping');
+	Route::get('/tools/speedtest/download', [SpeedTestController::class, 'download'])->name('tools.speedtest.download');
+	Route::post('/tools/speedtest/upload', [SpeedTestController::class, 'upload'])->name('tools.speedtest.upload');
+});
 
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
@@ -97,6 +106,14 @@ Route::prefix('{locale}')
 				Route::get('/favicon-generator/result/{key}', [FaviconGeneratorController::class, 'result'])->name('favicon-generator.result');
 				Route::get('/favicon-generator/download/{key}/{what}', [FaviconGeneratorController::class, 'download'])->name('favicon-generator.download');
 			});
+
+			// Speedtest: tool.limit counts only the page-load; the streaming
+			// sub-endpoints are throttled by IP separately so a single test
+			// doesn't burn the whole daily quota.
+			Route::middleware('tool.limit:speedtest')->group(function () {
+				Route::get('/speedtest', [SpeedTestController::class, 'show'])->name('speedtest');
+			});
+			Route::post('/speedtest/record', [SpeedTestController::class, 'record'])->name('speedtest.record');
 		});
 
 		Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');
