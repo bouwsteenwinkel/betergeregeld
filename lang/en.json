@@ -140,6 +140,10 @@
 	"Ik heb al een account": "I already have an account",
 	"Populair": "Popular",
 
+	"Upgrade naar Pro om de specifieke risico-indicatoren te zien (bedrijfsnaam, structuur-mismatch, verdachte waardes).": "Upgrade to Pro to see the specific risk indicators (company name, structure mismatch, suspicious values).",
+	"of maak eerst een account": "or create an account first",
+	"{1} :count risico gevonden|[2,*] :count risico's gevonden": "{1} :count risk found|[2,*] :count risks found",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

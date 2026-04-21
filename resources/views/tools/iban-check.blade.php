@@ -66,14 +66,41 @@
 
 				@if (count($result['risks']) > 0)
 					<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">{{ __('Risico-indicatoren') }}</h2>
-					<ul class="space-y-2.5">
-						@foreach ($result['risks'] as $risk)
-							<li class="flex items-start gap-3">
-								<span class="shrink-0 w-6 h-6 rounded-full bg-amber-100 text-amber-700 inline-flex items-center justify-center text-xs font-bold mt-0.5">!</span>
-								<span class="text-sm text-[color:var(--color-ink)] leading-relaxed pt-0.5">{{ __('iban.' . $risk) }}</span>
-							</li>
-						@endforeach
-					</ul>
+					@if ($features->bool('tool.iban.risk_detail'))
+						<ul class="space-y-2.5">
+							@foreach ($result['risks'] as $risk)
+								<li class="flex items-start gap-3">
+									<span class="shrink-0 w-6 h-6 rounded-full bg-amber-100 text-amber-700 inline-flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+									<span class="text-sm text-[color:var(--color-ink)] leading-relaxed pt-0.5">{{ __('iban.' . $risk) }}</span>
+								</li>
+							@endforeach
+						</ul>
+					@else
+						@php $count = count($result['risks']); @endphp
+						<div class="rounded-[var(--radius-control)] border border-amber-200 bg-amber-50/60 p-4">
+							<div class="flex items-start gap-3">
+								<span class="shrink-0 w-7 h-7 rounded-full bg-amber-100 text-amber-700 inline-flex items-center justify-center text-sm font-bold">{{ $count }}</span>
+								<div class="flex-1">
+									<p class="text-sm font-semibold text-[color:var(--color-ink)]">
+										{{ trans_choice('{1} :count risico gevonden|[2,*] :count risico\'s gevonden', $count, ['count' => $count]) }}
+									</p>
+									<p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed mt-1">
+										{{ __('Upgrade naar Pro om de specifieke risico-indicatoren te zien (bedrijfsnaam, structuur-mismatch, verdachte waardes).') }}
+									</p>
+									<div class="flex gap-2 mt-3">
+										<a href="/{{ app()->getLocale() }}/prijzen" class="btn-accent text-sm py-2 px-3">
+											{{ __('Upgrade naar Pro') }}
+										</a>
+										@guest
+											<a href="/{{ app()->getLocale() }}/register" class="text-sm text-[color:var(--color-ink)] hover:underline py-2">
+												{{ __('of maak eerst een account') }}
+											</a>
+										@endguest
+									</div>
+								</div>
+							</div>
+						</div>
+					@endif
 				@elseif ($result['valid'])
 					<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Geen risico-indicatoren gevonden.') }}</p>
 				@endif

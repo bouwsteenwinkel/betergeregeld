@@ -4,17 +4,25 @@ namespace App\Http\Controllers\Tools;
 
 use App\Http\Controllers\Controller;
 use App\Models\ToolEvent;
+use App\Services\Features\FeatureResolver;
 use App\Services\IbanValidator;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class IbanCheckController extends Controller
 {
-	public function __construct(private readonly IbanValidator $validator) {}
+	public function __construct(
+		private readonly IbanValidator $validator,
+		private readonly FeatureResolver $features,
+	) {}
 
-	public function show(string $locale): View
+	public function show(Request $request, string $locale): View
 	{
-		return view('tools.iban-check', ['result' => null, 'input' => ['name' => '', 'iban' => '']]);
+		return view('tools.iban-check', [
+			'result' => null,
+			'input' => ['name' => '', 'iban' => ''],
+			'features' => $this->features->forRequest($request->user()),
+		]);
 	}
 
 	public function check(Request $request, string $locale): View
@@ -39,6 +47,7 @@ class IbanCheckController extends Controller
 		return view('tools.iban-check', [
 			'result' => $result,
 			'input' => ['name' => $input['name'] ?? '', 'iban' => $input['iban']],
+			'features' => $this->features->forRequest($request->user()),
 		]);
 	}
 }
