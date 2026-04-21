@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,9 +31,16 @@ use Illuminate\Notifications\Notifiable;
  * @property Collection|UserTwofaBackupCode[] $user_twofa_backup_codes
  * @property Collection|UserTwofaTrustedDevice[] $user_twofa_trusted_devices
  */
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
 	use HasUuids, Notifiable;
+
+	public function canAccessPanel(Panel $panel): bool
+	{
+		return $panel->getId() === 'admin'
+			&& $this->role === 'admin'
+			&& $this->is_active;
+	}
 
 	protected $table = 'users';
 	protected $keyType = 'string';
