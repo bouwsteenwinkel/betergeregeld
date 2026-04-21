@@ -221,7 +221,7 @@
 					@endforeach
 				</ul>
 
-				<div class="mt-auto pt-2">
+				<div class="mt-auto pt-2 space-y-2">
 					@if ($isCurrent)
 						<button disabled class="w-full text-center py-2.5 px-4 rounded-[var(--radius-control)] border border-[color:var(--color-line)] text-sm text-[color:var(--color-ink-muted)] cursor-default">
 							{{ __('Je huidige plan') }}
@@ -238,16 +238,30 @@
 						@endauth
 					@else
 						@auth
-							<a href="/{{ $locale }}/contact?plan={{ $plan['key'] }}" class="{{ $isPro ? 'btn-accent' : 'btn-dark' }} w-full justify-center text-sm">
-								{{ $plan['trial_days'] > 0 ? __('Start :n-daagse proef', ['n' => $plan['trial_days']]) : __('Upgrade') }}
-							</a>
+							<form method="POST" action="{{ route('billing.checkout', ['locale' => $locale]) }}">
+								@csrf
+								<input type="hidden" name="plan" value="{{ $plan['key'] }}">
+								<input type="hidden" name="period" value="monthly">
+								<button type="submit" class="{{ $isPro ? 'btn-accent' : 'btn-dark' }} w-full justify-center text-sm">
+									{{ __('Nu abonneren — €:price/mnd', ['price' => (int) $plan['price_monthly']]) }}
+								</button>
+							</form>
+							@if ($plan['trial_days'] > 0)
+								<form method="POST" action="{{ route('billing.trial', ['locale' => $locale]) }}">
+									@csrf
+									<input type="hidden" name="plan" value="{{ $plan['key'] }}">
+									<button type="submit" class="w-full text-sm py-2 px-4 rounded-[var(--radius-control)] border border-[color:var(--color-line)] hover:border-[color:var(--color-line-strong)] text-[color:var(--color-ink)] transition">
+										{{ __('Of start :n-daagse proef', ['n' => $plan['trial_days']]) }}
+									</button>
+								</form>
+							@endif
 						@else
 							<a href="/{{ $locale }}/register?plan={{ $plan['key'] }}" class="{{ $isPro ? 'btn-accent' : 'btn-dark' }} w-full justify-center text-sm">
 								{{ $plan['trial_days'] > 0 ? __('Start :n-daagse proef', ['n' => $plan['trial_days']]) : __('Kies :name', ['name' => $plan['name']]) }}
 							</a>
 						@endauth
 						@if ($plan['trial_days'] > 0)
-							<p class="text-xs text-[color:var(--color-ink-soft)] text-center mt-2">{{ __('Geen creditcard nodig') }}</p>
+							<p class="text-xs text-[color:var(--color-ink-soft)] text-center">{{ __('Geen creditcard nodig voor proef') }}</p>
 						@endif
 					@endif
 				</div>

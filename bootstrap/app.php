@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'setlocale' => \App\Http\Middleware\SetLocale::class,
             'tool.limit' => \App\Http\Middleware\EnforceToolRateLimit::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

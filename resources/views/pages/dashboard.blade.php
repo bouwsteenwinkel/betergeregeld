@@ -52,6 +52,16 @@
 
 {{-- ============ MAIN GRID ============ --}}
 <section class="py-12">
+	@if (session('billing_message'))
+		<div class="max-w-[1200px] mx-auto px-6 mb-4">
+			<div class="rounded-[var(--radius-control)] border border-emerald-200 bg-emerald-50 text-emerald-900 p-4 text-sm">
+				<div class="flex items-start gap-3">
+					<svg class="w-5 h-5 mt-0.5 shrink-0 text-emerald-600" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 10l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<div>{{ session('billing_message') }}</div>
+				</div>
+			</div>
+		</div>
+	@endif
 	<div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
 
 		{{-- PLAN CARD --}}

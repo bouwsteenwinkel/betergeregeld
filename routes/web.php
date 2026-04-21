@@ -4,10 +4,12 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Controllers\Tools\VatCheckController;
@@ -15,6 +17,9 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
+
+// Webhooks live outside the locale prefix and must not use CSRF.
+Route::post('/webhooks/mollie', [WebhookController::class, 'mollie'])->name('webhooks.mollie');
 
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
@@ -44,6 +49,11 @@ Route::prefix('{locale}')
 
 		Route::middleware('auth')->group(function () {
 			Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+			Route::post('/billing/trial', [BillingController::class, 'startTrial'])->name('billing.trial');
+			Route::post('/billing/checkout', [BillingController::class, 'startCheckout'])->name('billing.checkout');
+			Route::get('/billing/return/{intent}', [BillingController::class, 'return'])->name('billing.return');
+			Route::get('/billing/fake-confirm/{intent}', [BillingController::class, 'fakeConfirm'])->name('billing.fake-confirm');
 
 			Route::get('/settings/2fa', [TwoFactorSettingsController::class, 'show'])->name('settings.2fa');
 			Route::post('/settings/2fa/enable', [TwoFactorSettingsController::class, 'enable'])->name('settings.2fa.enable');
