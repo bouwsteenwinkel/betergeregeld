@@ -12,8 +12,10 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
+use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
 use App\Http\Controllers\Tools\BookkeepingReportsController;
+use App\Http\Controllers\Tools\BookkeepingVatRateController;
 use App\Http\Controllers\Tools\DiffController;
 use App\Http\Controllers\Tools\FaviconGeneratorController;
 use App\Http\Controllers\Tools\IbanCheckController;
@@ -137,6 +139,21 @@ Route::prefix('{locale}')
 				Route::post('/', [BookkeepingController::class, 'store'])->name('store');
 				Route::get('/rapporten/winst-verlies', [BookkeepingReportsController::class, 'profitLoss'])->name('reports.profit-loss');
 				Route::get('/rapporten/btw-aangifte', [BookkeepingReportsController::class, 'vatReturn'])->name('reports.vat');
+
+				Route::get('/categorieen', [BookkeepingCategoryController::class, 'index'])->name('categories.index');
+				Route::get('/categorieen/nieuw', [BookkeepingCategoryController::class, 'create'])->name('categories.create');
+				Route::post('/categorieen', [BookkeepingCategoryController::class, 'store'])->name('categories.store');
+				Route::get('/categorieen/{id}/bewerken', [BookkeepingCategoryController::class, 'edit'])->name('categories.edit');
+				Route::put('/categorieen/{id}', [BookkeepingCategoryController::class, 'update'])->name('categories.update');
+				Route::delete('/categorieen/{id}', [BookkeepingCategoryController::class, 'destroy'])->name('categories.destroy');
+
+				Route::get('/btw-tarieven', [BookkeepingVatRateController::class, 'index'])->name('vat-rates.index');
+				Route::get('/btw-tarieven/nieuw', [BookkeepingVatRateController::class, 'create'])->name('vat-rates.create');
+				Route::post('/btw-tarieven', [BookkeepingVatRateController::class, 'store'])->name('vat-rates.store');
+				Route::get('/btw-tarieven/{id}/bewerken', [BookkeepingVatRateController::class, 'edit'])->name('vat-rates.edit');
+				Route::put('/btw-tarieven/{id}', [BookkeepingVatRateController::class, 'update'])->name('vat-rates.update');
+				Route::delete('/btw-tarieven/{id}', [BookkeepingVatRateController::class, 'destroy'])->name('vat-rates.destroy');
+
 				Route::get('/{id}/bewerken', [BookkeepingController::class, 'edit'])->name('edit');
 				Route::put('/{id}', [BookkeepingController::class, 'update'])->name('update');
 				Route::delete('/{id}', [BookkeepingController::class, 'destroy'])->name('destroy');
