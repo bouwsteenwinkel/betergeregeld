@@ -161,6 +161,43 @@
 			@endif
 		</div>
 
+		@if ($invoice->transactions->isNotEmpty())
+			<div class="card">
+				<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">
+					{{ __('Gekoppelde transacties') }}
+				</h3>
+				<table class="w-full text-sm">
+					<tbody>
+						@foreach ($invoice->transactions as $tx)
+							<tr class="border-b border-[color:var(--color-line)]/60 last:border-b-0">
+								<td class="py-2 pr-3 tabular-nums text-[color:var(--color-ink-muted)] text-xs whitespace-nowrap">
+									{{ $tx->transaction_date->format('d-m-Y') }}
+								</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] text-xs">
+									@if ($tx->vatRate)
+										{{ rtrim(rtrim(number_format((float) $tx->vatRate->rate, 2, ',', ''), '0'), ',') }}% BTW
+									@else
+										{{ __('Geen BTW') }}
+									@endif
+								</td>
+								<td class="py-2 px-3 text-right tabular-nums font-medium text-emerald-700">
+									+{{ $fmt($tx->amount) }}
+								</td>
+								<td class="py-2 pl-3 text-right">
+									<a href="{{ route('tools.bookkeeping.edit', ['locale' => $locale, 'id' => $tx->id]) }}" class="text-xs text-[color:var(--color-accent)] hover:underline">
+										{{ __('Bekijk') }}
+									</a>
+								</td>
+							</tr>
+						@endforeach
+					</tbody>
+				</table>
+				<p class="text-xs text-[color:var(--color-ink-soft)] mt-3">
+					{{ __('Deze transacties zijn automatisch aangemaakt toen de factuur op betaald gezet werd.') }}
+				</p>
+			</div>
+		@endif
+
 		<div class="text-xs text-[color:var(--color-ink-soft)] flex flex-wrap gap-4">
 			<span>{{ __('Aangemaakt') }}: {{ $invoice->created_at->format('d-m-Y H:i') }}</span>
 			@if ($invoice->sent_at)

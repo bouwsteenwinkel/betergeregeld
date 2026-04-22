@@ -25,7 +25,7 @@ class BookkeepingTransaction extends Model
 		'tenant_id', 'created_by_user_id',
 		'type', 'transaction_date', 'amount',
 		'vat_rate_id', 'vat_included', 'vat_deductible',
-		'category_id', 'relation_id',
+		'category_id', 'relation_id', 'invoice_id',
 		'description', 'counterparty', 'invoice_number', 'receipt_path',
 		'bank_reference', 'import_source',
 	];
@@ -43,6 +43,11 @@ class BookkeepingTransaction extends Model
 	public function relation()
 	{
 		return $this->belongsTo(BookkeepingRelation::class, 'relation_id');
+	}
+
+	public function invoice()
+	{
+		return $this->belongsTo(BookkeepingInvoice::class, 'invoice_id');
 	}
 
 	/** Display name for lists — prefer linked relation over free-text counterparty. */

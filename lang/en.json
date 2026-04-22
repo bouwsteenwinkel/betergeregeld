@@ -654,6 +654,12 @@
 	"Extra footer-tekst op facturen (optioneel)": "Extra footer text on invoices (optional)",
 	"Bijv. betalingsvoorwaarden of bankgegevens-zin.": "E.g. payment conditions or bank details line.",
 
+	":n transactie(s) automatisch aangemaakt.": ":n transaction(s) created automatically.",
+	"Gekoppelde transacties": "Linked transactions",
+	"Deze transacties zijn automatisch aangemaakt toen de factuur op betaald gezet werd.": "These transactions were created automatically when the invoice was marked as paid.",
+	"Gekoppelde factuur": "Linked invoice",
+	"Bekijk": "View",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

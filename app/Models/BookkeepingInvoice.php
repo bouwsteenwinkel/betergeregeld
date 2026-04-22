@@ -41,6 +41,11 @@ class BookkeepingInvoice extends Model
 		return $this->hasMany(BookkeepingInvoiceLine::class, 'invoice_id')->orderBy('sort_order')->orderBy('id');
 	}
 
+	public function transactions()
+	{
+		return $this->hasMany(BookkeepingTransaction::class, 'invoice_id');
+	}
+
 	public function recalculate(): void
 	{
 		$subtotal = 0.0;

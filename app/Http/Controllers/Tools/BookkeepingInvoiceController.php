@@ -10,6 +10,7 @@ use App\Models\BookkeepingTenantSettings;
 use App\Models\BookkeepingVatRate;
 use App\Services\Features\FeatureResolver;
 use App\Services\InvoiceNumberer;
+use App\Services\InvoicePaymentService;
 use App\Services\InvoicePdfRenderer;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +26,7 @@ class BookkeepingInvoiceController extends Controller
 		private readonly FeatureResolver $features,
 		private readonly InvoiceNumberer $numberer,
 		private readonly InvoicePdfRenderer $pdfRenderer,
+		private readonly InvoicePaymentService $paymentService,
 	) {}
 
 	public function index(Request $request, string $locale): View
@@ -98,7 +100,7 @@ class BookkeepingInvoiceController extends Controller
 	{
 		$this->mustHaveAccess($request);
 		$invoice = $this->mustOwn($request, $id);
-		$invoice->load(['lines.vatRate', 'relation']);
+		$invoice->load(['lines.vatRate', 'relation', 'transactions.vatRate']);
 		$settings = BookkeepingTenantSettings::find($request->user()->tenant_id);
 
 		return view('tools.bookkeeping.invoices.show', [
@@ -181,10 +183,19 @@ class BookkeepingInvoiceController extends Controller
 	{
 		$this->mustHaveAccess($request);
 		$invoice = $this->mustOwn($request, $id);
+		$created = [];
 		if (in_array($invoice->status, ['draft', 'sent'], true)) {
 			$invoice->update(['status' => 'paid', 'paid_at' => now(), 'sent_at' => $invoice->sent_at ?: now()]);
+			$created = $this->paymentService->createTransactionsForPaidInvoice(
+				$invoice,
+				$request->user()->getAuthIdentifier(),
+			);
 		}
-		return back()->with('bookkeeping_message', __('Factuur :n gemarkeerd als betaald.', ['n' => $invoice->invoice_number]));
+		$msg = __('Factuur :n gemarkeerd als betaald.', ['n' => $invoice->invoice_number]);
+		if (count($created) > 0) {
+			$msg .= ' ' . __(':n transactie(s) automatisch aangemaakt.', ['n' => count($created)]);
+		}
+		return back()->with('bookkeeping_message', $msg);
 	}
 
 	public function markCancelled(Request $request, string $locale, string $id): RedirectResponse

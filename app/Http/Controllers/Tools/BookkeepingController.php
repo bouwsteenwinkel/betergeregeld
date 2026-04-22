@@ -31,7 +31,7 @@ class BookkeepingController extends Controller
 
 		$q = BookkeepingTransaction::query()
 			->where('tenant_id', $user->tenant_id)
-			->with(['category', 'vatRate', 'relation'])
+			->with(['category', 'vatRate', 'relation', 'invoice'])
 			->orderByDesc('transaction_date')
 			->orderByDesc('created_at');
 

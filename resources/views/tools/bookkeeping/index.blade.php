@@ -137,6 +137,13 @@
 													<svg class="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 2h6l4 4v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z M10 2v4h4 M6 9h4M6 12h3" stroke-linecap="round" stroke-linejoin="round"/></svg>
 												</a>
 											@endif
+											@if ($tx->invoice_id)
+												<a href="{{ route('tools.bookkeeping.invoices.show', ['locale' => $locale, 'id' => $tx->invoice_id]) }}"
+													title="{{ __('Gekoppelde factuur') }}"
+													class="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded bg-[color:var(--color-accent)]/10 text-[color:var(--color-accent)] hover:bg-[color:var(--color-accent)]/20">
+													<svg class="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 2h7l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z M10 2v3h3 M5 8h6M5 11h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+												</a>
+											@endif
 										</div>
 										@if ($tx->invoice_number)
 											<div class="text-xs text-[color:var(--color-ink-soft)] font-mono">{{ $tx->invoice_number }}</div>
