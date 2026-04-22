@@ -146,6 +146,7 @@ class ToolsPlansSeeder extends Seeder
 					'tool.pdf_merge.max_size_mb' => 'unlimited',
 					'tool.pdf_merge.ocr' => '1',
 					'tool.pdf_merge.bulk' => '1',
+					'tool.pdf_redact.enabled' => '1',
 					'tool.pdf_redact.pattern_mode' => '1',
 					'tool.pdf_redact.audit_log' => '1',
 

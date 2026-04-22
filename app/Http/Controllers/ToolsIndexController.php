@@ -116,6 +116,15 @@ class ToolsIndexController extends Controller
 						'icon' => 'files',
 					],
 					[
+						'slug' => 'pdf-redact',
+						'route' => 'tools.pdf-redact',
+						'title_nl' => 'PDF redact', 'title_en' => 'PDF redact',
+						'desc_nl' => 'Zwart balken tekenen op PDF-pagina\'s; content wordt gerasteriseerd zodat tekst niet meer te extraheren is.',
+						'desc_en' => 'Draw black bars on PDF pages; content is rasterised so text cannot be extracted.',
+						'badge_nl' => 'Pro', 'badge_en' => 'Pro',
+						'icon' => 'shield',
+					],
+					[
 						'slug' => 'favicon-generator',
 						'route' => 'tools.favicon-generator',
 						'title_nl' => 'Favicon generator', 'title_en' => 'Favicon generator',

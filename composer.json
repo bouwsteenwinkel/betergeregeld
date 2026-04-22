@@ -15,7 +15,8 @@
         "maxmind-db/reader": "^1.13",
         "mollie/laravel-mollie": "^4.1",
         "pragmarx/google2fa": "^9.0",
-        "pragmarx/google2fa-qrcode": "^3.0"
+        "pragmarx/google2fa-qrcode": "^3.0",
+        "setasign/fpdf": "^1.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

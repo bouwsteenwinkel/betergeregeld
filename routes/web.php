@@ -18,6 +18,7 @@ use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Controllers\Tools\IpLookupController;
 use App\Http\Controllers\Tools\JsonFormatterController;
 use App\Http\Controllers\Tools\PdfMergeController;
+use App\Http\Controllers\Tools\PdfRedactController;
 use App\Http\Controllers\Tools\PostcodeCheckController;
 use App\Http\Controllers\Tools\SpeedTestController;
 use App\Http\Controllers\Tools\VatCheckController;
@@ -126,6 +127,15 @@ Route::prefix('{locale}')
 				Route::post('/pdf-merge/merge', [PdfMergeController::class, 'merge'])->name('pdf-merge.merge');
 				Route::get('/pdf-merge/download/{key}', [PdfMergeController::class, 'download'])->name('pdf-merge.download');
 				Route::post('/pdf-merge/reset', [PdfMergeController::class, 'reset'])->name('pdf-merge.reset');
+			});
+
+			Route::middleware('tool.limit:pdf_redact')->group(function () {
+				Route::get('/pdf-redact', [PdfRedactController::class, 'show'])->name('pdf-redact');
+				Route::post('/pdf-redact/upload', [PdfRedactController::class, 'upload'])->name('pdf-redact.upload');
+				Route::get('/pdf-redact/preview/{page}', [PdfRedactController::class, 'preview'])->name('pdf-redact.preview');
+				Route::post('/pdf-redact/apply', [PdfRedactController::class, 'apply'])->name('pdf-redact.apply');
+				Route::get('/pdf-redact/download/{key}', [PdfRedactController::class, 'download'])->name('pdf-redact.download');
+				Route::post('/pdf-redact/reset', [PdfRedactController::class, 'reset'])->name('pdf-redact.reset');
 			});
 		});
 

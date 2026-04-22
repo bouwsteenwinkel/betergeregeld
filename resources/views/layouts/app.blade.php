@@ -104,6 +104,7 @@
 						<li><a href="/{{ $currentLocale }}/tools/favicon-generator" class="hover:text-white">{{ __('Favicon generator') }}</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/speedtest" class="hover:text-white">{{ __('Speedtest') }}</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/pdf-merge" class="hover:text-white">{{ __('PDF merge') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/pdf-redact" class="hover:text-white">{{ __('PDF redact') }}</a></li>
 					</ul>
 				</div>
 				<div>
