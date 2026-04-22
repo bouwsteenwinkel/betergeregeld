@@ -13,6 +13,7 @@ class BookkeepingTenantSettings extends Model
 
 	protected $casts = [
 		'default_payment_terms_days' => 'int',
+		'auto_reminders_enabled' => 'bool',
 	];
 
 	protected $fillable = [
@@ -20,6 +21,6 @@ class BookkeepingTenantSettings extends Model
 		'company_name', 'address', 'postal_code', 'city', 'country',
 		'kvk_number', 'vat_number', 'iban',
 		'email', 'phone',
-		'default_payment_terms_days', 'invoice_footer',
+		'default_payment_terms_days', 'invoice_footer', 'auto_reminders_enabled',
 	];
 }

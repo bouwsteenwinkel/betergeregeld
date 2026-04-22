@@ -183,6 +183,7 @@ Route::prefix('{locale}')
 				Route::post('/facturen/{id}/verzenden', [BookkeepingInvoiceController::class, 'markSent'])->whereUuid('id')->name('invoices.mark-sent');
 				Route::post('/facturen/{id}/betaald', [BookkeepingInvoiceController::class, 'markPaid'])->whereUuid('id')->name('invoices.mark-paid');
 				Route::post('/facturen/{id}/annuleren', [BookkeepingInvoiceController::class, 'markCancelled'])->whereUuid('id')->name('invoices.mark-cancelled');
+				Route::post('/facturen/{id}/herinnering', [BookkeepingInvoiceController::class, 'sendReminder'])->whereUuid('id')->name('invoices.send-reminder');
 
 				Route::get('/import', [BookkeepingImportController::class, 'show'])->name('import.show');
 				Route::post('/import', [BookkeepingImportController::class, 'upload'])->name('import.upload');

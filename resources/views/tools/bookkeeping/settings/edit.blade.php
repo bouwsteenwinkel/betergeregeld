@@ -113,6 +113,17 @@
 							class="field-input w-32 font-mono">
 					</div>
 					<div>
+						<label class="flex items-center gap-2 text-sm cursor-pointer">
+							<input type="hidden" name="auto_reminders_enabled" value="0">
+							<input type="checkbox" name="auto_reminders_enabled" value="1"
+								@checked(old('auto_reminders_enabled', $settings->auto_reminders_enabled ?? true))>
+							<span>{{ __('Automatische betaalherinneringen versturen') }}</span>
+						</label>
+						<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5 ml-6">
+							{{ __('Dagelijkse job stuurt herinneringen op T−3, T+0, T+7 en T+21 t.o.v. vervaldatum. Je kunt altijd handmatig versturen vanaf de factuurpagina.') }}
+						</p>
+					</div>
+					<div>
 						<label for="invoice_footer" class="block text-sm font-semibold mb-2">{{ __('Extra footer-tekst op facturen (optioneel)') }}</label>
 						<textarea id="invoice_footer" name="invoice_footer" rows="2" maxlength="500"
 							class="field-input">{{ old('invoice_footer', $settings->invoice_footer) }}</textarea>

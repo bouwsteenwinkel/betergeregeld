@@ -169,6 +169,56 @@
 			@endif
 		</div>
 
+		@if (in_array($invoice->status, ['sent'], true))
+			@php
+				$reminderKinds = ['pre_due', 'due', 'overdue_7', 'overdue_21'];
+				$sentKinds = $reminders->pluck('kind')->all();
+			@endphp
+			<div class="card">
+				<div class="flex items-center justify-between gap-4 mb-3 flex-wrap">
+					<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)]">
+						{{ __('Herinneringen') }}
+					</h3>
+					<span class="text-xs text-[color:var(--color-ink-soft)]">
+						{{ $invoice->relation?->email ?: __('relatie heeft geen e-mail') }}
+					</span>
+				</div>
+
+				@if ($reminders->isEmpty())
+					<p class="text-sm text-[color:var(--color-ink-muted)]">
+						{{ __('Nog geen herinneringen verstuurd.') }}
+					</p>
+				@else
+					<ul class="text-sm space-y-1 mb-3">
+						@foreach ($reminders as $r)
+							<li class="flex items-center gap-2 text-[color:var(--color-ink-muted)]">
+								<span class="pill pill-ink text-[10px]">{{ __('reminder.' . $r->kind) }}</span>
+								<span class="tabular-nums text-xs">{{ $r->sent_at->format('d-m-Y H:i') }}</span>
+								<span class="text-xs">→ {{ $r->sent_to_email }}</span>
+								@if ($r->was_manual)<span class="text-xs text-[color:var(--color-ink-soft)]">({{ __('handmatig') }})</span>@endif
+							</li>
+						@endforeach
+					</ul>
+				@endif
+
+				@if ($invoice->relation?->email)
+					<div class="flex flex-wrap gap-2">
+						@foreach ($reminderKinds as $kind)
+							@if (! in_array($kind, $sentKinds, true))
+								<form method="POST" action="{{ route('tools.bookkeeping.invoices.send-reminder', ['locale' => $locale, 'id' => $invoice->id]) }}" class="inline">
+									@csrf
+									<input type="hidden" name="kind" value="{{ $kind }}">
+									<button type="submit" class="btn-dark text-xs">
+										{{ __('Stuur') }} {{ __('reminder.' . $kind) }}
+									</button>
+								</form>
+							@endif
+						@endforeach
+					</div>
+				@endif
+			</div>
+		@endif
+
 		@if ($invoice->transactions->isNotEmpty())
 			<div class="card">
 				<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">

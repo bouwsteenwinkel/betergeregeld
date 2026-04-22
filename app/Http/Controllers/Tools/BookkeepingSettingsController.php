@@ -36,7 +36,10 @@ class BookkeepingSettingsController extends Controller
 			'phone' => ['nullable', 'string', 'max:50'],
 			'default_payment_terms_days' => ['nullable', 'integer', 'min:0', 'max:365'],
 			'invoice_footer' => ['nullable', 'string', 'max:500'],
-		]);
+			'auto_reminders_enabled' => ['nullable', 'boolean'],
+		]) + [
+			'auto_reminders_enabled' => (bool) $request->boolean('auto_reminders_enabled', false),
+		];
 
 		BookkeepingTenantSettings::updateOrCreate(
 			['tenant_id' => $request->user()->tenant_id],

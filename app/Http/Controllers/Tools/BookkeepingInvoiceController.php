@@ -12,6 +12,7 @@ use App\Services\Features\FeatureResolver;
 use App\Services\InvoiceNumberer;
 use App\Services\InvoicePaymentService;
 use App\Services\InvoicePdfRenderer;
+use App\Services\InvoiceReminderService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class BookkeepingInvoiceController extends Controller
 		private readonly InvoiceNumberer $numberer,
 		private readonly InvoicePdfRenderer $pdfRenderer,
 		private readonly InvoicePaymentService $paymentService,
+		private readonly InvoiceReminderService $reminderService,
 	) {}
 
 	public function index(Request $request, string $locale): View
@@ -103,9 +105,15 @@ class BookkeepingInvoiceController extends Controller
 		$invoice->load(['lines.vatRate', 'relation', 'transactions.vatRate']);
 		$settings = BookkeepingTenantSettings::find($request->user()->tenant_id);
 
+		$reminders = \App\Models\BookkeepingInvoiceReminder::query()
+			->where('invoice_id', $invoice->id)
+			->orderByDesc('sent_at')
+			->get();
+
 		return view('tools.bookkeeping.invoices.show', [
 			'invoice' => $invoice,
 			'settings' => $settings,
+			'reminders' => $reminders,
 		]);
 	}
 
@@ -217,6 +225,29 @@ class BookkeepingInvoiceController extends Controller
 		if ($reversed > 0) {
 			$msg .= ' ' . __(':n automatische transactie(s) teruggedraaid.', ['n' => $reversed]);
 		}
+		return back()->with('bookkeeping_message', $msg);
+	}
+
+	public function sendReminder(Request $request, string $locale, string $id): RedirectResponse
+	{
+		$this->mustHaveAccess($request);
+		$invoice = $this->mustOwn($request, $id);
+
+		$data = $request->validate([
+			'kind' => ['required', 'in:pre_due,due,overdue_7,overdue_21'],
+		]);
+
+		$result = $this->reminderService->sendIfEligible($invoice, $data['kind'], true);
+
+		$msg = match ($result) {
+			'sent' => __('Herinnering verstuurd naar :e.', ['e' => $invoice->relation?->email]),
+			'already_sent' => __('Deze herinnering is eerder al verstuurd.'),
+			'no_email' => __('Relatie heeft geen e-mail ingevuld.'),
+			'no_settings' => __('Vul eerst je factuur-instellingen in.'),
+			'send_failed' => __('Versturen mislukt — zie logs.'),
+			default => __('Versturen niet gelukt (:r).', ['r' => $result]),
+		};
+
 		return back()->with('bookkeeping_message', $msg);
 	}
 
