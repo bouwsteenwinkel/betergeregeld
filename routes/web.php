@@ -16,9 +16,11 @@ use App\Http\Controllers\Tools\BookkeepingAuditLogController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
 use App\Http\Controllers\Tools\BookkeepingImportController;
+use App\Http\Controllers\Tools\BookkeepingInvoiceController;
 use App\Http\Controllers\Tools\BookkeepingReceiptController;
 use App\Http\Controllers\Tools\BookkeepingRelationController;
 use App\Http\Controllers\Tools\BookkeepingReportsController;
+use App\Http\Controllers\Tools\BookkeepingSettingsController;
 use App\Http\Controllers\Tools\BookkeepingVatRateController;
 use App\Http\Controllers\Tools\DiffController;
 use App\Http\Controllers\Tools\FaviconGeneratorController;
@@ -166,6 +168,21 @@ Route::prefix('{locale}')
 					->whereUuid('id')->name('receipt.destroy');
 
 				Route::get('/logboek', [BookkeepingAuditLogController::class, 'index'])->name('audit-log.index');
+
+				Route::get('/instellingen', [BookkeepingSettingsController::class, 'edit'])->name('settings.edit');
+				Route::put('/instellingen', [BookkeepingSettingsController::class, 'update'])->name('settings.update');
+
+				Route::get('/facturen', [BookkeepingInvoiceController::class, 'index'])->name('invoices.index');
+				Route::get('/facturen/nieuw', [BookkeepingInvoiceController::class, 'create'])->name('invoices.create');
+				Route::post('/facturen', [BookkeepingInvoiceController::class, 'store'])->name('invoices.store');
+				Route::get('/facturen/{id}', [BookkeepingInvoiceController::class, 'show'])->whereUuid('id')->name('invoices.show');
+				Route::get('/facturen/{id}/bewerken', [BookkeepingInvoiceController::class, 'edit'])->whereUuid('id')->name('invoices.edit');
+				Route::put('/facturen/{id}', [BookkeepingInvoiceController::class, 'update'])->whereUuid('id')->name('invoices.update');
+				Route::delete('/facturen/{id}', [BookkeepingInvoiceController::class, 'destroy'])->whereUuid('id')->name('invoices.destroy');
+				Route::get('/facturen/{id}/pdf', [BookkeepingInvoiceController::class, 'pdf'])->whereUuid('id')->name('invoices.pdf');
+				Route::post('/facturen/{id}/verzenden', [BookkeepingInvoiceController::class, 'markSent'])->whereUuid('id')->name('invoices.mark-sent');
+				Route::post('/facturen/{id}/betaald', [BookkeepingInvoiceController::class, 'markPaid'])->whereUuid('id')->name('invoices.mark-paid');
+				Route::post('/facturen/{id}/annuleren', [BookkeepingInvoiceController::class, 'markCancelled'])->whereUuid('id')->name('invoices.mark-cancelled');
 
 				Route::get('/import', [BookkeepingImportController::class, 'show'])->name('import.show');
 				Route::post('/import', [BookkeepingImportController::class, 'upload'])->name('import.upload');
