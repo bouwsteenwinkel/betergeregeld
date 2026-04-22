@@ -555,6 +555,7 @@
 	"audit.entity.relation": "Relatie",
 	"audit.entity.category": "Categorie",
 	"audit.entity.vat_rate": "BTW-tarief",
+	"audit.entity.invoice": "Factuur",
 	"audit.action.created": "Aangemaakt",
 	"audit.action.updated": "Gewijzigd",
 	"audit.action.deleted": "Verwijderd",

@@ -68,8 +68,16 @@
 					@csrf
 					<button type="submit" class="btn-accent text-sm">{{ __('Markeer als betaald') }}</button>
 				</form>
+			@endif
+			@if ($invoice->status !== 'cancelled')
+				@php
+					$autoTxCount = $invoice->transactions->where('import_source', 'invoice')->count();
+					$cancelConfirm = $invoice->status === 'paid' && $autoTxCount > 0
+						? __('Deze factuur is op betaald gezet. Annuleren verwijdert ook :n automatisch aangemaakte transactie(s). Doorgaan?', ['n' => $autoTxCount])
+						: __('Factuur annuleren?');
+				@endphp
 				<form method="POST" action="{{ route('tools.bookkeeping.invoices.mark-cancelled', ['locale' => $locale, 'id' => $invoice->id]) }}" class="inline"
-					onsubmit="return confirm('{{ __('Factuur annuleren?') }}')">
+					onsubmit="return confirm('{{ $cancelConfirm }}')">
 					@csrf
 					<button type="submit" class="text-sm text-red-600 hover:text-red-800 px-3 py-2">{{ __('Annuleer factuur') }}</button>
 				</form>

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\BookkeepingCategory;
+use App\Models\BookkeepingInvoice;
 use App\Models\BookkeepingRelation;
 use App\Models\BookkeepingTransaction;
 use App\Models\BookkeepingVatRate;
@@ -31,5 +32,6 @@ class AppServiceProvider extends ServiceProvider
         BookkeepingRelation::observe(BookkeepingAuditObserver::class);
         BookkeepingCategory::observe(BookkeepingAuditObserver::class);
         BookkeepingVatRate::observe(BookkeepingAuditObserver::class);
+        BookkeepingInvoice::observe(BookkeepingAuditObserver::class);
     }
 }

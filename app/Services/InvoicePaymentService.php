@@ -84,4 +84,22 @@ class InvoicePaymentService
 
 		return $created;
 	}
+
+	/**
+	 * Deletes the auto-generated transactions for this invoice.
+	 * Only removes rows with import_source='invoice' so manually-linked
+	 * transactions (e.g. user tagged a bank row to this invoice) stay.
+	 *
+	 * Returns the count of deleted rows.
+	 */
+	public function reverseTransactionsForInvoice(BookkeepingInvoice $invoice): int
+	{
+		return BookkeepingTransaction::query()
+			->where('invoice_id', $invoice->id)
+			->where('tenant_id', $invoice->tenant_id)
+			->where('import_source', 'invoice')
+			->get()
+			->each(fn ($tx) => $tx->delete()) // iterate so observer fires per-row
+			->count();
+	}
 }

@@ -202,10 +202,22 @@ class BookkeepingInvoiceController extends Controller
 	{
 		$this->mustHaveAccess($request);
 		$invoice = $this->mustOwn($request, $id);
-		if ($invoice->status !== 'paid') {
-			$invoice->update(['status' => 'cancelled']);
+
+		if ($invoice->status === 'cancelled') {
+			return back();
 		}
-		return back()->with('bookkeeping_message', __('Factuur :n geannuleerd.', ['n' => $invoice->invoice_number]));
+
+		$reversed = 0;
+		if ($invoice->status === 'paid') {
+			$reversed = $this->paymentService->reverseTransactionsForInvoice($invoice);
+		}
+		$invoice->update(['status' => 'cancelled']);
+
+		$msg = __('Factuur :n geannuleerd.', ['n' => $invoice->invoice_number]);
+		if ($reversed > 0) {
+			$msg .= ' ' . __(':n automatische transactie(s) teruggedraaid.', ['n' => $reversed]);
+		}
+		return back()->with('bookkeeping_message', $msg);
 	}
 
 	public function pdf(Request $request, string $locale, string $id): BinaryFileResponse

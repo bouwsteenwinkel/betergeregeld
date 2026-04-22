@@ -555,6 +555,7 @@
 	"audit.entity.relation": "Relation",
 	"audit.entity.category": "Category",
 	"audit.entity.vat_rate": "VAT rate",
+	"audit.entity.invoice": "Invoice",
 	"audit.action.created": "Created",
 	"audit.action.updated": "Updated",
 	"audit.action.deleted": "Deleted",
@@ -659,6 +660,8 @@
 	"Deze transacties zijn automatisch aangemaakt toen de factuur op betaald gezet werd.": "These transactions were created automatically when the invoice was marked as paid.",
 	"Gekoppelde factuur": "Linked invoice",
 	"Bekijk": "View",
+	":n automatische transactie(s) teruggedraaid.": ":n automatic transaction(s) reversed.",
+	"Deze factuur is op betaald gezet. Annuleren verwijdert ook :n automatisch aangemaakte transactie(s). Doorgaan?": "This invoice has been marked paid. Cancelling will also delete :n automatically-created transaction(s). Continue?",
 
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",

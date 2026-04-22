@@ -22,6 +22,7 @@ class BookkeepingAuditObserver
 		'App\\Models\\BookkeepingRelation' => 'relation',
 		'App\\Models\\BookkeepingCategory' => 'category',
 		'App\\Models\\BookkeepingVatRate' => 'vat_rate',
+		'App\\Models\\BookkeepingInvoice' => 'invoice',
 	];
 
 	public function created(Model $model): void

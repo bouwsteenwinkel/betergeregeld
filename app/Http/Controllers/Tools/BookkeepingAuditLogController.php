@@ -21,7 +21,7 @@ class BookkeepingAuditLogController extends Controller
 		);
 
 		$filters = $request->validate([
-			'entity_type' => ['nullable', 'in:transaction,relation,category,vat_rate'],
+			'entity_type' => ['nullable', 'in:transaction,relation,category,vat_rate,invoice'],
 			'action' => ['nullable', 'in:created,updated,deleted'],
 			'from' => ['nullable', 'date'],
 			'to' => ['nullable', 'date'],
