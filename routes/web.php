@@ -13,6 +13,7 @@ use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\BookkeepingController;
+use App\Http\Controllers\Tools\BookkeepingReportsController;
 use App\Http\Controllers\Tools\DiffController;
 use App\Http\Controllers\Tools\FaviconGeneratorController;
 use App\Http\Controllers\Tools\IbanCheckController;
@@ -134,6 +135,8 @@ Route::prefix('{locale}')
 				Route::get('/', [BookkeepingController::class, 'index'])->name('index');
 				Route::get('/nieuw', [BookkeepingController::class, 'create'])->name('create');
 				Route::post('/', [BookkeepingController::class, 'store'])->name('store');
+				Route::get('/rapporten/winst-verlies', [BookkeepingReportsController::class, 'profitLoss'])->name('reports.profit-loss');
+				Route::get('/rapporten/btw-aangifte', [BookkeepingReportsController::class, 'vatReturn'])->name('reports.vat');
 				Route::get('/{id}/bewerken', [BookkeepingController::class, 'edit'])->name('edit');
 				Route::put('/{id}', [BookkeepingController::class, 'update'])->name('update');
 				Route::delete('/{id}', [BookkeepingController::class, 'destroy'])->name('destroy');

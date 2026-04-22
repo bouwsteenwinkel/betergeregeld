@@ -38,7 +38,9 @@
 	</div>
 </section>
 
-<section class="py-10">
+@include('tools.bookkeeping._subnav')
+
+<section class="py-6">
 	<div class="max-w-[1200px] mx-auto px-6">
 		@if (session('bookkeeping_message'))
 			<div class="rounded-[var(--radius-control)] border border-emerald-200 bg-emerald-50 text-emerald-900 p-3 text-sm mb-4">
