@@ -15,6 +15,7 @@ use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\BookkeepingAuditLogController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
+use App\Http\Controllers\Tools\BookkeepingImportController;
 use App\Http\Controllers\Tools\BookkeepingReceiptController;
 use App\Http\Controllers\Tools\BookkeepingRelationController;
 use App\Http\Controllers\Tools\BookkeepingReportsController;
@@ -165,6 +166,11 @@ Route::prefix('{locale}')
 					->whereUuid('id')->name('receipt.destroy');
 
 				Route::get('/logboek', [BookkeepingAuditLogController::class, 'index'])->name('audit-log.index');
+
+				Route::get('/import', [BookkeepingImportController::class, 'show'])->name('import.show');
+				Route::post('/import', [BookkeepingImportController::class, 'upload'])->name('import.upload');
+				Route::get('/import/{key}/voorbeeld', [BookkeepingImportController::class, 'preview'])->name('import.preview');
+				Route::post('/import/{key}/commit', [BookkeepingImportController::class, 'commit'])->name('import.commit');
 
 				Route::get('/relaties', [BookkeepingRelationController::class, 'index'])->name('relations.index');
 				Route::get('/relaties/nieuw', [BookkeepingRelationController::class, 'create'])->name('relations.create');

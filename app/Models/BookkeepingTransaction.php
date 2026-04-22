@@ -27,6 +27,7 @@ class BookkeepingTransaction extends Model
 		'vat_rate_id', 'vat_included', 'vat_deductible',
 		'category_id', 'relation_id',
 		'description', 'counterparty', 'invoice_number', 'receipt_path',
+		'bank_reference', 'import_source',
 	];
 
 	public function category()
