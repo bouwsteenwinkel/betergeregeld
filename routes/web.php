@@ -12,6 +12,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
+use App\Http\Controllers\Tools\BookkeepingAuditLogController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
 use App\Http\Controllers\Tools\BookkeepingReceiptController;
@@ -162,6 +163,8 @@ Route::prefix('{locale}')
 					->whereUuid('id')->name('receipt.download');
 				Route::delete('/{id}/bonnetje', [BookkeepingReceiptController::class, 'destroy'])
 					->whereUuid('id')->name('receipt.destroy');
+
+				Route::get('/logboek', [BookkeepingAuditLogController::class, 'index'])->name('audit-log.index');
 
 				Route::get('/relaties', [BookkeepingRelationController::class, 'index'])->name('relations.index');
 				Route::get('/relaties/nieuw', [BookkeepingRelationController::class, 'create'])->name('relations.create');

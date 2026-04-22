@@ -8,6 +8,7 @@
 			['route' => 'tools.bookkeeping.reports.vat',                  'label' => __('BTW-aangifte')],
 			['route' => 'tools.bookkeeping.categories.index',             'label' => __('Categorieën'), 'admin' => true],
 			['route' => 'tools.bookkeeping.vat-rates.index',              'label' => __('BTW-tarieven'), 'admin' => true],
+			['route' => 'tools.bookkeeping.audit-log.index',              'label' => __('Logboek'), 'admin' => true],
 		] as $tab)
 			@php $active = request()->routeIs($tab['route']); @endphp
 			<a href="{{ route($tab['route'], ['locale' => $locale]) }}"
