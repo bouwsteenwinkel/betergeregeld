@@ -532,6 +532,13 @@
 	"alleen invullen als niet uit relatielijst": "only fill if not from relations list",
 	"Laat leeg als je hierboven een relatie hebt gekozen.": "Leave blank if you picked a relation above.",
 
+	"Bonnetje": "Receipt",
+	"Bonnetje bekijken": "View receipt",
+	"Bonnetje verwijderen?": "Delete receipt?",
+	"Bonnetje verwijderd.": "Receipt deleted.",
+	"Upload een nieuw bestand om het bestaande bonnetje te vervangen.": "Upload a new file to replace the existing receipt.",
+	"PDF, JPG of PNG — max 10 MB. Optioneel.": "PDF, JPG or PNG — max 10 MB. Optional.",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

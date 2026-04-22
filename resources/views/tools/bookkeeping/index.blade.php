@@ -128,7 +128,16 @@
 								<tr class="border-b border-[color:var(--color-line)]/60">
 									<td class="py-3 pr-3 tabular-nums text-[color:var(--color-ink-muted)]">{{ $tx->transaction_date->format('d-m-Y') }}</td>
 									<td class="py-3 px-3">
-										<div class="font-medium">{{ $tx->description }}</div>
+										<div class="font-medium flex items-center gap-2">
+											<span>{{ $tx->description }}</span>
+											@if ($tx->receipt_path)
+												<a href="{{ route('tools.bookkeeping.receipt.view', ['locale' => $locale, 'id' => $tx->id]) }}" target="_blank" rel="noopener"
+													title="{{ __('Bonnetje bekijken') }}"
+													class="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded bg-[color:var(--color-accent)]/10 text-[color:var(--color-accent)] hover:bg-[color:var(--color-accent)]/20">
+													<svg class="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 2h6l4 4v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z M10 2v4h4 M6 9h4M6 12h3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+												</a>
+											@endif
+										</div>
 										@if ($tx->invoice_number)
 											<div class="text-xs text-[color:var(--color-ink-soft)] font-mono">{{ $tx->invoice_number }}</div>
 										@endif

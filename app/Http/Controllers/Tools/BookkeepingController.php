@@ -93,7 +93,8 @@ class BookkeepingController extends Controller
 		$data['tenant_id'] = $request->user()->tenant_id;
 		$data['created_by_user_id'] = $request->user()->getAuthIdentifier();
 
-		BookkeepingTransaction::create($data);
+		$transaction = BookkeepingTransaction::create($data);
+		$this->handleReceiptUpload($request, $transaction);
 
 		return redirect()->route('tools.bookkeeping.index', ['locale' => $locale])
 			->with('bookkeeping_message', __('Transactie toegevoegd.'));
@@ -118,6 +119,7 @@ class BookkeepingController extends Controller
 		$this->mustHaveAccess($request);
 		$transaction = $this->mustOwn($request, $id);
 		$transaction->update($this->validated($request));
+		$this->handleReceiptUpload($request, $transaction);
 
 		return redirect()->route('tools.bookkeeping.index', ['locale' => $locale])
 			->with('bookkeeping_message', __('Transactie bijgewerkt.'));
@@ -127,6 +129,9 @@ class BookkeepingController extends Controller
 	{
 		$this->mustHaveAccess($request);
 		$transaction = $this->mustOwn($request, $id);
+		if ($transaction->receipt_path && is_file($transaction->receipt_path)) {
+			@unlink($transaction->receipt_path);
+		}
 		$transaction->delete();
 
 		return redirect()->route('tools.bookkeeping.index', ['locale' => $locale])
@@ -206,5 +211,42 @@ class BookkeepingController extends Controller
 			->matchingType($transactionType)
 			->orderBy('name')
 			->get();
+	}
+
+	/**
+	 * If a receipt file is in the request, store it under
+	 * storage/app/bookkeeping/receipts/{tenant_id}/{transaction_id}.{ext}
+	 * and update the transaction. Replaces any existing receipt.
+	 */
+	private function handleReceiptUpload(Request $request, BookkeepingTransaction $transaction): void
+	{
+		$request->validate([
+			'receipt' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+		]);
+
+		if (! $request->hasFile('receipt')) {
+			return;
+		}
+
+		// Remove existing receipt if present
+		if ($transaction->receipt_path && is_file($transaction->receipt_path)) {
+			@unlink($transaction->receipt_path);
+		}
+
+		$file = $request->file('receipt');
+		$ext = strtolower($file->getClientOriginalExtension() ?: 'bin');
+		if ($ext === 'jpeg') {
+			$ext = 'jpg';
+		}
+
+		$dir = storage_path('app/bookkeeping/receipts/' . $transaction->tenant_id);
+		if (! is_dir($dir)) {
+			mkdir($dir, 0755, true);
+		}
+
+		$path = $dir . '/' . $transaction->id . '.' . $ext;
+		$file->move(dirname($path), basename($path));
+
+		$transaction->update(['receipt_path' => $path]);
 	}
 }

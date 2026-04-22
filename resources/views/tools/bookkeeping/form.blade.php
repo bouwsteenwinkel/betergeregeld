@@ -35,7 +35,7 @@
 
 <section class="py-10">
 	<div class="max-w-[900px] mx-auto px-6">
-		<form method="POST" action="{{ $action }}" class="card space-y-5">
+		<form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="card space-y-5">
 			@csrf
 			@if ($isEdit) @method('PUT') @endif
 
@@ -144,6 +144,45 @@
 						<span>{{ __('BTW aftrekbaar') }}</span>
 					</label>
 				</div>
+			</div>
+
+			<div>
+				<label for="receipt" class="block text-sm font-semibold mb-2">{{ __('Bonnetje') }}</label>
+				@if ($isEdit && $t->receipt_path)
+					@php
+						$ext = strtolower(pathinfo($t->receipt_path, PATHINFO_EXTENSION));
+						$isImage = in_array($ext, ['jpg', 'jpeg', 'png'], true);
+					@endphp
+					<div class="flex items-center gap-3 p-3 rounded-[var(--radius-control)] border border-[color:var(--color-line)] bg-[color:var(--color-surface-soft,#fafafa)] mb-3">
+						@if ($isImage)
+							<a href="{{ route('tools.bookkeeping.receipt.view', ['locale' => $locale, 'id' => $t->id]) }}" target="_blank" rel="noopener" class="shrink-0">
+								<img src="{{ route('tools.bookkeeping.receipt.view', ['locale' => $locale, 'id' => $t->id]) }}"
+									alt="bonnetje" class="w-16 h-16 object-cover rounded border border-[color:var(--color-line)]">
+							</a>
+						@else
+							<div class="shrink-0 w-16 h-16 rounded-[var(--radius-control)] bg-[color:var(--color-accent)]/10 text-[color:var(--color-accent)] inline-flex items-center justify-center text-xs font-bold">PDF</div>
+						@endif
+						<div class="flex-1 min-w-0">
+							<div class="text-sm font-mono truncate">{{ basename($t->receipt_path) }}</div>
+							<div class="text-xs text-[color:var(--color-ink-soft)]">{{ round(filesize($t->receipt_path) / 1024) }} KB</div>
+						</div>
+						<a href="{{ route('tools.bookkeeping.receipt.download', ['locale' => $locale, 'id' => $t->id]) }}" class="text-xs text-[color:var(--color-accent)] hover:underline whitespace-nowrap">{{ __('Download') }}</a>
+						<form method="POST" action="{{ route('tools.bookkeeping.receipt.destroy', ['locale' => $locale, 'id' => $t->id]) }}" class="inline"
+							onsubmit="return confirm('{{ __('Bonnetje verwijderen?') }}')">
+							@csrf @method('DELETE')
+							<button type="submit" class="text-xs text-red-600 hover:underline whitespace-nowrap">{{ __('Verwijderen') }}</button>
+						</form>
+					</div>
+				@endif
+				<input id="receipt" name="receipt" type="file" accept="application/pdf,image/jpeg,image/png"
+					class="field-input">
+				<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5">
+					@if ($isEdit && $t->receipt_path)
+						{{ __('Upload een nieuw bestand om het bestaande bonnetje te vervangen.') }}
+					@else
+						{{ __('PDF, JPG of PNG — max 10 MB. Optioneel.') }}
+					@endif
+				</p>
 			</div>
 
 			<div>

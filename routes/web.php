@@ -14,6 +14,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
+use App\Http\Controllers\Tools\BookkeepingReceiptController;
 use App\Http\Controllers\Tools\BookkeepingRelationController;
 use App\Http\Controllers\Tools\BookkeepingReportsController;
 use App\Http\Controllers\Tools\BookkeepingVatRateController;
@@ -154,6 +155,13 @@ Route::prefix('{locale}')
 				Route::get('/btw-tarieven/{id}/bewerken', [BookkeepingVatRateController::class, 'edit'])->name('vat-rates.edit');
 				Route::put('/btw-tarieven/{id}', [BookkeepingVatRateController::class, 'update'])->name('vat-rates.update');
 				Route::delete('/btw-tarieven/{id}', [BookkeepingVatRateController::class, 'destroy'])->name('vat-rates.destroy');
+
+				Route::get('/{id}/bonnetje', [BookkeepingReceiptController::class, 'view'])
+					->whereUuid('id')->name('receipt.view');
+				Route::get('/{id}/bonnetje/download', [BookkeepingReceiptController::class, 'download'])
+					->whereUuid('id')->name('receipt.download');
+				Route::delete('/{id}/bonnetje', [BookkeepingReceiptController::class, 'destroy'])
+					->whereUuid('id')->name('receipt.destroy');
 
 				Route::get('/relaties', [BookkeepingRelationController::class, 'index'])->name('relations.index');
 				Route::get('/relaties/nieuw', [BookkeepingRelationController::class, 'create'])->name('relations.create');
