@@ -32,7 +32,7 @@
 				<div class="hidden md:flex items-center gap-6 font-medium">
 					<a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Home') }}</a>
 					<a href="/{{ $currentLocale }}/diensten" class="{{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Diensten') }}</a>
-					<a href="/{{ $currentLocale }}/tools/iban-check" class="{{ request()->is('*tools*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Tools') }}</a>
+					<a href="/{{ $currentLocale }}/tools" class="{{ request()->is('*tools*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Tools') }}</a>
 					<a href="/{{ $currentLocale }}/prijzen" class="{{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Prijzen') }}</a>
 					<a href="/{{ $currentLocale }}/over" class="{{ request()->is('*over*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Over ons') }}</a>
 					<a href="/{{ $currentLocale }}/contact" class="{{ request()->is('*contact*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Contact') }}</a>

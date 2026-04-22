@@ -9,6 +9,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\DiffController;
@@ -74,6 +75,8 @@ Route::prefix('{locale}')
 			Route::post('/settings/2fa/enable', [TwoFactorSettingsController::class, 'enable'])->name('settings.2fa.enable');
 			Route::post('/settings/2fa/disable', [TwoFactorSettingsController::class, 'disable'])->name('settings.2fa.disable');
 		});
+
+		Route::get('/tools', [ToolsIndexController::class, 'show'])->name('tools.index');
 
 		Route::prefix('tools')->name('tools.')->group(function () {
 			Route::middleware('tool.limit:iban')->group(function () {
