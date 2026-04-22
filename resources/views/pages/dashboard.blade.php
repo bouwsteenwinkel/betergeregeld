@@ -189,6 +189,69 @@
 			</div>
 		</div>
 
+		@if ($bookkeeping)
+			@php
+				$fmt = fn ($v) => '€' . number_format((float) $v, 2, ',', '.');
+			@endphp
+			<div class="card lg:col-span-3">
+				<div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
+					<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)]">
+						{{ __('Boekhouden — snapshot') }}
+					</h2>
+					<a href="{{ route('tools.bookkeeping.index', ['locale' => $locale]) }}" class="text-xs text-[color:var(--color-accent)] hover:underline">
+						{{ __('Naar boekhouden') }} →
+					</a>
+				</div>
+
+				<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+					<a href="{{ route('tools.bookkeeping.invoices.index', ['locale' => $locale, 'status' => 'sent']) }}" class="block">
+						<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)] font-bold mb-1">{{ __('Openstaand') }}</div>
+						<div class="text-2xl font-bold tabular-nums">{{ $fmt($bookkeeping['outstanding']['sum']) }}</div>
+						<div class="text-xs text-[color:var(--color-ink-soft)]">{{ $bookkeeping['outstanding']['count'] }} {{ __('facturen') }}</div>
+					</a>
+					<a href="{{ route('tools.bookkeeping.invoices.index', ['locale' => $locale, 'status' => 'sent']) }}" class="block">
+						<div class="text-xs uppercase tracking-wider font-bold mb-1 {{ $bookkeeping['overdue']['count'] > 0 ? 'text-red-700' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Vervallen') }}</div>
+						<div class="text-2xl font-bold tabular-nums {{ $bookkeeping['overdue']['count'] > 0 ? 'text-red-700' : '' }}">{{ $fmt($bookkeeping['overdue']['sum']) }}</div>
+						<div class="text-xs text-[color:var(--color-ink-soft)]">{{ $bookkeeping['overdue']['count'] }} {{ __('facturen') }}</div>
+					</a>
+					<div>
+						<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)] font-bold mb-1">{{ __('Deze week vervalt') }}</div>
+						<div class="text-2xl font-bold tabular-nums">{{ $fmt($bookkeeping['upcoming']['sum']) }}</div>
+						<div class="text-xs text-[color:var(--color-ink-soft)]">{{ $bookkeeping['upcoming']['count'] }} {{ __('facturen') }}</div>
+					</div>
+					<div>
+						<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)] font-bold mb-1">
+							{{ __('Deze maand') }} · {{ $fmt($bookkeeping['mtd']['result']) }}
+						</div>
+						<div class="text-xs text-emerald-700 tabular-nums">+ {{ $fmt($bookkeeping['mtd']['income']) }} {{ __('omzet') }}</div>
+						<div class="text-xs text-red-700 tabular-nums">− {{ $fmt($bookkeeping['mtd']['expense']) }} {{ __('kosten') }}</div>
+					</div>
+				</div>
+
+				@if ($bookkeeping['recent']->isNotEmpty())
+					<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-2">{{ __('Laatst betaald') }}</h3>
+					<table class="w-full text-sm">
+						<tbody>
+							@foreach ($bookkeeping['recent'] as $inv)
+								<tr class="border-b border-[color:var(--color-line)]/60 last:border-b-0">
+									<td class="py-1.5 pr-3 font-mono text-xs">
+										<a href="{{ route('tools.bookkeeping.invoices.show', ['locale' => $locale, 'id' => $inv->id]) }}" class="hover:text-[color:var(--color-accent)]">
+											{{ $inv->invoice_number }}
+										</a>
+									</td>
+									<td class="py-1.5 px-3 text-[color:var(--color-ink-muted)]">{{ $inv->relation?->name ?? '—' }}</td>
+									<td class="py-1.5 px-3 text-[color:var(--color-ink-soft)] tabular-nums text-xs">
+										{{ $inv->paid_at?->format('d-m-Y') ?? '—' }}
+									</td>
+									<td class="py-1.5 pl-3 text-right tabular-nums font-medium text-emerald-700">+{{ $fmt($inv->total) }}</td>
+								</tr>
+							@endforeach
+						</tbody>
+					</table>
+				@endif
+			</div>
+		@endif
+
 		{{-- QUICK SETTINGS --}}
 		<div class="card lg:col-span-3">
 			<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-4">{{ __('Instellingen') }}</h2>

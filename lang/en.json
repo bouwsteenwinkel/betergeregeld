@@ -681,6 +681,17 @@
 	"reminder.overdue_7": "7d overdue",
 	"reminder.overdue_21": "21d overdue",
 
+	"Boekhouden — snapshot": "Bookkeeping — snapshot",
+	"Naar boekhouden": "Open bookkeeping",
+	"Openstaand": "Outstanding",
+	"Vervallen": "Overdue",
+	"Deze week vervalt": "Due this week",
+	"Deze maand": "This month",
+	"omzet": "revenue",
+	"kosten": "expenses",
+	"facturen": "invoices",
+	"Laatst betaald": "Recently paid",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

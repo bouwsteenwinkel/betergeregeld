@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BookkeepingInvoice;
+use App\Models\BookkeepingTransaction;
 use App\Models\Plan;
 use App\Models\TenantSubscription;
 use App\Models\ToolUsageDaily;
@@ -79,6 +81,11 @@ class DashboardController extends Controller
 			->orderBy('sort_order')
 			->get(['id', 'plan_key', 'name', 'price_monthly', 'trial_days']);
 
+		$bookkeeping = null;
+		if ($bag->bool('tool.bookkeeping.enabled')) {
+			$bookkeeping = $this->bookkeepingSnapshot($user->tenant_id);
+		}
+
 		return view('pages.dashboard', [
 			'user' => $user,
 			'plan' => $plan,
@@ -86,6 +93,55 @@ class DashboardController extends Controller
 			'subscription' => $subscription,
 			'tools' => $tools,
 			'otherPlans' => $otherPlans,
+			'bookkeeping' => $bookkeeping,
 		]);
+	}
+
+	/** @return array{outstanding:array,overdue:array,upcoming:array,mtd:array,recent:array} */
+	private function bookkeepingSnapshot(string $tenantId): array
+	{
+		$today = CarbonImmutable::now();
+		$todayStr = $today->toDateString();
+		$weekAheadStr = $today->addDays(7)->toDateString();
+		$monthStartStr = $today->startOfMonth()->toDateString();
+
+		$invoicesBase = BookkeepingInvoice::query()
+			->where('tenant_id', $tenantId)
+			->where('status', 'sent');
+
+		$outstanding = [
+			'count' => (clone $invoicesBase)->count(),
+			'sum' => (float) (clone $invoicesBase)->sum('total'),
+		];
+
+		$overdue = [
+			'count' => (clone $invoicesBase)->whereNotNull('due_date')->where('due_date', '<', $todayStr)->count(),
+			'sum' => (float) (clone $invoicesBase)->whereNotNull('due_date')->where('due_date', '<', $todayStr)->sum('total'),
+		];
+
+		$upcoming = [
+			'count' => (clone $invoicesBase)->whereBetween('due_date', [$todayStr, $weekAheadStr])->count(),
+			'sum' => (float) (clone $invoicesBase)->whereBetween('due_date', [$todayStr, $weekAheadStr])->sum('total'),
+		];
+
+		$txBase = BookkeepingTransaction::query()
+			->where('tenant_id', $tenantId)
+			->where('transaction_date', '>=', $monthStartStr);
+
+		$mtd = [
+			'income' => (float) (clone $txBase)->where('type', 'income')->sum('amount'),
+			'expense' => (float) (clone $txBase)->where('type', 'expense')->sum('amount'),
+		];
+		$mtd['result'] = $mtd['income'] - $mtd['expense'];
+
+		$recent = BookkeepingInvoice::query()
+			->where('tenant_id', $tenantId)
+			->where('status', 'paid')
+			->with('relation:id,name')
+			->orderByDesc('paid_at')
+			->limit(5)
+			->get(['id', 'invoice_number', 'total', 'paid_at', 'relation_id']);
+
+		return compact('outstanding', 'overdue', 'upcoming', 'mtd', 'recent');
 	}
 }
