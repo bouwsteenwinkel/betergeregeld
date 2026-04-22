@@ -18,6 +18,7 @@
 		'files' => '<path d="M8 4h8l4 4v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z M4 8v12a2 2 0 0 0 2 2h10"/>',
 		'image' => '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 15-5-5-8 8"/>',
 		'shield' => '<path d="M12 2 4 5v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3Z"/><path d="M9 12h6M9 9h6"/>',
+		'book' => '<path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V4Z"/><path d="M4 18h14M8 8h6M8 12h6"/>',
 	];
 @endphp
 

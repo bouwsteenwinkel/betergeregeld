@@ -17,6 +17,15 @@ class ToolsIndexController extends Controller
 				'subtitle_en' => 'Checks on customer and payment data.',
 				'tools' => [
 					[
+						'slug' => 'bookkeeping',
+						'route' => 'tools.bookkeeping.index',
+						'title_nl' => 'Boekhouden', 'title_en' => 'Bookkeeping',
+						'desc_nl' => 'Eenvoudige administratie: transacties met BTW, categorieën en filterbare overzichten.',
+						'desc_en' => 'Simple bookkeeping: VAT-aware transactions, categories and filterable overviews.',
+						'badge_nl' => 'Pro', 'badge_en' => 'Pro',
+						'icon' => 'book',
+					],
+					[
 						'slug' => 'iban-check',
 						'route' => 'tools.iban-check',
 						'title_nl' => 'IBAN-check', 'title_en' => 'IBAN check',

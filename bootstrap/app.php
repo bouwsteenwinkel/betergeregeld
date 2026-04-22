@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,6 +21,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/*',
             'tools/speedtest/upload',
         ]);
+
+        // Guests redirect to the login of their current locale (falling back
+        // to the app default). Without this, unauthenticated requests to any
+        // {locale}-prefixed route fail because route('login') can't resolve
+        // the missing {locale} parameter.
+        $middleware->redirectGuestsTo(function (Request $request) {
+            $supported = \App\Http\Middleware\SetLocale::SUPPORTED;
+            $seg = $request->segment(1);
+            $locale = (is_string($seg) && in_array($seg, $supported, true))
+                ? $seg
+                : config('app.locale', 'nl');
+            return route('login', ['locale' => $locale]);
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

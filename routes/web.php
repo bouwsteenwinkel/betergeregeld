@@ -12,6 +12,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
+use App\Http\Controllers\Tools\BookkeepingController;
 use App\Http\Controllers\Tools\DiffController;
 use App\Http\Controllers\Tools\FaviconGeneratorController;
 use App\Http\Controllers\Tools\IbanCheckController;
@@ -127,6 +128,15 @@ Route::prefix('{locale}')
 				Route::post('/pdf-merge/merge', [PdfMergeController::class, 'merge'])->name('pdf-merge.merge');
 				Route::get('/pdf-merge/download/{key}', [PdfMergeController::class, 'download'])->name('pdf-merge.download');
 				Route::post('/pdf-merge/reset', [PdfMergeController::class, 'reset'])->name('pdf-merge.reset');
+			});
+
+			Route::middleware('auth')->prefix('boekhouden')->name('bookkeeping.')->group(function () {
+				Route::get('/', [BookkeepingController::class, 'index'])->name('index');
+				Route::get('/nieuw', [BookkeepingController::class, 'create'])->name('create');
+				Route::post('/', [BookkeepingController::class, 'store'])->name('store');
+				Route::get('/{id}/bewerken', [BookkeepingController::class, 'edit'])->name('edit');
+				Route::put('/{id}', [BookkeepingController::class, 'update'])->name('update');
+				Route::delete('/{id}', [BookkeepingController::class, 'destroy'])->name('destroy');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

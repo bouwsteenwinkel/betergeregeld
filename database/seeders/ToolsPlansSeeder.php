@@ -63,6 +63,8 @@ class ToolsPlansSeeder extends Seeder
 
 					'tool.loss.active_cases' => '1',
 					'tool.loss.team_view' => '0',
+
+					'tool.bookkeeping.enabled' => '0',
 				],
 			],
 			[
@@ -111,6 +113,8 @@ class ToolsPlansSeeder extends Seeder
 
 					'tool.loss.active_cases' => '10',
 					'tool.loss.team_view' => '0',
+
+					'tool.bookkeeping.enabled' => '1',
 				],
 			],
 			[
@@ -154,6 +158,9 @@ class ToolsPlansSeeder extends Seeder
 
 					'tool.loss.active_cases' => 'unlimited',
 					'tool.loss.team_view' => '1',
+
+					'tool.bookkeeping.enabled' => '1',
+					'tool.bookkeeping.multi_user' => '1',
 				],
 			],
 		];

@@ -105,6 +105,7 @@
 						<li><a href="/{{ $currentLocale }}/tools/speedtest" class="hover:text-white">{{ __('Speedtest') }}</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/pdf-merge" class="hover:text-white">{{ __('PDF merge') }}</a></li>
 						<li><a href="/{{ $currentLocale }}/tools/pdf-redact" class="hover:text-white">{{ __('PDF redact') }}</a></li>
+						<li><a href="/{{ $currentLocale }}/tools/boekhouden" class="hover:text-white">{{ __('Boekhouden') }}</a></li>
 					</ul>
 				</div>
 				<div>
