@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Tools;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookkeepingCategory;
+use App\Models\BookkeepingRelation;
 use App\Models\BookkeepingTransaction;
 use App\Models\BookkeepingVatRate;
 use App\Services\Features\FeatureResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class BookkeepingController extends Controller
@@ -29,7 +31,7 @@ class BookkeepingController extends Controller
 
 		$q = BookkeepingTransaction::query()
 			->where('tenant_id', $user->tenant_id)
-			->with(['category', 'vatRate'])
+			->with(['category', 'vatRate', 'relation'])
 			->orderByDesc('transaction_date')
 			->orderByDesc('created_at');
 
@@ -73,11 +75,13 @@ class BookkeepingController extends Controller
 	public function create(Request $request, string $locale): View
 	{
 		$this->mustHaveAccess($request);
+		$type = $request->query('type') === 'income' ? 'income' : 'expense';
 		return view('tools.bookkeeping.form', [
 			'transaction' => null,
-			'type' => $request->query('type') === 'income' ? 'income' : 'expense',
+			'type' => $type,
 			'categories' => $this->categoriesFor($request->user()),
 			'vatRates' => $this->vatRatesFor($request->user()),
+			'relations' => $this->relationsFor($request->user(), $type),
 		]);
 	}
 
@@ -105,6 +109,7 @@ class BookkeepingController extends Controller
 			'type' => $transaction->type,
 			'categories' => $this->categoriesFor($request->user()),
 			'vatRates' => $this->vatRatesFor($request->user()),
+			'relations' => $this->relationsFor($request->user(), $transaction->type),
 		]);
 	}
 
@@ -160,6 +165,10 @@ class BookkeepingController extends Controller
 			'vat_included' => ['nullable', 'boolean'],
 			'vat_deductible' => ['nullable', 'boolean'],
 			'category_id' => ['nullable', 'integer', 'exists:bookkeeping_categories,id'],
+			'relation_id' => [
+				'nullable', 'integer',
+				Rule::exists('bookkeeping_relations', 'id')->where('tenant_id', $request->user()->tenant_id),
+			],
 			'description' => ['required', 'string', 'max:500'],
 			'counterparty' => ['nullable', 'string', 'max:190'],
 			'invoice_number' => ['nullable', 'string', 'max:64'],
@@ -186,6 +195,16 @@ class BookkeepingController extends Controller
 			->forTenant($user->tenant_id)
 			->orderBy('is_default', 'desc')
 			->orderByDesc('rate')
+			->get();
+	}
+
+	private function relationsFor($user, string $transactionType)
+	{
+		return BookkeepingRelation::query()
+			->where('tenant_id', $user->tenant_id)
+			->active()
+			->matchingType($transactionType)
+			->orderBy('name')
 			->get();
 	}
 }

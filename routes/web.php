@@ -14,6 +14,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
+use App\Http\Controllers\Tools\BookkeepingRelationController;
 use App\Http\Controllers\Tools\BookkeepingReportsController;
 use App\Http\Controllers\Tools\BookkeepingVatRateController;
 use App\Http\Controllers\Tools\DiffController;
@@ -153,6 +154,13 @@ Route::prefix('{locale}')
 				Route::get('/btw-tarieven/{id}/bewerken', [BookkeepingVatRateController::class, 'edit'])->name('vat-rates.edit');
 				Route::put('/btw-tarieven/{id}', [BookkeepingVatRateController::class, 'update'])->name('vat-rates.update');
 				Route::delete('/btw-tarieven/{id}', [BookkeepingVatRateController::class, 'destroy'])->name('vat-rates.destroy');
+
+				Route::get('/relaties', [BookkeepingRelationController::class, 'index'])->name('relations.index');
+				Route::get('/relaties/nieuw', [BookkeepingRelationController::class, 'create'])->name('relations.create');
+				Route::post('/relaties', [BookkeepingRelationController::class, 'store'])->name('relations.store');
+				Route::get('/relaties/{id}/bewerken', [BookkeepingRelationController::class, 'edit'])->name('relations.edit');
+				Route::put('/relaties/{id}', [BookkeepingRelationController::class, 'update'])->name('relations.update');
+				Route::delete('/relaties/{id}', [BookkeepingRelationController::class, 'destroy'])->name('relations.destroy');
 
 				Route::get('/{id}/bewerken', [BookkeepingController::class, 'edit'])->name('edit');
 				Route::put('/{id}', [BookkeepingController::class, 'update'])->name('update');

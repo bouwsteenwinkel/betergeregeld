@@ -3,6 +3,7 @@
 	<nav class="flex gap-1 border-b border-[color:var(--color-line)] text-sm overflow-x-auto">
 		@foreach ([
 			['route' => 'tools.bookkeeping.index',                         'label' => __('Transacties')],
+			['route' => 'tools.bookkeeping.relations.index',              'label' => __('Relaties')],
 			['route' => 'tools.bookkeeping.reports.profit-loss',          'label' => __('Winst & verlies')],
 			['route' => 'tools.bookkeeping.reports.vat',                  'label' => __('BTW-aangifte')],
 			['route' => 'tools.bookkeeping.categories.index',             'label' => __('Categorieën'), 'admin' => true],

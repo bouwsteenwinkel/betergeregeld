@@ -134,7 +134,13 @@
 										@endif
 									</td>
 									<td class="py-3 px-3 text-[color:var(--color-ink-muted)]">{{ $tx->category?->name ?? '—' }}</td>
-									<td class="py-3 px-3 text-[color:var(--color-ink-muted)]">{{ $tx->counterparty ?? '—' }}</td>
+									<td class="py-3 px-3 text-[color:var(--color-ink-muted)]">
+										@if ($tx->relation)
+											<a href="{{ route('tools.bookkeeping.relations.edit', ['locale' => $locale, 'id' => $tx->relation->id]) }}" class="hover:text-[color:var(--color-accent)]">{{ $tx->relation->name }}</a>
+										@else
+											{{ $tx->counterparty ?? '—' }}
+										@endif
+									</td>
 									<td class="py-3 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">
 										@if ($tx->vatRate)
 											{{ rtrim(rtrim((string) $tx->vatRate->rate, '0'), '.') }}%

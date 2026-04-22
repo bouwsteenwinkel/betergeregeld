@@ -88,10 +88,32 @@
 					</select>
 				</div>
 				<div>
-					<label for="counterparty" class="block text-sm font-semibold mb-2">{{ __('Wederpartij') }}</label>
-					<input id="counterparty" name="counterparty" type="text" maxlength="190"
-						value="{{ $old('counterparty') }}" placeholder="{{ __('klant of leverancier (optioneel)') }}" class="field-input">
+					<label for="relation_id" class="block text-sm font-semibold mb-2">{{ __('Relatie') }}</label>
+					<select id="relation_id" name="relation_id" class="field-input">
+						<option value="">— {{ __('of los invullen hieronder') }} —</option>
+						@foreach ($relations as $rel)
+							<option value="{{ $rel->id }}" @selected((int) $old('relation_id', $transaction->relation_id ?? 0) === $rel->id)>
+								{{ $rel->name }}@if ($rel->city) · {{ $rel->city }}@endif
+							</option>
+						@endforeach
+					</select>
+					@if ($relations->isEmpty())
+						<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5">
+							<a href="{{ route('tools.bookkeeping.relations.create', ['locale' => app()->getLocale()]) }}" class="underline hover:text-[color:var(--color-ink)]">
+								{{ __('Nog geen relaties — voeg er een toe') }}
+							</a>
+						</p>
+					@endif
 				</div>
+			</div>
+
+			<div>
+				<label for="counterparty" class="block text-sm font-semibold mb-2">{{ __('Wederpartij (los)') }}</label>
+				<input id="counterparty" name="counterparty" type="text" maxlength="190"
+					value="{{ $old('counterparty') }}" placeholder="{{ __('alleen invullen als niet uit relatielijst') }}" class="field-input">
+				<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5">
+					{{ __('Laat leeg als je hierboven een relatie hebt gekozen.') }}
+				</p>
 			</div>
 
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">

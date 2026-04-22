@@ -25,7 +25,8 @@ class BookkeepingTransaction extends Model
 		'tenant_id', 'created_by_user_id',
 		'type', 'transaction_date', 'amount',
 		'vat_rate_id', 'vat_included', 'vat_deductible',
-		'category_id', 'description', 'counterparty', 'invoice_number', 'receipt_path',
+		'category_id', 'relation_id',
+		'description', 'counterparty', 'invoice_number', 'receipt_path',
 	];
 
 	public function category()
@@ -36,6 +37,17 @@ class BookkeepingTransaction extends Model
 	public function vatRate()
 	{
 		return $this->belongsTo(BookkeepingVatRate::class, 'vat_rate_id');
+	}
+
+	public function relation()
+	{
+		return $this->belongsTo(BookkeepingRelation::class, 'relation_id');
+	}
+
+	/** Display name for lists — prefer linked relation over free-text counterparty. */
+	public function counterpartyLabel(): ?string
+	{
+		return $this->relation?->name ?: $this->counterparty;
 	}
 
 	/**
