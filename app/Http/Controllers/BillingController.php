@@ -85,7 +85,10 @@ class BillingController extends Controller
 	{
 		abort_unless($this->gateway->isFake() || App::environment('local'), 404);
 
-		$intentModel = BillingIntent::findOrFail($intent);
+		$intentModel = BillingIntent::where('id', $intent)
+			->where('tenant_id', $request->user()->tenant_id)
+			->firstOrFail();
+
 		if ($intentModel->mollie_payment_id) {
 			$this->billing->syncFromGateway($intentModel->mollie_payment_id);
 		}

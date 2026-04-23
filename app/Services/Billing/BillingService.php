@@ -31,6 +31,15 @@ class BillingService
 		}
 
 		$now = CarbonImmutable::now();
+
+		// Starting a trial on a different plan also supersedes any stale
+		// active/trial rows — otherwise we'd leave two "active" rows around.
+		TenantSubscription::query()
+			->where('tenant_key', $user->tenant_id)
+			->where('plan_id', '!=', $plan->id)
+			->whereIn('status', ['active', 'trial', 'trialing'])
+			->update(['status' => 'canceled', 'cancel_at' => $now]);
+
 		return TenantSubscription::updateOrCreate(
 			['tenant_key' => $user->tenant_id, 'plan_id' => $plan->id],
 			[
@@ -131,6 +140,15 @@ class BillingService
 	{
 		$now = CarbonImmutable::now();
 		$periodEnds = $intent->period === 'yearly' ? $now->addYear() : $now->addMonth();
+
+		// Supersede any other active/trial subs on a different plan. Without this,
+		// a Pro→Business upgrade would leave the Pro row "active" too; that
+		// pollutes the table and breaks cancellation downgrade paths.
+		TenantSubscription::query()
+			->where('tenant_key', $intent->tenant_id)
+			->where('plan_id', '!=', $intent->plan_id)
+			->whereIn('status', ['active', 'trial', 'trialing'])
+			->update(['status' => 'canceled', 'cancel_at' => $now]);
 
 		$sub = TenantSubscription::where('tenant_key', $intent->tenant_id)
 			->where('plan_id', $intent->plan_id)
