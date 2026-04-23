@@ -80,6 +80,11 @@ Route::prefix('{locale}')
 		Route::get('/over', fn () => view('pages.about'))->name('about');
 		Route::get('/accessguard', [AccessGuardLandingController::class, 'show'])->name('accessguard.landing');
 		Route::get('/accessguard/demo', [AccessGuardDemoController::class, 'show'])->name('accessguard.demo');
+
+		Route::get('/blog', [\App\Http\Controllers\Blog\BlogController::class, 'index'])->name('blog.index');
+		Route::get('/blog/categorie/{categorySlug}', [\App\Http\Controllers\Blog\BlogController::class, 'category'])->name('blog.category');
+		Route::get('/blog/tag/{tagSlug}', [\App\Http\Controllers\Blog\BlogController::class, 'tag'])->name('blog.tag');
+		Route::get('/blog/{slug}', [\App\Http\Controllers\Blog\BlogController::class, 'show'])->name('blog.show');
 		Route::get('/accessguard/handleiding', [AccessGuardHandleidingController::class, 'download'])->name('accessguard.handleiding');
 		Route::get('/accessguard/notifications/unsubscribe/{token}', [AccessGuardNotificationSettingsController::class, 'unsubscribe'])->name('tools.accessguard.notifications.unsubscribe');
 
