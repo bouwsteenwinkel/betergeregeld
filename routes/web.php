@@ -16,6 +16,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
 use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAccessItemController;
+use App\Http\Controllers\Tools\AccessGuard\AccessProfileController as AccessGuardAccessProfileController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\DataController as AccessGuardDataController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
@@ -331,6 +332,15 @@ Route::prefix('{locale}')
 				Route::get('/data/export/matrix-wide', [AccessGuardDataController::class, 'exportMatrixWide'])->name('data.export-matrix-wide');
 				Route::get('/data/export/matrix-long', [AccessGuardDataController::class, 'exportMatrixLong'])->name('data.export-matrix-long');
 				Route::get('/data/export/cycle/{cycleId}', [AccessGuardDataController::class, 'exportCycleLog'])->whereNumber('cycleId')->name('data.export-cycle');
+
+				Route::get('/profielen', [AccessGuardAccessProfileController::class, 'index'])->name('profiles.index');
+				Route::get('/profielen/nieuw', [AccessGuardAccessProfileController::class, 'create'])->name('profiles.create');
+				Route::post('/profielen', [AccessGuardAccessProfileController::class, 'store'])->name('profiles.store');
+				Route::get('/profielen/{id}/bewerken', [AccessGuardAccessProfileController::class, 'edit'])->whereNumber('id')->name('profiles.edit');
+				Route::put('/profielen/{id}', [AccessGuardAccessProfileController::class, 'update'])->whereNumber('id')->name('profiles.update');
+				Route::delete('/profielen/{id}', [AccessGuardAccessProfileController::class, 'destroy'])->whereNumber('id')->name('profiles.destroy');
+				Route::get('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'applyForm'])->whereNumber('id')->name('profiles.apply-form');
+				Route::post('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'apply'])->whereNumber('id')->name('profiles.apply');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

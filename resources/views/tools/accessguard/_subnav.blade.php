@@ -14,6 +14,7 @@
 			['route' => 'tools.accessguard.systems.index', 'label' => __('Systemen')],
 			['route' => 'tools.accessguard.notifications.edit', 'label' => __('Notificaties')],
 			['route' => 'tools.accessguard.data.show', 'label' => __('Data')],
+			['route' => 'tools.accessguard.profiles.index', 'label' => __('Profielen')],
 		] as $tab)
 			@php $active = request()->routeIs($tab['route']); @endphp
 			<a href="{{ route($tab['route'], ['locale' => $locale]) }}"
