@@ -17,6 +17,7 @@ use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
 use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAccessItemController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
+use App\Http\Controllers\Tools\AccessGuard\DataController as AccessGuardDataController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\NotificationSettingsController as AccessGuardNotificationSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
@@ -321,6 +322,15 @@ Route::prefix('{locale}')
 
 				Route::get('/notificaties', [AccessGuardNotificationSettingsController::class, 'edit'])->name('notifications.edit');
 				Route::put('/notificaties', [AccessGuardNotificationSettingsController::class, 'update'])->name('notifications.update');
+
+				Route::get('/data', [AccessGuardDataController::class, 'show'])->name('data.show');
+				Route::get('/data/import', [AccessGuardDataController::class, 'importStart'])->name('data.import-start');
+				Route::post('/data/import', [AccessGuardDataController::class, 'importUpload'])->name('data.import-upload');
+				Route::get('/data/import/map', [AccessGuardDataController::class, 'importMap'])->name('data.import-map');
+				Route::post('/data/import/commit', [AccessGuardDataController::class, 'importCommit'])->name('data.import-commit');
+				Route::get('/data/export/matrix-wide', [AccessGuardDataController::class, 'exportMatrixWide'])->name('data.export-matrix-wide');
+				Route::get('/data/export/matrix-long', [AccessGuardDataController::class, 'exportMatrixLong'])->name('data.export-matrix-long');
+				Route::get('/data/export/cycle/{cycleId}', [AccessGuardDataController::class, 'exportCycleLog'])->whereNumber('cycleId')->name('data.export-cycle');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

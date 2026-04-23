@@ -13,6 +13,7 @@
 			['route' => 'tools.accessguard.people.index', 'label' => __('Personen')],
 			['route' => 'tools.accessguard.systems.index', 'label' => __('Systemen')],
 			['route' => 'tools.accessguard.notifications.edit', 'label' => __('Notificaties')],
+			['route' => 'tools.accessguard.data.show', 'label' => __('Data')],
 		] as $tab)
 			@php $active = request()->routeIs($tab['route']); @endphp
 			<a href="{{ route($tab['route'], ['locale' => $locale]) }}"
