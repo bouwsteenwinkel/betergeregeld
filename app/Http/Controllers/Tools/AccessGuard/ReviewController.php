@@ -6,17 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\AccessGuard\Cycle;
 use App\Models\AccessGuard\CycleItem;
 use App\Models\AccessGuard\ReviewLogEntry;
+use App\Services\AccessGuard\Ai\ExecutiveSummaryService;
+use App\Services\AccessGuard\Ai\ReviewRecommendationService;
 use App\Services\AccessGuard\ReviewService;
 use App\Services\Features\FeatureResolver;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
 {
 	public function __construct(
 		private readonly FeatureResolver $features,
 		private readonly ReviewService $service,
+		private readonly ReviewRecommendationService $recommender,
+		private readonly ExecutiveSummaryService $summariser,
 	) {}
 
 	public function index(Request $request, string $locale): View
@@ -207,10 +214,68 @@ class ReviewController extends Controller
 			->with('status', __('Cyclus geannuleerd.'));
 	}
 
+	public function aiSuggest(Request $request, string $locale, int $id): JsonResponse
+	{
+		$this->mustHaveAccess($request);
+		$this->mustHaveAi($request);
+
+		$cycle = Cycle::query()->where('tenant_id', $request->user()->tenant_id)->findOrFail($id);
+		if (! $cycle->isOpen()) {
+			return response()->json(['ok' => false, 'error' => __('Cyclus is niet open.')], 422);
+		}
+
+		try {
+			$result = $this->recommender->suggestForCycle($cycle);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 502);
+		}
+
+		return response()->json([
+			'ok' => true,
+			'suggestions' => $result['suggestions'],
+			'items_count' => $result['items_count'] ?? 0,
+			'skipped' => $result['skipped'] ?? 0,
+		]);
+	}
+
+	public function aiSummary(Request $request, string $locale, int $id): Response
+	{
+		$this->mustHaveAccess($request);
+		$this->mustHaveAi($request);
+
+		$cycle = Cycle::query()->where('tenant_id', $request->user()->tenant_id)->findOrFail($id);
+
+		try {
+			$result = $this->summariser->summarise($cycle);
+		} catch (\Throwable $e) {
+			return back()->with('error', $e->getMessage());
+		}
+
+		$pdf = Pdf::loadView('pages.accessguard-exec-summary', [
+			'cycle' => $cycle,
+			'summary' => $result['summary'],
+			'counts' => $result['counts'],
+			'bySystem' => $result['by_system'],
+			'actionCounts' => $result['action_counts'],
+			'generatedAt' => now()->format('d-m-Y H:i'),
+		])
+			->setPaper('a4')
+			->setOption('defaultFont', 'DejaVu Sans');
+
+		return $pdf->stream('accessguard-cycle-' . $cycle->id . '-summary.pdf');
+	}
+
 	protected function mustHaveAccess(Request $request): void
 	{
 		abort_unless($request->user(), 401);
 		$bag = $this->features->forUser($request->user());
 		abort_unless($bag->bool('tool.accessguard.enabled'), 402);
+	}
+
+	protected function mustHaveAi(Request $request): void
+	{
+		$bag = $this->features->forUser($request->user());
+		abort_unless($bag->bool('tool.accessguard.ai_explain'), 402);
+		abort_unless(config('accessguard.ai.enabled', true), 503);
 	}
 }

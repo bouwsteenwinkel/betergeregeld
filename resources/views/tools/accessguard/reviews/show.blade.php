@@ -76,20 +76,38 @@
 
 		@if ($cycle->isOpen())
 			<div class="card">
-				<form method="POST" action="{{ route('tools.accessguard.reviews.complete', ['locale' => $locale, 'id' => $cycle->id]) }}" class="flex items-center gap-3 flex-wrap" onsubmit="return confirm('{{ __('Cyclus afronden? Dit materializeert acties voor intrekkingen en wijzigingen.') }}');">
-					@csrf
-					<strong class="text-sm">{{ __('Cyclus afronden') }}</strong>
-					<span class="text-xs text-[color:var(--color-ink-muted)]">{{ __('Niet-besliste items defaulten naar:') }}</span>
-					<select name="undecided_default" class="field-input py-1 text-sm" style="width:auto">
-						<option value="keep">{{ __('Behouden') }}</option>
-						<option value="revoke">{{ __('Intrekken') }}</option>
-						<option value="change">{{ __('Wijzigen') }}</option>
-					</select>
-					<button type="submit" class="btn-accent text-sm">{{ __('Afronden') }}</button>
+				<div class="flex items-center justify-between gap-3 flex-wrap">
+					<form method="POST" action="{{ route('tools.accessguard.reviews.complete', ['locale' => $locale, 'id' => $cycle->id]) }}" class="flex items-center gap-3 flex-wrap" onsubmit="return confirm('{{ __('Cyclus afronden? Dit materializeert acties voor intrekkingen en wijzigingen.') }}');">
+						@csrf
+						<strong class="text-sm">{{ __('Cyclus afronden') }}</strong>
+						<span class="text-xs text-[color:var(--color-ink-muted)]">{{ __('Niet-besliste items defaulten naar:') }}</span>
+						<select name="undecided_default" class="field-input py-1 text-sm" style="width:auto">
+							<option value="keep">{{ __('Behouden') }}</option>
+							<option value="revoke">{{ __('Intrekken') }}</option>
+							<option value="change">{{ __('Wijzigen') }}</option>
+						</select>
+						<button type="submit" class="btn-accent text-sm">{{ __('Afronden') }}</button>
+						@if ($counts['undecided'] > 0)
+							<span class="text-xs text-amber-700">({{ $counts['undecided'] }} {{ __('nog open') }})</span>
+						@endif
+					</form>
 					@if ($counts['undecided'] > 0)
-						<span class="text-xs text-amber-700">({{ $counts['undecided'] }} {{ __('nog open') }})</span>
+						<button type="button" id="ai-suggest-btn" class="text-xs px-3 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-700">
+							🤖 {{ __('AI: suggereer beslissingen') }}
+						</button>
 					@endif
-				</form>
+				</div>
+				<span id="ai-suggest-status" class="text-xs text-[color:var(--color-ink-muted)] block mt-2"></span>
+			</div>
+		@endif
+
+		@if (! $cycle->isOpen())
+			<div class="card flex items-center justify-between gap-3">
+				<div>
+					<strong class="text-sm">{{ __('Management-samenvatting') }}</strong>
+					<p class="text-xs text-[color:var(--color-ink-muted)]">{{ __('AI-gegenereerde 1-pagina PDF met bevindingen + vervolgacties voor je bestuur.') }}</p>
+				</div>
+				<a href="{{ route('tools.accessguard.reviews.ai-summary', ['locale' => $locale, 'id' => $cycle->id]) }}" target="_blank" class="btn-accent text-sm">📊 {{ __('Genereer summary (PDF)') }}</a>
 			</div>
 		@endif
 
@@ -170,6 +188,56 @@
 				</form>
 			@endif
 		</div>
+
+		@push('scripts')
+		<script>
+		(function () {
+			const btn = document.getElementById('ai-suggest-btn');
+			const status = document.getElementById('ai-suggest-status');
+			if (!btn) return;
+			const url = @json(route('tools.accessguard.reviews.ai-suggest', ['locale' => $locale, 'id' => $cycle->id]));
+			const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+			btn.addEventListener('click', async () => {
+				btn.disabled = true;
+				status.textContent = '🤖 ' + @json(__('AI analyseert :n items…')).replace(':n', @json($counts['undecided']));
+				try {
+					const resp = await fetch(url, {
+						method: 'POST',
+						headers: {'X-CSRF-TOKEN': csrf, 'Accept': 'application/json'},
+					});
+					const body = await resp.json();
+					if (!resp.ok || !body.ok) {
+						status.textContent = body.error || 'error';
+						return;
+					}
+					// Render suggestions inline per row
+					let applied = 0;
+					Object.entries(body.suggestions).forEach(([itemId, sug]) => {
+						const row = document.querySelector(`input[name="item_ids[]"][value="${itemId}"]`)?.closest('tr');
+						if (!row) return;
+						const decisionCell = row.querySelectorAll('td')[4] || row.querySelectorAll('td')[3];
+						if (decisionCell) {
+							const bgColor = sug.decision === 'keep' ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+								: sug.decision === 'revoke' ? 'bg-red-50 border-red-200 text-red-800'
+								: 'bg-amber-50 border-amber-200 text-amber-800';
+							decisionCell.innerHTML = `<div class="rounded border p-1.5 ${bgColor}">
+								<div class="text-xs font-bold">🤖 ${sug.decision}</div>
+								<div class="text-[10px] mt-0.5">${sug.rationale}</div>
+							</div>`;
+						}
+						applied++;
+					});
+					status.textContent = @json(__(':n voorstellen geladen. Gebruik de rij-knoppen om te accepteren.')).replace(':n', applied);
+				} catch (e) {
+					status.textContent = 'error: ' + e.message;
+				} finally {
+					btn.disabled = false;
+				}
+			});
+		})();
+		</script>
+		@endpush
 
 		@if ($logs->isNotEmpty())
 			<details class="card">

@@ -281,6 +281,8 @@ Route::prefix('{locale}')
 				Route::post('/reviews/{id}/annuleren', [AccessGuardReviewController::class, 'cancel'])->whereNumber('id')->name('reviews.cancel');
 				Route::post('/reviews/{id}/items/{itemId}/beslissing', [AccessGuardReviewController::class, 'decide'])->whereNumber(['id', 'itemId'])->name('reviews.decide');
 				Route::post('/reviews/{id}/items/bulk', [AccessGuardReviewController::class, 'bulkDecide'])->whereNumber('id')->name('reviews.bulk-decide');
+				Route::post('/reviews/{id}/ai-suggest', [AccessGuardReviewController::class, 'aiSuggest'])->whereNumber('id')->name('reviews.ai-suggest');
+				Route::get('/reviews/{id}/ai-summary', [AccessGuardReviewController::class, 'aiSummary'])->whereNumber('id')->name('reviews.ai-summary');
 
 				Route::get('/acties', [AccessGuardReviewActionController::class, 'index'])->name('actions.index');
 				Route::post('/acties/{id}/afgerond', [AccessGuardReviewActionController::class, 'markDone'])->whereNumber('id')->name('actions.done');
