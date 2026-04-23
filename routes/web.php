@@ -19,6 +19,7 @@ use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAc
 use App\Http\Controllers\Tools\AccessGuard\AccessProfileController as AccessGuardAccessProfileController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\DataController as AccessGuardDataController;
+use App\Http\Controllers\Tools\AccessGuard\FeedbackController as AccessGuardFeedbackController;
 use App\Http\Controllers\Tools\AccessGuard\FirstRunController as AccessGuardFirstRunController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\NotificationSettingsController as AccessGuardNotificationSettingsController;
@@ -350,6 +351,8 @@ Route::prefix('{locale}')
 				Route::delete('/profielen/{id}', [AccessGuardAccessProfileController::class, 'destroy'])->whereNumber('id')->name('profiles.destroy');
 				Route::get('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'applyForm'])->whereNumber('id')->name('profiles.apply-form');
 				Route::post('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'apply'])->whereNumber('id')->name('profiles.apply');
+
+				Route::post('/feedback', [AccessGuardFeedbackController::class, 'submit'])->name('feedback.submit');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

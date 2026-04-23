@@ -26,3 +26,5 @@
 		@endforeach
 	</nav>
 </div>
+
+@include('tools.accessguard._feedback-widget')
