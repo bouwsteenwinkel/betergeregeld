@@ -17,6 +17,7 @@ class Person extends Model
 		'tenant_id', 'type', 'first_name', 'middle_name', 'last_name',
 		'email', 'phone', 'job_title', 'department', 'status',
 		'start_date', 'end_date', 'notes',
+		'external_source', 'external_id', 'last_sign_in_at', 'last_synced_at',
 	];
 
 	protected function casts(): array
@@ -24,6 +25,8 @@ class Person extends Model
 		return [
 			'start_date' => 'date',
 			'end_date' => 'date',
+			'last_sign_in_at' => 'datetime',
+			'last_synced_at' => 'datetime',
 		];
 	}
 

@@ -173,6 +173,7 @@ class ToolsPlansSeeder extends Seeder
 					'tool.accessguard.enabled' => '1',
 					'tool.accessguard.multi_user' => '1',
 					'tool.accessguard.ai_explain' => '1',
+					'tool.accessguard.directory_sync' => '1',
 				],
 			],
 		];

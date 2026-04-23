@@ -14,6 +14,7 @@ class RiskFlag extends Model
 		'overdue_action',
 		'pending_onboarding',
 		'stale_credential',
+		'dormant_account',
 	];
 	public const STATUSES = ['open', 'acknowledged', 'resolved'];
 

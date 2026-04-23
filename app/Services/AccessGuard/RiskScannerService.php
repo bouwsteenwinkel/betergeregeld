@@ -39,7 +39,49 @@ class RiskScannerService
 		$counts['overdue_action'] = $this->scanOverdueActions($tenantId, $now);
 		$counts['pending_onboarding'] = $this->scanPendingOnboarding($tenantId, $now);
 		$counts['stale_credential'] = $this->scanStaleCredentials($tenantId, $now);
+		$counts['dormant_account'] = $this->scanDormantAccounts($tenantId, $now);
 		return $counts;
+	}
+
+	/**
+	 * Person with a linked M365/Google account that hasn't signed in for 90+ days.
+	 * Only runs against people synced from a directory (external_source set).
+	 */
+	private function scanDormantAccounts(string $tenantId, CarbonImmutable $now): int
+	{
+		$threshold = $now->subDays(90);
+		$people = Person::query()
+			->where('tenant_id', $tenantId)
+			->whereNotNull('external_source')
+			->where('status', 'active')
+			->whereNotNull('last_sign_in_at')
+			->where('last_sign_in_at', '<', $threshold)
+			->get(['id', 'first_name', 'last_name', 'external_source', 'last_sign_in_at']);
+
+		$count = 0;
+		foreach ($people as $p) {
+			$days = (int) $now->diffInDays($p->last_sign_in_at);
+			$severity = $days >= 180 ? 4 : 3;
+			$this->upsert($tenantId, [
+				'kind' => 'dormant_account',
+				'severity' => $severity,
+				'subject_type' => 'person',
+				'subject_id' => (string) $p->id,
+				'title' => trim($p->first_name . ' ' . $p->last_name),
+				'description' => __(':days dagen niet ingelogd op :source. Overweeg toegang in te trekken.', [
+					'days' => $days,
+					'source' => strtoupper($p->external_source),
+				]),
+				'payload' => [
+					'person_id' => $p->id,
+					'days_dormant' => $days,
+					'last_sign_in_at' => $p->last_sign_in_at->toIso8601String(),
+					'source' => $p->external_source,
+				],
+			], $now);
+			$count++;
+		}
+		return $count;
 	}
 
 	/** Vault credential past expires_at OR rotation overdue. Severity 4-5. */

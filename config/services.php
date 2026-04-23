@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    // Microsoft Entra ID (Azure AD) — used by AccessGuard directory sync.
+    // Register an app at https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps
+    // and grant delegated scopes: User.Read.All, Directory.Read.All, offline_access.
+    'microsoft' => [
+        'client_id' => env('MICROSOFT_CLIENT_ID'),
+        'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
+        'redirect_uri' => env('MICROSOFT_REDIRECT_URI'),
+        'scope' => env('MICROSOFT_SCOPE', 'User.Read.All Directory.Read.All offline_access'),
+    ],
+
 ];
