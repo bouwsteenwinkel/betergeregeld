@@ -19,6 +19,7 @@ use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAc
 use App\Http\Controllers\Tools\AccessGuard\AccessProfileController as AccessGuardAccessProfileController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\DataController as AccessGuardDataController;
+use App\Http\Controllers\Tools\AccessGuard\DemoController as AccessGuardDemoController;
 use App\Http\Controllers\Tools\AccessGuard\FeedbackController as AccessGuardFeedbackController;
 use App\Http\Controllers\Tools\AccessGuard\FirstRunController as AccessGuardFirstRunController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
@@ -77,6 +78,7 @@ Route::prefix('{locale}')
 		Route::get('/', fn () => view('welcome'))->name('home');
 		Route::get('/over', fn () => view('pages.about'))->name('about');
 		Route::get('/accessguard', [AccessGuardLandingController::class, 'show'])->name('accessguard.landing');
+		Route::get('/accessguard/demo', [AccessGuardDemoController::class, 'show'])->name('accessguard.demo');
 		Route::get('/accessguard/handleiding', [AccessGuardHandleidingController::class, 'download'])->name('accessguard.handleiding');
 		Route::get('/accessguard/notifications/unsubscribe/{token}', [AccessGuardNotificationSettingsController::class, 'unsubscribe'])->name('tools.accessguard.notifications.unsubscribe');
 

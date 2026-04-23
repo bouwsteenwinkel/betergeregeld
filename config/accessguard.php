@@ -15,4 +15,14 @@ return [
 		// Cache identical (prompt_hash, tenant) answers for N seconds.
 		'cache_ttl_seconds' => 86400, // 24 h
 	],
+
+	'demo' => [
+		// Dedicated tenant UUID used by the public /accessguard/demo page.
+		// Never assigned to a real customer. Seeded lazily on first visit
+		// and refreshed daily by the scheduler so visitors always see
+		// a realistic, clean dataset.
+		'tenant_id' => '11111111-1111-1111-1111-111111111111',
+		'actor_user_id' => 'demo-visitor',
+		'reseed_after_hours' => 24,
+	],
 ];

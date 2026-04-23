@@ -473,7 +473,9 @@
 						<a href="{{ route('register', ['locale' => $locale]) }}" class="ag-btn ag-btn-primary">
 							{{ $isEn ? 'Start free trial' : 'Start gratis proef' }}
 						</a>
-						<a href="#how" class="ag-btn ag-btn-secondary">{{ $isEn ? 'See how it works' : 'Bekijk hoe het werkt' }}</a>
+						<a href="{{ route('accessguard.demo', ['locale' => $locale]) }}" class="ag-btn ag-btn-secondary">
+							{{ $isEn ? 'Try without signup' : 'Probeer zonder account' }}
+						</a>
 					@endif
 				</div>
 
