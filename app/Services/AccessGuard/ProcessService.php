@@ -23,6 +23,8 @@ use RuntimeException;
 
 class ProcessService
 {
+	public function __construct(private readonly VaultService $vault) {}
+
 	private const ALLOWED_MIME = ['application/pdf', 'image/png', 'image/jpeg'];
 	private const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
 
@@ -280,6 +282,27 @@ class ProcessService
 						'status' => 'inactive',
 						'end_date' => $person->end_date ?? $now->toDateString(),
 					]);
+				}
+
+				// If the offboarded person has a V2 user account (same tenant
+				// + email match), revoke every vault ACL they hold.
+				$vaultRevoked = 0;
+				if ($this->vault && $person && $person->email) {
+					$user = DB::table('users')
+						->where('tenant_id', $tenantId)
+						->where('email', $person->email)
+						->first();
+					if ($user) {
+						$vaultRevoked = $this->vault->revokeAllForUser(
+							$tenantId, $actorUserId, (string) $user->id,
+						);
+					}
+				}
+				if ($vaultRevoked > 0) {
+					$this->log($tenantId, $actorUserId, 'vault_acls_revoked', [
+						'process_id' => $process->id,
+						'count' => $vaultRevoked,
+					], personId: $process->person_id);
 				}
 			} else {
 				// onboarding completion: ensure person is active

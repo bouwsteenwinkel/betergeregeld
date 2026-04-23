@@ -22,6 +22,7 @@ use App\Http\Controllers\Tools\AccessGuard\ReviewActionController as AccessGuard
 use App\Http\Controllers\Tools\AccessGuard\RiskFlagController as AccessGuardRiskFlagController;
 use App\Http\Controllers\Tools\AccessGuard\ReviewController as AccessGuardReviewController;
 use App\Http\Controllers\Tools\AccessGuard\SystemController as AccessGuardSystemController;
+use App\Http\Controllers\Tools\AccessGuard\VaultController as AccessGuardVaultController;
 use App\Http\Controllers\Tools\BookkeepingAuditLogController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
@@ -297,6 +298,17 @@ Route::prefix('{locale}')
 				Route::post('/reminders/bouw', [AccessGuardReminderController::class, 'buildNow'])->name('reminders.build');
 				Route::post('/reminders/{id}/klaar', [AccessGuardReminderController::class, 'markDone'])->whereNumber('id')->name('reminders.done');
 				Route::post('/reminders/{id}/weg', [AccessGuardReminderController::class, 'dismiss'])->whereNumber('id')->name('reminders.dismiss');
+
+				Route::get('/vault', [AccessGuardVaultController::class, 'index'])->name('vault.index');
+				Route::get('/vault/nieuw', [AccessGuardVaultController::class, 'create'])->name('vault.create');
+				Route::post('/vault', [AccessGuardVaultController::class, 'store'])->name('vault.store');
+				Route::get('/vault/{id}', [AccessGuardVaultController::class, 'show'])->whereNumber('id')->name('vault.show');
+				Route::get('/vault/{id}/bewerken', [AccessGuardVaultController::class, 'edit'])->whereNumber('id')->name('vault.edit');
+				Route::put('/vault/{id}', [AccessGuardVaultController::class, 'update'])->whereNumber('id')->name('vault.update');
+				Route::delete('/vault/{id}', [AccessGuardVaultController::class, 'destroy'])->whereNumber('id')->name('vault.destroy');
+				Route::post('/vault/{id}/decrypt', [AccessGuardVaultController::class, 'decrypt'])->whereNumber('id')->name('vault.decrypt');
+				Route::post('/vault/{id}/acl', [AccessGuardVaultController::class, 'grantAcl'])->whereNumber('id')->name('vault.grant-acl');
+				Route::post('/vault/{id}/acl/{aclId}/intrekken', [AccessGuardVaultController::class, 'revokeAcl'])->whereNumber(['id', 'aclId'])->name('vault.revoke-acl');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

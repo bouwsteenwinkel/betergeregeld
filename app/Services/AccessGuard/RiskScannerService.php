@@ -10,6 +10,7 @@ use App\Models\AccessGuard\Person;
 use App\Models\AccessGuard\PersonAccessItem;
 use App\Models\AccessGuard\Process;
 use App\Models\AccessGuard\RiskFlag;
+use App\Models\AccessGuard\VaultCredential;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -35,7 +36,51 @@ class RiskScannerService
 		$counts['overdue_review'] = $this->scanOverdueReviews($tenantId, $now);
 		$counts['overdue_action'] = $this->scanOverdueActions($tenantId, $now);
 		$counts['pending_onboarding'] = $this->scanPendingOnboarding($tenantId, $now);
+		$counts['stale_credential'] = $this->scanStaleCredentials($tenantId, $now);
 		return $counts;
+	}
+
+	/** Vault credential past expires_at OR rotation overdue. Severity 4-5. */
+	private function scanStaleCredentials(string $tenantId, CarbonImmutable $now): int
+	{
+		$rows = VaultCredential::query()
+			->where('tenant_id', $tenantId)
+			->get(['id', 'name', 'expires_at', 'rotation_interval_days', 'last_rotated_at']);
+
+		$count = 0;
+		foreach ($rows as $cred) {
+			$expired = $cred->expires_at !== null && $cred->expires_at->isPast();
+			$rotationDue = $cred->rotation_interval_days
+				&& $cred->last_rotated_at
+				&& $cred->last_rotated_at->copy()->addDays($cred->rotation_interval_days)->isPast();
+			if (! $expired && ! $rotationDue) {
+				continue;
+			}
+
+			$reasons = [];
+			if ($expired) {
+				$reasons[] = __('verlopen op :date', ['date' => $cred->expires_at->format('d-m-Y')]);
+			}
+			if ($rotationDue) {
+				$reasons[] = __('rotatie overdue sinds :date', ['date' => $cred->last_rotated_at->copy()->addDays($cred->rotation_interval_days)->format('d-m-Y')]);
+			}
+
+			$this->upsert($tenantId, [
+				'kind' => 'stale_credential',
+				'severity' => $expired ? 5 : 4,
+				'subject_type' => 'credential',
+				'subject_id' => (string) $cred->id,
+				'title' => $cred->name,
+				'description' => implode(' · ', $reasons),
+				'payload' => [
+					'credential_id' => $cred->id,
+					'expired' => $expired,
+					'rotation_due' => $rotationDue,
+				],
+			], $now);
+			$count++;
+		}
+		return $count;
 	}
 
 	/** Admin-type item with has_access + not verified in 90+ days. Severity 4. */

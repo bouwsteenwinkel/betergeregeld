@@ -9,6 +9,7 @@
 			['route' => 'tools.accessguard.processes.index', 'label' => __('Processen')],
 			['route' => 'tools.accessguard.risks.index', 'label' => __('Risico\'s')],
 			['route' => 'tools.accessguard.reminders.index', 'label' => __('Reminders')],
+			['route' => 'tools.accessguard.vault.index', 'label' => __('Vault')],
 			['route' => 'tools.accessguard.people.index', 'label' => __('Personen')],
 			['route' => 'tools.accessguard.systems.index', 'label' => __('Systemen')],
 		] as $tab)
