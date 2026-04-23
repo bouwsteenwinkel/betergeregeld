@@ -14,6 +14,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
 use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAccessItemController;
+use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
 use App\Http\Controllers\Tools\AccessGuard\ProcessController as AccessGuardProcessController;
@@ -309,6 +310,8 @@ Route::prefix('{locale}')
 				Route::post('/vault/{id}/decrypt', [AccessGuardVaultController::class, 'decrypt'])->whereNumber('id')->name('vault.decrypt');
 				Route::post('/vault/{id}/acl', [AccessGuardVaultController::class, 'grantAcl'])->whereNumber('id')->name('vault.grant-acl');
 				Route::post('/vault/{id}/acl/{aclId}/intrekken', [AccessGuardVaultController::class, 'revokeAcl'])->whereNumber(['id', 'aclId'])->name('vault.revoke-acl');
+
+				Route::post('/ai/explain', [AccessGuardAiExplainController::class, 'explain'])->name('ai.explain');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

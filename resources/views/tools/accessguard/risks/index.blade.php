@@ -78,6 +78,9 @@
 								</td>
 								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)] tabular-nums whitespace-nowrap">{{ $f->detected_at->format('d-m H:i') }}</td>
 								<td class="py-2 px-3 text-right whitespace-nowrap">
+									<button type="button" class="ai-explain-btn text-xs px-3 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200" data-id="{{ $f->id }}" title="{{ __('Leg uit met AI') }}">
+										🤖 {{ __('Uitleg') }}
+									</button>
 									@if ($f->status === 'open')
 										<form method="POST" action="{{ route('tools.accessguard.risks.acknowledge', ['locale' => $locale, 'id' => $f->id]) }}" class="inline">
 											@csrf
@@ -106,5 +109,93 @@
 		<div>{{ $flags->links() }}</div>
 	</div>
 </section>
+
+<div id="ai-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+	<div class="bg-white rounded-[var(--radius-control)] shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+		<div class="p-5 border-b border-[color:var(--color-line)] flex items-start justify-between gap-3">
+			<div class="flex items-center gap-2">
+				<span class="text-lg">🤖</span>
+				<h3 id="ai-title" class="text-lg font-bold">{{ __('AI-uitleg') }}</h3>
+			</div>
+			<button type="button" id="ai-close" class="text-slate-400 hover:text-slate-700 text-xl leading-none">×</button>
+		</div>
+		<div id="ai-body" class="p-5 text-sm">
+			<div id="ai-loading" class="text-center py-8 text-[color:var(--color-ink-muted)]">{{ __('Bezig met AI-uitleg…') }}</div>
+			<div id="ai-error" class="hidden p-3 rounded bg-red-50 border border-red-200 text-red-800"></div>
+			<div id="ai-content" class="hidden space-y-4"></div>
+		</div>
+		<div class="p-3 border-t border-[color:var(--color-line)] text-xs text-[color:var(--color-ink-soft)] flex items-center justify-between">
+			<span id="ai-cached-hint"></span>
+			<span>{{ __('Aangedreven door OpenAI. Context is tenant-scoped, nooit secrets.') }}</span>
+		</div>
+	</div>
+</div>
+
+@push('scripts')
+<script>
+(function () {
+	const modal = document.getElementById('ai-modal');
+	const closeBtn = document.getElementById('ai-close');
+	const loading = document.getElementById('ai-loading');
+	const errorEl = document.getElementById('ai-error');
+	const content = document.getElementById('ai-content');
+	const cachedHint = document.getElementById('ai-cached-hint');
+	const url = @json(route('tools.accessguard.ai.explain', ['locale' => $locale]));
+	const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+	function show() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+	function hide() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+
+	closeBtn.addEventListener('click', hide);
+	modal.addEventListener('click', e => { if (e.target === modal) hide(); });
+
+	document.querySelectorAll('.ai-explain-btn').forEach(btn => {
+		btn.addEventListener('click', async () => {
+			loading.classList.remove('hidden');
+			errorEl.classList.add('hidden');
+			content.classList.add('hidden');
+			content.innerHTML = '';
+			cachedHint.textContent = '';
+			show();
+			try {
+				const resp = await fetch(url, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf},
+					body: JSON.stringify({subject_type: 'risk_flag', subject_id: parseInt(btn.dataset.id, 10)}),
+				});
+				const body = await resp.json();
+				loading.classList.add('hidden');
+				if (!resp.ok || !body.ok) {
+					errorEl.textContent = body.error || ('HTTP ' + resp.status);
+					errorEl.classList.remove('hidden');
+					return;
+				}
+				const ex = body.explanation;
+				const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+				let html = '';
+				if (ex.title) html += `<h4 class="font-bold text-base">${esc(ex.title)}</h4>`;
+				if (ex.summary) html += `<p>${esc(ex.summary)}</p>`;
+				if (ex.why_it_matters) html += `<div><strong class="text-xs uppercase tracking-wider text-slate-500">${@json(__('Waarom dit ertoe doet'))}</strong><p class="mt-1">${esc(ex.why_it_matters)}</p></div>`;
+				if (Array.isArray(ex.recommended_steps) && ex.recommended_steps.length) {
+					html += `<div><strong class="text-xs uppercase tracking-wider text-slate-500">${@json(__('Aanbevolen stappen'))}</strong><ol class="list-decimal list-inside mt-1 space-y-1">` +
+						ex.recommended_steps.map(s => `<li>${esc(s)}</li>`).join('') + `</ol></div>`;
+				}
+				if (Array.isArray(ex.warnings) && ex.warnings.length) {
+					html += `<div class="rounded bg-amber-50 border border-amber-200 p-2"><strong class="text-xs uppercase tracking-wider text-amber-800">${@json(__('Waarschuwingen'))}</strong><ul class="list-disc list-inside mt-1 space-y-1">` +
+						ex.warnings.map(s => `<li>${esc(s)}</li>`).join('') + `</ul></div>`;
+				}
+				content.innerHTML = html;
+				content.classList.remove('hidden');
+				cachedHint.textContent = body.cached ? @json(__('cached antwoord')) : (`${body.tokens.in + body.tokens.out} ` + @json(__('tokens')));
+			} catch (e) {
+				loading.classList.add('hidden');
+				errorEl.textContent = 'Request failed';
+				errorEl.classList.remove('hidden');
+			}
+		});
+	});
+})();
+</script>
+@endpush
 
 @endsection
