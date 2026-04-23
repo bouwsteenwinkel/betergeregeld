@@ -63,7 +63,13 @@
 								</td>
 								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $kindLabels[$a->kind] ?? $a->kind }}</td>
 								<td class="py-2 px-3">
-									<a href="{{ route('tools.accessguard.reviews.show', ['locale' => $locale, 'id' => $a->cycle_id]) }}" class="text-[color:var(--color-accent)] hover:underline">{{ $a->cycle?->title ?? '#' . $a->cycle_id }}</a>
+									@if ($a->cycle_id)
+										<a href="{{ route('tools.accessguard.reviews.show', ['locale' => $locale, 'id' => $a->cycle_id]) }}" class="text-[color:var(--color-accent)] hover:underline">{{ $a->cycle?->title ?? '#' . $a->cycle_id }}</a>
+									@elseif ($a->process_id)
+										<a href="{{ route('tools.accessguard.processes.show', ['locale' => $locale, 'id' => $a->process_id]) }}" class="text-[color:var(--color-accent)] hover:underline">{{ __('Offboarding') }} #{{ $a->process_id }}</a>
+									@else
+										<span class="text-xs text-[color:var(--color-ink-muted)]">—</span>
+									@endif
 								</td>
 								<td class="py-2 px-3">
 									<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $statusColors[$a->status] }}">

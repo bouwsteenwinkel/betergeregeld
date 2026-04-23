@@ -6,6 +6,7 @@
 			['route' => 'tools.accessguard.matrix', 'label' => __('Access Matrix')],
 			['route' => 'tools.accessguard.reviews.index', 'label' => __('Reviews')],
 			['route' => 'tools.accessguard.actions.index', 'label' => __('Acties')],
+			['route' => 'tools.accessguard.processes.index', 'label' => __('Processen')],
 			['route' => 'tools.accessguard.people.index', 'label' => __('Personen')],
 			['route' => 'tools.accessguard.systems.index', 'label' => __('Systemen')],
 		] as $tab)

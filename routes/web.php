@@ -15,6 +15,7 @@ use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
+use App\Http\Controllers\Tools\AccessGuard\ProcessController as AccessGuardProcessController;
 use App\Http\Controllers\Tools\AccessGuard\ReviewActionController as AccessGuardReviewActionController;
 use App\Http\Controllers\Tools\AccessGuard\ReviewController as AccessGuardReviewController;
 use App\Http\Controllers\Tools\AccessGuard\SystemController as AccessGuardSystemController;
@@ -262,6 +263,17 @@ Route::prefix('{locale}')
 				Route::get('/acties', [AccessGuardReviewActionController::class, 'index'])->name('actions.index');
 				Route::post('/acties/{id}/afgerond', [AccessGuardReviewActionController::class, 'markDone'])->whereNumber('id')->name('actions.done');
 				Route::post('/acties/{id}/annuleren', [AccessGuardReviewActionController::class, 'cancel'])->whereNumber('id')->name('actions.cancel');
+
+				Route::get('/processen', [AccessGuardProcessController::class, 'index'])->name('processes.index');
+				Route::get('/processen/nieuw', [AccessGuardProcessController::class, 'create'])->name('processes.create');
+				Route::post('/processen', [AccessGuardProcessController::class, 'store'])->name('processes.store');
+				Route::get('/processen/{id}', [AccessGuardProcessController::class, 'show'])->whereNumber('id')->name('processes.show');
+				Route::post('/processen/{id}/items/{itemId}', [AccessGuardProcessController::class, 'updateItem'])->whereNumber(['id', 'itemId'])->name('processes.update-item');
+				Route::post('/processen/{id}/items/{itemId}/bewijs', [AccessGuardProcessController::class, 'uploadEvidence'])->whereNumber(['id', 'itemId'])->name('processes.upload-evidence');
+				Route::get('/processen/{id}/bewijs/{evidenceId}', [AccessGuardProcessController::class, 'downloadEvidence'])->whereNumber(['id', 'evidenceId'])->name('processes.download-evidence');
+				Route::delete('/processen/{id}/bewijs/{evidenceId}', [AccessGuardProcessController::class, 'deleteEvidence'])->whereNumber(['id', 'evidenceId'])->name('processes.delete-evidence');
+				Route::post('/processen/{id}/complete', [AccessGuardProcessController::class, 'complete'])->whereNumber('id')->name('processes.complete');
+				Route::post('/processen/{id}/annuleren', [AccessGuardProcessController::class, 'cancel'])->whereNumber('id')->name('processes.cancel');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

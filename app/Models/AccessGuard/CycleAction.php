@@ -13,7 +13,7 @@ class CycleAction extends Model
 	protected $table = 'accessguard_review_actions';
 
 	protected $fillable = [
-		'tenant_id', 'cycle_id', 'review_item_id',
+		'tenant_id', 'cycle_id', 'review_item_id', 'process_id',
 		'person_id', 'system_id', 'kind', 'title', 'status',
 		'assigned_to_user_id', 'due_at', 'completed_at', 'note',
 	];
