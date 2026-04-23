@@ -20,6 +20,7 @@ use App\Http\Controllers\Tools\AccessGuard\AccessProfileController as AccessGuar
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\DataController as AccessGuardDataController;
 use App\Http\Controllers\Tools\AccessGuard\DemoController as AccessGuardDemoController;
+use App\Http\Controllers\Tools\AccessGuard\DirectoryController as AccessGuardDirectoryController;
 use App\Http\Controllers\Tools\AccessGuard\FeedbackController as AccessGuardFeedbackController;
 use App\Http\Controllers\Tools\AccessGuard\FirstRunController as AccessGuardFirstRunController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
@@ -355,6 +356,12 @@ Route::prefix('{locale}')
 				Route::post('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'apply'])->whereNumber('id')->name('profiles.apply');
 
 				Route::post('/feedback', [AccessGuardFeedbackController::class, 'submit'])->name('feedback.submit');
+
+				Route::get('/directory', [AccessGuardDirectoryController::class, 'index'])->name('directory.index');
+				Route::get('/directory/connect/m365', [AccessGuardDirectoryController::class, 'connect'])->name('directory.connect');
+				Route::get('/directory/callback/m365', [AccessGuardDirectoryController::class, 'callback'])->name('directory.callback');
+				Route::post('/directory/sync', [AccessGuardDirectoryController::class, 'syncNow'])->name('directory.sync');
+				Route::post('/directory/disconnect', [AccessGuardDirectoryController::class, 'disconnect'])->name('directory.disconnect');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

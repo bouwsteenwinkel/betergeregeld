@@ -117,7 +117,8 @@ The scheduler itself dispatches:
 
 | Time  | Command                                      | Purpose                                                      |
 |-------|----------------------------------------------|--------------------------------------------------------------|
-| 03:00 | `accessguard:scan-risks`                     | Scan all tenants for 7 risk patterns (stale_admin, orphan…) |
+| 02:30 | `accessguard:sync-directories`               | Pull users from connected M365/Entra ID tenants              |
+| 03:00 | `accessguard:scan-risks`                     | Scan all tenants for 8 risk patterns (stale, orphan, dormant…) |
 | 03:15 | `accessguard:build-reminders`                | Build deadline reminders for cycles/processes/actions        |
 | 06:00 | `bookkeeping:generate-recurring-invoices`    | Auto-create + email recurring invoices                       |
 | 08:00 | `accessguard:send-digests`                   | Daily AccessGuard digest email per opted-in user             |
@@ -203,3 +204,40 @@ When you're pointing a real prospect at the app:
 Laravel is stateless — keep the previous release folder on disk and swap the IIS document root back on failure. After swap: `php artisan config:cache` + `php artisan route:cache`.
 
 Database migrations are the only thing you can't easily roll back; always take a MariaDB dump before `migrate --force` (step 3 above). If a migration breaks, restore the dump before un-swapping.
+
+## 13. Microsoft 365 / Entra ID — enabling directory sync
+
+This is optional per-customer but the **server-side setup is one-time**. Once the app registration exists and env is set, any Business-plan tenant can self-serve the OAuth flow from `tools.accessguard.directory.index`.
+
+### One-time app registration (≈5 min)
+
+1. https://portal.azure.com → **Microsoft Entra ID** → **App registrations** → **New registration**.
+2. Name: `Betergeregeld AccessGuard`. Supported account types: **Accounts in any organizational directory (multitenant)**. Redirect URI type `Web`, value `https://betergeregeld.com/nl/tools/accessguard/directory/callback/m365` (adjust locale if default ≠ nl — both `nl` and `en` must be added if you want bilingual).
+3. After creation → **Certificates & secrets** → **New client secret** → copy the value (shown once) into `MICROSOFT_CLIENT_SECRET`.
+4. Note the **Application (client) ID** from the overview → `MICROSOFT_CLIENT_ID`.
+5. **API permissions** → **Microsoft Graph** → **Delegated permissions** → add `User.Read.All`, `Directory.Read.All`, `offline_access`. Click **Grant admin consent for your directory** (customers will grant consent for theirs during OAuth).
+
+### `.env` additions
+
+```
+MICROSOFT_CLIENT_ID=00000000-0000-0000-0000-000000000000
+MICROSOFT_CLIENT_SECRET=secret_value_here
+MICROSOFT_REDIRECT_URI=https://betergeregeld.com/nl/tools/accessguard/directory/callback/m365
+MICROSOFT_SCOPE="User.Read.All Directory.Read.All offline_access"
+```
+
+Then `php artisan config:cache` and verify:
+```powershell
+php artisan tinker --execute="echo config('services.microsoft.client_id') ? 'SET' : 'MISSING';"
+```
+
+### Per-customer onboarding
+
+On the customer side (Business plan only), they land on `/tools/accessguard/directory`, click **Verbind met Microsoft 365**, and OAuth the tenant they're an admin of. First sync runs manually (**Nu synchroniseren** button); thereafter the scheduler picks it up at 02:30 every night.
+
+### Troubleshooting
+
+- **`AADSTS65001: consent not granted`** — the customer's tenant admin needs to grant consent. The OAuth prompt links straight to it.
+- **`AADSTS7000215: Invalid client secret`** — secret expired (max 24 months) or wasn't copied correctly. Rotate it in Azure, update `.env`, `config:cache`.
+- **`403 Forbidden` on sync** — delegated scopes missing. Re-grant admin consent; Azure sometimes drops scopes silently after a permission edit.
+- **No users returned** — check the customer's Entra tenant actually has users in `/users` (some read-only guests aren't enumerated). `signInActivity` requires an Entra ID P1 licence; without it, `last_sign_in_at` stays null and the `dormant_account` risk never fires.

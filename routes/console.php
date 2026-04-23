@@ -18,6 +18,11 @@ Schedule::command('bookkeeping:generate-recurring-invoices')
     ->onOneServer()
     ->withoutOverlapping();
 
+Schedule::command('accessguard:sync-directories')
+    ->dailyAt('02:30')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 Schedule::command('accessguard:scan-risks')
     ->dailyAt('03:00')
     ->onOneServer()
