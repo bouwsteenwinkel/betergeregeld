@@ -12,3 +12,8 @@ Schedule::command('bookkeeping:send-invoice-reminders')
     ->dailyAt('08:00')
     ->onOneServer()
     ->withoutOverlapping();
+
+Schedule::command('bookkeeping:generate-recurring-invoices')
+    ->dailyAt('06:00')
+    ->onOneServer()
+    ->withoutOverlapping();

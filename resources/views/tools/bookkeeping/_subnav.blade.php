@@ -5,6 +5,7 @@
 			['route' => 'tools.bookkeeping.index',                         'label' => __('Transacties')],
 			['route' => 'tools.bookkeeping.relations.index',              'label' => __('Relaties')],
 			['route' => 'tools.bookkeeping.invoices.index',               'label' => __('Facturen')],
+			['route' => 'tools.bookkeeping.recurring.index',              'label' => __('Terugkerend')],
 			['route' => 'tools.bookkeeping.reports.profit-loss',          'label' => __('Winst & verlies')],
 			['route' => 'tools.bookkeeping.reports.vat',                  'label' => __('BTW-aangifte')],
 			['route' => 'tools.bookkeeping.import.show',                  'label' => __('CSV-import')],

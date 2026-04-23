@@ -29,6 +29,7 @@ class BookkeepingInvoice extends Model
 		'subtotal', 'vat_amount', 'total',
 		'notes', 'reference', 'payment_terms_days',
 		'sent_at', 'paid_at', 'created_by_user_id',
+		'recurring_template_id',
 	];
 
 	public function relation()

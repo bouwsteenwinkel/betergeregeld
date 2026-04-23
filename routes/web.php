@@ -18,6 +18,7 @@ use App\Http\Controllers\Tools\BookkeepingController;
 use App\Http\Controllers\Tools\BookkeepingImportController;
 use App\Http\Controllers\Tools\BookkeepingInvoiceController;
 use App\Http\Controllers\Tools\BookkeepingReceiptController;
+use App\Http\Controllers\Tools\BookkeepingRecurringController;
 use App\Http\Controllers\Tools\BookkeepingRelationController;
 use App\Http\Controllers\Tools\BookkeepingReportsController;
 use App\Http\Controllers\Tools\BookkeepingSettingsController;
@@ -184,6 +185,14 @@ Route::prefix('{locale}')
 				Route::post('/facturen/{id}/betaald', [BookkeepingInvoiceController::class, 'markPaid'])->whereUuid('id')->name('invoices.mark-paid');
 				Route::post('/facturen/{id}/annuleren', [BookkeepingInvoiceController::class, 'markCancelled'])->whereUuid('id')->name('invoices.mark-cancelled');
 				Route::post('/facturen/{id}/herinnering', [BookkeepingInvoiceController::class, 'sendReminder'])->whereUuid('id')->name('invoices.send-reminder');
+
+				Route::get('/terugkerend', [BookkeepingRecurringController::class, 'index'])->name('recurring.index');
+				Route::get('/terugkerend/nieuw', [BookkeepingRecurringController::class, 'create'])->name('recurring.create');
+				Route::post('/terugkerend', [BookkeepingRecurringController::class, 'store'])->name('recurring.store');
+				Route::get('/terugkerend/{id}/bewerken', [BookkeepingRecurringController::class, 'edit'])->whereUuid('id')->name('recurring.edit');
+				Route::put('/terugkerend/{id}', [BookkeepingRecurringController::class, 'update'])->whereUuid('id')->name('recurring.update');
+				Route::delete('/terugkerend/{id}', [BookkeepingRecurringController::class, 'destroy'])->whereUuid('id')->name('recurring.destroy');
+				Route::post('/terugkerend/{id}/nu', [BookkeepingRecurringController::class, 'runNow'])->whereUuid('id')->name('recurring.run-now');
 
 				Route::get('/import', [BookkeepingImportController::class, 'show'])->name('import.show');
 				Route::post('/import', [BookkeepingImportController::class, 'upload'])->name('import.upload');
