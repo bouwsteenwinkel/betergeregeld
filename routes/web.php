@@ -13,6 +13,7 @@ use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
+use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAccessItemController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
 use App\Http\Controllers\Tools\AccessGuard\ProcessController as AccessGuardProcessController;
@@ -236,6 +237,8 @@ Route::prefix('{locale}')
 
 				Route::get('/matrix', [AccessGuardMatrixController::class, 'index'])->name('matrix');
 				Route::post('/matrix/cell', [AccessGuardMatrixController::class, 'updateCell'])->name('matrix.update');
+				Route::get('/matrix/cel/{personId}/{systemId}', [AccessGuardMatrixController::class, 'cellDetail'])->whereNumber(['personId', 'systemId'])->name('matrix.cell');
+				Route::post('/matrix/item', [AccessGuardMatrixController::class, 'updateItemState'])->name('matrix.update-item');
 
 				Route::get('/personen', [AccessGuardPersonController::class, 'index'])->name('people.index');
 				Route::get('/personen/nieuw', [AccessGuardPersonController::class, 'create'])->name('people.create');
@@ -250,6 +253,13 @@ Route::prefix('{locale}')
 				Route::get('/systemen/{id}/bewerken', [AccessGuardSystemController::class, 'edit'])->whereNumber('id')->name('systems.edit');
 				Route::put('/systemen/{id}', [AccessGuardSystemController::class, 'update'])->whereNumber('id')->name('systems.update');
 				Route::delete('/systemen/{id}', [AccessGuardSystemController::class, 'destroy'])->whereNumber('id')->name('systems.destroy');
+
+				Route::get('/systemen/{systemId}/items', [AccessGuardAccessItemController::class, 'index'])->whereNumber('systemId')->name('systems.items.index');
+				Route::get('/systemen/{systemId}/items/nieuw', [AccessGuardAccessItemController::class, 'create'])->whereNumber('systemId')->name('systems.items.create');
+				Route::post('/systemen/{systemId}/items', [AccessGuardAccessItemController::class, 'store'])->whereNumber('systemId')->name('systems.items.store');
+				Route::get('/systemen/{systemId}/items/{id}/bewerken', [AccessGuardAccessItemController::class, 'edit'])->whereNumber(['systemId', 'id'])->name('systems.items.edit');
+				Route::put('/systemen/{systemId}/items/{id}', [AccessGuardAccessItemController::class, 'update'])->whereNumber(['systemId', 'id'])->name('systems.items.update');
+				Route::delete('/systemen/{systemId}/items/{id}', [AccessGuardAccessItemController::class, 'destroy'])->whereNumber(['systemId', 'id'])->name('systems.items.destroy');
 
 				Route::get('/reviews', [AccessGuardReviewController::class, 'index'])->name('reviews.index');
 				Route::get('/reviews/nieuw', [AccessGuardReviewController::class, 'create'])->name('reviews.create');

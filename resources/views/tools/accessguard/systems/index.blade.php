@@ -55,6 +55,7 @@
 									</span>
 								</td>
 								<td class="py-2 px-3 text-right">
+									<a href="{{ route('tools.accessguard.systems.items.index', ['locale' => $locale, 'systemId' => $s->id]) }}" class="text-slate-600 font-semibold hover:underline text-xs mr-2">{{ __('Items') }}</a>
 									<a href="{{ route('tools.accessguard.systems.edit', ['locale' => $locale, 'id' => $s->id]) }}" class="text-[color:var(--color-accent)] font-semibold hover:underline text-xs">{{ __('Bewerken') }}</a>
 									<form method="POST" action="{{ route('tools.accessguard.systems.destroy', ['locale' => $locale, 'id' => $s->id]) }}" class="inline" onsubmit="return confirm('{{ __('Weet je zeker dat je dit systeem wilt verwijderen? Alle cellen in de matrix worden ook verwijderd.') }}');">
 										@csrf

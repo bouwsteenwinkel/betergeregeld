@@ -54,9 +54,13 @@
 						<tr class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)]">
 							<th class="sticky left-0 z-10 bg-white text-left p-3 border-b border-r border-[color:var(--color-line)] min-w-[220px]">{{ __('Persoon') }}</th>
 							@foreach ($systems as $s)
+								@php $itemCount = $itemsBySystem[$s->id] ?? 0; @endphp
 								<th class="p-2 border-b border-[color:var(--color-line)] align-bottom" style="min-width:60px">
 									<div class="transform -rotate-45 origin-bottom-left whitespace-nowrap text-left pl-4" style="height:120px">
 										{{ $s->name }}
+										@if ($itemCount > 0)
+											<span class="text-[10px] text-[color:var(--color-ink-muted)]">({{ $itemCount }})</span>
+										@endif
 									</div>
 								</th>
 							@endforeach
@@ -73,16 +77,26 @@
 									@php
 										$cell = $cells[$p->id][$s->id] ?? ['state' => 'unknown', 'verified_at' => null];
 										$c = $stateColors[$cell['state']];
+										$hasItems = ($itemsBySystem[$s->id] ?? 0) > 0;
 									@endphp
 									<td class="p-1 border-b border-[color:var(--color-line)] text-center">
-										<button type="button"
-											class="cell w-9 h-9 rounded border font-bold {{ $c['bg'] }} {{ $c['border'] }} {{ $c['text'] }} hover:scale-110 transition"
-											data-person="{{ $p->id }}"
-											data-system="{{ $s->id }}"
-											data-state="{{ $cell['state'] }}"
-											@if ($cell['verified_at']) title="{{ __('Laatst geverifieerd') }}: {{ $cell['verified_at'] }}" @endif>
-											{{ $c['label'] }}
-										</button>
+										@if ($hasItems)
+											<a href="{{ route('tools.accessguard.matrix.cell', ['locale' => $locale, 'personId' => $p->id, 'systemId' => $s->id]) }}"
+												class="cell inline-flex items-center justify-center w-9 h-9 rounded border font-bold {{ $c['bg'] }} {{ $c['border'] }} {{ $c['text'] }} hover:scale-110 transition relative"
+												@if ($cell['verified_at']) title="{{ __('Laatst geverifieerd') }}: {{ $cell['verified_at'] }} · {{ __('klik om items te bekijken') }}" @else title="{{ __('klik om items te bekijken') }}" @endif>
+												{{ $c['label'] }}
+												<span class="absolute -top-1 -right-1 bg-[color:var(--color-accent)] text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center">·</span>
+											</a>
+										@else
+											<button type="button"
+												class="cell w-9 h-9 rounded border font-bold {{ $c['bg'] }} {{ $c['border'] }} {{ $c['text'] }} hover:scale-110 transition"
+												data-person="{{ $p->id }}"
+												data-system="{{ $s->id }}"
+												data-state="{{ $cell['state'] }}"
+												@if ($cell['verified_at']) title="{{ __('Laatst geverifieerd') }}: {{ $cell['verified_at'] }}" @endif>
+												{{ $c['label'] }}
+											</button>
+										@endif
 									</td>
 								@endforeach
 							</tr>
@@ -107,7 +121,8 @@
 	const url = @json(route('tools.accessguard.matrix.update', ['locale' => $locale]));
 	const csrf = document.querySelector('meta[name="csrf-token"]').content;
 
-	document.querySelectorAll('#accessguard-matrix .cell').forEach(btn => {
+	// Only cells without items use the AJAX cycle; item-bearing cells are <a href=...>.
+	document.querySelectorAll('#accessguard-matrix button.cell').forEach(btn => {
 		btn.addEventListener('click', async () => {
 			const current = btn.dataset.state;
 			const next = CYCLE[(CYCLE.indexOf(current) + 1) % CYCLE.length];
