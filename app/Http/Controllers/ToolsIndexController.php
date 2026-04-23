@@ -52,6 +52,15 @@ class ToolsIndexController extends Controller
 						'badge_nl' => 'Gratis', 'badge_en' => 'Free',
 						'icon' => 'map-pin',
 					],
+					[
+						'slug' => 'shipping-rates',
+						'route' => 'tools.shipping-rates',
+						'title_nl' => 'Verzendtarieven', 'title_en' => 'Shipping rates',
+						'desc_nl' => 'Vergelijk PostNL en DHL tarieven per zone en gewicht. Bereken de goedkoopste match incl. handling.',
+						'desc_en' => 'Compare PostNL and DHL rates by zone and weight. Calculate the cheapest match incl. handling.',
+						'badge_nl' => 'Gratis', 'badge_en' => 'Free',
+						'icon' => 'truck',
+					],
 				],
 			],
 			[

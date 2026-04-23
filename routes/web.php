@@ -31,6 +31,7 @@ use App\Http\Controllers\Tools\JsonFormatterController;
 use App\Http\Controllers\Tools\PdfMergeController;
 use App\Http\Controllers\Tools\PdfRedactController;
 use App\Http\Controllers\Tools\PostcodeCheckController;
+use App\Http\Controllers\Tools\ShippingRatesController;
 use App\Http\Controllers\Tools\SpeedTestController;
 use App\Http\Controllers\Tools\VatCheckController;
 use App\Http\Middleware\SetLocale;
@@ -115,6 +116,8 @@ Route::prefix('{locale}')
 
 			Route::get('/diff', [DiffController::class, 'show'])->name('diff');
 			Route::post('/diff', [DiffController::class, 'compare'])->name('diff.compare');
+
+			Route::get('/shipping-rates', [ShippingRatesController::class, 'show'])->name('shipping-rates');
 
 			Route::middleware('tool.limit:favicon')->group(function () {
 				Route::get('/favicon-generator', [FaviconGeneratorController::class, 'show'])->name('favicon-generator');
