@@ -126,7 +126,7 @@ class ToolsIndexController extends Controller
 				'tools' => [
 					[
 						'slug' => 'accessguard',
-						'route' => 'tools.accessguard.index',
+						'route' => 'accessguard.landing',
 						'title_nl' => 'AccessGuard', 'title_en' => 'AccessGuard',
 						'desc_nl' => 'Access matrix: wie heeft toegang tot welk systeem. Periodieke reviews, onboarding en offboarding in één overzicht.',
 						'desc_en' => 'Access matrix: who has access to which system. Periodic reviews, onboarding and offboarding in one view.',

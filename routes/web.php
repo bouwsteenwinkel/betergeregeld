@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccessGuardLandingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
@@ -69,6 +70,7 @@ Route::prefix('{locale}')
 	->group(function () {
 		Route::get('/', fn () => view('welcome'))->name('home');
 		Route::get('/over', fn () => view('pages.about'))->name('about');
+		Route::get('/accessguard', [AccessGuardLandingController::class, 'show'])->name('accessguard.landing');
 
 		Route::middleware('guest')->group(function () {
 			Route::get('/login', [LoginController::class, 'show'])->name('login');
