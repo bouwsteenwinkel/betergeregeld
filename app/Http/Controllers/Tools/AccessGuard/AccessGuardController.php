@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AccessGuard\AccessCell;
 use App\Models\AccessGuard\BusinessSystem;
 use App\Models\AccessGuard\Person;
+use App\Models\AccessGuard\Reminder;
+use App\Models\AccessGuard\RiskFlag;
 use App\Services\Features\FeatureResolver;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -41,6 +43,29 @@ class AccessGuardController extends Controller
 		$totalCells = $activePeopleCount * $activeSystemsCount;
 		$recordedCells = array_sum($byState);
 
+		$topRisks = RiskFlag::query()
+			->where('tenant_id', $tenantId)
+			->where('status', 'open')
+			->orderByDesc('severity')
+			->orderByDesc('detected_at')
+			->limit(5)
+			->get();
+		$openRisksCount = RiskFlag::query()
+			->where('tenant_id', $tenantId)
+			->where('status', 'open')
+			->count();
+
+		$topReminders = Reminder::query()
+			->where('tenant_id', $tenantId)
+			->where('status', 'open')
+			->orderBy('due_at')
+			->limit(5)
+			->get();
+		$openRemindersCount = Reminder::query()
+			->where('tenant_id', $tenantId)
+			->where('status', 'open')
+			->count();
+
 		return view('tools.accessguard.index', [
 			'peopleCount' => $peopleCount,
 			'activePeopleCount' => $activePeopleCount,
@@ -53,6 +78,10 @@ class AccessGuardController extends Controller
 			'hasAccess' => (int) ($byState['has_access'] ?? 0),
 			'noAccess' => (int) ($byState['no_access'] ?? 0),
 			'unknown' => (int) ($byState['unknown'] ?? 0),
+			'topRisks' => $topRisks,
+			'openRisksCount' => $openRisksCount,
+			'topReminders' => $topReminders,
+			'openRemindersCount' => $openRemindersCount,
 		]);
 	}
 

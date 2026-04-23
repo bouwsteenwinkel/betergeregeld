@@ -67,6 +67,62 @@
 			</div>
 		</div>
 
+		@if ($topRisks->isNotEmpty() || $topReminders->isNotEmpty())
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+				<div class="card">
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Open risico\'s') }}</h2>
+						@if ($openRisksCount > 0)
+							<a href="{{ route('tools.accessguard.risks.index', ['locale' => app()->getLocale()]) }}" class="text-xs text-[color:var(--color-accent)] font-semibold hover:underline">{{ __('Alle :n →', ['n' => $openRisksCount]) }}</a>
+						@endif
+					</div>
+					@if ($topRisks->isEmpty())
+						<p class="text-xs text-[color:var(--color-ink-muted)]">{{ __('Niks dringends. De dagelijkse scan draait om 03:00.') }}</p>
+					@else
+						<ul class="space-y-2 text-sm">
+							@foreach ($topRisks as $r)
+								<li class="flex items-start gap-2">
+									<span class="inline-flex gap-0.5 mt-1 flex-shrink-0">
+										@for ($i = 0; $i < 5; $i++)
+											<span class="w-1 h-3 rounded {{ $i < $r->severity ? 'bg-red-500' : 'bg-slate-200' }}"></span>
+										@endfor
+									</span>
+									<div class="flex-1 min-w-0">
+										<div class="font-semibold truncate">{{ $r->title }}</div>
+										<div class="text-xs text-[color:var(--color-ink-muted)] truncate">{{ $r->description }}</div>
+									</div>
+								</li>
+							@endforeach
+						</ul>
+					@endif
+				</div>
+
+				<div class="card">
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Reminders') }}</h2>
+						@if ($openRemindersCount > 0)
+							<a href="{{ route('tools.accessguard.reminders.index', ['locale' => app()->getLocale()]) }}" class="text-xs text-[color:var(--color-accent)] font-semibold hover:underline">{{ __('Alle :n →', ['n' => $openRemindersCount]) }}</a>
+						@endif
+					</div>
+					@if ($topReminders->isEmpty())
+						<p class="text-xs text-[color:var(--color-ink-muted)]">{{ __('Geen reminders open.') }}</p>
+					@else
+						<ul class="space-y-2 text-sm">
+							@foreach ($topReminders as $r)
+								<li class="flex items-start gap-2">
+									<span class="text-xs text-[color:var(--color-ink-muted)] tabular-nums w-16 flex-shrink-0">{{ $r->due_at?->format('d-m') ?? '—' }}</span>
+									<div class="flex-1 min-w-0">
+										<div class="font-semibold truncate">{{ $r->title }}</div>
+										<div class="text-xs text-[color:var(--color-ink-muted)] truncate">{{ $r->description }}</div>
+									</div>
+								</li>
+							@endforeach
+						</ul>
+					@endif
+				</div>
+			</div>
+		@endif
+
 		<div class="card">
 			<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">{{ __('Aan de slag') }}</h2>
 			<ol class="space-y-2 text-sm list-decimal list-inside">

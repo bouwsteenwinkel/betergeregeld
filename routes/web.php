@@ -17,7 +17,9 @@ use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAc
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
 use App\Http\Controllers\Tools\AccessGuard\ProcessController as AccessGuardProcessController;
+use App\Http\Controllers\Tools\AccessGuard\ReminderController as AccessGuardReminderController;
 use App\Http\Controllers\Tools\AccessGuard\ReviewActionController as AccessGuardReviewActionController;
+use App\Http\Controllers\Tools\AccessGuard\RiskFlagController as AccessGuardRiskFlagController;
 use App\Http\Controllers\Tools\AccessGuard\ReviewController as AccessGuardReviewController;
 use App\Http\Controllers\Tools\AccessGuard\SystemController as AccessGuardSystemController;
 use App\Http\Controllers\Tools\BookkeepingAuditLogController;
@@ -284,6 +286,17 @@ Route::prefix('{locale}')
 				Route::delete('/processen/{id}/bewijs/{evidenceId}', [AccessGuardProcessController::class, 'deleteEvidence'])->whereNumber(['id', 'evidenceId'])->name('processes.delete-evidence');
 				Route::post('/processen/{id}/complete', [AccessGuardProcessController::class, 'complete'])->whereNumber('id')->name('processes.complete');
 				Route::post('/processen/{id}/annuleren', [AccessGuardProcessController::class, 'cancel'])->whereNumber('id')->name('processes.cancel');
+
+				Route::get('/risicos', [AccessGuardRiskFlagController::class, 'index'])->name('risks.index');
+				Route::post('/risicos/scan', [AccessGuardRiskFlagController::class, 'scanNow'])->name('risks.scan');
+				Route::post('/risicos/{id}/bevestig', [AccessGuardRiskFlagController::class, 'acknowledge'])->whereNumber('id')->name('risks.acknowledge');
+				Route::post('/risicos/{id}/oplossen', [AccessGuardRiskFlagController::class, 'resolve'])->whereNumber('id')->name('risks.resolve');
+				Route::post('/risicos/{id}/heropen', [AccessGuardRiskFlagController::class, 'reopen'])->whereNumber('id')->name('risks.reopen');
+
+				Route::get('/reminders', [AccessGuardReminderController::class, 'index'])->name('reminders.index');
+				Route::post('/reminders/bouw', [AccessGuardReminderController::class, 'buildNow'])->name('reminders.build');
+				Route::post('/reminders/{id}/klaar', [AccessGuardReminderController::class, 'markDone'])->whereNumber('id')->name('reminders.done');
+				Route::post('/reminders/{id}/weg', [AccessGuardReminderController::class, 'dismiss'])->whereNumber('id')->name('reminders.dismiss');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {
