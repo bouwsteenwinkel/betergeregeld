@@ -13,6 +13,44 @@
 			<div class="card text-sm bg-emerald-50 border-emerald-200 text-emerald-900">{{ session('status') }}</div>
 		@endif
 
+		@if (session('demo_just_seeded'))
+			<div class="card border-[color:var(--color-accent)] border-2" style="background: linear-gradient(135deg, rgba(20,184,166,0.03) 0%, rgba(20,184,166,0.08) 100%)">
+				<div class="flex items-start gap-4">
+					<div class="text-3xl">🎉</div>
+					<div class="flex-1">
+						<h3 class="font-bold text-base mb-1">{{ __('Demo-data is geladen. Probeer deze volgende klikken:') }}</h3>
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-sm">
+							<a href="{{ route('tools.accessguard.matrix', ['locale' => app()->getLocale()]) }}" class="flex items-center gap-2 p-2 rounded border border-[color:var(--color-line)] hover:bg-white">
+								<span>◈</span><span class="font-semibold">{{ __('1. Open de Access Matrix') }}</span>
+							</a>
+							<a href="{{ route('tools.accessguard.risks.index', ['locale' => app()->getLocale()]) }}" class="flex items-center gap-2 p-2 rounded border border-[color:var(--color-line)] hover:bg-white">
+								<span>⚠</span><span class="font-semibold">{{ __('2. Bekijk de gedetecteerde risico\'s') }}</span>
+							</a>
+							<a href="{{ route('tools.accessguard.reviews.index', ['locale' => app()->getLocale()]) }}" class="flex items-center gap-2 p-2 rounded border border-[color:var(--color-line)] hover:bg-white">
+								<span>⟲</span><span class="font-semibold">{{ __('3. Loop de review-cyclus door') }}</span>
+							</a>
+							<a href="{{ route('tools.accessguard.vault.index', ['locale' => app()->getLocale()]) }}" class="flex items-center gap-2 p-2 rounded border border-[color:var(--color-line)] hover:bg-white">
+								<span>🔐</span><span class="font-semibold">{{ __('4. Kijk in de Vault') }}</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		@endif
+
+		@if ($isDemoSeeded && ! session('demo_just_seeded'))
+			<div class="card text-sm bg-amber-50 border-amber-200 text-amber-900 flex items-center justify-between flex-wrap gap-3">
+				<div class="flex items-center gap-2">
+					<span>💡</span>
+					<span>{{ __('Je werkt momenteel met demo-data. Wis het wanneer je klaar bent om je eigen data te importeren.') }}</span>
+				</div>
+				<form method="POST" action="{{ route('tools.accessguard.first-run.wipe', ['locale' => app()->getLocale()]) }}" onsubmit="return confirm('{{ __('Alle demo-data wissen?') }}');">
+					@csrf
+					<button type="submit" class="text-xs px-3 py-1.5 rounded border border-amber-300 hover:bg-amber-100">{{ __('Wis demo-data') }}</button>
+				</form>
+			</div>
+		@endif
+
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 			<div class="card">
 				<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)] font-bold mb-1">{{ __('Personen') }}</div>

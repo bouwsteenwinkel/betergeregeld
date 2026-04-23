@@ -19,6 +19,7 @@ use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAc
 use App\Http\Controllers\Tools\AccessGuard\AccessProfileController as AccessGuardAccessProfileController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\DataController as AccessGuardDataController;
+use App\Http\Controllers\Tools\AccessGuard\FirstRunController as AccessGuardFirstRunController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\NotificationSettingsController as AccessGuardNotificationSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
@@ -246,6 +247,8 @@ Route::prefix('{locale}')
 
 			Route::middleware('auth')->prefix('accessguard')->name('accessguard.')->group(function () {
 				Route::get('/', [AccessGuardController::class, 'index'])->name('index');
+				Route::post('/first-run/seed', [AccessGuardFirstRunController::class, 'seedDemo'])->name('first-run.seed');
+				Route::post('/first-run/wipe', [AccessGuardFirstRunController::class, 'wipeDemo'])->name('first-run.wipe');
 
 				Route::get('/matrix', [AccessGuardMatrixController::class, 'index'])->name('matrix');
 				Route::post('/matrix/cell', [AccessGuardMatrixController::class, 'updateCell'])->name('matrix.update');

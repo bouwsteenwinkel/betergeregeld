@@ -8,18 +8,31 @@ use App\Models\AccessGuard\BusinessSystem;
 use App\Models\AccessGuard\Person;
 use App\Models\AccessGuard\Reminder;
 use App\Models\AccessGuard\RiskFlag;
+use App\Services\AccessGuard\DemoSeeder;
 use App\Services\Features\FeatureResolver;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AccessGuardController extends Controller
 {
-	public function __construct(private readonly FeatureResolver $features) {}
+	public function __construct(
+		private readonly FeatureResolver $features,
+		private readonly DemoSeeder $seeder,
+	) {}
 
 	public function index(Request $request, string $locale): View
 	{
 		$this->mustHaveAccess($request);
 		$tenantId = $request->user()->tenant_id;
+
+		// First-run splash when the tenant is empty.
+		$totalPeople = Person::query()->where('tenant_id', $tenantId)->count();
+		$totalSystems = BusinessSystem::query()->where('tenant_id', $tenantId)->count();
+		if ($totalPeople === 0 && $totalSystems === 0) {
+			return view('tools.accessguard.first-run');
+		}
+
+		$isDemoSeeded = $this->seeder->isDemoSeeded($tenantId);
 
 		$peopleCount = Person::query()->where('tenant_id', $tenantId)->count();
 		$activePeopleCount = Person::query()
@@ -82,6 +95,7 @@ class AccessGuardController extends Controller
 			'openRisksCount' => $openRisksCount,
 			'topReminders' => $topReminders,
 			'openRemindersCount' => $openRemindersCount,
+			'isDemoSeeded' => $isDemoSeeded,
 		]);
 	}
 
