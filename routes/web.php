@@ -12,6 +12,10 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
+use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
+use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
+use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
+use App\Http\Controllers\Tools\AccessGuard\SystemController as AccessGuardSystemController;
 use App\Http\Controllers\Tools\BookkeepingAuditLogController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
 use App\Http\Controllers\Tools\BookkeepingController;
@@ -222,6 +226,27 @@ Route::prefix('{locale}')
 				Route::get('/{id}/bewerken', [BookkeepingController::class, 'edit'])->name('edit');
 				Route::put('/{id}', [BookkeepingController::class, 'update'])->name('update');
 				Route::delete('/{id}', [BookkeepingController::class, 'destroy'])->name('destroy');
+			});
+
+			Route::middleware('auth')->prefix('accessguard')->name('accessguard.')->group(function () {
+				Route::get('/', [AccessGuardController::class, 'index'])->name('index');
+
+				Route::get('/matrix', [AccessGuardMatrixController::class, 'index'])->name('matrix');
+				Route::post('/matrix/cell', [AccessGuardMatrixController::class, 'updateCell'])->name('matrix.update');
+
+				Route::get('/personen', [AccessGuardPersonController::class, 'index'])->name('people.index');
+				Route::get('/personen/nieuw', [AccessGuardPersonController::class, 'create'])->name('people.create');
+				Route::post('/personen', [AccessGuardPersonController::class, 'store'])->name('people.store');
+				Route::get('/personen/{id}/bewerken', [AccessGuardPersonController::class, 'edit'])->whereNumber('id')->name('people.edit');
+				Route::put('/personen/{id}', [AccessGuardPersonController::class, 'update'])->whereNumber('id')->name('people.update');
+				Route::delete('/personen/{id}', [AccessGuardPersonController::class, 'destroy'])->whereNumber('id')->name('people.destroy');
+
+				Route::get('/systemen', [AccessGuardSystemController::class, 'index'])->name('systems.index');
+				Route::get('/systemen/nieuw', [AccessGuardSystemController::class, 'create'])->name('systems.create');
+				Route::post('/systemen', [AccessGuardSystemController::class, 'store'])->name('systems.store');
+				Route::get('/systemen/{id}/bewerken', [AccessGuardSystemController::class, 'edit'])->whereNumber('id')->name('systems.edit');
+				Route::put('/systemen/{id}', [AccessGuardSystemController::class, 'update'])->whereNumber('id')->name('systems.update');
+				Route::delete('/systemen/{id}', [AccessGuardSystemController::class, 'destroy'])->whereNumber('id')->name('systems.destroy');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

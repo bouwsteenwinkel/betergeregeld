@@ -21,6 +21,7 @@
 		'book' => '<path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V4Z"/><path d="M4 18h14M8 8h6M8 12h6"/>',
 		'truck' => '<path d="M3 6h11v10H3Z M14 10h4l3 3v3h-7Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
 		'blocks' => '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+		'key' => '<circle cx="8" cy="15" r="4"/><path d="m10.85 12.15 8.15-8.15 3 3-2 2-2-2-2 2 2 2-2 2"/>',
 	];
 @endphp
 

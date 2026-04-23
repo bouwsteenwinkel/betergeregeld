@@ -68,6 +68,7 @@ class ToolsPlansSeeder extends Seeder
 					'tool.loss.team_view' => '0',
 
 					'tool.bookkeeping.enabled' => '0',
+					'tool.accessguard.enabled' => '0',
 				],
 			],
 			[
@@ -120,6 +121,7 @@ class ToolsPlansSeeder extends Seeder
 					'tool.loss.team_view' => '0',
 
 					'tool.bookkeeping.enabled' => '1',
+					'tool.accessguard.enabled' => '1',
 				],
 			],
 			[
@@ -166,6 +168,9 @@ class ToolsPlansSeeder extends Seeder
 
 					'tool.bookkeeping.enabled' => '1',
 					'tool.bookkeeping.multi_user' => '1',
+
+					'tool.accessguard.enabled' => '1',
+					'tool.accessguard.multi_user' => '1',
 				],
 			],
 		];

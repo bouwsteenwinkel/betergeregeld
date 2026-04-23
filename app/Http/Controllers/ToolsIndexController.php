@@ -118,6 +118,24 @@ class ToolsIndexController extends Controller
 				],
 			],
 			[
+				'key' => 'identity',
+				'title_nl' => 'Toegang & identity',
+				'title_en' => 'Access & identity',
+				'subtitle_nl' => 'Wie heeft toegang tot welk systeem, en klopt dat nog?',
+				'subtitle_en' => 'Who has access to which system, and is that still correct?',
+				'tools' => [
+					[
+						'slug' => 'accessguard',
+						'route' => 'tools.accessguard.index',
+						'title_nl' => 'AccessGuard', 'title_en' => 'AccessGuard',
+						'desc_nl' => 'Access matrix: wie heeft toegang tot welk systeem. Periodieke reviews, onboarding en offboarding in één overzicht.',
+						'desc_en' => 'Access matrix: who has access to which system. Periodic reviews, onboarding and offboarding in one view.',
+						'badge_nl' => 'Pro', 'badge_en' => 'Pro',
+						'icon' => 'key',
+					],
+				],
+			],
+			[
 				'key' => 'hobby',
 				'title_nl' => 'Hobby',
 				'title_en' => 'Hobby',
