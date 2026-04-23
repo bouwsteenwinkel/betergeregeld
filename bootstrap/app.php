@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Plesk/IIS terminates HTTPS in front of Laravel. Without this,
+        // request()->isSecure() returns false → secure cookies won't be
+        // set and URL::route() generates http:// links under HTTPS pages.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'setlocale' => \App\Http\Middleware\SetLocale::class,
             'tool.limit' => \App\Http\Middleware\EnforceToolRateLimit::class,
