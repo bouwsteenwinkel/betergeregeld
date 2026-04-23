@@ -36,6 +36,7 @@
 							<th class="text-left py-2 px-3 font-semibold">{{ __('Naam') }}</th>
 							<th class="text-left py-2 px-3 font-semibold">{{ __('Omschrijving') }}</th>
 							<th class="text-right py-2 px-3 font-semibold">{{ __('Items') }}</th>
+							<th class="text-right py-2 px-3 font-semibold">{{ __('Leden') }}</th>
 							<th class="text-left py-2 px-3 font-semibold">{{ __('Status') }}</th>
 							<th class="text-right py-2 px-3 font-semibold">{{ __('Acties') }}</th>
 						</tr>
@@ -43,24 +44,43 @@
 					<tbody>
 						@foreach ($profiles as $p)
 							<tr class="border-b border-[color:var(--color-line)]/60 hover:bg-[color:var(--color-surface-soft,#fafafa)]">
-								<td class="py-2 px-3 font-semibold">{{ $p->name }}</td>
+								<td class="py-2 px-3 font-semibold">
+									{{ $p->name }}
+									@if ($p->external_source)
+										<span class="inline-flex items-center ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 uppercase tracking-wider">
+											{{ $p->external_source }}
+										</span>
+									@endif
+								</td>
 								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)]">{{ $p->description ?: '—' }}</td>
 								<td class="py-2 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">{{ $p->items_count }}</td>
+								<td class="py-2 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">{{ $p->members_count }}</td>
 								<td class="py-2 px-3">
 									<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $p->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500' }}">
 										{{ $p->is_active ? __('Actief') : __('Inactief') }}
 									</span>
 								</td>
 								<td class="py-2 px-3 text-right whitespace-nowrap">
+									@if ($p->is_active && $p->items_count > 0 && $p->members_count > 0)
+										<form method="POST" action="{{ route('tools.accessguard.profiles.apply-to-members', ['locale' => $locale, 'id' => $p->id]) }}"
+											class="inline"
+											onsubmit="return confirm('{{ __('Profile toepassen op :n leden? Alleen onbekende cellen worden ingevuld.', ['n' => $p->members_count]) }}');">
+											@csrf
+											<input type="hidden" name="strategy" value="add_only">
+											<button type="submit" class="text-emerald-700 font-semibold hover:underline text-xs">{{ __('Op alle leden') }}</button>
+										</form>
+									@endif
 									@if ($p->is_active && $p->items_count > 0)
-										<a href="{{ route('tools.accessguard.profiles.apply-form', ['locale' => $locale, 'id' => $p->id]) }}" class="text-emerald-700 font-semibold hover:underline text-xs">{{ __('Toepassen') }}</a>
+										<a href="{{ route('tools.accessguard.profiles.apply-form', ['locale' => $locale, 'id' => $p->id]) }}" class="text-emerald-700 font-semibold hover:underline text-xs ml-2">{{ __('Op 1 persoon') }}</a>
 									@endif
 									<a href="{{ route('tools.accessguard.profiles.edit', ['locale' => $locale, 'id' => $p->id]) }}" class="text-[color:var(--color-accent)] font-semibold hover:underline text-xs ml-2">{{ __('Bewerken') }}</a>
-									<form method="POST" action="{{ route('tools.accessguard.profiles.destroy', ['locale' => $locale, 'id' => $p->id]) }}" class="inline" onsubmit="return confirm('{{ __('Profile verwijderen?') }}');">
-										@csrf
-										@method('DELETE')
-										<button type="submit" class="text-red-600 font-semibold hover:underline text-xs ml-2">{{ __('Verwijderen') }}</button>
-									</form>
+									@unless ($p->external_source)
+										<form method="POST" action="{{ route('tools.accessguard.profiles.destroy', ['locale' => $locale, 'id' => $p->id]) }}" class="inline" onsubmit="return confirm('{{ __('Profile verwijderen?') }}');">
+											@csrf
+											@method('DELETE')
+											<button type="submit" class="text-red-600 font-semibold hover:underline text-xs ml-2">{{ __('Verwijderen') }}</button>
+										</form>
+									@endunless
 								</td>
 							</tr>
 						@endforeach

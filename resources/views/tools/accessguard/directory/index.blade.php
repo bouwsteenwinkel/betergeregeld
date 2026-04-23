@@ -68,6 +68,16 @@
 							@endif
 						</dd>
 					</div>
+					<div>
+						<dt class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Groups in laatste sync') }}</dt>
+						<dd>{{ $connection->last_sync_groups_seen ?? 0 }}
+							@if (($connection->last_sync_memberships_seen ?? 0) > 0)
+								<span class="text-xs text-[color:var(--color-ink-muted)]">
+									({{ $connection->last_sync_memberships_seen }} {{ __('lidmaatschappen') }})
+								</span>
+							@endif
+						</dd>
+					</div>
 				</dl>
 
 				@if ($connection->last_sync_message)
@@ -112,6 +122,8 @@
 				<li>{{ __('Schrijft first/last name, job_title, department, last_sign_in_at.') }}</li>
 				<li>{{ __('accountEnabled=false in Entra → status=inactive in AccessGuard.') }}</li>
 				<li>{{ __('Scanner pakt users die 90+ dagen niet ingelogd zijn als risico (severity 3, 180+ dagen = 4).') }}</li>
+				<li>{{ __('Pullt security groups als AccessProfiles; leden-sets worden bij elke sync opnieuw geprunet.') }}</li>
+				<li>{{ __('Op het Profielen-overzicht kun je een profile in één klik toepassen op alle leden.') }}</li>
 				<li>{{ __('Dagelijkse auto-sync loopt via accessguard:sync-directories.') }}</li>
 			</ul>
 		</div>

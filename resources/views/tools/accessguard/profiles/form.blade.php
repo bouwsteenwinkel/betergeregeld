@@ -110,6 +110,46 @@
 				<a href="{{ route('tools.accessguard.profiles.index', ['locale' => $locale]) }}" class="text-sm text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">{{ __('Annuleren') }}</a>
 			</div>
 		</form>
+
+		@if ($editing && $members->count() > 0)
+			<div class="card mt-4">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)]">
+						{{ __('Leden') }} ({{ $members->count() }})
+					</h3>
+					@if ($profile->external_source)
+						<span class="text-xs text-[color:var(--color-ink-muted)]">
+							{{ __('Gesynchroniseerd vanuit :src', ['src' => strtoupper($profile->external_source)]) }}
+							@if ($profile->last_synced_at)
+								· {{ $profile->last_synced_at->diffForHumans() }}
+							@endif
+						</span>
+					@endif
+				</div>
+				<ul class="divide-y divide-[color:var(--color-line)]/60 text-sm">
+					@foreach ($members as $m)
+						@php $p = $m->person; @endphp
+						@if ($p)
+							<li class="flex items-center justify-between py-2">
+								<div>
+									<span class="font-semibold">{{ trim($p->first_name . ' ' . $p->last_name) }}</span>
+									@if ($p->job_title)
+										<span class="text-xs text-[color:var(--color-ink-muted)]"> — {{ $p->job_title }}</span>
+									@endif
+									@if ($p->status === 'inactive')
+										<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 uppercase">{{ __('Inactief') }}</span>
+									@endif
+								</div>
+								<span class="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider
+									{{ $m->source === 'manual' ? 'bg-slate-100 text-slate-700' : 'bg-sky-100 text-sky-800' }}">
+									{{ $m->source }}
+								</span>
+							</li>
+						@endif
+					@endforeach
+				</ul>
+			</div>
+		@endif
 	</div>
 </section>
 

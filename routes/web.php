@@ -354,6 +354,7 @@ Route::prefix('{locale}')
 				Route::delete('/profielen/{id}', [AccessGuardAccessProfileController::class, 'destroy'])->whereNumber('id')->name('profiles.destroy');
 				Route::get('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'applyForm'])->whereNumber('id')->name('profiles.apply-form');
 				Route::post('/profielen/{id}/toepassen', [AccessGuardAccessProfileController::class, 'apply'])->whereNumber('id')->name('profiles.apply');
+				Route::post('/profielen/{id}/toepassen-op-leden', [AccessGuardAccessProfileController::class, 'applyToMembers'])->whereNumber('id')->name('profiles.apply-to-members');
 
 				Route::post('/feedback', [AccessGuardFeedbackController::class, 'submit'])->name('feedback.submit');
 

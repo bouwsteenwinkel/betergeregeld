@@ -26,7 +26,7 @@ class AccessProfileController extends Controller
 		$this->mustHaveAccess($request);
 		$profiles = AccessProfile::query()
 			->where('tenant_id', $request->user()->tenant_id)
-			->withCount('items')
+			->withCount(['items', 'members'])
 			->orderByDesc('is_active')
 			->orderBy('name')
 			->get();
@@ -39,6 +39,7 @@ class AccessProfileController extends Controller
 		return view('tools.accessguard.profiles.form', [
 			'profile' => new AccessProfile(['is_active' => true]),
 			'profileItems' => collect(),
+			'members' => collect(),
 			'systems' => $this->systemsFor($request),
 			'items' => $this->itemsFor($request),
 		]);
@@ -63,6 +64,7 @@ class AccessProfileController extends Controller
 		return view('tools.accessguard.profiles.form', [
 			'profile' => $profile,
 			'profileItems' => $profile->items()->get(),
+			'members' => $profile->members()->with('person:id,first_name,last_name,email,job_title,status,external_source')->get(),
 			'systems' => $this->systemsFor($request),
 			'items' => $this->itemsFor($request),
 		]);
@@ -125,6 +127,32 @@ class AccessProfileController extends Controller
 				'name' => trim($person->first_name . ' ' . $person->last_name),
 				'a' => $result['applied'],
 				's' => $result['skipped'],
+			]);
+
+		return back()->with('status', $msg);
+	}
+
+	public function applyToMembers(Request $request, string $locale, int $id): RedirectResponse
+	{
+		$this->mustHaveAccess($request);
+		$data = $request->validate([
+			'strategy' => ['required', 'in:add_only,overwrite,dry_run'],
+		]);
+		$profile = $this->findOwned($request, $id);
+
+		$result = $this->service->applyToAllMembers(
+			$request->user()->tenant_id,
+			(string) $request->user()->getAuthIdentifier(),
+			$profile,
+			$data['strategy'],
+		);
+
+		$msg = $data['strategy'] === 'dry_run'
+			? __('Dry-run: :n wijzigingen zouden worden toegepast op :m leden.', [
+				'n' => $result['total_would_change'], 'm' => $result['members'],
+			])
+			: __(':m leden verwerkt: :a toegepast, :s overgeslagen.', [
+				'm' => $result['members'], 'a' => $result['total_applied'], 's' => $result['total_skipped'],
 			]);
 
 		return back()->with('status', $msg);

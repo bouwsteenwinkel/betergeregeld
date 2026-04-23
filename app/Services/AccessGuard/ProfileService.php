@@ -89,6 +89,41 @@ class ProfileService
 		];
 	}
 
+	/**
+	 * Apply a profile to every person in its ProfileMember list — used to
+	 * cascade a synced M365 group's access template to all its members
+	 * in one click.
+	 *
+	 * @return array{members:int, total_applied:int, total_skipped:int, total_would_change:int, strategy:string}
+	 */
+	public function applyToAllMembers(
+		string $tenantId,
+		string $actorUserId,
+		AccessProfile $profile,
+		string $strategy = 'add_only',
+	): array {
+		if ($profile->tenant_id !== $tenantId) throw new RuntimeException('Tenant mismatch on profile');
+
+		$members = $profile->members()->with('person')->get();
+		$applied = 0; $skipped = 0; $would = 0;
+
+		foreach ($members as $member) {
+			if (! $member->person || $member->person->tenant_id !== $tenantId) continue;
+			$result = $this->applyTo($tenantId, $actorUserId, $member->person, $profile, $strategy);
+			$applied += $result['applied'];
+			$skipped += $result['skipped'];
+			$would += $result['would_change'];
+		}
+
+		return [
+			'members' => $members->count(),
+			'total_applied' => $applied,
+			'total_skipped' => $skipped,
+			'total_would_change' => $would,
+			'strategy' => $strategy,
+		];
+	}
+
 	private function currentCellState(string $tenantId, int $personId, int $systemId): ?string
 	{
 		return DB::table('accessguard_access_cells')
