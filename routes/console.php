@@ -27,3 +27,8 @@ Schedule::command('accessguard:build-reminders')
     ->dailyAt('03:15')
     ->onOneServer()
     ->withoutOverlapping();
+
+Schedule::command('accessguard:send-digests')
+    ->dailyAt('08:00')
+    ->onOneServer()
+    ->withoutOverlapping();

@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\DB;
  */
 class RiskScannerService
 {
+	public function __construct(private readonly NotificationService $notifier) {}
+
 	/**
 	 * @return array<string,int> per-rule counts written
 	 */
@@ -307,10 +309,31 @@ class RiskScannerService
 		]);
 		$values['payload'] = isset($values['payload']) ? json_encode($values['payload']) : null;
 
+		// Was this risk already open/acked/resolved before this run? We only
+		// fire instant alerts on first detection — so repeat runs stay quiet.
+		$existed = RiskFlag::query()
+			->where('tenant_id', $tenantId)
+			->where('kind', $fields['kind'])
+			->where('subject_type', $fields['subject_type'])
+			->where('subject_id', $fields['subject_id'])
+			->exists();
+
 		RiskFlag::query()->upsert(
 			[$values + ['created_at' => $now]],
 			['tenant_id', 'kind', 'subject_type', 'subject_id'],
 			['severity', 'title', 'description', 'detected_at', 'payload', 'updated_at'],
 		);
+
+		if (! $existed && ($fields['severity'] ?? 0) >= 5) {
+			$fresh = RiskFlag::query()
+				->where('tenant_id', $tenantId)
+				->where('kind', $fields['kind'])
+				->where('subject_type', $fields['subject_type'])
+				->where('subject_id', $fields['subject_id'])
+				->first();
+			if ($fresh) {
+				$this->notifier->dispatchInstantAlert($fresh);
+			}
+		}
 	}
 }

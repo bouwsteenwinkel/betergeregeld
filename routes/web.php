@@ -18,6 +18,7 @@ use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
 use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAccessItemController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
+use App\Http\Controllers\Tools\AccessGuard\NotificationSettingsController as AccessGuardNotificationSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
 use App\Http\Controllers\Tools\AccessGuard\ProcessController as AccessGuardProcessController;
 use App\Http\Controllers\Tools\AccessGuard\ReminderController as AccessGuardReminderController;
@@ -73,6 +74,7 @@ Route::prefix('{locale}')
 		Route::get('/over', fn () => view('pages.about'))->name('about');
 		Route::get('/accessguard', [AccessGuardLandingController::class, 'show'])->name('accessguard.landing');
 		Route::get('/accessguard/handleiding', [AccessGuardHandleidingController::class, 'download'])->name('accessguard.handleiding');
+		Route::get('/accessguard/notifications/unsubscribe/{token}', [AccessGuardNotificationSettingsController::class, 'unsubscribe'])->name('tools.accessguard.notifications.unsubscribe');
 
 		Route::middleware('guest')->group(function () {
 			Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -316,6 +318,9 @@ Route::prefix('{locale}')
 				Route::post('/vault/{id}/acl/{aclId}/intrekken', [AccessGuardVaultController::class, 'revokeAcl'])->whereNumber(['id', 'aclId'])->name('vault.revoke-acl');
 
 				Route::post('/ai/explain', [AccessGuardAiExplainController::class, 'explain'])->name('ai.explain');
+
+				Route::get('/notificaties', [AccessGuardNotificationSettingsController::class, 'edit'])->name('notifications.edit');
+				Route::put('/notificaties', [AccessGuardNotificationSettingsController::class, 'update'])->name('notifications.update');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {
