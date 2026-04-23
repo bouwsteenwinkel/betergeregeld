@@ -720,6 +720,9 @@
 				<a href="{{ route('pricing', ['locale' => $locale]) }}" class="ag-btn ag-btn-primary">
 					{{ $isEn ? 'See all pricing' : 'Bekijk alle prijzen' }}
 				</a>
+				<a href="{{ route('accessguard.handleiding', ['locale' => $locale]) }}" class="ag-btn ag-btn-secondary" target="_blank">
+					📄 {{ $isEn ? 'Download manual (PDF)' : 'Download handleiding (PDF)' }}
+				</a>
 				@if (! $isAuthed)
 					<a href="{{ route('register', ['locale' => $locale]) }}" class="ag-btn ag-btn-secondary">
 						{{ $isEn ? 'Start free trial' : 'Start gratis proef' }}
