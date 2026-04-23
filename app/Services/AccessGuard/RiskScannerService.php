@@ -4,10 +4,12 @@ namespace App\Services\AccessGuard;
 
 use App\Models\AccessGuard\AccessCell;
 use App\Models\AccessGuard\AccessItem;
+use App\Models\AccessGuard\AccessProfile;
 use App\Models\AccessGuard\Cycle;
 use App\Models\AccessGuard\CycleAction;
 use App\Models\AccessGuard\Person;
 use App\Models\AccessGuard\PersonAccessItem;
+use App\Models\AccessGuard\ProfileMember;
 use App\Models\AccessGuard\Process;
 use App\Models\AccessGuard\RiskFlag;
 use App\Models\AccessGuard\VaultCredential;
@@ -40,7 +42,79 @@ class RiskScannerService
 		$counts['pending_onboarding'] = $this->scanPendingOnboarding($tenantId, $now);
 		$counts['stale_credential'] = $this->scanStaleCredentials($tenantId, $now);
 		$counts['dormant_account'] = $this->scanDormantAccounts($tenantId, $now);
+		$counts['admin_group_creep'] = $this->scanAdminGroupCreep($tenantId, $now);
 		return $counts;
+	}
+
+	// Admin-ish profile name patterns. Mirrors MsGraphClient::looksLikeAdminGroup.
+	// Scans at risk-time rather than relying on a stored flag so renaming a
+	// group to "Sales Admins" retroactively escalates risk on next scan.
+	private const ADMIN_NAME_PATTERNS = ['administrator', 'admin', 'owner', 'privileged', 'root'];
+
+	/**
+	 * Someone was added to a synced admin-looking group in the last 7 days.
+	 * Severity 5 — these are the changes an auditor most wants to know about.
+	 * Idempotent per (tenant, profile_id, person_id) so repeat scans don't
+	 * duplicate, and the risk auto-stales out of the scanner after 7 days
+	 * without re-firing (it stays open in the DB until admin resolves it).
+	 */
+	private function scanAdminGroupCreep(string $tenantId, CarbonImmutable $now): int
+	{
+		$cutoff = $now->subDays(7);
+
+		$adminProfiles = AccessProfile::query()
+			->where('tenant_id', $tenantId)
+			->whereNotNull('external_source')
+			->get(['id', 'name', 'external_source'])
+			->filter(fn ($p) => $this->looksLikeAdminName((string) $p->name));
+
+		if ($adminProfiles->isEmpty()) return 0;
+
+		$memberships = ProfileMember::query()
+			->where('tenant_id', $tenantId)
+			->whereIn('profile_id', $adminProfiles->pluck('id'))
+			->where('created_at', '>=', $cutoff)
+			->with('person:id,first_name,last_name,status')
+			->get();
+
+		$count = 0;
+		foreach ($memberships as $m) {
+			$profile = $adminProfiles->firstWhere('id', $m->profile_id);
+			if (! $profile || ! $m->person) continue;
+
+			$daysSinceAdd = (int) $now->diffInDays($m->created_at);
+			$this->upsert($tenantId, [
+				'kind' => 'admin_group_creep',
+				'severity' => 5,
+				'subject_type' => 'profile_member',
+				'subject_id' => $m->profile_id . ':' . $m->person_id,
+				'title' => trim($m->person->first_name . ' ' . $m->person->last_name)
+					. ' → ' . $profile->name,
+				'description' => __(':days dagen geleden toegevoegd aan een admin-groep via :src. Bevestig of deze toegang terecht is.', [
+					'days' => $daysSinceAdd,
+					'src' => strtoupper((string) $profile->external_source),
+				]),
+				'payload' => [
+					'profile_id' => $m->profile_id,
+					'profile_name' => $profile->name,
+					'person_id' => $m->person_id,
+					'external_source' => $profile->external_source,
+					'days_since_add' => $daysSinceAdd,
+					'added_at' => $m->created_at->toIso8601String(),
+				],
+			], $now);
+			$count++;
+		}
+		return $count;
+	}
+
+	private function looksLikeAdminName(string $name): bool
+	{
+		$lower = strtolower($name);
+		foreach (self::ADMIN_NAME_PATTERNS as $pat) {
+			if (str_contains($lower, $pat)) return true;
+		}
+		return false;
 	}
 
 	/**

@@ -12,6 +12,9 @@
 		'overdue_review' => __('Overdue review'),
 		'overdue_action' => __('Overdue action'),
 		'pending_onboarding' => __('Onboarding vergeten'),
+		'stale_credential' => __('Stale credential'),
+		'dormant_account' => __('Dormant account'),
+		'admin_group_creep' => __('Admin-groep uitbreiding'),
 	];
 	$statusColors = [
 		'open' => 'bg-red-100 text-red-800',
