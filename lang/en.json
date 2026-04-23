@@ -731,6 +731,8 @@
 	"Upload logo (optioneel)": "Upload logo (optional)",
 	"PNG of JPG, max 2 MB. Verschijnt linksboven op PDF-facturen en in herinnerings-e-mails.": "PNG or JPG, max 2 MB. Shown top-left on PDF invoices and in reminder emails.",
 
+	"Excel-export": "Excel export",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

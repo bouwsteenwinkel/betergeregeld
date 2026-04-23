@@ -49,6 +49,12 @@
 						@endfor
 					</select>
 				</div>
+				<div class="flex items-end">
+					<a href="{{ route('tools.bookkeeping.reports.vat.export', ['locale' => $locale, 'year' => $year, 'quarter' => $quarter]) }}"
+						class="btn-dark text-sm">
+						{{ __('Excel-export') }}
+					</a>
+				</div>
 			</div>
 		</form>
 

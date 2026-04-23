@@ -47,6 +47,10 @@
 				</div>
 				<div class="flex gap-2">
 					<button type="submit" class="btn-accent text-sm">{{ __('Toepassen') }}</button>
+					<a href="{{ route('tools.bookkeeping.reports.profit-loss.export', array_merge(['locale' => $locale], request()->only(['year','from','to']))) }}"
+						class="btn-dark text-sm">
+						{{ __('Excel-export') }}
+					</a>
 				</div>
 			</div>
 		</form>

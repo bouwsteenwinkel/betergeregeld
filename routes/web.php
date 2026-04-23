@@ -145,7 +145,9 @@ Route::prefix('{locale}')
 				Route::get('/nieuw', [BookkeepingController::class, 'create'])->name('create');
 				Route::post('/', [BookkeepingController::class, 'store'])->name('store');
 				Route::get('/rapporten/winst-verlies', [BookkeepingReportsController::class, 'profitLoss'])->name('reports.profit-loss');
+				Route::get('/rapporten/winst-verlies/export', [BookkeepingReportsController::class, 'profitLossExport'])->name('reports.profit-loss.export');
 				Route::get('/rapporten/btw-aangifte', [BookkeepingReportsController::class, 'vatReturn'])->name('reports.vat');
+				Route::get('/rapporten/btw-aangifte/export', [BookkeepingReportsController::class, 'vatReturnExport'])->name('reports.vat.export');
 
 				Route::get('/categorieen', [BookkeepingCategoryController::class, 'index'])->name('categories.index');
 				Route::get('/categorieen/nieuw', [BookkeepingCategoryController::class, 'create'])->name('categories.create');

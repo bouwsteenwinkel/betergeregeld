@@ -4,41 +4,25 @@ namespace App\Http\Controllers\Tools;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookkeepingTransaction;
+use App\Services\BookkeepingExcelExporter;
 use App\Services\Features\FeatureResolver;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BookkeepingReportsController extends Controller
 {
-	public function __construct(private readonly FeatureResolver $features) {}
+	public function __construct(
+		private readonly FeatureResolver $features,
+		private readonly BookkeepingExcelExporter $exporter,
+	) {}
 
 	/** Winst & verlies — income − expense per period, optional breakdown per category. */
 	public function profitLoss(Request $request, string $locale): View
 	{
 		$this->mustHaveAccess($request);
-
-		$data = $request->validate([
-			'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-			'from' => ['nullable', 'date'],
-			'to' => ['nullable', 'date'],
-		]);
-
-		$today = CarbonImmutable::now();
-		$year = $data['year'] ?? (int) $today->year;
-		$from = $data['from'] ?? $today->setDate($year, 1, 1)->toDateString();
-		$to = $data['to'] ?? $today->setDate($year, 12, 31)->toDateString();
-
-		$q = BookkeepingTransaction::query()
-			->where('tenant_id', $request->user()->tenant_id)
-			->whereBetween('transaction_date', [$from, $to])
-			->with(['category', 'vatRate']);
-
-		$txs = $q->get();
-
-		[$incomeRows, $incomeTotal] = $this->groupByCategory($txs->where('type', 'income'));
-		[$expenseRows, $expenseTotal] = $this->groupByCategory($txs->where('type', 'expense'));
-		$result = $incomeTotal - $expenseTotal;
+		$data = $this->buildProfitLossData($request);
 
 		$availableYears = BookkeepingTransaction::query()
 			->where('tenant_id', $request->user()->tenant_id)
@@ -48,35 +32,84 @@ class BookkeepingReportsController extends Controller
 			->pluck('y')
 			->all();
 		if (empty($availableYears)) {
-			$availableYears = [(int) $today->year];
+			$availableYears = [(int) CarbonImmutable::now()->year];
 		}
 
-		return view('tools.bookkeeping.reports.profit-loss', [
+		return view('tools.bookkeeping.reports.profit-loss', $data + ['availableYears' => $availableYears]);
+	}
+
+	public function profitLossExport(Request $request, string $locale): BinaryFileResponse
+	{
+		$this->mustHaveAccess($request);
+		$data = $this->buildProfitLossData($request);
+
+		$path = $this->exporter->profitLoss($request->user()->tenant_id, $data);
+		return response()->download($path, 'winst-verlies-' . $data['from'] . '-' . $data['to'] . '.xlsx')
+			->deleteFileAfterSend(true);
+	}
+
+	private function buildProfitLossData(Request $request): array
+	{
+		$input = $request->validate([
+			'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+			'from' => ['nullable', 'date'],
+			'to' => ['nullable', 'date'],
+		]);
+
+		$today = CarbonImmutable::now();
+		$year = $input['year'] ?? (int) $today->year;
+		$from = $input['from'] ?? $today->setDate($year, 1, 1)->toDateString();
+		$to = $input['to'] ?? $today->setDate($year, 12, 31)->toDateString();
+
+		$txs = BookkeepingTransaction::query()
+			->where('tenant_id', $request->user()->tenant_id)
+			->whereBetween('transaction_date', [$from, $to])
+			->with(['category', 'vatRate'])
+			->get();
+
+		[$incomeRows, $incomeTotal] = $this->groupByCategory($txs->where('type', 'income'));
+		[$expenseRows, $expenseTotal] = $this->groupByCategory($txs->where('type', 'expense'));
+
+		return [
 			'year' => $year,
 			'from' => $from,
 			'to' => $to,
-			'availableYears' => $availableYears,
 			'incomeRows' => $incomeRows,
 			'incomeTotal' => $incomeTotal,
 			'expenseRows' => $expenseRows,
 			'expenseTotal' => $expenseTotal,
-			'result' => $result,
-		]);
+			'result' => $incomeTotal - $expenseTotal,
+		];
 	}
 
 	/** BTW-aangifte per kwartaal (NL). */
 	public function vatReturn(Request $request, string $locale): View
 	{
 		$this->mustHaveAccess($request);
+		$data = $this->buildVatReturnData($request);
+		return view('tools.bookkeeping.reports.vat', $data);
+	}
 
-		$data = $request->validate([
+	public function vatReturnExport(Request $request, string $locale): BinaryFileResponse
+	{
+		$this->mustHaveAccess($request);
+		$data = $this->buildVatReturnData($request);
+
+		$path = $this->exporter->vatReturn($request->user()->tenant_id, $data);
+		return response()->download($path, 'btw-aangifte-Q' . $data['quarter'] . '-' . $data['year'] . '.xlsx')
+			->deleteFileAfterSend(true);
+	}
+
+	private function buildVatReturnData(Request $request): array
+	{
+		$input = $request->validate([
 			'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
 			'quarter' => ['nullable', 'integer', 'min:1', 'max:4'],
 		]);
 
 		$today = CarbonImmutable::now();
-		$year = $data['year'] ?? (int) $today->year;
-		$quarter = $data['quarter'] ?? (int) ceil($today->month / 3);
+		$year = $input['year'] ?? (int) $today->year;
+		$quarter = $input['quarter'] ?? (int) ceil($today->month / 3);
 
 		$monthStart = (($quarter - 1) * 3) + 1;
 		$from = CarbonImmutable::create($year, $monthStart, 1)->toDateString();
@@ -88,7 +121,7 @@ class BookkeepingReportsController extends Controller
 			->with('vatRate')
 			->get();
 
-		$incomeByRate = [];  // [rate => ['net' => , 'vat' => , 'gross' => , 'count' => ]]
+		$incomeByRate = [];
 		foreach ($txs->where('type', 'income') as $tx) {
 			$rate = $tx->vatRate ? (float) $tx->vatRate->rate : 0.0;
 			$key = (string) $rate;
@@ -117,9 +150,8 @@ class BookkeepingReportsController extends Controller
 		uksort($incomeByRate, fn ($a, $b) => (float) $b <=> (float) $a);
 
 		$totalVatDue = array_sum(array_column($incomeByRate, 'vat'));
-		$netPayable = $totalVatDue - $deductibleVat;
 
-		return view('tools.bookkeeping.reports.vat', [
+		return [
 			'year' => $year,
 			'quarter' => $quarter,
 			'from' => $from,
@@ -130,8 +162,8 @@ class BookkeepingReportsController extends Controller
 			'nonDeductibleVat' => $nonDeductibleVat,
 			'expenseNet' => $expenseNet,
 			'expenseCount' => $expenseCount,
-			'netPayable' => $netPayable,
-		]);
+			'netPayable' => $totalVatDue - $deductibleVat,
+		];
 	}
 
 	// ----- helpers -----
