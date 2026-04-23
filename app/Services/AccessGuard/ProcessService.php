@@ -3,9 +3,12 @@
 namespace App\Services\AccessGuard;
 
 use App\Models\AccessGuard\AccessCell;
+use App\Models\AccessGuard\AccessItem;
+use App\Models\AccessGuard\BusinessSystem;
 use App\Models\AccessGuard\ChecklistTemplate;
 use App\Models\AccessGuard\CycleAction;
 use App\Models\AccessGuard\Person;
+use App\Models\AccessGuard\PersonAccessItem;
 use App\Models\AccessGuard\Process;
 use App\Models\AccessGuard\ProcessEvidence;
 use App\Models\AccessGuard\ProcessItem;
@@ -211,20 +214,61 @@ class ProcessService
 
 			$actionsCreated = 0;
 			if ($process->kind === 'offboarding') {
-				$hasAccessCells = AccessCell::query()
+				// Pre-resolve system names + which systems have items
+				$systemNames = BusinessSystem::query()
+					->where('tenant_id', $tenantId)
+					->pluck('name', 'id')
+					->all();
+				$itemBearingSystems = AccessItem::query()
+					->where('tenant_id', $tenantId)
+					->where('is_active', true)
+					->distinct()
+					->pluck('system_id')
+					->all();
+
+				// Per-item revokes for systems with items
+				$itemsToRevoke = PersonAccessItem::query()
 					->where('tenant_id', $tenantId)
 					->where('person_id', $process->person_id)
 					->where('access_state', 'has_access')
+					->whereIn('system_id', $itemBearingSystems)
+					->with('accessItem:id,name')
 					->get();
 
-				foreach ($hasAccessCells as $cell) {
+				foreach ($itemsToRevoke as $pai) {
+					$systemName = $systemNames[$pai->system_id] ?? "system #{$pai->system_id}";
+					$itemName = $pai->accessItem?->name ?? "item #{$pai->access_item_id}";
+					CycleAction::create([
+						'tenant_id' => $tenantId,
+						'process_id' => $process->id,
+						'person_id' => $pai->person_id,
+						'system_id' => $pai->system_id,
+						'access_item_id' => $pai->access_item_id,
+						'kind' => 'revoke_access',
+						'title' => "Revoke: {$person->full_name} → {$systemName} / {$itemName}",
+						'status' => 'open',
+						'note' => 'Auto-created on offboarding completion',
+					]);
+					$actionsCreated++;
+				}
+
+				// Legacy cell-level revokes for systems WITHOUT items
+				$cellRevokes = AccessCell::query()
+					->where('tenant_id', $tenantId)
+					->where('person_id', $process->person_id)
+					->where('access_state', 'has_access')
+					->whereNotIn('system_id', $itemBearingSystems)
+					->get();
+
+				foreach ($cellRevokes as $cell) {
+					$systemName = $systemNames[$cell->system_id] ?? "system #{$cell->system_id}";
 					CycleAction::create([
 						'tenant_id' => $tenantId,
 						'process_id' => $process->id,
 						'person_id' => $cell->person_id,
 						'system_id' => $cell->system_id,
 						'kind' => 'revoke_access',
-						'title' => "Revoke: {$person->full_name} → system #{$cell->system_id}",
+						'title' => "Revoke: {$person->full_name} → {$systemName}",
 						'status' => 'open',
 						'note' => 'Auto-created on offboarding completion',
 					]);

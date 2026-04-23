@@ -12,8 +12,8 @@ class CycleItem extends Model
 	protected $table = 'accessguard_review_items';
 
 	protected $fillable = [
-		'tenant_id', 'cycle_id', 'person_id', 'system_id',
-		'person_label', 'system_label',
+		'tenant_id', 'cycle_id', 'person_id', 'system_id', 'access_item_id',
+		'person_label', 'system_label', 'snapshot_item_name',
 		'snapshot_state', 'snapshot_level', 'snapshot_identifier',
 		'decision', 'decision_note', 'decided_by_user_id', 'decided_at',
 	];

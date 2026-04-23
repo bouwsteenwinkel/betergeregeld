@@ -3,11 +3,13 @@
 namespace App\Services\AccessGuard;
 
 use App\Models\AccessGuard\AccessCell;
+use App\Models\AccessGuard\AccessItem;
 use App\Models\AccessGuard\BusinessSystem;
 use App\Models\AccessGuard\Cycle;
 use App\Models\AccessGuard\CycleAction;
 use App\Models\AccessGuard\CycleItem;
 use App\Models\AccessGuard\Person;
+use App\Models\AccessGuard\PersonAccessItem;
 use App\Models\AccessGuard\ReviewLogEntry;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +17,8 @@ use RuntimeException;
 
 class ReviewService
 {
+	public function __construct(private readonly MatrixService $matrix) {}
+
 	/**
 	 * Create a new review cycle and snapshot the current matrix into items.
 	 *
@@ -77,6 +81,20 @@ class ReviewService
 			->get(['person_id', 'system_id', 'access_state', 'access_level', 'account_identifier'])
 			->groupBy(fn ($c) => $c->person_id . '_' . $c->system_id);
 
+		$items = AccessItem::query()
+			->where('tenant_id', $tenantId)
+			->where('is_active', true)
+			->whereIn('system_id', $systems->pluck('id'))
+			->orderBy('sort_order')
+			->get(['id', 'system_id', 'name'])
+			->groupBy('system_id');
+
+		$personItemMap = PersonAccessItem::query()
+			->where('tenant_id', $tenantId)
+			->whereIn('person_id', $people->pluck('id'))
+			->get(['person_id', 'access_item_id', 'access_state', 'access_level', 'account_identifier'])
+			->groupBy(fn ($r) => $r->person_id . '_' . $r->access_item_id);
+
 		$rows = [];
 		$now = CarbonImmutable::now()->toDateTimeString();
 		foreach ($people as $p) {
@@ -84,20 +102,47 @@ class ReviewService
 				$p->first_name, $p->middle_name, $p->last_name,
 			])));
 			foreach ($systems as $s) {
-				$cell = $cellMap->get($p->id . '_' . $s->id)?->first();
-				$rows[] = [
-					'tenant_id' => $tenantId,
-					'cycle_id' => $cycle->id,
-					'person_id' => $p->id,
-					'system_id' => $s->id,
-					'person_label' => $fullName,
-					'system_label' => $s->name,
-					'snapshot_state' => $cell?->access_state ?? 'unknown',
-					'snapshot_level' => $cell?->access_level,
-					'snapshot_identifier' => $cell?->account_identifier,
-					'created_at' => $now,
-					'updated_at' => $now,
-				];
+				$systemItems = $items->get($s->id);
+
+				if ($systemItems && $systemItems->isNotEmpty()) {
+					// One snapshot row per active access item
+					foreach ($systemItems as $it) {
+						$pai = $personItemMap->get($p->id . '_' . $it->id)?->first();
+						$rows[] = [
+							'tenant_id' => $tenantId,
+							'cycle_id' => $cycle->id,
+							'person_id' => $p->id,
+							'system_id' => $s->id,
+							'access_item_id' => $it->id,
+							'person_label' => $fullName,
+							'system_label' => $s->name,
+							'snapshot_item_name' => $it->name,
+							'snapshot_state' => $pai?->access_state ?? 'unknown',
+							'snapshot_level' => $pai?->access_level,
+							'snapshot_identifier' => $pai?->account_identifier,
+							'created_at' => $now,
+							'updated_at' => $now,
+						];
+					}
+				} else {
+					// Legacy cell-level snapshot
+					$cell = $cellMap->get($p->id . '_' . $s->id)?->first();
+					$rows[] = [
+						'tenant_id' => $tenantId,
+						'cycle_id' => $cycle->id,
+						'person_id' => $p->id,
+						'system_id' => $s->id,
+						'access_item_id' => null,
+						'person_label' => $fullName,
+						'system_label' => $s->name,
+						'snapshot_item_name' => null,
+						'snapshot_state' => $cell?->access_state ?? 'unknown',
+						'snapshot_level' => $cell?->access_level,
+						'snapshot_identifier' => $cell?->account_identifier,
+						'created_at' => $now,
+						'updated_at' => $now,
+					];
+				}
 			}
 		}
 
@@ -177,9 +222,10 @@ class ReviewService
 			$now = CarbonImmutable::now();
 			foreach ($decidedItems as $item) {
 				$kind = $item->decision === 'revoke' ? 'revoke_access' : 'review_level';
-				$title = $item->decision === 'revoke'
-					? "Revoke: {$item->person_label} → {$item->system_label}"
-					: "Review level: {$item->person_label} → {$item->system_label}";
+				$subject = $item->access_item_id
+					? "{$item->person_label} → {$item->system_label} / {$item->snapshot_item_name}"
+					: "{$item->person_label} → {$item->system_label}";
+				$title = $item->decision === 'revoke' ? "Revoke: {$subject}" : "Review level: {$subject}";
 
 				$action = CycleAction::create([
 					'tenant_id' => $tenantId,
@@ -187,6 +233,7 @@ class ReviewService
 					'review_item_id' => $item->id,
 					'person_id' => $item->person_id,
 					'system_id' => $item->system_id,
+					'access_item_id' => $item->access_item_id,
 					'kind' => $kind,
 					'title' => $title,
 					'status' => 'open',
@@ -196,22 +243,32 @@ class ReviewService
 				$this->log($tenantId, $actorUserId, 'action_created', [
 					'action_id' => $action->id,
 					'kind' => $kind,
+					'access_item_id' => $item->access_item_id,
 				], cycleId: $cycle->id, itemId: $item->id, actionId: $action->id, personId: $item->person_id, systemId: $item->system_id);
 			}
 
-			// 3. For "keep" decisions: bump last_verified_at on the matrix cell
-			CycleItem::query()
+			// 3. For "keep" decisions: bump last_verified_at on the matched row
+			//    (item-level or cell-level depending on the snapshot).
+			$keeps = CycleItem::query()
 				->where('cycle_id', $cycle->id)
 				->where('decision', 'keep')
-				->select('person_id', 'system_id', 'snapshot_state')
-				->get()
-				->each(function ($it) use ($tenantId, $now) {
+				->select('person_id', 'system_id', 'access_item_id')
+				->get();
+			foreach ($keeps as $k) {
+				if ($k->access_item_id) {
+					PersonAccessItem::query()
+						->where('tenant_id', $tenantId)
+						->where('person_id', $k->person_id)
+						->where('access_item_id', $k->access_item_id)
+						->update(['last_verified_at' => $now]);
+				} else {
 					AccessCell::query()
 						->where('tenant_id', $tenantId)
-						->where('person_id', $it->person_id)
-						->where('system_id', $it->system_id)
+						->where('person_id', $k->person_id)
+						->where('system_id', $k->system_id)
 						->update(['last_verified_at' => $now]);
-				});
+				}
+			}
 
 			$cycle->update([
 				'status' => 'completed',
@@ -255,17 +312,40 @@ class ReviewService
 
 		return DB::transaction(function () use ($tenantId, $actorUserId, $action, $note) {
 			$now = CarbonImmutable::now();
+			$applied = [];
 
-			$cellUpdate = ['last_verified_at' => $now];
-			if ($action->kind === 'revoke_access') {
-				$cellUpdate['access_state'] = 'no_access';
+			if ($action->access_item_id) {
+				// Item-level: flip the per-item state (cell aggregate recomputes).
+				if ($action->kind === 'revoke_access') {
+					$this->matrix->setItemState(
+						$tenantId,
+						$action->person_id,
+						$action->access_item_id,
+						'no_access',
+					);
+					$applied = ['scope' => 'item', 'item_state' => 'no_access'];
+				} else {
+					// review_level → only bump verified timestamp on the item
+					PersonAccessItem::query()
+						->where('tenant_id', $tenantId)
+						->where('person_id', $action->person_id)
+						->where('access_item_id', $action->access_item_id)
+						->update(['last_verified_at' => $now]);
+					$applied = ['scope' => 'item', 'verified_only' => true];
+				}
+			} else {
+				// Legacy cell-level
+				$cellUpdate = ['last_verified_at' => $now];
+				if ($action->kind === 'revoke_access') {
+					$cellUpdate['access_state'] = 'no_access';
+				}
+				AccessCell::query()
+					->where('tenant_id', $tenantId)
+					->where('person_id', $action->person_id)
+					->where('system_id', $action->system_id)
+					->update($cellUpdate);
+				$applied = ['scope' => 'cell'] + $cellUpdate;
 			}
-
-			AccessCell::query()
-				->where('tenant_id', $tenantId)
-				->where('person_id', $action->person_id)
-				->where('system_id', $action->system_id)
-				->update($cellUpdate);
 
 			$action->update([
 				'status' => 'done',
@@ -275,7 +355,7 @@ class ReviewService
 
 			$this->log($tenantId, $actorUserId, 'action_done', [
 				'kind' => $action->kind,
-				'applied' => $cellUpdate,
+				'applied' => $applied,
 			], cycleId: $action->cycle_id, itemId: $action->review_item_id, actionId: $action->id, personId: $action->person_id, systemId: $action->system_id);
 
 			return $action;

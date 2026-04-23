@@ -129,7 +129,12 @@
 										<td class="p-2 text-center"><input type="checkbox" name="item_ids[]" value="{{ $item->id }}" class="cycle-item-cb"></td>
 									@endif
 									<td class="py-2 px-3 font-semibold">{{ $item->person_label }}</td>
-									<td class="py-2 px-3">{{ $item->system_label }}</td>
+									<td class="py-2 px-3">
+										{{ $item->system_label }}
+										@if ($item->snapshot_item_name)
+											<div class="text-xs text-[color:var(--color-ink-muted)]">/ {{ $item->snapshot_item_name }}</div>
+										@endif
+									</td>
 									<td class="py-2 px-3">
 										<span class="inline-flex items-center px-2 py-0.5 rounded text-xs {{ $stateColors[$item->snapshot_state] ?? '' }}">
 											{{ str_replace('_', ' ', $item->snapshot_state) }}
