@@ -15,6 +15,8 @@ use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
 use App\Http\Controllers\Tools\AccessGuard\MatrixController as AccessGuardMatrixController;
 use App\Http\Controllers\Tools\AccessGuard\PersonController as AccessGuardPersonController;
+use App\Http\Controllers\Tools\AccessGuard\ReviewActionController as AccessGuardReviewActionController;
+use App\Http\Controllers\Tools\AccessGuard\ReviewController as AccessGuardReviewController;
 use App\Http\Controllers\Tools\AccessGuard\SystemController as AccessGuardSystemController;
 use App\Http\Controllers\Tools\BookkeepingAuditLogController;
 use App\Http\Controllers\Tools\BookkeepingCategoryController;
@@ -247,6 +249,19 @@ Route::prefix('{locale}')
 				Route::get('/systemen/{id}/bewerken', [AccessGuardSystemController::class, 'edit'])->whereNumber('id')->name('systems.edit');
 				Route::put('/systemen/{id}', [AccessGuardSystemController::class, 'update'])->whereNumber('id')->name('systems.update');
 				Route::delete('/systemen/{id}', [AccessGuardSystemController::class, 'destroy'])->whereNumber('id')->name('systems.destroy');
+
+				Route::get('/reviews', [AccessGuardReviewController::class, 'index'])->name('reviews.index');
+				Route::get('/reviews/nieuw', [AccessGuardReviewController::class, 'create'])->name('reviews.create');
+				Route::post('/reviews', [AccessGuardReviewController::class, 'store'])->name('reviews.store');
+				Route::get('/reviews/{id}', [AccessGuardReviewController::class, 'show'])->whereNumber('id')->name('reviews.show');
+				Route::post('/reviews/{id}/complete', [AccessGuardReviewController::class, 'complete'])->whereNumber('id')->name('reviews.complete');
+				Route::post('/reviews/{id}/annuleren', [AccessGuardReviewController::class, 'cancel'])->whereNumber('id')->name('reviews.cancel');
+				Route::post('/reviews/{id}/items/{itemId}/beslissing', [AccessGuardReviewController::class, 'decide'])->whereNumber(['id', 'itemId'])->name('reviews.decide');
+				Route::post('/reviews/{id}/items/bulk', [AccessGuardReviewController::class, 'bulkDecide'])->whereNumber('id')->name('reviews.bulk-decide');
+
+				Route::get('/acties', [AccessGuardReviewActionController::class, 'index'])->name('actions.index');
+				Route::post('/acties/{id}/afgerond', [AccessGuardReviewActionController::class, 'markDone'])->whereNumber('id')->name('actions.done');
+				Route::post('/acties/{id}/annuleren', [AccessGuardReviewActionController::class, 'cancel'])->whereNumber('id')->name('actions.cancel');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {
