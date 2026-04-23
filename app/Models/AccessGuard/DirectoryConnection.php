@@ -18,6 +18,7 @@ class DirectoryConnection extends Model
 		'access_token_enc', 'refresh_token_enc', 'expires_at', 'scopes',
 		'status', 'last_synced_at', 'last_sync_status', 'last_sync_message',
 		'last_sync_users_seen', 'last_sync_users_created', 'last_sync_users_updated',
+		'last_sync_groups_seen', 'last_sync_groups_upserted', 'last_sync_memberships_seen',
 	];
 
 	protected function casts(): array

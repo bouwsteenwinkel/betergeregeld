@@ -22,4 +22,13 @@ interface DirectoryClient
 	 * @return iterable<DirectoryUser>
 	 */
 	public function listUsers(): iterable;
+
+	/**
+	 * Stream groups page-by-page. Each DirectoryGroup must include its
+	 * memberExternalIds — implementations should pre-fetch members so the
+	 * sync service doesn't have to do an extra round-trip per group.
+	 *
+	 * @return iterable<DirectoryGroup>
+	 */
+	public function listGroups(): iterable;
 }

@@ -23,6 +23,12 @@ class MsGraphClient implements DirectoryClient
 	// Fields we actually care about. Graph returns whatever we don't ask for,
 	// so $select keeps the payload small.
 	private const USER_SELECT = 'id,mail,userPrincipalName,givenName,surname,jobTitle,department,accountEnabled,signInActivity';
+	private const GROUP_SELECT = 'id,displayName,description,securityEnabled,mailEnabled,groupTypes,isAssignableToRole';
+
+	// Admin-like displayName patterns — Entra built-in admin roles use "Administrator"
+	// somewhere in their name (Global Administrator, User Administrator, etc.) and
+	// custom groups that contain "admin" almost always grant privileged access.
+	private const ADMIN_PATTERNS = ['administrator', 'admin', 'owner', 'privileged'];
 
 	public function __construct(private DirectoryConnection $connection) {}
 
@@ -43,6 +49,73 @@ class MsGraphClient implements DirectoryClient
 			}
 			$url = $payload['@odata.nextLink'] ?? null;
 		}
+	}
+
+	public function listGroups(): iterable
+	{
+		$this->ensureFreshToken();
+
+		// Only security-enabled groups. M365 modern groups (Teams) are noise
+		// for IAM — they're collaboration spaces, not access grants.
+		$url = self::GRAPH . '/groups?$select=' . self::GROUP_SELECT . '&$filter=securityEnabled eq true&$top=100';
+
+		while ($url) {
+			$resp = $this->http()->get($url);
+			if ($resp->failed()) {
+				throw new RuntimeException('Graph groups call failed: ' . $resp->status() . ' ' . $resp->body());
+			}
+			$payload = $resp->json();
+			foreach ($payload['value'] ?? [] as $g) {
+				yield $this->toDirectoryGroup($g);
+			}
+			$url = $payload['@odata.nextLink'] ?? null;
+		}
+	}
+
+	private function toDirectoryGroup(array $g): DirectoryGroup
+	{
+		return new DirectoryGroup(
+			externalId: (string) $g['id'],
+			displayName: (string) ($g['displayName'] ?? 'Unknown'),
+			description: $g['description'] ?? null,
+			isAdminGroup: $this->looksLikeAdminGroup($g),
+			memberExternalIds: $this->fetchMemberIds($g['id']),
+		);
+	}
+
+	private function looksLikeAdminGroup(array $g): bool
+	{
+		if (! empty($g['isAssignableToRole'])) {
+			return true;
+		}
+		$name = strtolower((string) ($g['displayName'] ?? ''));
+		foreach (self::ADMIN_PATTERNS as $pat) {
+			if (str_contains($name, $pat)) return true;
+		}
+		return false;
+	}
+
+	/** @return string[] */
+	private function fetchMemberIds(string $groupId): array
+	{
+		$url = self::GRAPH . '/groups/' . urlencode($groupId) . '/members?$select=id&$top=100';
+		$ids = [];
+		while ($url) {
+			$resp = $this->http()->get($url);
+			if ($resp->failed()) {
+				// Group with hidden membership (HiddenMembership privacy) returns
+				// 403 even on admin consent. Skip gracefully — membership simply
+				// isn't visible in the sync.
+				if ($resp->status() === 403) return $ids;
+				throw new RuntimeException("Graph members call failed for group {$groupId}: " . $resp->status());
+			}
+			$payload = $resp->json();
+			foreach ($payload['value'] ?? [] as $m) {
+				if (isset($m['id'])) $ids[] = (string) $m['id'];
+			}
+			$url = $payload['@odata.nextLink'] ?? null;
+		}
+		return $ids;
 	}
 
 	private function toDirectoryUser(array $u): DirectoryUser
