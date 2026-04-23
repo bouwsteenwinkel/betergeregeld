@@ -172,6 +172,8 @@ Route::prefix('{locale}')
 
 				Route::get('/instellingen', [BookkeepingSettingsController::class, 'edit'])->name('settings.edit');
 				Route::put('/instellingen', [BookkeepingSettingsController::class, 'update'])->name('settings.update');
+				Route::delete('/instellingen/logo', [BookkeepingSettingsController::class, 'destroyLogo'])->name('settings.logo.destroy');
+				Route::get('/instellingen/logo', [BookkeepingSettingsController::class, 'viewLogo'])->name('settings.logo.view');
 
 				Route::get('/facturen', [BookkeepingInvoiceController::class, 'index'])->name('invoices.index');
 				Route::get('/facturen/nieuw', [BookkeepingInvoiceController::class, 'create'])->name('invoices.create');

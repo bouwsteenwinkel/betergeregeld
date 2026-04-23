@@ -51,6 +51,24 @@ class InvoicePdfRenderer
 
 	private function header(FPDF $pdf, BookkeepingInvoice $inv, ?BookkeepingTenantSettings $s): void
 	{
+		// Optional logo: top-left, max 40 × 20 mm, preserves aspect
+		if ($s?->hasLogo()) {
+			try {
+				$info = @getimagesize($s->logo_path);
+				if ($info) {
+					$maxW = 40;
+					$maxH = 20;
+					$ratio = $info[0] / max(1, $info[1]);
+					$w = $ratio > ($maxW / $maxH) ? $maxW : $maxH * $ratio;
+					$h = $w / $ratio;
+					$pdf->Image($s->logo_path, 18, 18, $w, $h);
+					$pdf->SetY(18 + $h + 3);
+				}
+			} catch (\Throwable) {
+				// logo unreadable — fall through to plain header
+			}
+		}
+
 		// Left: sender
 		$pdf->SetFont('Arial', 'B', 14);
 		$pdf->Cell(100, 6, $this->t($s?->company_name ?: '(bedrijfsnaam niet ingevuld)'), 0, 2);
@@ -71,7 +89,8 @@ class InvoicePdfRenderer
 			$pdf->Cell(100, 4, $this->t($s->phone), 0, 2);
 		}
 
-		// Right: invoice meta
+		// Right: invoice meta (fixed position at top-right, independent of logo)
+		$savedY = $pdf->GetY();
 		$pdf->SetXY(120, 18);
 		$pdf->SetFont('Arial', 'B', 22);
 		$pdf->Cell(72, 10, 'FACTUUR', 0, 2, 'R');
@@ -85,8 +104,9 @@ class InvoicePdfRenderer
 			$pdf->Cell(72, 4, $this->t('Ref.: ' . $inv->reference), 0, 2, 'R');
 		}
 
-		// Move cursor to just under the biggest block (around y=55)
-		$pdf->SetY(60);
+		// Move cursor below both columns — pick the larger Y
+		$bottomLeft = max($savedY, $pdf->GetY());
+		$pdf->SetY(max(60, $bottomLeft + 3));
 	}
 
 	private function billTo(FPDF $pdf, BookkeepingInvoice $inv): void

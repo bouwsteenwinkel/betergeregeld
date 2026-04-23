@@ -695,6 +695,14 @@
 	"De scheduler draait dagelijks om 08:00. Voor productie moet php artisan schedule:run via cron lopen.": "De scheduler draait dagelijks om 08:00. Voor productie moet php artisan schedule:run via cron lopen.",
 	"recurring.frequency.monthly": "Maandelijks",
 
+	"Logo": "Logo",
+	"Logo verwijderen?": "Logo verwijderen?",
+	"Logo verwijderen": "Logo verwijderen",
+	"Logo verwijderd.": "Logo verwijderd.",
+	"Vervang logo (optioneel)": "Vervang logo (optioneel)",
+	"Upload logo (optioneel)": "Upload logo (optioneel)",
+	"PNG of JPG, max 2 MB. Verschijnt linksboven op PDF-facturen en in herinnerings-e-mails.": "PNG of JPG, max 2 MB. Verschijnt linksboven op PDF-facturen en in herinnerings-e-mails.",
+
 	"Aan": "Aan",
 	"Afzender-gegevens ontbreken.": "Afzender-gegevens ontbreken.",
 	"Vul in bij Instellingen": "Vul in bij Instellingen",

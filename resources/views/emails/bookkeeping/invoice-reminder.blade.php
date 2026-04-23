@@ -31,6 +31,9 @@
 </style>
 </head>
 <body>
+	@if ($settings->hasLogo())
+		<img src="{{ $message->embed($settings->logo_path) }}" alt="{{ $settings->company_name }}" style="max-height: 60px; margin-bottom: 16px;">
+	@endif
 	<h1>Factuur {{ $invoice->invoice_number }}</h1>
 
 	<p>{{ $greeting }}</p>

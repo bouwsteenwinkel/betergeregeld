@@ -723,6 +723,14 @@
 	"De scheduler draait dagelijks om 08:00. Voor productie moet php artisan schedule:run via cron lopen.": "Scheduler runs daily at 08:00. For production, php artisan schedule:run must run via cron.",
 	"recurring.frequency.monthly": "Monthly",
 
+	"Logo": "Logo",
+	"Logo verwijderen?": "Delete logo?",
+	"Logo verwijderen": "Delete logo",
+	"Logo verwijderd.": "Logo deleted.",
+	"Vervang logo (optioneel)": "Replace logo (optional)",
+	"Upload logo (optioneel)": "Upload logo (optional)",
+	"PNG of JPG, max 2 MB. Verschijnt linksboven op PDF-facturen en in herinnerings-e-mails.": "PNG or JPG, max 2 MB. Shown top-left on PDF invoices and in reminder emails.",
+
 	"Twee-staps verificatie": "Two-factor authentication",
 	"Voer de 6-cijferige code uit je authenticator-app in.": "Enter the 6-digit code from your authenticator app.",
 	"Code": "Code",

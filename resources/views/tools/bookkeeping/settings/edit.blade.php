@@ -31,9 +31,30 @@
 			</div>
 		@endif
 
-		<form method="POST" action="{{ route('tools.bookkeeping.settings.update', ['locale' => $locale]) }}" class="card space-y-5">
+		<form method="POST" action="{{ route('tools.bookkeeping.settings.update', ['locale' => $locale]) }}" enctype="multipart/form-data" class="card space-y-5">
 			@csrf
 			@method('PUT')
+
+			<div>
+				<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">{{ __('Logo') }}</h3>
+				@if ($settings->hasLogo())
+					<div class="flex items-center gap-4 p-3 rounded-[var(--radius-control)] border border-[color:var(--color-line)] bg-[color:var(--color-surface-soft,#fafafa)] mb-3">
+						<img src="{{ route('tools.bookkeeping.settings.logo.view', ['locale' => $locale]) }}?t={{ $settings->updated_at?->timestamp }}"
+							alt="logo" class="h-16 w-auto object-contain rounded">
+						<div class="flex-1 text-xs text-[color:var(--color-ink-muted)] font-mono">
+							{{ basename($settings->logo_path) }}
+							<div class="text-[color:var(--color-ink-soft)]">{{ round(filesize($settings->logo_path) / 1024) }} KB</div>
+						</div>
+					</div>
+				@endif
+				<label for="logo" class="block text-sm font-semibold mb-2">
+					{{ $settings->hasLogo() ? __('Vervang logo (optioneel)') : __('Upload logo (optioneel)') }}
+				</label>
+				<input id="logo" name="logo" type="file" accept="image/png,image/jpeg" class="field-input">
+				<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5">
+					{{ __('PNG of JPG, max 2 MB. Verschijnt linksboven op PDF-facturen en in herinnerings-e-mails.') }}
+				</p>
+			</div>
 
 			<div>
 				<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">{{ __('Bedrijfsgegevens') }}</h3>
@@ -140,10 +161,21 @@
 				</div>
 			@endif
 
-			<div>
+			<div class="flex gap-2 items-center flex-wrap">
 				<button type="submit" class="btn-accent">{{ __('Opslaan') }}</button>
+				@if ($settings->hasLogo())
+					<span class="text-[color:var(--color-ink-soft)] text-xs ml-2">·</span>
+				@endif
 			</div>
 		</form>
+
+		@if ($settings->hasLogo())
+			<form method="POST" action="{{ route('tools.bookkeeping.settings.logo.destroy', ['locale' => $locale]) }}"
+				onsubmit="return confirm('{{ __('Logo verwijderen?') }}')" class="mt-2">
+				@csrf @method('DELETE')
+				<button type="submit" class="text-xs text-red-600 hover:underline">{{ __('Logo verwijderen') }}</button>
+			</form>
+		@endif
 	</div>
 </section>
 

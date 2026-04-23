@@ -22,5 +22,11 @@ class BookkeepingTenantSettings extends Model
 		'kvk_number', 'vat_number', 'iban',
 		'email', 'phone',
 		'default_payment_terms_days', 'invoice_footer', 'auto_reminders_enabled',
+		'logo_path',
 	];
+
+	public function hasLogo(): bool
+	{
+		return $this->logo_path && is_file($this->logo_path);
+	}
 }
