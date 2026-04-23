@@ -118,6 +118,24 @@ class ToolsIndexController extends Controller
 				],
 			],
 			[
+				'key' => 'hobby',
+				'title_nl' => 'Hobby',
+				'title_en' => 'Hobby',
+				'subtitle_nl' => 'Speciale lookups voor verzamelaars.',
+				'subtitle_en' => 'Specialist lookups for collectors.',
+				'tools' => [
+					[
+						'slug' => 'lego-lookup',
+						'route' => 'tools.lego-lookup',
+						'title_nl' => 'LEGO Element Finder', 'title_en' => 'LEGO Element Finder',
+						'desc_nl' => 'Zoek een LEGO-onderdeel op Element ID. Toont part, kleur, afbeelding en links naar Rebrickable en BrickLink.',
+						'desc_en' => 'Look up a LEGO part by Element ID. Shows the part, colour, image and links to Rebrickable and BrickLink.',
+						'badge_nl' => 'Gratis', 'badge_en' => 'Free',
+						'icon' => 'blocks',
+					],
+				],
+			],
+			[
 				'key' => 'files',
 				'title_nl' => 'Bestanden & media',
 				'title_en' => 'Files & media',

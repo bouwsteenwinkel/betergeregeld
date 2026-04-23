@@ -28,6 +28,7 @@ use App\Http\Controllers\Tools\FaviconGeneratorController;
 use App\Http\Controllers\Tools\IbanCheckController;
 use App\Http\Controllers\Tools\IpLookupController;
 use App\Http\Controllers\Tools\JsonFormatterController;
+use App\Http\Controllers\Tools\LegoLookupController;
 use App\Http\Controllers\Tools\PdfMergeController;
 use App\Http\Controllers\Tools\PdfRedactController;
 use App\Http\Controllers\Tools\PostcodeCheckController;
@@ -118,6 +119,11 @@ Route::prefix('{locale}')
 			Route::post('/diff', [DiffController::class, 'compare'])->name('diff.compare');
 
 			Route::get('/shipping-rates', [ShippingRatesController::class, 'show'])->name('shipping-rates');
+
+			Route::middleware('tool.limit:lego_lookup')->group(function () {
+				Route::get('/lego-lookup', [LegoLookupController::class, 'show'])->name('lego-lookup');
+				Route::post('/lego-lookup', [LegoLookupController::class, 'check'])->name('lego-lookup.check');
+			});
 
 			Route::middleware('tool.limit:favicon')->group(function () {
 				Route::get('/favicon-generator', [FaviconGeneratorController::class, 'show'])->name('favicon-generator');

@@ -51,6 +51,9 @@ class ToolsPlansSeeder extends Seeder
 					'tool.favicon.daily.user' => '20',
 					'tool.favicon.all_sizes' => '0',
 
+					'tool.lego_lookup.daily.anon' => '20',
+					'tool.lego_lookup.daily.user' => '200',
+
 					'tool.pdf_merge.max_files' => '3',
 					'tool.pdf_merge.max_size_mb' => '10',
 					'tool.pdf_merge.watermark' => '1',
@@ -100,6 +103,8 @@ class ToolsPlansSeeder extends Seeder
 
 					'tool.favicon.daily.user' => 'unlimited',
 					'tool.favicon.all_sizes' => '1',
+
+					'tool.lego_lookup.daily.user' => 'unlimited',
 
 					'tool.pdf_merge.max_files' => '50',
 					'tool.pdf_merge.max_size_mb' => '500',
