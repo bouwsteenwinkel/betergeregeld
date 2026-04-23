@@ -333,6 +333,10 @@ Route::prefix('{locale}')
 				Route::get('/data/export/matrix-long', [AccessGuardDataController::class, 'exportMatrixLong'])->name('data.export-matrix-long');
 				Route::get('/data/export/cycle/{cycleId}', [AccessGuardDataController::class, 'exportCycleLog'])->whereNumber('cycleId')->name('data.export-cycle');
 
+				Route::post('/data/import/ai-map', [AccessGuardDataController::class, 'aiSmartMap'])->name('data.ai-smart-map');
+				Route::get('/data/screenshot', [AccessGuardDataController::class, 'screenshotStart'])->name('data.screenshot-start');
+				Route::post('/data/screenshot', [AccessGuardDataController::class, 'screenshotUpload'])->name('data.screenshot-upload');
+
 				Route::get('/profielen', [AccessGuardAccessProfileController::class, 'index'])->name('profiles.index');
 				Route::get('/profielen/nieuw', [AccessGuardAccessProfileController::class, 'create'])->name('profiles.create');
 				Route::post('/profielen', [AccessGuardAccessProfileController::class, 'store'])->name('profiles.store');

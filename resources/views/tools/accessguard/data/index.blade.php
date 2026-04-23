@@ -46,6 +46,10 @@
 						<div class="font-semibold text-sm">{{ __('Systemen importeren') }}</div>
 						<div class="text-xs text-[color:var(--color-ink-muted)] mt-0.5">{{ __('Apps, services en andere toegang-doelen') }}</div>
 					</a>
+					<a href="{{ route('tools.accessguard.data.screenshot-start', ['locale' => $locale]) }}" class="block p-3 rounded border border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 hover:bg-[color:var(--color-accent)]/10">
+						<div class="font-semibold text-sm">🤖 {{ __('Screenshot → personen') }}</div>
+						<div class="text-xs text-[color:var(--color-ink-muted)] mt-0.5">{{ __('Plak een screenshot van je M365/Google/Salesforce admin — AI extraheert automatisch') }}</div>
+					</a>
 				</div>
 			</div>
 

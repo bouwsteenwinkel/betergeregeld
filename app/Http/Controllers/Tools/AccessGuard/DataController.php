@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Tools\AccessGuard;
 
 use App\Http\Controllers\Controller;
+use App\Services\AccessGuard\Ai\CsvSmartMapper;
+use App\Services\AccessGuard\Ai\ScreenshotIngestService;
 use App\Services\AccessGuard\CsvExportService;
 use App\Services\AccessGuard\CsvImportService;
 use App\Services\Features\FeatureResolver;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -18,6 +22,8 @@ class DataController extends Controller
 		private readonly FeatureResolver $features,
 		private readonly CsvImportService $importer,
 		private readonly CsvExportService $exporter,
+		private readonly CsvSmartMapper $smartMapper,
+		private readonly ScreenshotIngestService $shots,
 	) {}
 
 	public function show(Request $request, string $locale): View
@@ -131,10 +137,84 @@ class DataController extends Controller
 		return $this->importStart($request, $locale);
 	}
 
+	public function aiSmartMap(Request $request, string $locale): JsonResponse
+	{
+		$this->mustHaveAccess($request);
+		$this->mustHaveAi($request);
+
+		$data = $request->validate(['key' => ['required', 'string']]);
+		$stash = Cache::get($data['key']);
+		abort_unless($stash && $stash['tenant_id'] === $request->user()->tenant_id, 404);
+
+		try {
+			$mapping = $this->smartMapper->suggest(
+				$stash['kind'],
+				$stash['headers'],
+				array_slice($stash['rows'], 0, 5),
+			);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 502);
+		}
+
+		return response()->json(['ok' => true, 'mapping' => $mapping]);
+	}
+
+	public function screenshotStart(Request $request, string $locale): View
+	{
+		$this->mustHaveAccess($request);
+		$this->mustHaveAi($request);
+		return view('tools.accessguard.data.screenshot-start');
+	}
+
+	public function screenshotUpload(Request $request, string $locale): RedirectResponse
+	{
+		$this->mustHaveAccess($request);
+		$this->mustHaveAi($request);
+
+		$request->validate([
+			'file' => ['required', 'file', 'mimes:png,jpg,jpeg,webp', 'max:8192'],
+		]);
+
+		try {
+			$extract = $this->shots->extract($request->file('file'));
+		} catch (\Throwable $e) {
+			return back()->with('error', $e->getMessage());
+		}
+
+		if (empty($extract['users'])) {
+			return back()->with('error', __('Geen gebruikers gedetecteerd in de screenshot.'));
+		}
+
+		$preview = $this->shots->toCsvPreview($extract['users']);
+
+		$key = 'ag-csv-import:' . $request->user()->tenant_id . ':' . Str::uuid();
+		Cache::put($key, [
+			'kind' => CsvImportService::KIND_PEOPLE,
+			'tenant_id' => $request->user()->tenant_id,
+			'headers' => $preview['headers'],
+			'rows' => $preview['rows'],
+			'source_app' => $extract['source_app'],
+		], now()->addMinutes(30));
+
+		return redirect()
+			->route('tools.accessguard.data.import-map', ['locale' => $locale, 'key' => $key])
+			->with('status', __(':n gebruikers gedetecteerd uit :app. Controleer de mapping en klik Importeren.', [
+				'n' => count($extract['users']),
+				'app' => $extract['source_app'],
+			]));
+	}
+
 	protected function mustHaveAccess(Request $request): void
 	{
 		abort_unless($request->user(), 401);
 		$bag = $this->features->forUser($request->user());
 		abort_unless($bag->bool('tool.accessguard.enabled'), 402);
+	}
+
+	protected function mustHaveAi(Request $request): void
+	{
+		$bag = $this->features->forUser($request->user());
+		abort_unless($bag->bool('tool.accessguard.ai_explain'), 402);
+		abort_unless(config('accessguard.ai.enabled', true), 503);
 	}
 }
