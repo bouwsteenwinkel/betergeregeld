@@ -7,6 +7,7 @@
 
 @push('head')
 	<link rel="canonical" href="{{ route('blog.show', ['locale' => $locale, 'slug' => $post->slug]) }}">
+	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} — Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
 	<meta property="og:title" content="{{ $post->title }}">
 	<meta property="og:description" content="{{ $post->excerpt }}">
 	<meta property="og:type" content="article">

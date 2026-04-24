@@ -5,6 +5,10 @@
 @section('title', 'Blog — ' . config('app.name'))
 @section('description', 'Praktische gidsen over toegangsbeheer, IT-governance, compliance en MKB-administratie. Geschreven door het Betergeregeld-team.')
 
+@push('head')
+	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} — Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
+@endpush
+
 @section('content')
 
 @include('blog._styles')

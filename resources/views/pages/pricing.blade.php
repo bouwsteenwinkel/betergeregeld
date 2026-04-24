@@ -352,6 +352,46 @@
 	</div>
 </section>
 
+{{-- ============ FURTHER READING ============ --}}
+<section class="py-16 bg-[color:var(--color-surface-soft,#fafafa)]">
+	<div class="max-w-[1120px] mx-auto px-6">
+		<div class="max-w-[720px] mb-8">
+			<p class="text-xs uppercase tracking-wider font-bold text-[color:var(--color-accent)] mb-2">{{ __('Verder lezen') }}</p>
+			<h2 class="text-2xl md:text-3xl font-bold mb-3">{{ $isEn ? 'See how our tools are used in practice' : 'Kijk hoe onze tools in de praktijk werken' }}</h2>
+			<p class="text-[color:var(--color-ink-muted)]">
+				{{ $isEn
+					? 'Over 115 guides on access management, compliance, PDF redaction, invoicing and SMB security — written for operators, not consultants.'
+					: 'Ruim 115 gidsen over toegangsbeheer, compliance, PDF-redactie, facturatie en MKB-security — geschreven voor ondernemers, niet voor consultants.' }}
+			</p>
+		</div>
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'toegangsbeheer-mkb-complete-gids']) }}"
+				class="card hover:shadow-md transition-shadow block group">
+				<p class="text-xs uppercase tracking-wider font-bold text-[color:var(--color-accent)] mb-2">★ {{ __('AccessGuard') }}</p>
+				<h3 class="font-bold text-lg mb-2 group-hover:text-[color:var(--color-accent)] transition-colors">{{ __('Toegangsbeheer voor het MKB') }}</h3>
+				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Complete gids — van eerste matrix tot directory-sync, reviews en automatisering.') }}</p>
+			</a>
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'pdf-redactie-voor-mkb-complete-gids']) }}"
+				class="card hover:shadow-md transition-shadow block group">
+				<p class="text-xs uppercase tracking-wider font-bold text-[color:var(--color-accent)] mb-2">★ {{ __('PDF Redact') }}</p>
+				<h3 class="font-bold text-lg mb-2 group-hover:text-[color:var(--color-accent)] transition-colors">{{ __('PDF redactie voor MKB') }}</h3>
+				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Waarom zwarte balken niet werken en hoe je CV\'s en contracten veilig deelt.') }}</p>
+			</a>
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'mkb-facturatie-complete-gids']) }}"
+				class="card hover:shadow-md transition-shadow block group">
+				<p class="text-xs uppercase tracking-wider font-bold text-[color:var(--color-accent)] mb-2">★ {{ __('Bookkeeping') }}</p>
+				<h3 class="font-bold text-lg mb-2 group-hover:text-[color:var(--color-accent)] transition-colors">{{ __('MKB-facturatie van quote tot betaling') }}</h3>
+				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Offerte, factuur, herinnering, BTW, UBL — de hele keten uitgelegd.') }}</p>
+			</a>
+		</div>
+		<div class="text-center mt-8">
+			<a href="{{ route('blog.index', ['locale' => $locale]) }}" class="btn-light text-sm">
+				{{ $isEn ? 'Browse all 115+ guides' : 'Bekijk alle 115+ gidsen' }} →
+			</a>
+		</div>
+	</div>
+</section>
+
 {{-- ============ FINAL CTA ============ --}}
 <section class="section-dark py-20">
 	<div class="max-w-[800px] mx-auto px-6 text-center">

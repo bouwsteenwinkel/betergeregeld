@@ -72,6 +72,9 @@ Route::middleware('throttle:speedtest')->group(function () {
 	Route::post('/tools/speedtest/upload', [SpeedTestController::class, 'upload'])->name('tools.speedtest.upload');
 });
 
+// Sitemap is locale-agnostic — Google expects it at the document root.
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'sitemap'])->name('sitemap');
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)
@@ -82,6 +85,7 @@ Route::prefix('{locale}')
 		Route::get('/accessguard/demo', [AccessGuardDemoController::class, 'show'])->name('accessguard.demo');
 
 		Route::get('/blog', [\App\Http\Controllers\Blog\BlogController::class, 'index'])->name('blog.index');
+		Route::get('/blog/rss', [\App\Http\Controllers\SitemapController::class, 'rss'])->name('blog.rss');
 		Route::get('/blog/categorie/{categorySlug}', [\App\Http\Controllers\Blog\BlogController::class, 'category'])->name('blog.category');
 		Route::get('/blog/tag/{tagSlug}', [\App\Http\Controllers\Blog\BlogController::class, 'tag'])->name('blog.tag');
 		Route::get('/blog/{slug}', [\App\Http\Controllers\Blog\BlogController::class, 'show'])->name('blog.show');
