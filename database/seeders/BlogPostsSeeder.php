@@ -9,6 +9,7 @@ use Database\Seeders\Blog\BlogComplianceSeeder;
 use Database\Seeders\Blog\BlogIntroSeeder;
 use Database\Seeders\Blog\BlogM365Seeder;
 use Database\Seeders\Blog\BlogOffboardingSeeder;
+use Database\Seeders\Blog\BlogPdfRedactSeeder;
 use Database\Seeders\Blog\BlogPrivacySeeder;
 use Database\Seeders\Blog\BlogSecuritySeeder;
 use Illuminate\Database\Seeder;
@@ -33,6 +34,7 @@ class BlogPostsSeeder extends Seeder
 			BlogBookkeepingSeeder::class,
 			BlogPrivacySeeder::class,
 			BlogSecuritySeeder::class,
+			BlogPdfRedactSeeder::class,
 		]);
 	}
 }
