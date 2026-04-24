@@ -735,6 +735,54 @@
 	</div>
 </section>
 
+{{-- READING / KENNISBANK — blog cross-links --}}
+<section class="ag-section ag-section-alt" id="blog-links">
+	<div class="ag-container">
+		<div class="ag-stack-md" style="max-width: 760px;">
+			<span class="ag-kicker">{{ $isEn ? 'Further reading' : 'Verder lezen' }}</span>
+			<h2 class="ag-h2">{{ $isEn ? 'Deep dives, not demos.' : 'Eerst alles weten? Begin hier.' }}</h2>
+			<p class="ag-lead">
+				{{ $isEn
+					? 'Our guide library covers access management end-to-end — from the first matrix to M365 directory sync, ISO 27001 Annex A.9, and quarterly review rhythms.'
+					: 'Onze gids-bibliotheek behandelt toegangsbeheer van begin tot eind — van de eerste matrix tot M365 directory-sync, ISO 27001 Annex A.9, en kwartaal-review-ritmes.' }}
+			</p>
+		</div>
+		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px;">
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'toegangsbeheer-mkb-complete-gids']) }}"
+				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
+				<span class="ag-kicker" style="align-self: flex-start;">★ {{ __('Pillar-gids') }}</span>
+				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Toegangsbeheer voor het MKB — complete gids') }}</strong>
+				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('Van je eerste matrix tot directory-sync, reviews en automatisering.') }}</span>
+			</a>
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'iso-27001-annex-a9-toegangsbeheer']) }}"
+				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
+				<span class="ag-kicker" style="align-self: flex-start;">{{ __('Compliance') }}</span>
+				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('ISO 27001 Annex A.9: wat de auditor wil zien') }}</strong>
+				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('Bewijsvoering per sub-control, inclusief access reviews.') }}</span>
+			</a>
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'waterdichte-offboarding-stappen']) }}"
+				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
+				<span class="ag-kicker" style="align-self: flex-start;">{{ __('Offboarding') }}</span>
+				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Waterdichte offboarding in 12 stappen') }}</strong>
+				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('Checklist met termijnen, verantwoordelijken en valkuilen.') }}</span>
+			</a>
+			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'm365-entra-id-governance-mkb']) }}"
+				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
+				<span class="ag-kicker" style="align-self: flex-start;">{{ __('M365 governance') }}</span>
+				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Microsoft 365 governance voor het MKB') }}</strong>
+				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('MFA, Conditional Access, Intune, licenties — het pragmatische minimum.') }}</span>
+			</a>
+		</div>
+		<div style="text-align: center; margin-top: 28px;">
+			<a href="{{ route('blog.category', ['locale' => $locale, 'categorySlug' => 'toegangsbeheer']) }}"
+				class="ag-btn ag-btn-secondary">
+				{{ $isEn ? 'All articles on access management' : 'Alle artikelen over toegangsbeheer' }}
+				<svg width="16" height="16" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+			</a>
+		</div>
+	</div>
+</section>
+
 {{-- FINAL CTA --}}
 <section class="ag-final-cta">
 	<div class="ag-container">
