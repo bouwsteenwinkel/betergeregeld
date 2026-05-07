@@ -84,6 +84,16 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // ----- Branding-vars (gebruikt door zowel banner als floating button) -----
+  var BR = CFG.branding || {};
+  var col = BR.colors || {};
+  var rad = (BR.corner_radius_px || 12) + 'px';
+
+  // CSS injecteren we ALTIJD, ook bij existing-consent — anders verschijnt
+  // het 🍪-icoontje en de prefs-modal unstyled (de banner-styles + button
+  // + modal-styles staan in dezelfde block).
+  injectStyles();
+
   // ----- Status check -----
   var existingConsent = getCookie(COOKIE_NAME);
   var savedChoices = loadChoices();
@@ -95,15 +105,10 @@
     return;
   }
 
-  // ----- Banner UI -----
-  var BR = CFG.branding || {};
-  var col = BR.colors || {};
-  var rad = (BR.corner_radius_px || 12) + 'px';
-
-  var styleId = 'cmp-style';
-  if (!document.getElementById(styleId)) {
+  function injectStyles() {
+    if (document.getElementById('cmp-style')) return;
     var style = document.createElement('style');
-    style.id = styleId;
+    style.id = 'cmp-style';
     style.textContent =
       '#cmp-banner{position:fixed;left:16px;right:16px;bottom:16px;max-width:780px;margin:0 auto;background:' + (col.banner_bg || '#1F1F1D') + ';color:' + (col.banner_text || '#F5F1E6') + ';padding:18px 20px;border-radius:' + rad + ';font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;line-height:1.5;box-shadow:0 8px 30px rgba(0,0,0,.25);z-index:2147483000;display:flex;flex-direction:column;gap:12px;animation:cmpFade .3s ease-out}' +
       '#cmp-banner h2{margin:0;font-size:15px;font-weight:700}' +
@@ -117,12 +122,13 @@
       '@keyframes cmpFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}' +
       '#cmp-prefs{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2147483001;display:none;align-items:center;justify-content:center;padding:16px}' +
       '#cmp-prefs.is-open{display:flex}' +
-      '#cmp-prefs-inner{background:#fff;color:#1F1F1D;border-radius:14px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;font-size:14px}' +
+      '#cmp-prefs-inner{background:#fff;color:#1F1F1D;border-radius:14px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;font-size:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}' +
       '#cmp-prefs h2{margin:0 0 8px;font-size:18px}' +
-      '#cmp-prefs label{display:flex;gap:12px;padding:12px;border:1px solid #eee;border-radius:8px;margin-top:10px;cursor:pointer}' +
+      '#cmp-prefs p{margin:0 0 8px;color:#475569}' +
+      '#cmp-prefs label{display:flex;gap:12px;padding:12px;border:1px solid #eee;border-radius:8px;margin-top:10px;cursor:pointer;align-items:flex-start}' +
       '#cmp-prefs label .meta{flex:1}' +
       '#cmp-prefs label strong{display:block;margin-bottom:2px;font-size:14px}' +
-      '#cmp-prefs label small{color:#666;font-size:12px;line-height:1.4}' +
+      '#cmp-prefs label small{color:#666;font-size:12px;line-height:1.4;display:block}' +
       '#cmp-prefs-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}' +
       '#cmp-reopen{position:fixed;left:14px;bottom:14px;width:42px;height:42px;border-radius:50%;background:' + (col.banner_bg || '#1F1F1D') + ';color:' + (col.banner_text || '#F5F1E6') + ';border:1px solid rgba(255,255,255,.15);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;z-index:2147482999;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;padding:0;transition:transform .15s,box-shadow .15s;font-family:inherit}' +
       '#cmp-reopen:hover{transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,.25)}' +
@@ -131,6 +137,7 @@
     document.head.appendChild(style);
   }
 
+  // ----- Banner UI -----
   var banner = document.createElement('div');
   banner.id = 'cmp-banner';
   banner.setAttribute('role', 'dialog');
