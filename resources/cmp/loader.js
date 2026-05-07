@@ -199,9 +199,17 @@
       var desc = txt('cat.' + cat.key + '.desc', '');
       html += '<label><input type="checkbox" data-cmp-cat="' + escapeHtml(cat.key) + '"' + disabled + checked + '><div class="meta"><strong>' + escapeHtml(name) + '</strong><small>' + escapeHtml(desc) + '</small></div></label>';
     });
+    // Buttons via inline-styles om host-CSS-resets (button{padding:0;…})
+    // bulletproof te neutraliseren. Brand-kleur uit branding-config.
+    var primaryBg   = col.btn_primary_bg   || '#D85A30';
+    var primaryFg   = col.btn_primary_text || '#fff';
+    var btnBaseCss = 'all:revert;display:inline-block;box-sizing:border-box;font:inherit;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;font-weight:600;line-height:1.2;padding:10px 18px;border-radius:8px;border:1px solid transparent;cursor:pointer;text-decoration:none;text-transform:none;letter-spacing:normal;width:auto;height:auto;min-width:0;max-width:none;margin:0;text-shadow:none;box-shadow:none;outline:0;transition:opacity .15s,background .15s';
+    var btnSecCss   = btnBaseCss + ';background:#f3f4f6;color:#1F1F1D;border-color:#e5e7eb';
+    var btnPrimCss  = btnBaseCss + ';background:' + primaryBg + ';color:' + primaryFg + ';border-color:' + primaryBg;
+
     html += '<div id="cmp-prefs-actions">';
-    html += '<button type="button" class="cmp-btn-secondary" data-cmp-action="prefs-cancel">' + escapeHtml(txt('prefs.btn_cancel', 'Annuleren')) + '</button>';
-    html += '<button type="button" class="cmp-btn-primary" data-cmp-action="prefs-save">' + escapeHtml(txt('prefs.btn_save', 'Opslaan')) + '</button>';
+    html += '<button type="button" class="cmp-btn-secondary" data-cmp-action="prefs-cancel" style="' + btnSecCss  + '">' + escapeHtml(txt('prefs.btn_cancel', 'Annuleren')) + '</button>';
+    html += '<button type="button" class="cmp-btn-primary"   data-cmp-action="prefs-save"   style="' + btnPrimCss + '">' + escapeHtml(txt('prefs.btn_save',   'Opslaan'))   + '</button>';
     html += '</div></div>';
     modal.innerHTML = html;
     document.documentElement.appendChild(modal);
