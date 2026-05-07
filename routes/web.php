@@ -75,6 +75,14 @@ Route::middleware('throttle:speedtest')->group(function () {
 // Sitemap is locale-agnostic — Google expects it at the document root.
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'sitemap'])->name('sitemap');
 
+// CMP — public-facing endpoints. Locale-agnostic; loader/scripts worden
+// geserveerd zonder authenticatie en met CORS open zodat externe sites
+// (bouwsteenwinkel.nl, brikl.nl, etc.) ze kunnen embedden.
+Route::get('/cmp/loader.js',  [\App\Http\Controllers\CmpController::class, 'loader'])->name('cmp.loader');
+Route::get('/cmp/scripts.js', [\App\Http\Controllers\CmpController::class, 'scripts'])->name('cmp.scripts');
+Route::post('/cmp/consent',   [\App\Http\Controllers\CmpController::class, 'consent'])->name('cmp.consent');
+Route::options('/cmp/consent',[\App\Http\Controllers\CmpController::class, 'consentOptions']);
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)

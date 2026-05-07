@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
             'tools/speedtest/upload',
+            'cmp/consent',
         ]);
 
         // Guests redirect to the login of their current locale (falling back
