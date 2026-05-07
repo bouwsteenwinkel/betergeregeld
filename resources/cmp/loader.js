@@ -25,12 +25,37 @@
   function loadChoices() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) { return null; }
   }
+  function generateUuid() {
+    // RFC 4122 v4 — gebruikt crypto.randomUUID waar beschikbaar
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    var s = '', r;
+    for (var i = 0; i < 32; i++) {
+      r = Math.random() * 16 | 0;
+      if (i === 12) r = 4;
+      else if (i === 16) r = (r & 3) | 8;
+      s += (i === 8 || i === 12 || i === 16 || i === 20 ? '-' : '') + r.toString(16);
+    }
+    return s;
+  }
   function saveChoices(choices, status) {
+    // Persist lokaal METEEN — onafhankelijk van of de server-fetch slaagt.
+    // Zonder dit: bij CORS-/netwerk-fout krijgt de gebruiker bij elke
+    // refresh weer de banner ondanks "ja, accepteer".
+    var consentId = getCookie(COOKIE_NAME);
+    if (!consentId || !/^[0-9a-f-]{36}$/i.test(consentId)) {
+      consentId = generateUuid();
+    }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(choices));
       localStorage.setItem(POLICY_KEY, String(CFG.policy_version));
     } catch (e) {}
-    var consentId = getCookie(COOKIE_NAME);
+    setCookie(COOKIE_NAME, consentId, COOKIE_DAYS);
+    injectScripts(consentId);
+
+    // Sync naar server in achtergrond — server upsert met dezelfde UUID
+    // (saveConsent in CmpService respecteert de meegegeven consent_id).
+    // Als deze fetch faalt: niet erg, lokale staat is al opgeslagen en
+    // bij volgende page-load proberen we 't opnieuw via syncConsentIfNeeded.
     fetch(CFG.endpoint_consent, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -42,12 +67,7 @@
         status: status,
         policy_version: CFG.policy_version,
       })
-    }).then(function(r) { return r.json(); }).then(function(data) {
-      if (data && data.consent_id) {
-        setCookie(COOKIE_NAME, data.consent_id, COOKIE_DAYS);
-        injectScripts(data.consent_id);
-      }
-    }).catch(function() { /* silent retry next page */ });
+    }).catch(function() { /* server-sync mislukt; client-state is al goed */ });
   }
   function injectScripts(consentId) {
     var s = document.createElement('script');
