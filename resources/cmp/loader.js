@@ -71,6 +71,7 @@
   if (existingConsent && savedChoices && savedPolicy === CFG.policy_version) {
     injectScripts(existingConsent);
     setupReopenLink();
+    setupFloatingButton();
     return;
   }
 
@@ -102,7 +103,11 @@
       '#cmp-prefs label .meta{flex:1}' +
       '#cmp-prefs label strong{display:block;margin-bottom:2px;font-size:14px}' +
       '#cmp-prefs label small{color:#666;font-size:12px;line-height:1.4}' +
-      '#cmp-prefs-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}';
+      '#cmp-prefs-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}' +
+      '#cmp-reopen{position:fixed;left:14px;bottom:14px;width:42px;height:42px;border-radius:50%;background:' + (col.banner_bg || '#1F1F1D') + ';color:' + (col.banner_text || '#F5F1E6') + ';border:1px solid rgba(255,255,255,.15);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;z-index:2147482999;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;padding:0;transition:transform .15s,box-shadow .15s;font-family:inherit}' +
+      '#cmp-reopen:hover{transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,.25)}' +
+      '#cmp-reopen:focus-visible{outline:2px solid ' + (col.btn_primary_bg || '#D85A30') + ';outline-offset:2px}' +
+      '@media (max-width:520px){#cmp-reopen{left:10px;bottom:10px;width:38px;height:38px;font-size:18px}}';
     document.head.appendChild(style);
   }
 
@@ -142,6 +147,7 @@
   function closeBanner() {
     if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
     setupReopenLink();
+    setupFloatingButton();
   }
 
   function openPrefs() {
@@ -191,6 +197,18 @@
         openPrefs();
       });
     });
+  }
+
+  function setupFloatingButton() {
+    if (document.getElementById('cmp-reopen')) return;  // al aanwezig
+    var btn = document.createElement('button');
+    btn.id = 'cmp-reopen';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', txt('footer.cookie_settings', 'Cookievoorkeuren'));
+    btn.title = txt('footer.cookie_settings', 'Cookievoorkeuren');
+    btn.textContent = '🍪';
+    btn.addEventListener('click', function() { openPrefs(); });
+    document.documentElement.appendChild(btn);
   }
 
   // Public API for footer "cookie-voorkeuren"-link
