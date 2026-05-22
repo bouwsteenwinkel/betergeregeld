@@ -37,3 +37,38 @@ Schedule::command('accessguard:send-digests')
     ->dailyAt('08:00')
     ->onOneServer()
     ->withoutOverlapping();
+
+// Vulnerability Radar — daily catalog + vuln feed refresh, then scan
+// every active asset. Order matters: catalog before vulns (so OSV
+// queries iterate the new catalog products), vulns before scan
+// (so the matcher has fresh data when a scan emits findings).
+Schedule::command('radar:sync-catalog')
+    ->dailyAt('04:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
+Schedule::command('radar:sync-vulns')
+    ->dailyAt('04:15')
+    ->onOneServer()
+    ->withoutOverlapping();
+
+Schedule::command('radar:scan --all-active')
+    ->dailyAt('05:00')
+    ->onOneServer()
+    ->withoutOverlapping(120);
+
+// Security-headers probe — apart van de fingerprint/vuln-scan zodat een
+// trage doelsite de queue-worker niet 2 minuten lang vasthoudt. Queue
+// mode dispatcht per asset; diff-detect (new vs resolved keys) gaat
+// naar het scan-log + raw_output.
+Schedule::command('radar:scan-headers --all-active --queue')
+    ->dailyAt('05:30')
+    ->onOneServer()
+    ->withoutOverlapping(60);
+
+// TLS + cookies + CMP — gebundeld in 1 job per asset (RunWebChecksScanJob)
+// zodat de queue niet 3× zo veel tickets krijgt. Eigen slot na headers.
+Schedule::command('radar:scan-web --all-active --queue')
+    ->dailyAt('05:45')
+    ->onOneServer()
+    ->withoutOverlapping(90);
