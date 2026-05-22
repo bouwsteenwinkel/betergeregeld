@@ -133,6 +133,15 @@ class ToolsIndexController extends Controller
 						'badge_nl' => 'Pro', 'badge_en' => 'Pro',
 						'icon' => 'key',
 					],
+					[
+						'slug' => 'security-radar',
+						'route' => 'tools.radar.index',
+						'title_nl' => 'Security Radar', 'title_en' => 'Security Radar',
+						'desc_nl' => 'Scan websites op security-headers, TLS-certificaten, cookies en CMP-compliance. Dagelijkse cron + diff-detect.',
+						'desc_en' => 'Scan websites for security headers, TLS certificates, cookies and CMP compliance. Daily cron + diff detection.',
+						'badge_nl' => 'Pro', 'badge_en' => 'Pro',
+						'icon' => 'shield-check',
+					],
 				],
 			],
 			[

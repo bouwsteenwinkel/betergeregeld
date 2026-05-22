@@ -15,6 +15,9 @@ use App\Http\Controllers\ToolsIndexController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Settings\TwoFactorSettingsController;
 use App\Http\Controllers\Tools\AccessGuard\AccessGuardController;
+use App\Http\Controllers\Tools\Radar\RadarAssetController;
+use App\Http\Controllers\Tools\Radar\RadarDashboardController;
+use App\Http\Controllers\Tools\Radar\RadarFindingController;
 use App\Http\Controllers\Tools\AccessGuard\AccessItemController as AccessGuardAccessItemController;
 use App\Http\Controllers\Tools\AccessGuard\AccessProfileController as AccessGuardAccessProfileController;
 use App\Http\Controllers\Tools\AccessGuard\AiExplainController as AccessGuardAiExplainController;
@@ -380,6 +383,19 @@ Route::prefix('{locale}')
 				Route::get('/directory/callback/m365', [AccessGuardDirectoryController::class, 'callback'])->name('directory.callback');
 				Route::post('/directory/sync', [AccessGuardDirectoryController::class, 'syncNow'])->name('directory.sync');
 				Route::post('/directory/disconnect', [AccessGuardDirectoryController::class, 'disconnect'])->name('directory.disconnect');
+			});
+
+			Route::middleware('auth')->prefix('radar')->name('radar.')->group(function () {
+				Route::get('/', [RadarDashboardController::class, 'index'])->name('index');
+
+				Route::get('/assets', [RadarAssetController::class, 'index'])->name('assets.index');
+				Route::get('/assets/nieuw', [RadarAssetController::class, 'create'])->name('assets.create');
+				Route::post('/assets', [RadarAssetController::class, 'store'])->name('assets.store');
+				Route::get('/assets/{id}', [RadarAssetController::class, 'show'])->whereNumber('id')->name('assets.show');
+				Route::delete('/assets/{id}', [RadarAssetController::class, 'destroy'])->whereNumber('id')->name('assets.destroy');
+				Route::post('/assets/{id}/scan', [RadarAssetController::class, 'scan'])->whereNumber('id')->name('assets.scan');
+
+				Route::post('/findings/{id}/status', [RadarFindingController::class, 'updateStatus'])->whereNumber('id')->name('findings.update-status');
 			});
 
 			Route::middleware('tool.limit:pdf_redact')->group(function () {

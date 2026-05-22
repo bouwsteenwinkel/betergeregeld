@@ -69,6 +69,11 @@ class ToolsPlansSeeder extends Seeder
 
 					'tool.bookkeeping.enabled' => '0',
 					'tool.accessguard.enabled' => '0',
+
+					'tool.radar.enabled' => '0',
+					'tool.radar.max_assets' => '0',
+					'tool.radar.checks_allowed' => '',
+					'tool.radar.scans_per_day' => '0',
 				],
 			],
 			[
@@ -123,6 +128,12 @@ class ToolsPlansSeeder extends Seeder
 					'tool.bookkeeping.enabled' => '1',
 					'tool.accessguard.enabled' => '1',
 					'tool.accessguard.ai_explain' => '1',
+
+					'tool.radar.enabled' => '1',
+					'tool.radar.max_assets' => '3',
+					'tool.radar.checks_allowed' => 'headers,cookies,cmp',
+					'tool.radar.scans_per_day' => '3',
+					'tool.radar.ai_explain' => '0',
 				],
 			],
 			[
@@ -174,6 +185,13 @@ class ToolsPlansSeeder extends Seeder
 					'tool.accessguard.multi_user' => '1',
 					'tool.accessguard.ai_explain' => '1',
 					'tool.accessguard.directory_sync' => '1',
+					'tool.accessguard.vulnerability_radar' => '1',
+
+					'tool.radar.enabled' => '1',
+					'tool.radar.max_assets' => 'unlimited',
+					'tool.radar.checks_allowed' => 'headers,tls,cookies,cmp',
+					'tool.radar.scans_per_day' => '25',
+					'tool.radar.ai_explain' => '1',
 				],
 			],
 		];
