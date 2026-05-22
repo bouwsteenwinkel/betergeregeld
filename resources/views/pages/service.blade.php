@@ -131,4 +131,35 @@
 	</div>
 </section>
 
+{{-- Verwante artikelen — internal-linking + visitor-retention. Alleen
+	 zichtbaar als ServiceController posts vond via category/tag-match
+	 (config/service_blog_links.php). --}}
+@if (!empty($relatedPosts) && $relatedPosts->isNotEmpty())
+	<section class="py-16 bg-[color:var(--color-surface)]">
+		<div class="max-w-[1100px] mx-auto px-6">
+			<h2 class="display-3 mb-2">{{ $isEn ? 'Related articles' : 'Verwante artikelen' }}</h2>
+			<p class="text-[color:var(--color-ink-muted)] mb-8 max-w-2xl">
+				{{ $isEn ? 'Practical reads that fit this service.' : 'Praktische artikelen die bij deze dienst aansluiten.' }}
+			</p>
+			<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+				@foreach ($relatedPosts as $rp)
+					<a href="/{{ $locale }}/blog/{{ $rp->slug }}"
+						class="block bg-white border border-[color:var(--color-line)] rounded-[var(--radius-card)] p-5 hover:shadow-[var(--shadow-soft)] transition">
+						<div class="text-[11px] uppercase tracking-wider font-semibold text-[color:var(--color-accent)] mb-2">
+							{{ $rp->category->name ?? '' }}
+						</div>
+						<h3 class="font-bold mb-2 leading-snug">{{ $rp->title }}</h3>
+						<p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed">
+							{{ \Illuminate\Support\Str::limit($rp->excerpt, 140) }}
+						</p>
+						<div class="mt-3 text-xs text-[color:var(--color-ink-muted)]">
+							{{ $rp->reading_time_min }} min{{ $rp->is_pillar ? ' · ★ Pillar' : '' }}
+						</div>
+					</a>
+				@endforeach
+			</div>
+		</div>
+	</section>
+@endif
+
 @endsection
