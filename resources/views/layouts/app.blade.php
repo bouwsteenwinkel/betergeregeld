@@ -1,16 +1,96 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@php
+	$__bg_locale  = app()->getLocale();
+	$__bg_path    = request()->path();
+	$__bg_pparts  = explode('/', ltrim($__bg_path, '/'));
+	$__bg_tail    = count($__bg_pparts) > 1 ? '/' . implode('/', array_slice($__bg_pparts, 1)) : '';
+	$__bg_canon_path = '/' . $__bg_locale . $__bg_tail;
+	$__bg_canonical  = url($__bg_canon_path);
+	// yieldContent kan een al door Blade ge-escapete string opleveren; eerst
+	// terug naar plain text decoden, daarna laat Blade's {{ }} ze opnieuw
+	// nét één keer escapen.
+	$__bg_og_title_raw = html_entity_decode((string) View::yieldContent('title'), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+	$__bg_og_desc_raw  = html_entity_decode((string) View::yieldContent('description'), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+	$__bg_og_title = trim($__bg_og_title_raw) !== '' ? trim($__bg_og_title_raw) : config('app.name');
+	$__bg_og_desc  = trim($__bg_og_desc_raw) !== ''
+		? trim($__bg_og_desc_raw)
+		: __('Beter Geregeld ICT helpt bedrijven met maatwerk websites, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische optimalisatie.');
+@endphp
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>@yield('title', config('app.name'))</title>
 	<meta name="description" content="@yield('description', __('Beter Geregeld ICT helpt bedrijven met maatwerk websites, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische optimalisatie.'))">
+
+	{{-- Canonical + hreflang per locale (per-page override via @push('head')) --}}
+	<link rel="canonical" href="{{ $__bg_canonical }}">
+	@foreach (\App\Http\Middleware\SetLocale::SUPPORTED as $__bg_loc)
+		<link rel="alternate" hreflang="{{ $__bg_loc }}" href="{{ url('/' . $__bg_loc . $__bg_tail) }}">
+	@endforeach
+	<link rel="alternate" hreflang="x-default" href="{{ url('/nl' . $__bg_tail) }}">
+
+	{{-- Open Graph defaults (per-page override via @section('og_type', '...') etc) --}}
+	<meta property="og:type" content="@yield('og_type', 'website')">
+	<meta property="og:locale" content="{{ str_replace('-', '_', $__bg_locale) }}_NL">
+	<meta property="og:site_name" content="Beter Geregeld ICT">
+	<meta property="og:title" content="{{ $__bg_og_title }}">
+	<meta property="og:description" content="{{ $__bg_og_desc }}">
+	<meta property="og:url" content="{{ $__bg_canonical }}">
+	<meta name="twitter:card" content="summary_large_image">
+
 	<link rel="icon" href="/favicon.ico">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
+
+	{{-- Organization + LocalBusiness baseline JSON-LD --}}
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"    => 'https://schema.org',
+		"\x40type"       => 'Organization',
+		"\x40id"         => url('/#organization'),
+		'name'        => 'Beter Geregeld ICT',
+		'alternateName' => 'Beter Geregeld',
+		'url'         => url('/'),
+		'logo'        => url('/favicon.ico'),
+		'email'       => 'info@betergeregeld.com',
+		'telephone'   => '+31352011729',
+		'foundingDate' => '1989',
+		'address'     => [
+			"\x40type"           => 'PostalAddress',
+			'streetAddress'   => 'T.B. Huurmanlaan 5',
+			'postalCode'      => '1403 SL',
+			'addressLocality' => 'Bussum',
+			'addressCountry'  => 'NL',
+		],
+		'sameAs'      => [],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"    => 'https://schema.org',
+		"\x40type"       => 'LocalBusiness',
+		"\x40id"         => url('/#localbusiness'),
+		'name'        => 'Beter Geregeld ICT',
+		'image'       => url('/favicon.ico'),
+		'url'         => url('/'),
+		'email'       => 'info@betergeregeld.com',
+		'telephone'   => '+31352011729',
+		'priceRange'  => '€€',
+		'address'     => [
+			"\x40type"           => 'PostalAddress',
+			'streetAddress'   => 'T.B. Huurmanlaan 5',
+			'postalCode'      => '1403 SL',
+			'addressLocality' => 'Bussum',
+			'addressCountry'  => 'NL',
+		],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+
+	@stack('head')
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col">
 	@php
