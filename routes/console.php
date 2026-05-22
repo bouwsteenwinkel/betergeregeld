@@ -38,6 +38,14 @@ Schedule::command('accessguard:send-digests')
     ->onOneServer()
     ->withoutOverlapping();
 
+// SEO — Google Search Console daily import naar seo_query_daily.
+// GSC's 'final' data heeft 2-3 dagen lag, dus exacte uur is niet kritiek.
+// 04:30 is een vrij slot tussen radar:sync-vulns (04:15) en radar:scan (05:00).
+Schedule::command('seo:import-gsc')
+    ->dailyAt('04:30')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Vulnerability Radar — daily catalog + vuln feed refresh, then scan
 // every active asset. Order matters: catalog before vulns (so OSV
 // queries iterate the new catalog products), vulns before scan
