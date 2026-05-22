@@ -46,6 +46,13 @@ Schedule::command('seo:import-gsc')
     ->onOneServer()
     ->withoutOverlapping();
 
+// PageSpeed Insights — top-3 URLs per property, mobile + desktop. Loopt
+// na GSC-import zodat de URL-selectie de meest verse top-clicks pakt.
+Schedule::command('seo:run-psi')
+    ->dailyAt('05:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Vulnerability Radar — daily catalog + vuln feed refresh, then scan
 // every active asset. Order matters: catalog before vulns (so OSV
 // queries iterate the new catalog products), vulns before scan
