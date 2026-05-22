@@ -27,13 +27,40 @@ class SitemapController extends Controller
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 		$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
+		// Publieke tools die rechtstreeks indexeerbaar zijn (geen auth-required,
+		// geen sub-app). Synced met ToolsIndexController publicSlugs.
+		$publicTools = [
+			'iban-check', 'vat-check', 'postcode-check', 'shipping-rates',
+			'ip-lookup', 'lego-lookup',
+			'json-formatter', 'diff',
+			'favicon-generator', 'speedtest', 'pdf-merge',
+		];
+
+		// Diensten uit config — alle slugs zijn publiek (services_catalog.php
+		// heeft 12 diensten per 2026-05-22).
+		$serviceSlugs = array_keys(config('services_catalog', []));
+
 		foreach ($locales as $locale) {
+			// Top-level pagina's
 			$xml .= $this->url(url("/{$locale}"), '1.0', 'daily');
 			$xml .= $this->url(url("/{$locale}/over"), '0.6', 'monthly');
 			$xml .= $this->url(url("/{$locale}/accessguard"), '0.9', 'weekly');
 			$xml .= $this->url(url("/{$locale}/accessguard/demo"), '0.7', 'monthly');
 			$xml .= $this->url(url("/{$locale}/prijzen"), '0.8', 'weekly');
+			$xml .= $this->url(url("/{$locale}/contact"), '0.5', 'yearly');
 			$xml .= $this->url(url("/{$locale}/blog"), '0.8', 'daily');
+
+			// Diensten-index + per slug (commerciële intent → priority 0.8)
+			$xml .= $this->url(url("/{$locale}/diensten"), '0.8', 'weekly');
+			foreach ($serviceSlugs as $slug) {
+				$xml .= $this->url(url("/{$locale}/diensten/{$slug}"), '0.8', 'monthly');
+			}
+
+			// Tools-index + per publieke tool
+			$xml .= $this->url(url("/{$locale}/tools"), '0.7', 'weekly');
+			foreach ($publicTools as $slug) {
+				$xml .= $this->url(url("/{$locale}/tools/{$slug}"), '0.7', 'monthly');
+			}
 		}
 
 		foreach (BlogCategory::query()->get(['slug', 'updated_at']) as $cat) {
@@ -58,15 +85,16 @@ class SitemapController extends Controller
 			}
 		}
 
+		// Blog-posts zijn nu alleen Nederlands geschreven (geen vertalingen
+		// in DB). Sitemap toont daarom enkel de /nl/-variant zodat Google
+		// geen duplicate-content/hreflang-mismatch krijgt.
 		foreach (BlogPost::query()->published()->get(['slug', 'updated_at', 'is_pillar']) as $post) {
-			foreach ($locales as $locale) {
-				$xml .= $this->url(
-					url("/{$locale}/blog/{$post->slug}"),
-					$post->is_pillar ? '0.8' : '0.6',
-					'monthly',
-					$post->updated_at,
-				);
-			}
+			$xml .= $this->url(
+				url("/nl/blog/{$post->slug}"),
+				$post->is_pillar ? '0.8' : '0.6',
+				'monthly',
+				$post->updated_at,
+			);
 		}
 
 		$xml .= '</urlset>' . "\n";
