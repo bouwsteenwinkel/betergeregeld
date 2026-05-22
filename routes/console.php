@@ -53,6 +53,14 @@ Schedule::command('seo:run-psi')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
+// gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
+// de mail rond koffietijd binnenkomt.
+Schedule::command('blog:generate-daily --skip-if-todays-post')
+    ->dailyAt('09:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Vulnerability Radar — daily catalog + vuln feed refresh, then scan
 // every active asset. Order matters: catalog before vulns (so OSV
 // queries iterate the new catalog products), vulns before scan

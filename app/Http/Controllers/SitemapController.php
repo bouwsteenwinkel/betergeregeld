@@ -85,12 +85,14 @@ class SitemapController extends Controller
 			}
 		}
 
-		// Blog-posts zijn nu alleen Nederlands geschreven (geen vertalingen
-		// in DB). Sitemap toont daarom enkel de /nl/-variant zodat Google
-		// geen duplicate-content/hreflang-mismatch krijgt.
-		foreach (BlogPost::query()->published()->get(['slug', 'updated_at', 'is_pillar']) as $post) {
+		// Blog-posts per locale. Sinds 2026-05-22 zijn blog_posts
+		// multi-lingual (locale-veld + translation_of_post_id). De
+		// dailyAt 09:00 'blog:generate-daily' command schrijft direct
+		// een NL- en EN-versie; oudere posts hebben alleen NL en zijn
+		// daarom alleen onder /nl/ vindbaar.
+		foreach (BlogPost::query()->published()->get(['slug', 'locale', 'updated_at', 'is_pillar']) as $post) {
 			$xml .= $this->url(
-				url("/nl/blog/{$post->slug}"),
+				url("/{$post->locale}/blog/{$post->slug}"),
 				$post->is_pillar ? '0.8' : '0.6',
 				'monthly',
 				$post->updated_at,

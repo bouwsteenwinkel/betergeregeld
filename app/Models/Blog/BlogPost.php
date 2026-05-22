@@ -12,7 +12,8 @@ class BlogPost extends Model
 	protected $table = 'blog_posts';
 
 	protected $fillable = [
-		'category_id', 'slug', 'title', 'meta_title', 'excerpt', 'body',
+		'category_id', 'locale', 'translation_of_post_id',
+		'slug', 'title', 'meta_title', 'excerpt', 'body',
 		'reading_time_min', 'is_pillar', 'featured', 'published_at',
 	];
 

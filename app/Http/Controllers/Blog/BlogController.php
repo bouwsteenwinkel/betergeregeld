@@ -13,13 +13,13 @@ class BlogController extends Controller
 {
 	public function index(Request $request, string $locale): View
 	{
-		$featured = BlogPost::query()->published()->where('featured', true)
+		$featured = BlogPost::query()->published()->where('locale', $locale)->where('featured', true)
 			->with('category')->orderByDesc('published_at')->limit(3)->get();
 
-		$pillars = BlogPost::query()->published()->where('is_pillar', true)
+		$pillars = BlogPost::query()->published()->where('locale', $locale)->where('is_pillar', true)
 			->with('category')->orderBy('category_id')->get();
 
-		$recent = BlogPost::query()->published()
+		$recent = BlogPost::query()->published()->where('locale', $locale)
 			->whereNotIn('id', $featured->pluck('id'))
 			->with('category')
 			->orderByDesc('published_at')
@@ -28,7 +28,7 @@ class BlogController extends Controller
 
 		$categories = BlogCategory::query()
 			->orderBy('sort_order')
-			->withCount(['posts' => fn ($q) => $q->whereNotNull('published_at')])
+			->withCount(['posts' => fn ($q) => $q->whereNotNull('published_at')->where('locale', $locale)])
 			->get();
 
 		return view('blog.index', compact('featured', 'pillars', 'recent', 'categories'));
@@ -38,9 +38,9 @@ class BlogController extends Controller
 	{
 		$category = BlogCategory::query()->where('slug', $categorySlug)->firstOrFail();
 
-		$pillar = $category->posts()->where('is_pillar', true)->first();
+		$pillar = $category->posts()->where('locale', $locale)->where('is_pillar', true)->first();
 
-		$posts = BlogPost::query()->published()
+		$posts = BlogPost::query()->published()->where('locale', $locale)
 			->where('category_id', $category->id)
 			->where('is_pillar', false)
 			->with('category')
@@ -51,7 +51,7 @@ class BlogController extends Controller
 		$otherCategories = BlogCategory::query()
 			->where('id', '!=', $category->id)
 			->orderBy('sort_order')
-			->withCount(['posts' => fn ($q) => $q->whereNotNull('published_at')])
+			->withCount(['posts' => fn ($q) => $q->whereNotNull('published_at')->where('locale', $locale)])
 			->get();
 
 		return view('blog.category', compact('category', 'pillar', 'posts', 'otherCategories'));
@@ -60,6 +60,7 @@ class BlogController extends Controller
 	public function show(Request $request, string $locale, string $slug): View
 	{
 		$post = BlogPost::query()->published()
+			->where('locale', $locale)
 			->where('slug', $slug)
 			->with('category', 'tags')
 			->firstOrFail();
@@ -79,6 +80,7 @@ class BlogController extends Controller
 		$tag = BlogTag::query()->where('slug', $tagSlug)->firstOrFail();
 		$posts = $tag->posts()
 			->whereNotNull('published_at')
+			->where('locale', $locale)
 			->with('category')
 			->orderByDesc('published_at')
 			->paginate(20);
