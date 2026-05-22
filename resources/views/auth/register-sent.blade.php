@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', __('Controleer je e-mail') . ' — ' . config('app.name'))
+@section('robots', 'noindex,nofollow')
 
 @section('content')
 	<div class="max-w-md mx-auto">

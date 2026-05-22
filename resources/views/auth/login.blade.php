@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', __('Inloggen') . ' — ' . config('app.name'))
+@section('robots', 'noindex,nofollow')
 
 @section('content')
 <section class="py-16 bg-[color:var(--color-surface)] min-h-[70vh] flex items-center">

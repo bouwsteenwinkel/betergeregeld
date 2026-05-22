@@ -21,6 +21,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<meta name="robots" content="@yield('robots', 'index,follow,max-image-preview:large,max-snippet:-1')">
 	<title>@yield('title', config('app.name'))</title>
 	<meta name="description" content="@yield('description', __('Beter Geregeld ICT helpt bedrijven met maatwerk websites, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische optimalisatie.'))">
 
@@ -38,7 +39,12 @@
 	<meta property="og:title" content="{{ $__bg_og_title }}">
 	<meta property="og:description" content="{{ $__bg_og_desc }}">
 	<meta property="og:url" content="{{ $__bg_canonical }}">
+	<meta property="og:image" content="@yield('og_image', url('/og-image.png'))">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Beter Geregeld ICT — maatwerk websites, koppelingen en automatisering">
 	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:image" content="@yield('og_image', url('/og-image.png'))">
 
 	<link rel="icon" href="/favicon.ico">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,6 +73,18 @@
 			'addressCountry'  => 'NL',
 		],
 		'sameAs'      => [],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"   => 'https://schema.org',
+		"\x40type"      => 'WebSite',
+		"\x40id"        => url('/#website'),
+		'name'          => 'Beter Geregeld ICT',
+		'alternateName' => 'Beter Geregeld',
+		'url'           => url('/'),
+		'inLanguage'    => ['nl-NL', 'en-NL'],
+		'publisher'     => ["\x40id" => url('/#organization')],
 	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 	</script>
 	<script type="application/ld+json">

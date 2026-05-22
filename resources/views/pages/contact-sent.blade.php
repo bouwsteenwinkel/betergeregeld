@@ -6,6 +6,7 @@
 @endphp
 
 @section('title', ($isEn ? 'Thanks for your message' : 'Bedankt voor je bericht') . ' — Beter Geregeld ICT')
+@section('robots', 'noindex,follow')
 
 @section('content')
 
