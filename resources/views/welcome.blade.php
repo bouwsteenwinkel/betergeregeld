@@ -47,6 +47,28 @@
 	$expertise = ['Maatwerk webapplicaties', 'Klantportalen', 'Custom business portals', 'API integraties', 'ERP-koppelingen', 'Procesautomatisering', 'Performance optimalisatie', 'Technische SEO', 'WordPress optimalisatie', 'Toegangsbeheer', '2FA en beveiliging', 'Meertalige websites'];
 @endphp
 
+@push('head')
+	@php
+		$__bg_faq_schema = [
+			"\x40context"   => 'https://schema.org',
+			"\x40type"      => 'FAQPage',
+			'mainEntity' => array_map(fn ($q) => [
+				"\x40type"          => 'Question',
+				'name'           => $isEn ? $q['q_en'] : $q['q_nl'],
+				'acceptedAnswer' => [
+					"\x40type" => 'Answer',
+					'text'  => $isEn ? $q['a_en'] : $q['a_nl'],
+				],
+			], $faq ?? []),
+		];
+	@endphp
+	@if (!empty($__bg_faq_schema['mainEntity']))
+		<script type="application/ld+json">
+		{!! json_encode($__bg_faq_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+		</script>
+	@endif
+@endpush
+
 @section('content')
 
 {{-- ============ HERO ============ --}}

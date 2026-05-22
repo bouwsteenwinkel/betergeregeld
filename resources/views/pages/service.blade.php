@@ -14,6 +14,41 @@
 @section('title', $h1 . ' — Beter Geregeld ICT')
 @section('description', $lead)
 
+@push('head')
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"    => 'https://schema.org',
+		"\x40type"       => 'Service',
+		'name'        => $h1,
+		'description' => $lead,
+		'serviceType' => $pill,
+		'provider'    => [
+			"\x40type" => 'Organization',
+			"\x40id"   => url('/#organization'),
+			'name'  => 'Beter Geregeld ICT',
+			'url'   => url('/'),
+		],
+		'areaServed'  => [
+			"\x40type" => 'Country',
+			'name'  => 'Netherlands',
+		],
+		'inLanguage'  => $locale,
+		'url'         => url(request()->path()),
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"        => 'https://schema.org',
+		"\x40type"           => 'BreadcrumbList',
+		'itemListElement' => [
+			["\x40type" => 'ListItem', 'position' => 1, 'name' => $isEn ? 'Home' : 'Home',         'item' => url("/{$locale}")],
+			["\x40type" => 'ListItem', 'position' => 2, 'name' => $isEn ? 'Services' : 'Diensten', 'item' => url("/{$locale}/diensten")],
+			["\x40type" => 'ListItem', 'position' => 3, 'name' => $h1,                              'item' => url(request()->path())],
+		],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+@endpush
+
 @section('content')
 
 <section class="section-dark relative overflow-hidden">

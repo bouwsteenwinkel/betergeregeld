@@ -4,17 +4,48 @@
 
 @section('title', ($post->meta_title ?: $post->title) . ' — Blog — ' . config('app.name'))
 @section('description', $post->excerpt)
+@section('og_type', 'article')
 
 @push('head')
-	<link rel="canonical" href="{{ route('blog.show', ['locale' => $locale, 'slug' => $post->slug]) }}">
+	{{-- Canonical, og:title, og:description en hreflang komen al uit layouts/app.blade.php
+		 op basis van URL + @section('title')/@section('description'). Hier alleen blog-
+		 specifieke article-meta + RSS-link + Article schema. --}}
 	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} — Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
-	<meta property="og:title" content="{{ $post->title }}">
-	<meta property="og:description" content="{{ $post->excerpt }}">
-	<meta property="og:type" content="article">
 	<meta property="article:section" content="{{ $post->category->name }}">
 	@if ($post->published_at)
 		<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">
 	@endif
+	@if ($post->updated_at)
+		<meta property="article:modified_time" content="{{ $post->updated_at->toIso8601String() }}">
+	@endif
+
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"      => 'https://schema.org',
+		"\x40type"         => 'Article',
+		'headline'      => $post->title,
+		'description'   => $post->excerpt,
+		'inLanguage'    => $locale,
+		'datePublished' => optional($post->published_at)->toIso8601String(),
+		'dateModified'  => optional($post->updated_at)->toIso8601String(),
+		'mainEntityOfPage' => [
+			"\x40type" => 'WebPage',
+			"\x40id"   => route('blog.show', ['locale' => $locale, 'slug' => $post->slug]),
+		],
+		'articleSection' => $post->category->name,
+		'keywords'       => $post->tags->pluck('name')->implode(', '),
+		'author'         => [
+			"\x40type" => 'Organization',
+			'name'  => 'Beter Geregeld ICT',
+			'url'   => url('/'),
+		],
+		'publisher'      => [
+			"\x40type" => 'Organization',
+			'name'  => 'Beter Geregeld ICT',
+			"\x40id"   => url('/#organization'),
+		],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
 @endpush
 
 @section('content')
