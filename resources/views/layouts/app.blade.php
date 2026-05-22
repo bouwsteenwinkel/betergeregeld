@@ -22,6 +22,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<meta name="robots" content="@yield('robots', 'index,follow,max-image-preview:large,max-snippet:-1')">
+
+	{{-- Local SEO + mobile / browser hints --}}
+	<meta name="geo.region" content="NL">
+	<meta name="geo.placename" content="Bussum">
+	<meta name="geo.position" content="52.275;5.166">
+	<meta name="ICBM" content="52.275, 5.166">
+	<meta name="theme-color" content="#0f172a">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="apple-mobile-web-app-title" content="Beter Geregeld">
+	<meta name="application-name" content="Beter Geregeld">
+
 	<title>@yield('title', config('app.name'))</title>
 	<meta name="description" content="@yield('description', __('Beter Geregeld ICT helpt bedrijven met maatwerk websites, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische optimalisatie.'))">
 
