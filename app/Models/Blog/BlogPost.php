@@ -49,9 +49,11 @@ class BlogPost extends Model
 	public function relatedPosts(int $limit = 5): \Illuminate\Support\Collection
 	{
 		$tagIds = $this->tags()->pluck('blog_tags.id');
+		$locale = $this->locale ?: 'nl';
 
 		$scored = static::query()
 			->published()
+			->where('locale', $locale)
 			->where('id', '!=', $this->id)
 			->with('category')
 			->when($tagIds->isNotEmpty(), fn ($q) => $q->whereHas('tags', fn ($tq) => $tq->whereIn('blog_tags.id', $tagIds)))
@@ -63,10 +65,12 @@ class BlogPost extends Model
 
 		if ($scored->count() >= $limit) return $scored;
 
-		// Fall back to same-category, then newest anywhere, to always hit $limit.
+		// Fall back to same-category in same locale, then newest anywhere
+		// in this locale, to always hit $limit.
 		$seenIds = $scored->pluck('id')->push($this->id)->all();
 		$fill = static::query()
 			->published()
+			->where('locale', $locale)
 			->whereNotIn('id', $seenIds)
 			->where('category_id', $this->category_id)
 			->orderByDesc('is_pillar')

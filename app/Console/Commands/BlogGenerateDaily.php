@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Middleware\SetLocale;
 use App\Models\Blog\BlogPost;
 use App\Services\Blog\BlogGenerator;
 use App\Services\Blog\BlogTranslator;
@@ -49,30 +50,36 @@ class BlogGenerateDaily extends Command
 		}
 		$this->info("✓ NL gepubliceerd: {$nl->title}  ({$nl->slug})");
 
-		$en = null;
+		$translations = [];
 		if (!$this->option('no-translate')) {
-			$this->info('Vertaal naar EN…');
-			try {
-				$en = $translator->translate($nl, 'en');
-				$this->info("✓ EN gepubliceerd: {$en->title}  ({$en->slug})");
-			} catch (Throwable $e) {
-				$this->warn('Vertaling mislukt (NL-post staat wel live): ' . $e->getMessage());
+			$targets = array_values(array_diff(SetLocale::SUPPORTED, ['nl']));
+			foreach ($targets as $loc) {
+				$this->info("Vertaal naar {$loc}…");
+				try {
+					$tr = $translator->translate($nl, $loc);
+					$translations[$loc] = $tr;
+					$this->info("✓ {$loc} gepubliceerd: {$tr->title}  ({$tr->slug})");
+				} catch (Throwable $e) {
+					$this->warn("Vertaling {$loc} mislukt: " . $e->getMessage());
+				}
 			}
 		}
 
 		if (!$this->option('no-mail')) {
-			$this->sendNotification($nl, $en);
+			$this->sendNotification($nl, $translations);
 		}
 
 		return self::SUCCESS;
 	}
 
-	private function sendNotification(BlogPost $nl, ?BlogPost $en): void
+	/**
+	 * @param array<string,BlogPost> $translations
+	 */
+	private function sendNotification(BlogPost $nl, array $translations): void
 	{
 		$to = env('BLOG_NOTIFY_TO', 'dennis@bouwsteenwinkel.nl');
 		$base = rtrim(env('APP_URL', 'https://betergeregeld.com'), '/');
 		$nlUrl = "{$base}/nl/blog/{$nl->slug}";
-		$enUrl = $en ? "{$base}/en/blog/{$en->slug}" : null;
 
 		$subject = 'Nieuwe blog online: ' . $nl->title;
 
@@ -83,10 +90,13 @@ class BlogGenerateDaily extends Command
 			"",
 			"NL:  {$nlUrl}",
 		];
-		if ($enUrl) {
-			$lines[] = "EN:  {$enUrl}";
-		} else {
-			$lines[] = "EN:  (vertaling mislukt, alleen NL staat online)";
+		foreach (SetLocale::SUPPORTED as $loc) {
+			if ($loc === 'nl') continue;
+			if (isset($translations[$loc])) {
+				$lines[] = strtoupper($loc) . ":  {$base}/{$loc}/blog/" . $translations[$loc]->slug;
+			} else {
+				$lines[] = strtoupper($loc) . ":  (vertaling mislukt)";
+			}
 		}
 		$lines[] = "";
 		$lines[] = "Categorie:    " . ($nl->category->name ?? '?');
@@ -100,12 +110,21 @@ class BlogGenerateDaily extends Command
 
 		$text = implode("\n", $lines);
 
+		$linkRows = '<p><strong>NL:</strong> <a href="' . e($nlUrl) . '">' . e($nlUrl) . '</a><br>';
+		foreach (SetLocale::SUPPORTED as $loc) {
+			if ($loc === 'nl') continue;
+			if (isset($translations[$loc])) {
+				$url = "{$base}/{$loc}/blog/" . $translations[$loc]->slug;
+				$linkRows .= '<strong>' . strtoupper($loc) . ':</strong> <a href="' . e($url) . '">' . e($url) . '</a><br>';
+			} else {
+				$linkRows .= '<strong>' . strtoupper($loc) . ':</strong> <em>vertaling mislukt</em><br>';
+			}
+		}
+		$linkRows .= '</p>';
+
 		$html = '<p>Hoi Dennis,</p>'
 			. '<p>Een nieuwe blog-post is automatisch gepubliceerd op betergeregeld.com.</p>'
-			. '<p><strong>NL:</strong> <a href="' . e($nlUrl) . '">' . e($nlUrl) . '</a><br>'
-			. ($enUrl
-				? '<strong>EN:</strong> <a href="' . e($enUrl) . '">' . e($enUrl) . '</a></p>'
-				: '<strong>EN:</strong> <em>vertaling mislukt, alleen NL staat online</em></p>')
+			. $linkRows
 			. '<table style="font-size:13px;border-collapse:collapse"><tbody>'
 			. '<tr><td style="padding:2px 12px 2px 0">Categorie</td><td>' . e($nl->category->name ?? '?') . '</td></tr>'
 			. '<tr><td style="padding:2px 12px 2px 0">Leestijd</td><td>' . (int) $nl->reading_time_min . ' min</td></tr>'
