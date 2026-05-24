@@ -3,12 +3,28 @@
 @php
 	$locale = app()->getLocale();
 	$isEn = $locale !== 'nl';
-	$h1 = $isEn ? $service['h1_en'] : $service['h1_nl'];
-	$lead = $isEn ? $service['lead_en'] : $service['lead_nl'];
-	$pill = $isEn ? $service['pill_en'] : $service['pill_nl'];
-	$bullets = $isEn ? $service['bullets_en'] : $service['bullets_nl'];
-	$ctaTitle = $isEn ? $service['cta_title_en'] : $service['cta_title_nl'];
-	$ctaText = $isEn ? $service['cta_text_en'] : $service['cta_text_nl'];
+
+	// Locale-aware lookup met 3-laagse fallback:
+	//   1. services_catalog_extra.{slug}.{locale}.{field}  (DE/FR/ES via Claude)
+	//   2. services_catalog.{slug}.{field}_en              (Engelse bron-variant)
+	//   3. services_catalog.{slug}.{field}_nl              (NL bron als laatste)
+	$tx = function (string $field) use ($service, $slug, $locale) {
+		$extra = config("services_catalog_extra.{$slug}.{$locale}");
+		if (is_array($extra) && array_key_exists($field, $extra)) {
+			return $extra[$field];
+		}
+		if ($locale !== 'nl' && isset($service[$field . '_en'])) {
+			return $service[$field . '_en'];
+		}
+		return $service[$field . '_nl'] ?? '';
+	};
+
+	$h1       = $tx('h1');
+	$lead     = $tx('lead');
+	$pill     = $tx('pill');
+	$bullets  = $tx('bullets');
+	$ctaTitle = $tx('cta_title');
+	$ctaText  = $tx('cta_text');
 @endphp
 
 @section('title', $h1 . ' — Beter Geregeld ICT')

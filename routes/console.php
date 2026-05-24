@@ -61,6 +61,23 @@ Schedule::command('blog:generate-daily --skip-if-todays-post')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Wekelijkse retry voor backfill-translations en UI-lang-vertalingen.
+// Vult op natuurlijke wijze gaten op die ontstaan door:
+//   - Claude API-quota-resets (maandelijks)
+//   - sporadische tool_use-failures (chunk-1-misses bij lang:translate)
+//   - nieuwe NL-posts/UI-keys die nog geen vertaling hebben
+// Beide commands zijn idempotent — bestaande vertalingen worden niet opnieuw
+// gedaan, alleen gaten worden gevuld.
+Schedule::command('blog:backfill-translations en de fr es --delay=0')
+    ->weeklyOn(1, '04:00')   // maandag 04:00
+    ->onOneServer()
+    ->withoutOverlapping();
+
+Schedule::command('lang:translate en de fr es')
+    ->weeklyOn(1, '03:00')   // maandag 03:00 (vóór de blog-backfill)
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Vulnerability Radar — daily catalog + vuln feed refresh, then scan
 // every active asset. Order matters: catalog before vulns (so OSV
 // queries iterate the new catalog products), vulns before scan
