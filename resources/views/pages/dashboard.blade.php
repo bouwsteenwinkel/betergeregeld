@@ -4,7 +4,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 
 	$planBadgeClass = match ($plan->plan_key) {
 		'tools_pro' => 'pill-teal',

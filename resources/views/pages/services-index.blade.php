@@ -2,7 +2,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 @endphp
 
 @section('title', ($isEn ? 'All services' : 'Alle diensten') . ' — Beter Geregeld ICT')

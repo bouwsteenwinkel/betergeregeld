@@ -5,7 +5,11 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	// $isEn dient als binary-fallback voor de hardcoded NL/EN-content.
+	// Voor DE/FR/ES geven we EN i.p.v. NL — beter te begrijpen voor
+	// internationale bezoekers tot we per-locale-varianten toevoegen
+	// (services_catalog.php + services_faq.php uitbreiden met _de/_fr/_es).
+	$isEn = $locale !== 'nl';
 
 	$services = [
 		['slug' => 'cookie-banner-instellen',     'badge' => 'CookieGeregeld',   'title_nl' => 'Cookie banner laten instellen',      'title_en' => 'Cookie banner setup',              'desc_nl' => 'Categorieën, scripts en een nette technische basis voor consent.', 'desc_en' => 'Categories, scripts and a clean technical basis for consent.'],

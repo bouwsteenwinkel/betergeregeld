@@ -5,7 +5,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 
 	$icons = [
 		'credit-card' => '<path d="M3 8h18M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z M6 14h4"/>',

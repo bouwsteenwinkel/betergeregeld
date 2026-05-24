@@ -2,7 +2,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 	$stateColor = [
 		'has_access' => ['#ecfdf5', '#065f46', '#a7f3d0', '✓'],
 		'no_access' => ['#f8fafc', '#64748b', '#e2e8f0', '—'],

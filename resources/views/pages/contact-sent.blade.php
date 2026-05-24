@@ -2,7 +2,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 @endphp
 
 @section('title', ($isEn ? 'Thanks for your message' : 'Bedankt voor je bericht') . ' — Beter Geregeld ICT')

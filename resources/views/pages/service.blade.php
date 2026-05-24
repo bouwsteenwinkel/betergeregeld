@@ -2,7 +2,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 	$h1 = $isEn ? $service['h1_en'] : $service['h1_nl'];
 	$lead = $isEn ? $service['lead_en'] : $service['lead_nl'];
 	$pill = $isEn ? $service['pill_en'] : $service['pill_nl'];

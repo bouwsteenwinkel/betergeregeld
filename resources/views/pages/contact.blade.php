@@ -2,7 +2,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 
 	$topics = [
 		'cookie-banner-instellen' => $isEn ? 'Cookie banner setup' : 'Cookie banner instellen',

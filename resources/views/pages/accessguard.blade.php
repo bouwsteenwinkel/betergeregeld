@@ -2,7 +2,7 @@
 
 @php
 	$locale = app()->getLocale();
-	$isEn = $locale === 'en';
+	$isEn = $locale !== 'nl';
 @endphp
 
 @section('title', 'AccessGuard — ' . ($isEn ? 'Know who has access to what' : 'Zeker weten wie waar toegang heeft') . ' — ' . config('app.name'))
