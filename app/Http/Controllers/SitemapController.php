@@ -34,6 +34,8 @@ class SitemapController extends Controller
 			'ip-lookup', 'lego-lookup',
 			'json-formatter', 'diff',
 			'favicon-generator', 'speedtest', 'pdf-merge',
+			// Security / DNS / cert (2026-05-24)
+			'dns-inspector', 'mail-auth-check', 'ssl-check', 'security-headers', 'whois-lookup',
 		];
 
 		// Diensten uit config — alle slugs zijn publiek (services_catalog.php

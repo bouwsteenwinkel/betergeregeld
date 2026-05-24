@@ -165,6 +165,28 @@ Route::prefix('{locale}')
 
 			Route::get('/shipping-rates', [ShippingRatesController::class, 'show'])->name('shipping-rates');
 
+			// DNS / security / cert-tools — server-side lookups, geen externe API-keys.
+			Route::middleware('tool.limit:dns_inspector')->group(function () {
+				Route::get('/dns-inspector', [\App\Http\Controllers\Tools\DnsInspectorController::class, 'show'])->name('dns-inspector');
+				Route::post('/dns-inspector', [\App\Http\Controllers\Tools\DnsInspectorController::class, 'check'])->name('dns-inspector.check');
+			});
+			Route::middleware('tool.limit:mail_auth')->group(function () {
+				Route::get('/mail-auth-check', [\App\Http\Controllers\Tools\MailAuthCheckController::class, 'show'])->name('mail-auth');
+				Route::post('/mail-auth-check', [\App\Http\Controllers\Tools\MailAuthCheckController::class, 'check'])->name('mail-auth.check');
+			});
+			Route::middleware('tool.limit:ssl_check')->group(function () {
+				Route::get('/ssl-check', [\App\Http\Controllers\Tools\SslCheckController::class, 'show'])->name('ssl-check');
+				Route::post('/ssl-check', [\App\Http\Controllers\Tools\SslCheckController::class, 'check'])->name('ssl-check.check');
+			});
+			Route::middleware('tool.limit:headers')->group(function () {
+				Route::get('/security-headers', [\App\Http\Controllers\Tools\HeadersAnalyzerController::class, 'show'])->name('headers-analyzer');
+				Route::post('/security-headers', [\App\Http\Controllers\Tools\HeadersAnalyzerController::class, 'check'])->name('headers-analyzer.check');
+			});
+			Route::middleware('tool.limit:whois')->group(function () {
+				Route::get('/whois-lookup', [\App\Http\Controllers\Tools\WhoisLookupController::class, 'show'])->name('whois-lookup');
+				Route::post('/whois-lookup', [\App\Http\Controllers\Tools\WhoisLookupController::class, 'check'])->name('whois-lookup.check');
+			});
+
 			Route::middleware('tool.limit:lego_lookup')->group(function () {
 				Route::get('/lego-lookup', [LegoLookupController::class, 'show'])->name('lego-lookup');
 				Route::post('/lego-lookup', [LegoLookupController::class, 'check'])->name('lego-lookup.check');
