@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Monitor\Server;
+use App\Models\Seo\SeoImportsLog;
+use App\Models\Seo\SeoProperty;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -44,7 +46,68 @@ class MonitorCheckAlerts extends Command
 
 		$this->info("Klaar — {$changes} overgang(en) van " . $servers->count() . ' server(s).');
 
+		$this->checkSeoFreshness($to);
+
 		return self::SUCCESS;
+	}
+
+	/**
+	 * SEO-import-versheid: mailt — net als de server-alerts, alléén bij OVERGANG —
+	 * wanneer een GSC-property al > config('seo.freshness_alert_days') dagen geen
+	 * succesvolle import had (stale), en opnieuw één mail bij herstel. Zo valt een
+	 * stilgevallen import (scheduler/cron weg, of credential weg) niet meer
+	 * wekenlang ongemerkt uit.
+	 */
+	private function checkSeoFreshness(?string $to): void
+	{
+		$days = (int) config('seo.freshness_alert_days', 3);
+
+		foreach (SeoProperty::query()->where('is_active', true)->get() as $prop) {
+			$condition = $prop->freshnessCondition($days);
+			$previous = $prop->freshness_alert_state ?? 'ok';
+
+			if ($condition === $previous) {
+				continue;
+			}
+
+			$prop->forceFill([
+				'freshness_alert_state' => $condition,
+				'freshness_alerted_at'  => now(),
+			])->save();
+
+			$this->info("SEO [{$prop->label}]: {$previous} → {$condition}");
+
+			if (! $to) {
+				continue;
+			}
+
+			if ($condition === 'stale') {
+				$last = SeoImportsLog::query()
+					->where('property_id', $prop->id)
+					->where('status', 'success')
+					->latest('id')
+					->value('finished_at');
+				$when = $last
+					? \Illuminate\Support\Carbon::parse($last)->diffForHumans()
+					: 'nooit / geen succesvolle import';
+
+				$subject = "[SEO] ALERT: Search Console-import staat stil — {$prop->label}";
+				$body = "De Search Console-import voor '{$prop->label}' ({$prop->site_url}) is al > {$days} dagen niet succesvol geweest.\n\n"
+					. "Laatste succesvolle import: {$when}\n"
+					. 'Laatste foutmelding: ' . ($prop->last_import_error ?? '-') . "\n\n"
+					. "Controleer:\n"
+					. "  • draait de scheduler-cron (php artisan schedule:run) op de server?\n"
+					. "  • staat de service-account-JSON er (storage/app/google-api.json of GOOGLE_API_KEY_PATH)?\n\n"
+					. 'Handmatig bijwerken: php artisan seo:import-gsc';
+
+				Mail::raw($body, fn ($m) => $m->to($to)->subject($subject));
+			} elseif ($previous === 'stale') {
+				$subject = "[SEO] HERSTELD: Search Console-import draait weer — {$prop->label}";
+				$body = "De Search Console-import voor '{$prop->label}' ({$prop->site_url}) is weer up-to-date.";
+
+				Mail::raw($body, fn ($m) => $m->to($to)->subject($subject));
+			}
+		}
 	}
 
 	/**

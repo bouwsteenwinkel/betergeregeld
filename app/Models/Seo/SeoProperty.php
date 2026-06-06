@@ -20,6 +20,7 @@ class SeoProperty extends Model
 	protected $fillable = [
 		'tenant_id', 'site_url', 'label', 'is_active',
 		'last_imported_date', 'last_import_error',
+		'freshness_alert_state', 'freshness_alerted_at',
 	];
 
 	public function tenant(): BelongsTo
@@ -35,8 +36,29 @@ class SeoProperty extends Model
 	protected function casts(): array
 	{
 		return [
-			'is_active'          => 'boolean',
-			'last_imported_date' => 'date',
+			'is_active'            => 'boolean',
+			'last_imported_date'   => 'date',
+			'freshness_alerted_at' => 'datetime',
 		];
+	}
+
+	/**
+	 * Versheid van de GSC-import: 'stale' als er > $days dagen geen SUCCESVOLLE
+	 * import is geweest (gestopte scheduler óf telkens falende import), anders 'ok'.
+	 * Voedt de freshness-alert in monitor:check-alerts.
+	 */
+	public function freshnessCondition(int $days): string
+	{
+		$lastSuccess = SeoImportsLog::query()
+			->where('property_id', $this->id)
+			->where('status', 'success')
+			->latest('id')
+			->value('finished_at');
+
+		if (! $lastSuccess || \Illuminate\Support\Carbon::parse($lastSuccess)->lt(now()->subDays($days))) {
+			return 'stale';
+		}
+
+		return 'ok';
 	}
 }
