@@ -34,6 +34,15 @@ class SeoPropertiesTable
 					->date('d-m-Y')
 					->placeholder('Nooit')
 					->sortable(),
+				TextColumn::make('freshness_alert_state')
+					->label('Bewaking')
+					->badge()
+					->formatStateUsing(fn (?string $state) => $state === 'stale' ? 'Staat stil' : 'Vers')
+					->color(fn (?string $state) => $state === 'stale' ? 'danger' : 'success')
+					->icon(fn (?string $state) => $state === 'stale' ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
+					->tooltip(fn (SeoProperty $r) => $r->freshness_alerted_at
+						? 'Sinds ' . $r->freshness_alerted_at->diffForHumans()
+						: 'Nog geen statuswijziging'),
 				TextColumn::make('last_import_error')
 					->label('Laatste fout')
 					->placeholder('—')
