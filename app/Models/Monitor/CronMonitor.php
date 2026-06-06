@@ -57,12 +57,14 @@ class CronMonitor extends Model
 		'grace_minutes',
 		'is_active',
 		'alerts_enabled',
+		'is_source',
 		'notify_email',
 	];
 
 	protected $casts = [
 		'is_active'               => 'bool',
 		'alerts_enabled'          => 'bool',
+		'is_source'               => 'bool',
 		'expected_period_minutes' => 'int',
 		'grace_minutes'           => 'int',
 		'last_duration_ms'        => 'int',
@@ -157,6 +159,32 @@ class CronMonitor extends Model
 	}
 
 	/**
+	 * Vindt (of maakt idempotent aan) de onder-monitor voor een job onder deze
+	 * bron. De job-naam wordt geslugd en geprefixt met de bron-sleutel, zodat
+	 * jobs van verschillende bronnen niet botsen. period/grace komen van de ping
+	 * (de bron kent het interval het best) met de bron-defaults als terugval.
+	 */
+	public function childForJob(string $job, ?int $period = null, ?int $grace = null): CronMonitor
+	{
+		$slug = trim(preg_replace('/[^a-z0-9]+/', '-', strtolower($job)), '-');
+		$prefix = $this->source_key ?: substr($this->ping_token, 0, 8);
+
+		return static::firstOrCreate(
+			['source_key' => $prefix . ':' . $slug],
+			[
+				'name'                    => mb_substr($job, 0, 120),
+				'website'                 => $this->website,
+				'tenant_id'               => $this->tenant_id,
+				'expected_period_minutes' => ($period && $period > 0) ? $period : $this->expected_period_minutes,
+				'grace_minutes'           => ($grace !== null && $grace >= 0) ? $grace : $this->grace_minutes,
+				'description'             => 'Auto-geprovisioned via bron "' . $this->name . '".',
+				'alerts_enabled'          => true,
+				'is_active'               => true,
+			]
+		);
+	}
+
+	/**
 	 * Uiterste tijdstip waarop de volgende succes-ping binnen had moeten zijn.
 	 * Gerekend vanaf de laatste heartbeat (of, als die er nog niet is, vanaf het
 	 * aanmaken — zo krijgt een net-toegevoegde monitor eerst zijn eigen periode
@@ -177,6 +205,12 @@ class CronMonitor extends Model
 	 */
 	public function currentCondition(): string
 	{
+		// Een bron is een token-houder/container; zijn eigen heartbeat zegt niets
+		// (alleen de onder-monitors worden gepingd). Nooit alarmeren.
+		if ($this->is_source) {
+			return 'ok';
+		}
+
 		if ($this->last_status === 'fail') {
 			return 'failed';
 		}

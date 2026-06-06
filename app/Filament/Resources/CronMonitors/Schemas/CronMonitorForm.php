@@ -78,6 +78,11 @@ class CronMonitorForm
 							->label('Alerts aan')
 							->default(true)
 							->helperText('Mail bij te-laat / fout en bij herstel.'),
+						Toggle::make('is_source')
+							->label('Bron-modus')
+							->default(false)
+							->helperText('Aan = deze monitor maakt via ?job= automatisch onder-monitors aan (voor projecten met veel cron-jobs, bijv. Bouwsteenwinkel). De bron zelf alarmeert niet.')
+							->columnSpanFull(),
 						TextInput::make('notify_email')
 							->label('Meld-adres')
 							->email()

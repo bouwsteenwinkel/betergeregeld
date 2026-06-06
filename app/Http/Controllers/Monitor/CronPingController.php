@@ -40,6 +40,16 @@ class CronPingController extends Controller
 		$durationMs = $request->input('ms', $request->input('duration_ms'));
 		$message    = $request->input('msg', $request->input('message'));
 
+		// Bron-modus: één token, per ?job= een eigen onder-monitor (auto-aangemaakt).
+		$job = $request->input('job');
+		if ($monitor->is_source && is_string($job) && trim($job) !== '') {
+			$monitor = $monitor->childForJob(
+				$job,
+				$request->filled('period') ? (int) $request->input('period') : null,
+				$request->filled('grace') ? (int) $request->input('grace') : null,
+			);
+		}
+
 		$applied = $monitor->applyPing(
 			$signal,
 			$exitCode !== null ? (int) $exitCode : null,

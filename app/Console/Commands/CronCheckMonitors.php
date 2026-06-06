@@ -24,7 +24,7 @@ class CronCheckMonitors extends Command
 		$fallback = config('monitor.alert_email');
 		$changes = 0;
 
-		foreach (CronMonitor::query()->where('is_active', true)->where('alerts_enabled', true)->get() as $monitor) {
+		foreach (CronMonitor::query()->where('is_active', true)->where('alerts_enabled', true)->where('is_source', false)->get() as $monitor) {
 			$condition = $monitor->currentCondition();
 			$previous = $monitor->alert_state ?? 'ok';
 
