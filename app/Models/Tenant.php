@@ -48,8 +48,14 @@ class Tenant extends Model
 	protected $fillable = [
 		'name',
 		'plan',
-		'is_active'
+		'is_active',
+		'server_id'
 	];
+
+	public function server()
+	{
+		return $this->belongsTo(\App\Models\Monitor\Server::class);
+	}
 
 	public function case_events()
 	{

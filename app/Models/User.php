@@ -48,6 +48,15 @@ class User extends Authenticatable implements FilamentUser, HasName
 		return $this->email ?? 'user';
 	}
 
+	/**
+	 * Super-admins (the platform team) get full VPS monitoring; every other
+	 * tenant only sees the limited SLA/status view for its own server.
+	 */
+	public function isSuperAdmin(): bool
+	{
+		return $this->tenant_id === config('monitor.platform_tenant_id');
+	}
+
 	protected $table = 'users';
 	protected $keyType = 'string';
 	public $incrementing = false;

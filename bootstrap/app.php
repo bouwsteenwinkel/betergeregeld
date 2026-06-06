@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/*',
             'tools/speedtest/upload',
             'cmp/consent',
+            'monitor/ingest',
         ]);
 
         // Guests redirect to the login of their current locale (falling back

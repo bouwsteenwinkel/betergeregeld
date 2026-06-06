@@ -86,6 +86,10 @@ Route::get('/cmp/scripts.js', [\App\Http\Controllers\CmpController::class, 'scri
 Route::post('/cmp/consent',   [\App\Http\Controllers\CmpController::class, 'consent'])->name('cmp.consent');
 Route::options('/cmp/consent',[\App\Http\Controllers\CmpController::class, 'consentOptions']);
 
+// VPS monitoring ingest — host collectors POST samples here, authenticated by a
+// per-server token (Bearer / X-Monitor-Token). Locale-agnostic + CSRF-exempt.
+Route::post('/monitor/ingest', \App\Http\Controllers\Monitor\IngestController::class)->name('monitor.ingest');
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)
