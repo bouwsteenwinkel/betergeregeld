@@ -27,6 +27,12 @@ Schedule::command('monitor:run-checks')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Cron-monitoring — mail bij overgangen (ok/late/failed) van bewaakte cron-jobs.
+Schedule::command('cron:check-monitors')
+    ->everyFiveMinutes()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 Schedule::command('bookkeeping:send-invoice-reminders')
     ->dailyAt('08:00')
     ->onOneServer()

@@ -90,6 +90,11 @@ Route::options('/cmp/consent',[\App\Http\Controllers\CmpController::class, 'cons
 // per-server token (Bearer / X-Monitor-Token). Locale-agnostic + CSRF-exempt.
 Route::post('/monitor/ingest', \App\Http\Controllers\Monitor\IngestController::class)->name('monitor.ingest');
 
+// Cron-monitoring heartbeat — bewaakte jobs pingen hun ping_token (GET of POST).
+// {signal} = success (default) | start | fail. Locale-agnostisch + CSRF-exempt.
+Route::match(['get', 'post'], '/cron/ping/{token}/{signal?}', \App\Http\Controllers\Monitor\CronPingController::class)
+	->name('cron.ping');
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)

@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Monitor\CronPing;
 use App\Models\Monitor\Metric;
 use Illuminate\Console\Command;
 
 /**
- * Houdt monitor_metrics begrensd: verwijdert samples ouder dan de
+ * Houdt monitor_metrics én cron_pings begrensd: verwijdert rijen ouder dan de
  * retentieperiode (config/monitor.php → retention_days). Chunked delete zodat
  * een grote achterstand de DB niet in één query belast.
  */
@@ -34,7 +35,13 @@ class MonitorPruneMetrics extends Command
 			$total += $deleted;
 		} while ($deleted > 0);
 
-		$this->info("Verwijderd: {$total} samples ouder dan {$days} dagen (vóór {$cutoff->toDateTimeString()}).");
+		$pings = 0;
+		do {
+			$deleted = CronPing::where('received_at', '<', $cutoff)->limit(5000)->delete();
+			$pings += $deleted;
+		} while ($deleted > 0);
+
+		$this->info("Verwijderd: {$total} metric-samples + {$pings} cron-pings ouder dan {$days} dagen (vóór {$cutoff->toDateTimeString()}).");
 
 		return self::SUCCESS;
 	}
