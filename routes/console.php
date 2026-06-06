@@ -8,6 +8,19 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// VPS-monitoring — prune metric-samples ouder dan config('monitor.retention_days').
+// 02:00 is een rustig slot vóór de bookkeeping/radar-jobs.
+Schedule::command('monitor:prune-metrics')
+    ->dailyAt('02:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
+// VPS-monitoring — mail bij offline/volle-schijf-overgangen (alleen bij wijziging).
+Schedule::command('monitor:check-alerts')
+    ->everyFiveMinutes()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 Schedule::command('bookkeeping:send-invoice-reminders')
     ->dailyAt('08:00')
     ->onOneServer()

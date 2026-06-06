@@ -37,4 +37,9 @@ return [
 	 * rows so the time-series table stays bounded.
 	 */
 	'retention_days' => (int) env('MONITOR_RETENTION_DAYS', 30),
+
+	/*
+	 * Where offline/disk alert mails go. Defaults to the platform inbox.
+	 */
+	'alert_email' => env('MONITOR_ALERT_EMAIL', 'info@bouwsteenwinkel.nl'),
 ];

@@ -39,6 +39,10 @@ class MonitorServerForm
 							->label('Actief')
 							->default(true)
 							->helperText('Inactieve servers weigeren ingest en tellen niet mee in overzichten.'),
+						Toggle::make('alerts_enabled')
+							->label('Alerts aan')
+							->default(true)
+							->helperText('Mail bij offline gaan of volle schijf.'),
 					]),
 
 				Section::make('Collector')

@@ -39,13 +39,16 @@ class Server extends Model
 		'provider',
 		'location',
 		'is_active',
+		'alerts_enabled',
 		'ingest_token',
 		'notes',
 	];
 
 	protected $casts = [
 		'is_active' => 'bool',
+		'alerts_enabled' => 'bool',
 		'agent_last_seen_at' => 'datetime',
+		'alerted_at' => 'datetime',
 		'last_cpu_percent' => 'float',
 		'last_mem_percent' => 'float',
 		'last_disk_percent' => 'float',
@@ -86,6 +89,24 @@ class Server extends Model
 			$age >= (int) config('monitor.offline_after') => 'offline',
 			default => 'stale',
 		};
+	}
+
+	/**
+	 * Alert-waardige toestand: offline (heartbeat weg) of disk (schijf vol).
+	 * CPU/RAM worden bewust niet gealarmeerd — die pieken te vaak. Een server
+	 * die nog nooit contact had (status 'unknown') telt als ok (net toegevoegd).
+	 */
+	public function currentCondition(): string
+	{
+		if ($this->status() === 'offline') {
+			return 'offline';
+		}
+
+		if ($this->last_disk_percent !== null && $this->last_disk_percent >= (int) config('monitor.disk_warn')) {
+			return 'disk';
+		}
+
+		return 'ok';
 	}
 
 	/**
