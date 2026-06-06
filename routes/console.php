@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\Monitor\CronMonitorPinger;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -33,25 +34,44 @@ Schedule::command('cron:check-monitors')
     ->onOneServer()
     ->withoutOverlapping();
 
-Schedule::command('bookkeeping:send-invoice-reminders')
-    ->dailyAt('08:00')
+// Cron-monitoring — zorg dat de interne jobs als monitor bestaan (idempotent).
+Schedule::command('cron:provision-internal')
+    ->dailyAt('00:05')
     ->onOneServer()
     ->withoutOverlapping();
 
-Schedule::command('bookkeeping:generate-recurring-invoices')
-    ->dailyAt('06:00')
-    ->onOneServer()
-    ->withoutOverlapping();
+// De onderstaande dagelijkse jobs bewaken zichzelf: CronMonitorPinger::watch()
+// hangt success/failure-hooks aan de taak en pingt de bijbehorende cron-monitor
+// (config('monitor.internal_crons')) in-process. Zo zien we het meteen als een
+// van deze jobs faalt of stilvalt — zonder externe ping-URL.
+CronMonitorPinger::watch(
+    Schedule::command('bookkeeping:send-invoice-reminders')
+        ->dailyAt('08:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'bookkeeping:send-invoice-reminders'
+);
+
+CronMonitorPinger::watch(
+    Schedule::command('bookkeeping:generate-recurring-invoices')
+        ->dailyAt('06:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'bookkeeping:generate-recurring-invoices'
+);
 
 Schedule::command('accessguard:sync-directories')
     ->dailyAt('02:30')
     ->onOneServer()
     ->withoutOverlapping();
 
-Schedule::command('accessguard:scan-risks')
-    ->dailyAt('03:00')
-    ->onOneServer()
-    ->withoutOverlapping();
+CronMonitorPinger::watch(
+    Schedule::command('accessguard:scan-risks')
+        ->dailyAt('03:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'accessguard:scan-risks'
+);
 
 Schedule::command('accessguard:build-reminders')
     ->dailyAt('03:15')
@@ -66,25 +86,34 @@ Schedule::command('accessguard:send-digests')
 // SEO — Google Search Console daily import naar seo_query_daily.
 // GSC's 'final' data heeft 2-3 dagen lag, dus exacte uur is niet kritiek.
 // 04:30 is een vrij slot tussen radar:sync-vulns (04:15) en radar:scan (05:00).
-Schedule::command('seo:import-gsc')
-    ->dailyAt('04:30')
-    ->onOneServer()
-    ->withoutOverlapping();
+CronMonitorPinger::watch(
+    Schedule::command('seo:import-gsc')
+        ->dailyAt('04:30')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'seo:import-gsc'
+);
 
 // PageSpeed Insights — top-3 URLs per property, mobile + desktop. Loopt
 // na GSC-import zodat de URL-selectie de meest verse top-clicks pakt.
-Schedule::command('seo:run-psi')
-    ->dailyAt('05:00')
-    ->onOneServer()
-    ->withoutOverlapping();
+CronMonitorPinger::watch(
+    Schedule::command('seo:run-psi')
+        ->dailyAt('05:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'seo:run-psi'
+);
 
 // Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
 // gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
 // de mail rond koffietijd binnenkomt.
-Schedule::command('blog:generate-daily --skip-if-todays-post')
-    ->dailyAt('09:00')
-    ->onOneServer()
-    ->withoutOverlapping();
+CronMonitorPinger::watch(
+    Schedule::command('blog:generate-daily --skip-if-todays-post')
+        ->dailyAt('09:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'blog:generate-daily'
+);
 
 // Wekelijkse retry voor backfill-translations en UI-lang-vertalingen.
 // Vult op natuurlijke wijze gaten op die ontstaan door:
@@ -117,10 +146,13 @@ Schedule::command('radar:sync-vulns')
     ->onOneServer()
     ->withoutOverlapping();
 
-Schedule::command('radar:scan --all-active')
-    ->dailyAt('05:00')
-    ->onOneServer()
-    ->withoutOverlapping(120);
+CronMonitorPinger::watch(
+    Schedule::command('radar:scan --all-active')
+        ->dailyAt('05:00')
+        ->onOneServer()
+        ->withoutOverlapping(120),
+    'radar:scan'
+);
 
 // Security-headers probe — apart van de fingerprint/vuln-scan zodat een
 // trage doelsite de queue-worker niet 2 minuten lang vasthoudt. Queue

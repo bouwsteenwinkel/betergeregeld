@@ -42,4 +42,20 @@ return [
 	 * Where offline/disk alert mails go. Defaults to the platform inbox.
 	 */
 	'alert_email' => env('MONITOR_ALERT_EMAIL', 'info@bouwsteenwinkel.nl'),
+
+	/*
+	 * Interne Laravel-scheduler-jobs die zichzelf bewaken via de cron-monitor
+	 * (dead-man's-switch). Elke entry wordt idempotent geprovisioned tot een
+	 * cron_monitors-rij (op source_key); de scheduler-hooks in routes/console.php
+	 * pingen 'm bij success/failure. period/grace in minuten (1440 = dagelijks).
+	 */
+	'internal_crons' => [
+		['key' => 'seo:import-gsc',                          'name' => 'SEO · GSC-import',                    'period' => 1440, 'grace' => 240, 'website' => 'betergeregeld.com'],
+		['key' => 'seo:run-psi',                             'name' => 'SEO · PageSpeed Insights',            'period' => 1440, 'grace' => 240, 'website' => 'betergeregeld.com'],
+		['key' => 'bookkeeping:generate-recurring-invoices', 'name' => 'Boekhouding · terugkerende facturen', 'period' => 1440, 'grace' => 120],
+		['key' => 'bookkeeping:send-invoice-reminders',      'name' => 'Boekhouding · factuurherinneringen',  'period' => 1440, 'grace' => 120],
+		['key' => 'accessguard:scan-risks',                  'name' => 'AccessGuard · risico-scan',           'period' => 1440, 'grace' => 180],
+		['key' => 'radar:scan',                              'name' => 'Vulnerability Radar · scan',          'period' => 1440, 'grace' => 180],
+		['key' => 'blog:generate-daily',                     'name' => 'Blog · dagelijkse generatie',         'period' => 1440, 'grace' => 180],
+	],
 ];

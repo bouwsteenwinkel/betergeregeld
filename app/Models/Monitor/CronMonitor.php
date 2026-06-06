@@ -51,6 +51,7 @@ class CronMonitor extends Model
 		'website',
 		'name',
 		'ping_token',
+		'source_key',
 		'description',
 		'expected_period_minutes',
 		'grace_minutes',
@@ -88,6 +89,71 @@ class CronMonitor extends Model
 	public function pings(): HasMany
 	{
 		return $this->hasMany(CronPing::class);
+	}
+
+	/**
+	 * Verwerkt één binnenkomende ping: legt de ruwe regel vast (cron_pings) én
+	 * werkt de gedenormaliseerde laatste-stand bij. Gedeeld door de HTTP-endpoint
+	 * (externe jobs) en de in-process scheduler-hooks (eigen Laravel-jobs).
+	 *
+	 * Een success met een exit-code != 0 telt automatisch als fout. Bij success
+	 * verschuift de heartbeat (last_ping_at) en wordt een foutstand gewist; bij
+	 * fail blijft last_ping_at staan zodat dezelfde run niet óók 'late' wordt.
+	 *
+	 * @return string Het uiteindelijk toegepaste signaal (start|success|fail).
+	 */
+	public function applyPing(
+		string $signal = 'success',
+		?int $exitCode = null,
+		?int $durationMs = null,
+		?string $message = null,
+		?string $sourceIp = null,
+	): string {
+		$signal = strtolower($signal);
+		if (! in_array($signal, ['success', 'start', 'fail'], true)) {
+			$signal = 'success';
+		}
+		if ($signal === 'success' && $exitCode !== null && $exitCode !== 0) {
+			$signal = 'fail';
+		}
+
+		$now = now();
+		$msg = $message !== null ? mb_substr($message, 0, 500) : null;
+
+		$this->pings()->create([
+			'status'      => $signal,
+			'exit_code'   => $exitCode,
+			'duration_ms' => $durationMs,
+			'message'     => $msg,
+			'source_ip'   => $sourceIp,
+			'received_at' => $now,
+		]);
+
+		$update = ['last_status' => $signal];
+
+		if ($signal === 'start') {
+			$update['last_started_at'] = $now;
+			if ($msg !== null) {
+				$update['last_message'] = $msg;
+			}
+		} elseif ($signal === 'success') {
+			$update['last_ping_at']     = $now;
+			$update['last_duration_ms'] = $durationMs;
+			$update['last_exit_code']   = null;
+			$update['last_message']     = $msg;
+		} else { // fail
+			$update['last_exit_code'] = $exitCode;
+			if ($durationMs !== null) {
+				$update['last_duration_ms'] = $durationMs;
+			}
+			if ($msg !== null) {
+				$update['last_message'] = $msg;
+			}
+		}
+
+		$this->forceFill($update)->save();
+
+		return $signal;
 	}
 
 	/**

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Monitor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Monitor\CronMonitor;
-use App\Models\Monitor\CronPing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -41,50 +40,19 @@ class CronPingController extends Controller
 		$durationMs = $request->input('ms', $request->input('duration_ms'));
 		$message    = $request->input('msg', $request->input('message'));
 
-		// Een fail kan ook impliciet zijn: success-signaal met een exit-code != 0.
-		if ($signal === 'success' && $exitCode !== null && (int) $exitCode !== 0) {
-			$signal = 'fail';
-		}
-
-		$now = now();
-
-		CronPing::create([
-			'cron_monitor_id' => $monitor->id,
-			'status'          => $signal,
-			'exit_code'       => $exitCode !== null ? (int) $exitCode : null,
-			'duration_ms'     => $durationMs !== null ? (int) $durationMs : null,
-			'message'         => $message !== null ? mb_substr((string) $message, 0, 500) : null,
-			'source_ip'       => $request->ip(),
-			'received_at'     => $now,
-		]);
-
-		$update = [
-			'last_status'  => $signal,
-			'last_message' => $message !== null ? mb_substr((string) $message, 0, 500) : $monitor->last_message,
-		];
-
-		if ($signal === 'start') {
-			$update['last_started_at'] = $now;
-		} elseif ($signal === 'success') {
-			// Heartbeat: dit verzet de deadline en wist een eventuele foutstand.
-			$update['last_ping_at']     = $now;
-			$update['last_duration_ms'] = $durationMs !== null ? (int) $durationMs : null;
-			$update['last_exit_code']   = null;
-			$update['last_message']     = $message !== null ? mb_substr((string) $message, 0, 500) : null;
-		} elseif ($signal === 'fail') {
-			// Geen heartbeat: last_ping_at blijft staan, zodat de checker een fout
-			// meldt maar niet alsnog 'late' rekent op dezelfde run.
-			$update['last_exit_code']   = $exitCode !== null ? (int) $exitCode : null;
-			$update['last_duration_ms'] = $durationMs !== null ? (int) $durationMs : $monitor->last_duration_ms;
-		}
-
-		$monitor->forceFill($update)->save();
+		$applied = $monitor->applyPing(
+			$signal,
+			$exitCode !== null ? (int) $exitCode : null,
+			$durationMs !== null ? (int) $durationMs : null,
+			$message !== null ? (string) $message : null,
+			$request->ip(),
+		);
 
 		return response()->json([
 			'ok'          => true,
 			'monitor'     => $monitor->name,
-			'signal'      => $signal,
-			'received_at' => $now->toIso8601String(),
+			'signal'      => $applied,
+			'received_at' => now()->toIso8601String(),
 		]);
 	}
 }
