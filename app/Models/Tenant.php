@@ -57,6 +57,11 @@ class Tenant extends Model
 		return $this->belongsTo(\App\Models\Monitor\Server::class);
 	}
 
+	public function seoProperties()
+	{
+		return $this->hasMany(\App\Models\Seo\SeoProperty::class, 'tenant_id');
+	}
+
 	public function case_events()
 	{
 		return $this->hasMany(CaseEvent::class);

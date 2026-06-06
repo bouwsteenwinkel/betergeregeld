@@ -2,7 +2,10 @@
 
 namespace App\Models\Seo;
 
+use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Eén GSC-property die we monitoren. site_url is óf 'sc-domain:host' óf
@@ -15,9 +18,19 @@ class SeoProperty extends Model
 	protected $table = 'seo_properties';
 
 	protected $fillable = [
-		'site_url', 'label', 'is_active',
+		'tenant_id', 'site_url', 'label', 'is_active',
 		'last_imported_date', 'last_import_error',
 	];
+
+	public function tenant(): BelongsTo
+	{
+		return $this->belongsTo(Tenant::class);
+	}
+
+	public function queries(): HasMany
+	{
+		return $this->hasMany(SeoQueryDaily::class, 'property_id');
+	}
 
 	protected function casts(): array
 	{
