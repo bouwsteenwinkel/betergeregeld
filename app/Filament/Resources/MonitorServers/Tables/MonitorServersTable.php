@@ -43,20 +43,22 @@ class MonitorServersTable
 						default => 'gray',
 					}),
 
-				TextColumn::make('last_cpu_percent')
-					->label('CPU')
-					->formatStateUsing(fn (?float $state) => $state === null ? '—' : rtrim(rtrim(number_format($state, 1), '0'), '.') . '%')
-					->color(fn (?float $state) => $state !== null && $state >= (int) config('monitor.cpu_warn') ? 'danger' : null),
+				// CPU / RAM / Disk gebundeld in één compacte kolom — scheelt twee
+				// kolombreedtes zodat de tabel binnen ~1900px past. Wordt rood zodra
+				// één van de drie zijn waarschuwingsdrempel overschrijdt.
+				TextColumn::make('resources')
+					->label('CPU / RAM / Disk')
+					->state(function (Server $r) {
+						$fmt = fn (?float $v) => $v === null ? '—' : rtrim(rtrim(number_format($v, 1), '0'), '.') . '%';
 
-				TextColumn::make('last_mem_percent')
-					->label('RAM')
-					->formatStateUsing(fn (?float $state) => $state === null ? '—' : rtrim(rtrim(number_format($state, 1), '0'), '.') . '%')
-					->color(fn (?float $state) => $state !== null && $state >= (int) config('monitor.mem_warn') ? 'danger' : null),
-
-				TextColumn::make('last_disk_percent')
-					->label('Disk')
-					->formatStateUsing(fn (?float $state) => $state === null ? '—' : rtrim(rtrim(number_format($state, 1), '0'), '.') . '%')
-					->color(fn (?float $state) => $state !== null && $state >= (int) config('monitor.disk_warn') ? 'danger' : null),
+						return $fmt($r->last_cpu_percent) . '  ·  ' . $fmt($r->last_mem_percent) . '  ·  ' . $fmt($r->last_disk_percent);
+					})
+					->color(fn (Server $r) => (
+						($r->last_cpu_percent !== null && $r->last_cpu_percent >= (int) config('monitor.cpu_warn'))
+						|| ($r->last_mem_percent !== null && $r->last_mem_percent >= (int) config('monitor.mem_warn'))
+						|| ($r->last_disk_percent !== null && $r->last_disk_percent >= (int) config('monitor.disk_warn'))
+					) ? 'danger' : null)
+					->tooltip('Drempels: CPU ' . config('monitor.cpu_warn') . '% · RAM ' . config('monitor.mem_warn') . '% · Disk ' . config('monitor.disk_warn') . '%'),
 
 				TextColumn::make('agent_last_seen_at')
 					->label('Laatste contact')

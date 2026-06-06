@@ -32,6 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Beter Geregeld — Admin')
             ->favicon(asset('favicon.ico'))
             ->maxContentWidth(Width::Full)
+            // Smaller linkermenu (default 20rem) zodat brede tabellen binnen ~1900px passen.
+            ->sidebarWidth('15rem')
             ->colors([
                 'primary' => Color::Teal,
                 'gray' => Color::Slate,
