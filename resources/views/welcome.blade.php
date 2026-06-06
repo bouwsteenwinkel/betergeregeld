@@ -81,21 +81,21 @@
 	<div class="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-[color:var(--color-accent)] opacity-10 blur-3xl"></div>
 	<div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[color:var(--color-accent)] opacity-5 blur-3xl"></div>
 
-	<div class="relative max-w-[1400px] mx-auto px-6 py-24 sm:py-32">
+	<div class="relative max-w-[1400px] mx-auto px-6 pt-16 pb-24 sm:py-32">
 		<div class="max-w-4xl">
 			<span class="pill pill-dark mb-6 max-w-full">
 				<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
-				{{ $isEn ? 'Since 1989, modern tech, no fuss' : 'Sinds 1989, moderne techniek, zonder gedoe' }}
+				{{ $isEn ? 'Since 1989: VOS, ICM, now Beter Geregeld' : 'Sinds 1989: VOS, ICM, nu Beter Geregeld' }}
 			</span>
 			<h1 class="display-1 mb-6">
 				{{ $isEn ? 'We build what' : 'Wij bouwen wat' }}
 				<span class="accent-word">{{ $isEn ? 'works.' : 'werkt.' }}</span><br>
-				{{ $isEn ? 'Not more, not less.' : 'Niet meer, niet minder.' }}
+				{{ $isEn ? 'And stay reachable.' : 'En blijven bereikbaar.' }}
 			</h1>
 			<p class="text-lg sm:text-xl text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl mb-10">
 				{{ $isEn
-					? 'Custom web applications, customer portals, API integrations and process automation. We turn real-world operational bottlenecks into clear technical solutions that actually ship.'
-					: 'Maatwerk webapplicaties, klantportalen, API-koppelingen en procesautomatisering. We vertalen echte bedrijfs­knelpunten naar duidelijke technische oplossingen die ook live gaan.' }}
+					? 'Custom web applications, customer portals, API integrations and process automation. For organisations stuck with separate systems that don\'t talk to each other.'
+					: 'Maatwerk webapplicaties, klantportalen, API-koppelingen en procesautomatisering. Voor organisaties die vastlopen op losse systemen die niet met elkaar praten.' }}
 			</p>
 			<div class="flex flex-wrap gap-3 mb-12">
 				<a href="/{{ $locale }}/diensten" class="btn-accent">
