@@ -43,8 +43,12 @@
 			</div>
 
 			<p class="mt-4 text-xs text-gray-400 dark:text-gray-500">
-				Beschikbaarheid wordt gemeten via de heartbeat van de monitoring-agent
-				(ontvangen metingen ÷ verwachte metingen per periode).
+				@if ($data['uptime_source'] === 'checks')
+					Beschikbaarheid wordt gemeten via actieve uptime-checks (HTTP/TCP) op deze server.
+				@else
+					Beschikbaarheid wordt gemeten via de heartbeat van de monitoring-agent
+					(ontvangen metingen ÷ verwachte metingen per periode).
+				@endif
 			</p>
 		</x-filament::section>
 	@endif

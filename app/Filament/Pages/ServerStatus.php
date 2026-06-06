@@ -64,13 +64,19 @@ class ServerStatus extends Page
 
 		[$label, $color] = $map[$server->status()] ?? $map['unknown'];
 
+		// Echte HTTP/TCP-checks zijn een hardere uptime-bron; val terug op de
+		// heartbeat-meting als er (nog) geen checkresultaten zijn.
+		$check24 = $server->checkUptimePercent(24);
+		$check30 = $server->checkUptimePercent(24 * 30);
+
 		return [
-			'name'         => $server->name,
-			'status_label' => $label,
-			'status_color' => $color,
-			'last_seen'    => $server->agent_last_seen_at,
-			'uptime_24h'   => $server->uptimePercent(24),
-			'uptime_30d'   => $server->uptimePercent(24 * 30),
+			'name'          => $server->name,
+			'status_label'  => $label,
+			'status_color'  => $color,
+			'last_seen'     => $server->agent_last_seen_at,
+			'uptime_24h'    => $check24 ?? $server->uptimePercent(24),
+			'uptime_30d'    => $check30 ?? $server->uptimePercent(24 * 30),
+			'uptime_source' => $check24 !== null ? 'checks' : 'heartbeat',
 		];
 	}
 }

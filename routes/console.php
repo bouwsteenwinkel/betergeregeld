@@ -21,6 +21,12 @@ Schedule::command('monitor:check-alerts')
     ->onOneServer()
     ->withoutOverlapping();
 
+// VPS-monitoring — HTTP/TCP-uptimechecks uitvoeren (voedt de SLA per server).
+Schedule::command('monitor:run-checks')
+    ->everyFiveMinutes()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 Schedule::command('bookkeeping:send-invoice-reminders')
     ->dailyAt('08:00')
     ->onOneServer()

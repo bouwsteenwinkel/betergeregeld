@@ -73,6 +73,38 @@ class Server extends Model
 		return $this->hasMany(Tenant::class);
 	}
 
+	public function checks(): HasMany
+	{
+		return $this->hasMany(Check::class);
+	}
+
+	/**
+	 * Uptime op basis van echte HTTP/TCP-checks van deze server. Null als er
+	 * geen actieve checks of nog geen resultaten zijn (dan valt de SLA terug
+	 * op de heartbeat-meting).
+	 */
+	public function checkUptimePercent(int $hours = 24): ?float
+	{
+		$checkIds = $this->checks()->where('is_active', true)->pluck('id');
+
+		if ($checkIds->isEmpty()) {
+			return null;
+		}
+
+		$query = CheckResult::whereIn('check_id', $checkIds)
+			->where('checked_at', '>=', now()->subHours($hours));
+
+		$total = $query->count();
+
+		if ($total === 0) {
+			return null;
+		}
+
+		$up = (clone $query)->where('status', 'up')->count();
+
+		return round($up / $total * 100, 2);
+	}
+
 	/**
 	 * online | stale | offline | unknown — derived from heartbeat recency.
 	 */
