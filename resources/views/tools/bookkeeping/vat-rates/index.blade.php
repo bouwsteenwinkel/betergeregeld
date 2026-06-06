@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('BTW-tarieven') . ' — ' . config('app.name'))
+@section('title', __('BTW-tarieven') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -64,7 +64,7 @@
 								<td class="py-2 pr-3">{{ $r->name }}</td>
 								<td class="py-2 px-3 text-right tabular-nums font-mono">{{ $fmtRate($r->rate) }}</td>
 								<td class="py-2 px-3 tabular-nums text-[color:var(--color-ink-muted)]">{{ $r->effective_from?->format('d-m-Y') }}</td>
-								<td class="py-2 px-3 tabular-nums text-[color:var(--color-ink-muted)]">{{ $r->effective_to?->format('d-m-Y') ?? '—' }}</td>
+								<td class="py-2 px-3 tabular-nums text-[color:var(--color-ink-muted)]">{{ $r->effective_to?->format('d-m-Y') ?? ', ' }}</td>
 								<td class="py-2 px-3">
 									@if ($r->is_default)
 										<span class="pill pill-teal text-[10px]">{{ __('Standaard') }}</span>

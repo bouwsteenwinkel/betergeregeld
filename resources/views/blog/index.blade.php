@@ -2,11 +2,11 @@
 
 @php $locale = app()->getLocale(); @endphp
 
-@section('title', 'Blog — ' . config('app.name'))
+@section('title', 'Blog, ' . config('app.name'))
 @section('description', 'Praktische gidsen over toegangsbeheer, IT-governance, compliance en MKB-administratie. Geschreven door het Betergeregeld-team.')
 
 @push('head')
-	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} — Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
+	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }}, Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
 @endpush
 
 @section('content')
@@ -16,7 +16,7 @@
 <div class="blog-root">
 	<div class="blog-hero">
 		<h1>Blog</h1>
-		<p>Praktische gidsen over toegangsbeheer, IT-governance, compliance en MKB-administratie — direct bruikbaar, zonder jargon.</p>
+		<p>Praktische gidsen over toegangsbeheer, IT-governance, compliance en MKB-administratie, direct bruikbaar, zonder jargon.</p>
 	</div>
 
 	<div class="blog-section">

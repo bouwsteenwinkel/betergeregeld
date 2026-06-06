@@ -5,7 +5,7 @@
 	$isEn = $locale !== 'nl';
 @endphp
 
-@section('title', ($isEn ? 'All services' : 'Alle diensten') . ' — Beter Geregeld ICT')
+@section('title', ($isEn ? 'All services' : 'Alle diensten') . ', Beter Geregeld ICT')
 @section('description', $isEn ? 'Overview of all services: custom websites, portals, integrations, security, performance and optimisation.' : 'Overzicht van alle diensten: maatwerk websites, portals, koppelingen, beveiliging, performance en optimalisatie.')
 
 @section('content')

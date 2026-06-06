@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($category ? __('Categorie bewerken') : __('Nieuwe categorie')) . ' — ' . config('app.name'))
+@section('title', ($category ? __('Categorie bewerken') : __('Nieuwe categorie')) . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -52,7 +52,7 @@
 				<input id="sort_order" name="sort_order" type="number" min="0" max="65535"
 					value="{{ old('sort_order', $category->sort_order ?? 100) }}" class="field-input w-32">
 				<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5">
-					{{ __('Lagere nummers verschijnen eerst. Standaard-categorieën staan op 0–310.') }}
+					{{ __('Lagere nummers verschijnen eerst. Standaard-categorieën staan op 0-310.') }}
 				</p>
 			</div>
 

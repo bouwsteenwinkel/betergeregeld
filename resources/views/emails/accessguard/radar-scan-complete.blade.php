@@ -21,7 +21,7 @@
 - **Software gedetecteerd:** {{ $scan->detections_count }}
 - **Bevindingen:** {{ $scan->findings_count }}
 - **Gestart:** {{ $scan->started_at?->format('d-m-Y H:i:s') }}
-- **Duur:** @if ($scan->started_at && $scan->finished_at) {{ round($scan->started_at->diffInMilliseconds($scan->finished_at) / 1000, 2) }}s @else — @endif
+- **Duur:** @if ($scan->started_at && $scan->finished_at) {{ round($scan->started_at->diffInMilliseconds($scan->finished_at) / 1000, 2) }}s @else, @endif
 
 @if (array_sum($totals) > 0)
 ## Open bevindingen
@@ -38,7 +38,7 @@
 ## Top {{ $topFindings->count() }} ({{ count($topFindings) }} van {{ $totals['critical'] + $totals['high'] }} kritiek/hoog)
 
 @foreach ($topFindings as $f)
-- **{{ $f->vulnerability?->cve_id ?? 'Finding #' . $f->id }}** ({{ $f->severity }}, score {{ $f->risk_score }})@if ($f->vulnerability?->cisa_kev) — *actief misbruikt (CISA KEV)*@endif
+- **{{ $f->vulnerability?->cve_id ?? 'Finding #' . $f->id }}** ({{ $f->severity }}, score {{ $f->risk_score }})@if ($f->vulnerability?->cisa_kev), *actief misbruikt (CISA KEV)*@endif
   {{ \Illuminate\Support\Str::limit($f->vulnerability?->description ?? '', 180) }}
 @endforeach
 @endif

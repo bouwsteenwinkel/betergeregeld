@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($invoice ? __('Factuur bewerken') : __('Nieuwe factuur')) . ' — ' . config('app.name'))
+@section('title', ($invoice ? __('Factuur bewerken') : __('Nieuwe factuur')) . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -34,7 +34,7 @@
 				<div>
 					<label for="relation_id" class="block text-sm font-semibold mb-2">{{ __('Klant') }}</label>
 					<select id="relation_id" name="relation_id" required class="field-input">
-						<option value="">—</option>
+						<option value="">, </option>
 						@foreach ($relations as $r)
 							<option value="{{ $r->id }}" @selected((int) old('relation_id', $invoice->relation_id ?? 0) === $r->id)>{{ $r->name }}</option>
 						@endforeach
@@ -89,7 +89,7 @@
 							<input type="number" name="lines[{{ $i }}][unit_price]" step="0.01" min="0" required placeholder="{{ __('Stuksprijs') }}"
 								value="{{ old('lines.' . $i . '.unit_price', $line['unit_price']) }}" class="field-input font-mono">
 							<select name="lines[{{ $i }}][vat_rate_id]" class="field-input">
-								<option value="">— {{ __('Geen BTW') }}</option>
+								<option value="">, {{ __('Geen BTW') }}</option>
 								@foreach ($vatRates as $vr)
 									<option value="{{ $vr->id }}" @selected((int) old('lines.' . $i . '.vat_rate_id', $line['vat_rate_id'] ?? 0) === $vr->id)>{{ $vr->name }}</option>
 								@endforeach
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const i = nextIndex();
 		const div = document.createElement('div');
 		div.className = 'line-row grid grid-cols-1 sm:grid-cols-[3fr_1fr_1.5fr_1fr_auto] gap-2 items-start';
-		let vatOpts = '<option value="">— @json(__('Geen BTW')) —</option>';
+		let vatOpts = '<option value="">, @json(__('Geen BTW')), </option>';
 		vatOptions.forEach(v => vatOpts += `<option value="${v.id}">${v.name}</option>`);
 		div.innerHTML = `
 			<input type="text" name="lines[${i}][description]" placeholder="@json(__('Omschrijving'))" maxlength="500" required class="field-input">

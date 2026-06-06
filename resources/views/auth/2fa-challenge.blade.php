@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Twee-staps verificatie') . ' — ' . config('app.name'))
+@section('title', __('Twee-staps verificatie') . ', ' . config('app.name'))
 @section('robots', 'noindex,nofollow')
 
 @section('content')

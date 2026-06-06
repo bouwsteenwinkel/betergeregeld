@@ -5,7 +5,7 @@
 	$isEn = $locale !== 'nl';
 @endphp
 
-@section('title', 'AccessGuard — ' . ($isEn ? 'Know who has access to what' : 'Zeker weten wie waar toegang heeft') . ' — ' . config('app.name'))
+@section('title', 'AccessGuard, ' . ($isEn ? 'Know who has access to what' : 'Zeker weten wie waar toegang heeft') . ', ' . config('app.name'))
 @section('description', $isEn
 	? 'AccessGuard: the access matrix for SMBs without an IT department. Know exactly who has access to which system, periodic reviews, airtight onboarding and offboarding.'
 	: 'AccessGuard: de toegangsmatrix voor MKB zonder IT-afdeling. Zie exact wie waar toegang toe heeft, voer periodieke reviews uit en regel onboarding en offboarding waterdicht.')
@@ -14,7 +14,7 @@
 
 <style>
 /* ========================================================
-   AccessGuard landing — V1-styled (scoped to .ag root)
+   AccessGuard landing, V1-styled (scoped to .ag root)
    Only on /{locale}/accessguard
    ======================================================== */
 .ag {
@@ -519,14 +519,14 @@
 								<span class="ag-matrix-name">{{ $row[0] }}</span>
 								@foreach ($row[1] as $state)
 									<span class="ag-matrix-cell ag-cell-{{ $state }}">
-										{!! ['ok' => '✓', 'no' => '×', 'flag' => '?', 'unknown' => '—'][$state] !!}
+										{!! ['ok' => '✓', 'no' => '×', 'flag' => '?', 'unknown' => ', '][$state] !!}
 									</span>
 								@endforeach
 							</div>
 						@endforeach
 					</div>
 					<div class="ag-matrix-foot">
-						<span>✓ {{ $isEn ? 'access' : 'toegang' }} · × {{ $isEn ? 'none' : 'geen' }} · ? {{ $isEn ? 'review' : 'review' }} · — {{ $isEn ? 'unknown' : 'onbekend' }}</span>
+						<span>✓ {{ $isEn ? 'access' : 'toegang' }} · × {{ $isEn ? 'none' : 'geen' }} · ? {{ $isEn ? 'review' : 'review' }} ·, {{ $isEn ? 'unknown' : 'onbekend' }}</span>
 						<strong>⚠ 2 {{ $isEn ? 'open risks' : 'open risico\'s' }}</strong>
 					</div>
 				</div>
@@ -542,8 +542,8 @@
 			<span class="ag-kicker ag-kicker-dark">{{ $isEn ? 'Why this matters' : 'Waarom dit ertoe doet' }}</span>
 			<h2 class="ag-h2">
 				{{ $isEn
-					? 'Access chaos is invisible — until someone leaves.'
-					: 'Toegangschaos zie je niet — tot er iemand weggaat.' }}
+					? 'Access chaos is invisible, until someone leaves.'
+					: 'Toegangschaos zie je niet, tot er iemand weggaat.' }}
 			</h2>
 		</div>
 
@@ -581,8 +581,8 @@
 			</h2>
 			<p class="ag-lead">
 				{{ $isEn
-					? 'Seven integrated layers, built in the sequence that real SMBs operate in — not a feature list from a security vendor.'
-					: 'Zeven geïntegreerde lagen, in de volgorde gebouwd waarop een MKB-bedrijf echt werkt — geen feature-lijst van een security-leverancier.' }}
+					? 'Seven integrated layers, built in the sequence that real SMBs operate in, not a feature list from a security vendor.'
+					: 'Zeven geïntegreerde lagen, in de volgorde gebouwd waarop een MKB-bedrijf echt werkt, geen feature-lijst van een security-leverancier.' }}
 			</p>
 		</div>
 
@@ -592,8 +592,8 @@
 				 'd_nl' => 'People × systemen in één overzicht. Klik op een cel om de status in één klik door te rouleren (toegang / geen / review / onbekend).',
 				 'd_en' => 'People × systems at a glance. Click a cell to cycle the status in one click (access / none / review / unknown).'],
 				['icon' => '◇', 't_nl' => 'Fijnmazige items', 't_en' => 'Fine-grained items',
-				 'd_nl' => 'Per systeem definieer je rollen, licenties en accounts. "Admin op Salesforce" vs "Read-only" — de cel aggregeert automatisch.',
-				 'd_en' => 'Per system you define roles, licences and accounts. "Salesforce Admin" vs "Read-only" — the cell aggregates automatically.'],
+				 'd_nl' => 'Per systeem definieer je rollen, licenties en accounts. "Admin op Salesforce" vs "Read-only", de cel aggregeert automatisch.',
+				 'd_en' => 'Per system you define roles, licences and accounts. "Salesforce Admin" vs "Read-only", the cell aggregates automatically.'],
 				['icon' => '⟲', 't_nl' => 'Periodieke reviews', 't_en' => 'Periodic reviews',
 				 'd_nl' => 'Start een review-cyclus: de matrix wordt gesnapshot. Per regel keep/revoke/change. Bij completion: intrekkingsacties voor IT.',
 				 'd_en' => 'Kick off a review cycle: the matrix is snapshotted. Decide keep/revoke/change per row. On completion IT gets revoke actions.'],
@@ -672,8 +672,8 @@
 				</h2>
 				<p class="ag-p">
 					{{ $isEn
-						? 'Most access management tools assume a dedicated IAM team. AccessGuard is built for 10–200 person SMBs where the office manager, HR lead or operational director keeps track.'
-						: 'De meeste access-management tools gaan uit van een dedicated IAM-team. AccessGuard is gebouwd voor 10–200-persoons MKB waar de office manager, HR-lead of operationeel directeur het bijhoudt.' }}
+						? 'Most access management tools assume a dedicated IAM team. AccessGuard is built for 10-200 person SMBs where the office manager, HR lead or operational director keeps track.'
+						: 'De meeste access-management tools gaan uit van een dedicated IAM-team. AccessGuard is gebouwd voor 10-200-persoons MKB waar de office manager, HR-lead of operationeel directeur het bijhoudt.' }}
 				</p>
 				<p class="ag-p">
 					{{ $isEn
@@ -686,9 +686,9 @@
 				<h3 class="ag-who-title">{{ $isEn ? 'Typical fit' : 'Typische fit' }}</h3>
 				<ul class="ag-check-list">
 					@foreach ([
-						['nl' => 'Organisaties van 10–200 medewerkers', 'en' => 'Organisations of 10–200 staff'],
+						['nl' => 'Organisaties van 10-200 medewerkers', 'en' => 'Organisations of 10-200 staff'],
 						['nl' => 'Geen dedicated IT-afdeling of IAM-team', 'en' => 'No dedicated IT or IAM team'],
-						['nl' => 'Gebruik van 5–30 SaaS-systemen (M365, Slack, Salesforce, Exact, etc.)', 'en' => 'Using 5–30 SaaS systems (M365, Slack, Salesforce, Exact, etc.)'],
+						['nl' => 'Gebruik van 5-30 SaaS-systemen (M365, Slack, Salesforce, Exact, etc.)', 'en' => 'Using 5-30 SaaS systems (M365, Slack, Salesforce, Exact, etc.)'],
 						['nl' => 'Compliance-eisen (ISO 27001, NEN 7510, GDPR-audit) die bewijs vragen', 'en' => 'Compliance requirements (ISO 27001, NEN 7510, GDPR audits) that demand proof'],
 						['nl' => 'Externe leveranciers + tijdelijke krachten die ook toegang krijgen', 'en' => 'External suppliers + temporary staff that also get access'],
 					] as $item)
@@ -735,7 +735,7 @@
 	</div>
 </section>
 
-{{-- READING / KENNISBANK — blog cross-links --}}
+{{-- READING / KENNISBANK, blog cross-links --}}
 <section class="ag-section ag-section-alt" id="blog-links">
 	<div class="ag-container">
 		<div class="ag-stack-md" style="max-width: 760px;">
@@ -743,15 +743,15 @@
 			<h2 class="ag-h2">{{ $isEn ? 'Deep dives, not demos.' : 'Eerst alles weten? Begin hier.' }}</h2>
 			<p class="ag-lead">
 				{{ $isEn
-					? 'Our guide library covers access management end-to-end — from the first matrix to M365 directory sync, ISO 27001 Annex A.9, and quarterly review rhythms.'
-					: 'Onze gids-bibliotheek behandelt toegangsbeheer van begin tot eind — van de eerste matrix tot M365 directory-sync, ISO 27001 Annex A.9, en kwartaal-review-ritmes.' }}
+					? 'Our guide library covers access management end-to-end, from the first matrix to M365 directory sync, ISO 27001 Annex A.9, and quarterly review rhythms.'
+					: 'Onze gids-bibliotheek behandelt toegangsbeheer van begin tot eind, van de eerste matrix tot M365 directory-sync, ISO 27001 Annex A.9, en kwartaal-review-ritmes.' }}
 			</p>
 		</div>
 		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px;">
 			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'toegangsbeheer-mkb-complete-gids']) }}"
 				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
 				<span class="ag-kicker" style="align-self: flex-start;">★ {{ __('Pillar-gids') }}</span>
-				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Toegangsbeheer voor het MKB — complete gids') }}</strong>
+				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Toegangsbeheer voor het MKB, complete gids') }}</strong>
 				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('Van je eerste matrix tot directory-sync, reviews en automatisering.') }}</span>
 			</a>
 			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'iso-27001-annex-a9-toegangsbeheer']) }}"
@@ -770,7 +770,7 @@
 				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
 				<span class="ag-kicker" style="align-self: flex-start;">{{ __('M365 governance') }}</span>
 				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Microsoft 365 governance voor het MKB') }}</strong>
-				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('MFA, Conditional Access, Intune, licenties — het pragmatische minimum.') }}</span>
+				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('MFA, Conditional Access, Intune, licenties, het pragmatische minimum.') }}</span>
 			</a>
 		</div>
 		<div style="text-align: center; margin-top: 28px;">
@@ -792,8 +792,8 @@
 			</h2>
 			<p class="ag-lead">
 				{{ $isEn
-					? 'In a quarter of an hour you have your first matrix filled in. The rest follows naturally — review cycles, offboarding, evidence and proof.'
-					: 'In een kwartier heb je je eerste matrix ingevuld. De rest volgt vanzelf — review-cycli, offboarding, bewijs en audit-spoor.' }}
+					? 'In a quarter of an hour you have your first matrix filled in. The rest follows naturally, review cycles, offboarding, evidence and proof.'
+					: 'In een kwartier heb je je eerste matrix ingevuld. De rest volgt vanzelf, review-cycli, offboarding, bewijs en audit-spoor.' }}
 			</p>
 			<div class="ag-actions ag-actions-center">
 				@if ($hasAccess)

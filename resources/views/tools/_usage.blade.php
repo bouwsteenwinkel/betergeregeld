@@ -12,9 +12,9 @@
 				<p class="text-sm font-semibold text-amber-900">
 					{{ __('Je daglimiet zit erop') }}
 					@if ($limitHit['scope'] === 'anon')
-						— {{ $limitHit['limit'] }} {{ __('checks per dag zonder account') }}
+						, {{ $limitHit['limit'] }} {{ __('checks per dag zonder account') }}
 					@else
-						— {{ $limitHit['limit'] }} {{ __('checks per dag op je huidige plan') }}
+						, {{ $limitHit['limit'] }} {{ __('checks per dag op je huidige plan') }}
 					@endif
 				</p>
 				<p class="text-sm text-amber-900/90 mt-1 leading-relaxed">

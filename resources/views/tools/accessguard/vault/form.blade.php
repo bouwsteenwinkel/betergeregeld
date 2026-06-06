@@ -53,7 +53,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Gekoppeld systeem') }}</label>
 					<select name="system_id" class="field-input py-1.5">
-						<option value="">—</option>
+						<option value="">, </option>
 						@foreach ($systems as $s)
 							<option value="{{ $s->id }}" @selected(old('system_id', $credential->system_id) === $s->id)>{{ $s->name }}</option>
 						@endforeach
@@ -64,7 +64,7 @@
 			<div>
 				<label class="block text-xs font-semibold mb-1">{{ __('Gekoppeld item (optioneel)') }}</label>
 				<select name="access_item_id" class="field-input py-1.5">
-					<option value="">—</option>
+					<option value="">, </option>
 					@foreach ($items as $i)
 						<option value="{{ $i->id }}" @selected(old('access_item_id', $credential->access_item_id) === $i->id)>{{ $i->name }}</option>
 					@endforeach

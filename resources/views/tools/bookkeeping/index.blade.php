@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Boekhouden') . ' — ' . config('app.name'))
+@section('title', __('Boekhouden') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -68,7 +68,7 @@
 				</div>
 				<div class="text-xs text-[color:var(--color-ink-soft)]">
 					{{ __('Filterbereik') }}:
-					{{ $filters['from'] ?? __('alle dagen') }} — {{ $filters['to'] ?? __('nu') }}
+					{{ $filters['from'] ?? __('alle dagen') }}, {{ $filters['to'] ?? __('nu') }}
 				</div>
 			</div>
 		</div>
@@ -79,7 +79,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Type') }}</label>
 					<select name="type" class="field-input py-1.5">
-						<option value="" @selected(empty($filters['type']))>— {{ __('alle') }} —</option>
+						<option value="" @selected(empty($filters['type']))>, {{ __('alle') }}, </option>
 						<option value="expense" @selected(($filters['type'] ?? '') === 'expense')>{{ __('Kosten') }}</option>
 						<option value="income" @selected(($filters['type'] ?? '') === 'income')>{{ __('Inkomsten') }}</option>
 					</select>
@@ -149,19 +149,19 @@
 											<div class="text-xs text-[color:var(--color-ink-soft)] font-mono">{{ $tx->invoice_number }}</div>
 										@endif
 									</td>
-									<td class="py-3 px-3 text-[color:var(--color-ink-muted)]">{{ $tx->category?->name ?? '—' }}</td>
+									<td class="py-3 px-3 text-[color:var(--color-ink-muted)]">{{ $tx->category?->name ?? ', ' }}</td>
 									<td class="py-3 px-3 text-[color:var(--color-ink-muted)]">
 										@if ($tx->relation)
 											<a href="{{ route('tools.bookkeeping.relations.edit', ['locale' => $locale, 'id' => $tx->relation->id]) }}" class="hover:text-[color:var(--color-accent)]">{{ $tx->relation->name }}</a>
 										@else
-											{{ $tx->counterparty ?? '—' }}
+											{{ $tx->counterparty ?? ', ' }}
 										@endif
 									</td>
 									<td class="py-3 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">
 										@if ($tx->vatRate)
 											{{ rtrim(rtrim((string) $tx->vatRate->rate, '0'), '.') }}%
 										@else
-											—
+											, 
 										@endif
 									</td>
 									<td class="py-3 px-3 text-right tabular-nums font-medium {{ $tx->type === 'income' ? 'text-emerald-700' : '' }}">

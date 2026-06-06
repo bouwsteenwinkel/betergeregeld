@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Categorieën') . ' — ' . config('app.name'))
+@section('title', __('Categorieën') . ', ' . config('app.name'))
 
 @php $locale = app()->getLocale(); @endphp
 
@@ -64,7 +64,7 @@
 									@if ($cat->is_active)
 										<span class="text-emerald-700">✓</span>
 									@else
-										<span class="text-[color:var(--color-ink-soft)]">—</span>
+										<span class="text-[color:var(--color-ink-soft)]">, </span>
 									@endif
 								</td>
 								<td class="py-2 pl-3 text-right whitespace-nowrap">

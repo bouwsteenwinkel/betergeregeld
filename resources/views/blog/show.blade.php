@@ -2,7 +2,7 @@
 
 @php $locale = app()->getLocale(); @endphp
 
-@section('title', ($post->meta_title ?: $post->title) . ' — Blog — ' . config('app.name'))
+@section('title', ($post->meta_title ?: $post->title) . ', Blog, ' . config('app.name'))
 @section('description', $post->excerpt)
 @section('og_type', 'article')
 
@@ -10,7 +10,7 @@
 	{{-- Canonical, og:title, og:description en hreflang komen al uit layouts/app.blade.php
 		 op basis van URL + @section('title')/@section('description'). Hier alleen blog-
 		 specifieke article-meta + RSS-link + Article schema. --}}
-	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} — Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
+	<link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }}, Blog" href="{{ route('blog.rss', ['locale' => $locale]) }}">
 	<meta property="article:section" content="{{ $post->category->name }}">
 	@if ($post->published_at)
 		<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">

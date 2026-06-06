@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>{{ $cycle->title }} — Executive summary</title>
+<title>{{ $cycle->title }}, Executive summary</title>
 <style>
 	@page { margin: 20mm 18mm; }
 	body { font-family: DejaVu Sans, sans-serif; font-size: 10pt; color: #0f172a; line-height: 1.55; margin: 0; }
@@ -55,7 +55,7 @@
 	<h1>{{ $summary['title'] ?? $cycle->title }}</h1>
 	<div class="cover-meta">
 		{{ $cycle->title }} ·
-		@if ($cycle->starts_at) {{ $cycle->starts_at->format('d-m-Y') }} – @endif
+		@if ($cycle->starts_at) {{ $cycle->starts_at->format('d-m-Y') }} - @endif
 		@if ($cycle->completed_at) {{ $cycle->completed_at->format('d-m-Y') }} @endif
 		· Scope: {{ $cycle->scope }}
 	</div>

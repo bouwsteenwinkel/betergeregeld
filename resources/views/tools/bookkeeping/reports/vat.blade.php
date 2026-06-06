@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('BTW-aangifte') . ' — ' . config('app.name'))
+@section('title', __('BTW-aangifte') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -22,7 +22,7 @@
 		</nav>
 		<h1 class="display-1">BTW-<span class="accent-word">{{ __('aangifte') }}</span></h1>
 		<p class="text-[color:var(--color-on-dark-muted)] mt-2">
-			Q{{ $quarter }} {{ $year }} · {{ $from }} — {{ $to }}
+			Q{{ $quarter }} {{ $year }} · {{ $from }}, {{ $to }}
 		</p>
 	</div>
 </section>
@@ -60,7 +60,7 @@
 
 		<div class="card">
 			<h3 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">
-				{{ __('1. Prestaties binnenland — omzet per BTW-tarief') }}
+				{{ __('1. Prestaties binnenland, omzet per BTW-tarief') }}
 			</h3>
 			@if (empty($incomeByRate))
 				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Geen omzet in dit kwartaal.') }}</p>
@@ -98,7 +98,7 @@
 
 		<div class="card">
 			<h3 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">
-				{{ __('5b. Voorbelasting — BTW op inkoop') }}
+				{{ __('5b. Voorbelasting, BTW op inkoop') }}
 			</h3>
 			<dl class="grid grid-cols-1 sm:grid-cols-[15rem_1fr] gap-x-6 gap-y-2 text-sm">
 				<dt class="text-[color:var(--color-ink-muted)]">{{ __('Aftrekbare BTW') }}</dt>

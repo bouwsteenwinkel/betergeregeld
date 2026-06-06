@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Favicon generator') . ' — ' . config('app.name'))
+@section('title', __('Favicon generator') . ', ' . config('app.name'))
 
 @section('content')
 
@@ -17,7 +17,7 @@
 		<span class="pill pill-dark mb-5">Tool · {{ __('Gratis') }}</span>
 		<h1 class="display-1 mb-5">Favicon <span class="accent-word">{{ __('generator') }}</span></h1>
 		<p class="text-lg text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl">
-			{{ __('Upload een vierkant logo (PNG/JPG/WEBP, max 5 MB) — krijg alle standaard favicon-formaten in één ZIP.') }}
+			{{ __('Upload een vierkant logo (PNG/JPG/WEBP, max 5 MB), krijg alle standaard favicon-formaten in één ZIP.') }}
 		</p>
 	</div>
 </section>

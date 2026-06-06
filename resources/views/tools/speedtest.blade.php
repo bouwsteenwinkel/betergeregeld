@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Internet snelheidstest') . ' — ' . config('app.name'))
+@section('title', __('Internet snelheidstest') . ', ' . config('app.name'))
 
 @section('content')
 
@@ -44,15 +44,15 @@
 
 			<div class="grid grid-cols-3 gap-4 mb-2">
 				<div class="text-center">
-					<div id="stPing" class="text-3xl font-bold tabular-nums">—</div>
+					<div id="stPing" class="text-3xl font-bold tabular-nums">, </div>
 					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Ping (ms)') }}</div>
 				</div>
 				<div class="text-center">
-					<div id="stDown" class="text-3xl font-bold tabular-nums">—</div>
+					<div id="stDown" class="text-3xl font-bold tabular-nums">, </div>
 					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Download (Mbps)') }}</div>
 				</div>
 				<div class="text-center">
-					<div id="stUp" class="text-3xl font-bold tabular-nums">—</div>
+					<div id="stUp" class="text-3xl font-bold tabular-nums">, </div>
 					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Upload (Mbps)') }}</div>
 				</div>
 			</div>
@@ -99,7 +99,7 @@
 	function setError(t) { if (!t) { errBox.hidden = true; errBox.textContent = ''; } else { errBox.hidden = false; errBox.textContent = t; } }
 	function reset() {
 		setBar(0); setError(''); setStatus(@json(__('Klaar om te starten.')));
-		pingEl.textContent = '—'; downEl.textContent = '—'; upEl.textContent = '—';
+		pingEl.textContent = ', '; downEl.textContent = ', '; upEl.textContent = ', ';
 		btnReset.hidden = true;
 	}
 
@@ -139,7 +139,7 @@
 	}
 
 	async function measureUpload() {
-		// Random blob — incompressible, reflects real network throughput
+		// Random blob, incompressible, reflects real network throughput
 		const buf = new Uint8Array(UP_BYTES);
 		crypto.getRandomValues(buf.subarray(0, Math.min(UP_BYTES, 65536)));
 		// Fill rest by repeating the random block

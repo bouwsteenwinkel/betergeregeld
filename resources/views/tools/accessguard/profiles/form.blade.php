@@ -10,7 +10,7 @@
 	$itemsBySystem = $items->groupBy('system_id');
 @endphp
 
-@section('title', $crumb . ' — AccessGuard')
+@section('title', $crumb . ', AccessGuard')
 
 @section('content')
 
@@ -66,7 +66,7 @@
 								@endforeach
 							</select>
 							<select name="items[{{ $loop->index }}][access_item_id]" class="field-input py-1 text-sm flex-1">
-								<option value="">— {{ __('heel systeem') }} —</option>
+								<option value="">, {{ __('heel systeem') }}, </option>
 								@foreach ($items->where('system_id', $pi->system_id) as $i)
 									<option value="{{ $i->id }}" @selected($pi->access_item_id === $i->id)>{{ $i->name }}</option>
 								@endforeach
@@ -88,7 +88,7 @@
 							@endforeach
 						</select>
 						<select name="items[999][access_item_id]" class="field-input py-1 text-sm flex-1">
-							<option value="">— {{ __('heel systeem') }} —</option>
+							<option value="">, {{ __('heel systeem') }}, </option>
 							@foreach ($items as $i)
 								<option value="{{ $i->id }}">{{ $i->name }} ({{ $i->system_id }})</option>
 							@endforeach
@@ -134,7 +134,7 @@
 								<div>
 									<span class="font-semibold">{{ trim($p->first_name . ' ' . $p->last_name) }}</span>
 									@if ($p->job_title)
-										<span class="text-xs text-[color:var(--color-ink-muted)]"> — {{ $p->job_title }}</span>
+										<span class="text-xs text-[color:var(--color-ink-muted)]">, {{ $p->job_title }}</span>
 									@endif
 									@if ($p->status === 'inactive')
 										<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 uppercase">{{ __('Inactief') }}</span>

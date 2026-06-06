@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('PDF redact') . ' — ' . config('app.name'))
+@section('title', __('PDF redact') . ', ' . config('app.name'))
 
 @section('content')
 

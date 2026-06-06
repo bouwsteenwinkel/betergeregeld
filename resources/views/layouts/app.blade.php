@@ -53,7 +53,7 @@
 	<meta property="og:image" content="@yield('og_image', url('/og-image.png'))">
 	<meta property="og:image:width" content="1200">
 	<meta property="og:image:height" content="630">
-	<meta property="og:image:alt" content="Beter Geregeld ICT — maatwerk websites, koppelingen en automatisering">
+	<meta property="og:image:alt" content="Beter Geregeld ICT, maatwerk websites, koppelingen en automatisering">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:image" content="@yield('og_image', url('/og-image.png'))">
 
@@ -74,7 +74,7 @@
 		'url'         => url('/'),
 		'logo'        => url('/favicon.ico'),
 		'email'       => 'info@betergeregeld.com',
-		'telephone'   => '+31352011729',
+		'telephone'   => '+31882545101',
 		'foundingDate' => '1989',
 		'address'     => [
 			"\x40type"           => 'PostalAddress',
@@ -107,7 +107,7 @@
 		'image'       => url('/favicon.ico'),
 		'url'         => url('/'),
 		'email'       => 'info@betergeregeld.com',
-		'telephone'   => '+31352011729',
+		'telephone'   => '+31882545101',
 		'priceRange'  => '€€',
 		'address'     => [
 			"\x40type"           => 'PostalAddress',
@@ -133,13 +133,13 @@
 			<a href="{{ route('home') }}" class="flex items-center gap-3 group">
 				<span class="flex items-center justify-center w-9 h-9 rounded-lg bg-[color:var(--color-ink)] text-white font-black text-sm tracking-tight">BG</span>
 				<span class="flex flex-col leading-tight">
-					<span class="font-bold text-[color:var(--color-ink)]">Beter Geregeld ICT</span>
+					<span class="font-bold text-[color:var(--color-ink)] whitespace-nowrap">Beter Geregeld ICT</span>
 					<span class="text-[11px] text-[color:var(--color-ink-soft)] hidden sm:inline">{{ __('Tools & automatisering') }}</span>
 				</span>
 			</a>
 
-			<nav class="flex items-center gap-6 text-sm" aria-label="{{ __('Hoofdnavigatie') }}">
-				<div class="hidden md:flex items-center gap-6 font-medium">
+			<nav class="hidden md:flex items-center gap-6 text-sm" aria-label="{{ __('Hoofdnavigatie') }}">
+				<div class="flex items-center gap-6 font-medium">
 					<a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Home') }}</a>
 					<a href="/{{ $currentLocale }}/diensten" class="{{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Diensten') }}</a>
 					<a href="/{{ $currentLocale }}/tools" class="{{ request()->is('*tools*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Tools') }}</a>
@@ -172,10 +172,66 @@
 					</a>
 				@endauth
 			</nav>
+
+			{{-- Mobiel: hamburger-knop --}}
+			<button type="button" id="bg-nav-toggle" class="md:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 rounded-lg text-[color:var(--color-ink)] hover:bg-[color:var(--color-surface-2)]" aria-label="{{ __('Menu') }}" aria-expanded="false" aria-controls="bg-mobile-nav">
+				<svg id="bg-nav-icon-open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+				<svg id="bg-nav-icon-close" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+			</button>
+		</div>
+
+		{{-- Mobiel uitklap-menu --}}
+		<div id="bg-mobile-nav" class="md:hidden hidden border-t border-[color:var(--color-line)] bg-white">
+			<nav class="px-6 py-4 flex flex-col gap-1 text-[15px]" aria-label="{{ __('Mobiele navigatie') }}">
+				<a href="{{ route('home') }}" class="py-2 {{ request()->routeIs('home') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Home') }}</a>
+				<a href="/{{ $currentLocale }}/diensten" class="py-2 {{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Diensten') }}</a>
+				<a href="/{{ $currentLocale }}/tools" class="py-2 {{ request()->is('*tools*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Tools') }}</a>
+				<a href="/{{ $currentLocale }}/prijzen" class="py-2 {{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Prijzen') }}</a>
+				<a href="/{{ $currentLocale }}/over" class="py-2 {{ request()->is('*over*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Over ons') }}</a>
+				<a href="/{{ $currentLocale }}/contact" class="py-2 {{ request()->is('*contact*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Contact') }}</a>
+
+				<div class="flex items-center gap-1.5 text-xs font-semibold pt-3 mt-2 border-t border-[color:var(--color-line)]">
+					@foreach (\App\Http\Middleware\SetLocale::SUPPORTED as $loc)
+						<a href="/{{ $loc }}{{ $pathTail }}" class="px-2 py-1 rounded uppercase tracking-wider {{ $loc === $currentLocale ? 'bg-[color:var(--color-ink)] text-white' : 'text-[color:var(--color-ink-soft)]' }}">{{ $loc }}</a>
+					@endforeach
+				</div>
+
+				@auth
+					<a href="{{ route('dashboard') }}" class="py-2 text-[color:var(--color-ink-muted)] font-medium mt-1">{{ __('Dashboard') }}</a>
+					<form method="POST" action="{{ route('logout') }}" class="pt-1">
+						@csrf
+						<button type="submit" class="py-2 text-left text-[color:var(--color-ink-muted)]">{{ __('Uitloggen') }}</button>
+					</form>
+				@else
+					<a href="{{ route('login') }}" class="py-2 text-[color:var(--color-ink-muted)] mt-1">{{ __('Inloggen') }}</a>
+					<a href="/{{ $currentLocale }}/contact" class="btn-accent text-sm justify-center mt-2">
+						{{ __('Plan gesprek') }}
+						<svg class="w-3.5 h-3.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</a>
+				@endauth
+			</nav>
 		</div>
 	</header>
 
-	<main class="flex-1 w-full" id="main-content">
+	<script>
+		(function () {
+			var btn = document.getElementById('bg-nav-toggle');
+			var panel = document.getElementById('bg-mobile-nav');
+			if (!btn || !panel) return;
+			var iOpen = document.getElementById('bg-nav-icon-open');
+			var iClose = document.getElementById('bg-nav-icon-close');
+			function set(open) {
+				panel.classList.toggle('hidden', !open);
+				btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+				if (iOpen) iOpen.classList.toggle('hidden', open);
+				if (iClose) iClose.classList.toggle('hidden', !open);
+			}
+			btn.addEventListener('click', function () { set(panel.classList.contains('hidden')); });
+			panel.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+		})();
+	</script>
+
+	<main class="flex-1 w-full overflow-x-clip" id="main-content">
 		@yield('content')
 	</main>
 
@@ -229,7 +285,7 @@
 					<h3 class="font-semibold mb-4 text-sm tracking-wide uppercase text-[color:var(--color-on-dark-soft)]">{{ __('Contact') }}</h3>
 					<ul class="space-y-2 text-sm text-[color:var(--color-on-dark-muted)]">
 						<li><a href="mailto:info@betergeregeld.com" class="hover:text-white">info@betergeregeld.com</a></li>
-						<li><a href="tel:+31352011729" class="hover:text-white">+31 35 201 1729</a></li>
+						<li><a href="tel:+31882545101" class="hover:text-white">088-2545101</a></li>
 						<li class="pt-1 text-xs text-[color:var(--color-on-dark-soft)]">T.B. Huurmanlaan 5<br>1403 SL Bussum</li>
 					</ul>
 				</div>

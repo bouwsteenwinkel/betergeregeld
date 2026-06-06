@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('CSV-import') . ' — ' . config('app.name'))
+@section('title', __('CSV-import') . ', ' . config('app.name'))
 
 @php $locale = app()->getLocale(); @endphp
 

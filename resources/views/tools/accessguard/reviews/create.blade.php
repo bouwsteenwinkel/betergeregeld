@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Nieuwe cyclus') . ' — AccessGuard')
+@section('title', __('Nieuwe cyclus') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();

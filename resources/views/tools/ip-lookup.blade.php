@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Wat is mijn IP') . ' — ' . config('app.name'))
+@section('title', __('Wat is mijn IP') . ', ' . config('app.name'))
 
 @section('content')
 
@@ -53,7 +53,7 @@
 
 			@if (! $result['geo_available'])
 				<div class="rounded-[var(--radius-control)] border border-amber-200 bg-amber-50 text-amber-900 p-3 text-sm mb-5">
-					{{ __('GeoLite2-database niet geladen — geo- en ASN-info zijn niet beschikbaar.') }}
+					{{ __('GeoLite2-database niet geladen, geo- en ASN-info zijn niet beschikbaar.') }}
 				</div>
 			@endif
 
@@ -99,10 +99,10 @@
 							@endif
 						@else
 							<span>{{ $result['isp']['org'] }}</span>
-							<span class="ml-2 text-xs text-[color:var(--color-ink-muted)]">— <a href="{{ route('pricing') }}" class="underline hover:text-[color:var(--color-ink)]">{{ __('ASN-detail op Pro') }}</a></span>
+							<span class="ml-2 text-xs text-[color:var(--color-ink-muted)]">, <a href="{{ route('pricing') }}" class="underline hover:text-[color:var(--color-ink)]">{{ __('ASN-detail op Pro') }}</a></span>
 						@endif
 					@else
-						<span class="text-[color:var(--color-ink-soft)]">—</span>
+						<span class="text-[color:var(--color-ink-soft)]">, </span>
 					@endif
 				</dd>
 

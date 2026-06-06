@@ -53,7 +53,7 @@ class MatrixController extends Controller
 			];
 		}
 
-		// Per-system count of active items — a system with items disables the
+		// Per-system count of active items, a system with items disables the
 		// click-to-cycle on its matrix column (users drill down instead).
 		$itemsBySystem = AccessItem::query()
 			->where('tenant_id', $tenantId)
@@ -90,7 +90,7 @@ class MatrixController extends Controller
 			return response()->json([
 				'ok' => false,
 				'error' => 'system_has_items',
-				'message' => __('Dit systeem heeft items — ga naar de drill-down om per item te beslissen.'),
+				'message' => __('Dit systeem heeft items, ga naar de drill-down om per item te beslissen.'),
 			], 422);
 		}
 
@@ -173,7 +173,7 @@ class MatrixController extends Controller
 
 		$tenantId = $request->user()->tenant_id;
 
-		// Scope check — person must belong to the tenant.
+		// Scope check, person must belong to the tenant.
 		Person::query()->where('tenant_id', $tenantId)->findOrFail($data['person_id']);
 
 		$result = $this->matrix->setItemState(

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Facturen') . ' — ' . config('app.name'))
+@section('title', __('Facturen') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -49,7 +49,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Status') }}</label>
 					<select name="status" class="field-input py-1.5">
-						<option value="" @selected(empty($filters['status']))>— {{ __('alle') }} —</option>
+						<option value="" @selected(empty($filters['status']))>, {{ __('alle') }}, </option>
 						@foreach (['draft', 'sent', 'paid', 'cancelled'] as $s)
 							<option value="{{ $s }}" @selected(($filters['status'] ?? '') === $s)>{{ __('invoice.status.' . $s) }}</option>
 						@endforeach
@@ -58,7 +58,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Klant') }}</label>
 					<select name="relation_id" class="field-input py-1.5">
-						<option value="">— {{ __('alle') }} —</option>
+						<option value="">, {{ __('alle') }}, </option>
 						@foreach ($relations as $r)
 							<option value="{{ $r->id }}" @selected(($filters['relation_id'] ?? 0) == $r->id)>{{ $r->name }}</option>
 						@endforeach
@@ -99,13 +99,13 @@
 										</a>
 									</td>
 									<td class="py-2 px-3 tabular-nums text-[color:var(--color-ink-muted)]">{{ $inv->issue_date->format('d-m-Y') }}</td>
-									<td class="py-2 px-3">{{ $inv->relation?->name ?? '—' }}</td>
+									<td class="py-2 px-3">{{ $inv->relation?->name ?? ', ' }}</td>
 									<td class="py-2 px-3 text-center">
 										<span class="pill border {{ $statusClass($inv->status) }} text-[10px] uppercase tracking-wider">{{ __('invoice.status.' . $inv->status) }}</span>
 									</td>
 									<td class="py-2 px-3 text-right tabular-nums font-medium">{{ $fmt($inv->total) }}</td>
 									<td class="py-2 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)] text-xs">
-										{{ $inv->due_date?->format('d-m-Y') ?? '—' }}
+										{{ $inv->due_date?->format('d-m-Y') ?? ', ' }}
 									</td>
 									<td class="py-2 pl-3 text-right whitespace-nowrap">
 										<a href="{{ route('tools.bookkeeping.invoices.pdf', ['locale' => $locale, 'id' => $inv->id]) }}" class="text-xs text-[color:var(--color-accent)] hover:underline">PDF</a>

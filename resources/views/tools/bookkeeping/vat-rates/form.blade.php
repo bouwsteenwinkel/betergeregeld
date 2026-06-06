@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($rate ? __('BTW-tarief bewerken') : __('Nieuw BTW-tarief')) . ' — ' . config('app.name'))
+@section('title', ($rate ? __('BTW-tarief bewerken') : __('Nieuw BTW-tarief')) . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();

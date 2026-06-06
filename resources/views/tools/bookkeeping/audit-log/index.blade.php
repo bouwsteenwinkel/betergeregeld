@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Logboek') . ' — ' . config('app.name'))
+@section('title', __('Logboek') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -9,7 +9,7 @@
 			return $v ? '✓' : '✗';
 		}
 		if ($v === null || $v === '') {
-			return '—';
+			return ', ';
 		}
 		if (is_array($v)) {
 			return json_encode($v, JSON_UNESCAPED_UNICODE);
@@ -47,7 +47,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Entiteit') }}</label>
 					<select name="entity_type" class="field-input py-1.5">
-						<option value="" @selected(empty($filters['entity_type']))>— {{ __('alle') }} —</option>
+						<option value="" @selected(empty($filters['entity_type']))>, {{ __('alle') }}, </option>
 						@foreach (['transaction', 'relation', 'category', 'vat_rate', 'invoice'] as $et)
 							<option value="{{ $et }}" @selected(($filters['entity_type'] ?? '') === $et)>{{ __('audit.entity.' . $et) }}</option>
 						@endforeach
@@ -56,7 +56,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Actie') }}</label>
 					<select name="action" class="field-input py-1.5">
-						<option value="" @selected(empty($filters['action']))>— {{ __('alle') }} —</option>
+						<option value="" @selected(empty($filters['action']))>, {{ __('alle') }}, </option>
 						@foreach (['created', 'updated', 'deleted'] as $a)
 							<option value="{{ $a }}" @selected(($filters['action'] ?? '') === $a)>{{ __('audit.action.' . $a) }}</option>
 						@endforeach

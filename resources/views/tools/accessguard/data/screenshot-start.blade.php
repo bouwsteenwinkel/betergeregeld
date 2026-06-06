@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Screenshot → matrix') . ' — AccessGuard')
+@section('title', __('Screenshot → matrix') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -37,7 +37,7 @@
 
 			<div class="bg-amber-50 border border-amber-200 rounded p-3 text-xs">
 				<strong class="text-amber-800">{{ __('Privacy') }}:</strong>
-				<p class="mt-1 text-amber-900">{{ __('De screenshot wordt naar OpenAI gestuurd voor extractie. Zorg dat het geen echt gevoelige gegevens bevat (salarissen, medische info). Namen en emails zijn acceptabel — die landen sowieso in je AccessGuard.') }}</p>
+				<p class="mt-1 text-amber-900">{{ __('De screenshot wordt naar OpenAI gestuurd voor extractie. Zorg dat het geen echt gevoelige gegevens bevat (salarissen, medische info). Namen en emails zijn acceptabel, die landen sowieso in je AccessGuard.') }}</p>
 			</div>
 
 			<div class="flex items-center gap-3 border-t border-[color:var(--color-line)] pt-4">

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('IBAN naamcheck & risico-analyse') . ' — ' . config('app.name'))
+@section('title', __('IBAN naamcheck & risico-analyse') . ', ' . config('app.name'))
 
 @section('content')
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $cred->name . ' — Vault')
+@section('title', $cred->name . ', Vault')
 
 @php
 	$locale = app()->getLocale();

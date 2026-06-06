@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('SSL/TLS certificaat checker') . ' — ' . config('app.name'))
+@section('title', __('SSL/TLS certificaat checker') . ', ' . config('app.name'))
 @section('description', __('Bekijk uitgever, vervaldatum, SANs en sleutel-info van het SSL-certificaat van een domein.'))
 
 @section('content')
@@ -18,7 +18,7 @@
 		<span class="pill pill-dark mb-5">Tool · {{ __('Gratis') }}</span>
 		<h1 class="display-1 mb-5">SSL/TLS <span class="accent-word">{{ __('check') }}</span></h1>
 		<p class="text-lg text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl">
-			{{ __('Live TLS-handshake — wij lezen het certificaat en tonen uitgever, vervaldatum, SANs, sleutel-info en waarschuwen bij issues.') }}
+			{{ __('Live TLS-handshake, wij lezen het certificaat en tonen uitgever, vervaldatum, SANs, sleutel-info en waarschuwen bij issues.') }}
 		</p>
 	</div>
 </section>

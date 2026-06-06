@@ -5,7 +5,7 @@
 	$isEn = $locale !== 'nl';
 	$stateColor = [
 		'has_access' => ['#ecfdf5', '#065f46', '#a7f3d0', '✓'],
-		'no_access' => ['#f8fafc', '#64748b', '#e2e8f0', '—'],
+		'no_access' => ['#f8fafc', '#64748b', '#e2e8f0', ', '],
 		'needs_review' => ['#fef3c7', '#92400e', '#fde68a', '?'],
 		'unknown' => ['#f8fafc', '#94a3b8', '#e2e8f0', '·'],
 	];
@@ -18,10 +18,10 @@
 	];
 @endphp
 
-@section('title', 'AccessGuard ' . ($isEn ? 'demo' : 'demo') . ' — ' . config('app.name'))
+@section('title', 'AccessGuard ' . ($isEn ? 'demo' : 'demo') . ', ' . config('app.name'))
 @section('description', $isEn
-	? 'Try AccessGuard live — no signup. See a realistic access matrix, review cycle and risk flags.'
-	: 'Probeer AccessGuard live — geen account nodig. Bekijk een realistische toegangsmatrix, review-cyclus en risico-flags.')
+	? 'Try AccessGuard live, no signup. See a realistic access matrix, review cycle and risk flags.'
+	: 'Probeer AccessGuard live, geen account nodig. Bekijk een realistische toegangsmatrix, review-cyclus en risico-flags.')
 
 @section('content')
 
@@ -203,8 +203,8 @@
 <div class="agd-banner">
 	<span class="agd-banner-pill">{{ $isEn ? 'Live demo' : 'Live demo' }}</span>
 	<span>{{ $isEn
-		? 'Realistic SMB data — explore freely. Resets every 24 h.'
-		: 'Realistische MKB-data — verken vrij. Reset elke 24 uur.' }}</span>
+		? 'Realistic SMB data, explore freely. Resets every 24 h.'
+		: 'Realistische MKB-data, verken vrij. Reset elke 24 uur.' }}</span>
 	<a href="{{ route('register', ['locale' => $locale]) }}">{{ $isEn ? 'Start free in your own space →' : 'Start gratis in je eigen omgeving →' }}</a>
 </div>
 
@@ -240,7 +240,7 @@
 	<div class="agd-section-title">
 		<div>
 			<h2>{{ $isEn ? '1. The access matrix' : '1. De toegangsmatrix' }}</h2>
-			<p>{{ $isEn ? 'Who has access to what — at a glance.' : 'Wie heeft waar toegang — in één oogopslag.' }}</p>
+			<p>{{ $isEn ? 'Who has access to what, at a glance.' : 'Wie heeft waar toegang, in één oogopslag.' }}</p>
 		</div>
 	</div>
 	<div class="agd-card">
@@ -281,8 +281,8 @@
 		</div>
 		<p style="margin: 14px 0 0; font-size: 12px; color: var(--agd-muted);">
 			{{ $isEn
-				? '✓ has access · — no access · ? needs review. Red dot = inactive person (still has grants → risk).'
-				: '✓ heeft toegang · — geen toegang · ? moet bekeken worden. Rode stip = inactieve persoon (heeft nog rechten → risico).' }}
+				? '✓ has access ·, no access · ? needs review. Red dot = inactive person (still has grants → risk).'
+				: '✓ heeft toegang ·, geen toegang · ? moet bekeken worden. Rode stip = inactieve persoon (heeft nog rechten → risico).' }}
 		</p>
 	</div>
 </div>

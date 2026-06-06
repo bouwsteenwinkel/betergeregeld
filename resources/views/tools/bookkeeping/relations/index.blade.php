@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Relaties') . ' — ' . config('app.name'))
+@section('title', __('Relaties') . ', ' . config('app.name'))
 
 @php $locale = app()->getLocale(); @endphp
 
@@ -40,7 +40,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Type') }}</label>
 					<select name="type" class="field-input py-1.5">
-						<option value="" @selected(empty($filters['type']))>— {{ __('alle') }} —</option>
+						<option value="" @selected(empty($filters['type']))>, {{ __('alle') }}, </option>
 						<option value="client" @selected(($filters['type'] ?? '') === 'client')>{{ __('Klant') }}</option>
 						<option value="supplier" @selected(($filters['type'] ?? '') === 'supplier')>{{ __('Leverancier') }}</option>
 						<option value="both" @selected(($filters['type'] ?? '') === 'both')>{{ __('Beide') }}</option>
@@ -49,7 +49,7 @@
 				<div>
 					<label class="block text-xs font-semibold mb-1">{{ __('Status') }}</label>
 					<select name="active" class="field-input py-1.5">
-						<option value="all" @selected(($filters['active'] ?? '') === 'all')>— {{ __('alle') }} —</option>
+						<option value="all" @selected(($filters['active'] ?? '') === 'all')>, {{ __('alle') }}, </option>
 						<option value="active" @selected(($filters['active'] ?? 'active') === 'active')>{{ __('Actief') }}</option>
 						<option value="inactive" @selected(($filters['active'] ?? '') === 'inactive')>{{ __('Inactief') }}</option>
 					</select>
@@ -104,7 +104,7 @@
 										@if ($r->is_active)
 											<span class="text-emerald-700">✓</span>
 										@else
-											<span class="text-[color:var(--color-ink-soft)]">—</span>
+											<span class="text-[color:var(--color-ink-soft)]">, </span>
 										@endif
 									</td>
 									<td class="py-2 pl-3 text-right whitespace-nowrap">

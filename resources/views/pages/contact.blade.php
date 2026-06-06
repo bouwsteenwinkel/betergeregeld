@@ -24,7 +24,7 @@
 	];
 @endphp
 
-@section('title', 'Contact — Beter Geregeld ICT')
+@section('title', 'Contact, Beter Geregeld ICT')
 @section('description', $isEn ? 'Get in touch about websites, portals, integrations, security or technical optimisation.' : 'Neem contact op over websites, portals, koppelingen, beveiliging of technische optimalisatie.')
 
 @section('content')
@@ -43,7 +43,7 @@
 		</h1>
 		<p class="text-lg text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl">
 			{{ $isEn
-				? 'Tell us briefly what you need. We\'ll get back to you personally — usually within one business day.'
+				? 'Tell us briefly what you need. We\'ll get back to you personally, usually within one business day.'
 				: 'Vertel kort wat je nodig hebt. We reageren persoonlijk, meestal binnen één werkdag.' }}
 		</p>
 	</div>
@@ -68,7 +68,7 @@
 			<div>
 				<label for="topic" class="block text-sm font-semibold mb-2">{{ $isEn ? 'Topic (optional)' : 'Onderwerp (optioneel)' }}</label>
 				<select id="topic" name="topic" class="field-input">
-					<option value="">{{ $isEn ? '— Choose a topic —' : '— Kies een onderwerp —' }}</option>
+					<option value="">{{ $isEn ? ', Choose a topic, ' : ', Kies een onderwerp, ' }}</option>
 					@foreach ($topics as $key => $label)
 						<option value="{{ $key }}" @selected(old('topic', $topic) === $key)>{{ $label }}</option>
 					@endforeach
@@ -123,7 +123,7 @@
 					</li>
 					<li>
 						<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-soft)] mb-1">{{ $isEn ? 'Phone' : 'Telefoon' }}</div>
-						<a href="tel:+31352011729" class="font-semibold hover:text-[color:var(--color-accent-hover)]">+31 35 201 1729</a>
+						<a href="tel:+31882545101" class="font-semibold hover:text-[color:var(--color-accent-hover)]">088-2545101</a>
 					</li>
 				</ul>
 			</div>

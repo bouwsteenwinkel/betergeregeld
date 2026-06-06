@@ -2,7 +2,7 @@
 
 @php $locale = app()->getLocale(); @endphp
 
-@section('title', 'Artikelen met tag "' . $tag->name . '" — Blog')
+@section('title', 'Artikelen met tag "' . $tag->name . '", Blog')
 @section('description', 'Alle blog-artikelen met het onderwerp ' . $tag->name . '.')
 
 @section('content')

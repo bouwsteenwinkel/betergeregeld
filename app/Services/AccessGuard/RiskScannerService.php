@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * Periodic scan of a tenant's access matrix, reviews and processes
  * to surface risk patterns as open RiskFlag rows. Idempotent on the
  * unique (tenant, kind, subject_type, subject_id) key so repeat runs
- * won't duplicate, and resolved rows stay resolved — a rule only
+ * won't duplicate, and resolved rows stay resolved, a rule only
  * reopens a risk by creating a new subject_id.
  */
 class RiskScannerService
@@ -53,7 +53,7 @@ class RiskScannerService
 
 	/**
 	 * Someone was added to a synced admin-looking group in the last 7 days.
-	 * Severity 5 — these are the changes an auditor most wants to know about.
+	 * Severity 5, these are the changes an auditor most wants to know about.
 	 * Idempotent per (tenant, profile_id, person_id) so repeat scans don't
 	 * duplicate, and the risk auto-stales out of the scanner after 7 days
 	 * without re-firing (it stays open in the DB until admin resolves it).
@@ -229,7 +229,7 @@ class RiskScannerService
 				'subject_type' => 'access_item',
 				'subject_id' => (string) $pai->access_item_id . ':' . $pai->person_id,
 				'title' => trim(($pai->person->first_name ?? '') . ' ' . ($pai->person->last_name ?? ''))
-					. ' — ' . ($pai->accessItem?->name ?? '') . ' (' . ($pai->system?->name ?? '') . ')',
+					. ', ' . ($pai->accessItem?->name ?? '') . ' (' . ($pai->system?->name ?? '') . ')',
 				'description' => __(':days dagen niet geverifieerd op een admin-achtige rol.', [
 					'days' => $pai->last_verified_at ? $now->diffInDays($pai->last_verified_at) : '90+',
 				]),
@@ -313,7 +313,7 @@ class RiskScannerService
 				'subject_type' => 'person',
 				'subject_id' => (string) $person->id,
 				'title' => trim($person->first_name . ' ' . $person->last_name),
-				'description' => __('Toegang tot :n systemen — review of dit nodig is.', ['n' => $r->c]),
+				'description' => __('Toegang tot :n systemen, review of dit nodig is.', ['n' => $r->c]),
 				'payload' => ['systems_count' => $r->c, 'threshold' => $threshold],
 			], $now);
 			$count++;
@@ -377,7 +377,7 @@ class RiskScannerService
 
 	/**
 	 * Person with status=scheduled_in but no active onboarding
-	 * process — someone's going to start without setup. Severity 3.
+	 * process, someone's going to start without setup. Severity 3.
 	 */
 	private function scanPendingOnboarding(string $tenantId, CarbonImmutable $now): int
 	{
@@ -426,7 +426,7 @@ class RiskScannerService
 		$values['payload'] = isset($values['payload']) ? json_encode($values['payload']) : null;
 
 		// Was this risk already open/acked/resolved before this run? We only
-		// fire instant alerts on first detection — so repeat runs stay quiet.
+		// fire instant alerts on first detection, so repeat runs stay quiet.
 		$existed = RiskFlag::query()
 			->where('tenant_id', $tenantId)
 			->where('kind', $fields['kind'])

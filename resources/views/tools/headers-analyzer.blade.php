@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('HTTP security headers analyzer') . ' — ' . config('app.name'))
+@section('title', __('HTTP security headers analyzer') . ', ' . config('app.name'))
 @section('description', __('Krijg een A-F grade voor de security-headers van een website: HSTS, CSP, X-Frame-Options en meer.'))
 
 @section('content')
@@ -86,7 +86,7 @@
 					<div class="mt-6 card bg-[color:var(--color-surface)] text-xs">
 						<div class="font-semibold mb-2">{{ __('Info-only (geen score)') }}</div>
 						@if ($result['server'])      <div>Server: <code>{{ $result['server'] }}</code></div> @endif
-						@if ($result['x_powered_by']) <div>X-Powered-By: <code>{{ $result['x_powered_by'] }}</code> — overweeg verbergen.</div> @endif
+						@if ($result['x_powered_by']) <div>X-Powered-By: <code>{{ $result['x_powered_by'] }}</code>, overweeg verbergen.</div> @endif
 					</div>
 				@endif
 			@endif

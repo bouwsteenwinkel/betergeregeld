@@ -10,7 +10,7 @@
 		</x-filament::section>
 	@else
 		<x-filament::section>
-			<x-slot name="heading">Zoekprestaties — laatste 28 dagen</x-slot>
+			<x-slot name="heading">Zoekprestaties, laatste 28 dagen</x-slot>
 			<x-slot name="description">Bron: Google Search Console.</x-slot>
 
 			<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">

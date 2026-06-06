@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Factuur') . ' ' . $invoice->invoice_number . ' — ' . config('app.name'))
+@section('title', __('Factuur') . ' ' . $invoice->invoice_number . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -96,7 +96,7 @@
 				<div>
 					<h3 class="text-xs font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-2">{{ __('Van') }}</h3>
 					@if ($settings)
-						<p class="text-sm font-medium">{{ $settings->company_name ?? '—' }}</p>
+						<p class="text-sm font-medium">{{ $settings->company_name ?? ', ' }}</p>
 						@if ($settings->address || $settings->city)
 							<p class="text-sm text-[color:var(--color-ink-muted)]">
 								{{ $settings->address }}<br>
@@ -139,7 +139,7 @@
 							<td class="py-2 px-3 text-right tabular-nums">{{ rtrim(rtrim(number_format((float) $line->quantity, 2, ',', ''), '0'), ',') }}</td>
 							<td class="py-2 px-3 text-right tabular-nums">{{ $fmt($line->unit_price) }}</td>
 							<td class="py-2 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">
-								{{ $line->vatRate ? rtrim(rtrim(number_format((float) $line->vatRate->rate, 2, ',', ''), '0'), ',') . '%' : '—' }}
+								{{ $line->vatRate ? rtrim(rtrim(number_format((float) $line->vatRate->rate, 2, ',', ''), '0'), ',') . '%' : ', ' }}
 							</td>
 							<td class="py-2 pl-3 text-right tabular-nums font-medium">{{ $fmt($line->lineNet()) }}</td>
 						</tr>

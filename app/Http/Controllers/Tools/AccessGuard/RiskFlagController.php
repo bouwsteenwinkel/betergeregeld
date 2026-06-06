@@ -38,7 +38,7 @@ class RiskFlagController extends Controller
 		$this->mustHaveAccess($request);
 		$counts = $this->scanner->scan($request->user()->tenant_id);
 		$total = array_sum($counts);
-		return back()->with('status', __('Scan klaar — :n risico\'s gedetecteerd.', ['n' => $total]));
+		return back()->with('status', __('Scan klaar, :n risico\'s gedetecteerd.', ['n' => $total]));
 	}
 
 	public function acknowledge(Request $request, string $locale, int $id): RedirectResponse

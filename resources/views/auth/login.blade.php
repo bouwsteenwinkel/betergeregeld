@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Inloggen') . ' — ' . config('app.name'))
+@section('title', __('Inloggen') . ', ' . config('app.name'))
 @section('robots', 'noindex,nofollow')
 
 @section('content')

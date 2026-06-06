@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Tools') . ' — ' . config('app.name'))
+@section('title', __('Tools') . ', ' . config('app.name'))
 @section('description', __('Overzicht van alle Beter Geregeld-tools: IBAN, BTW, postcode, IP, PDF, JSON, diff, favicon, speedtest.'))
 
 @php

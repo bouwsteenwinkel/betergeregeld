@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'AccessGuard — ' . config('app.name'))
+@section('title', 'AccessGuard, ' . config('app.name'))
 
 @section('content')
 
@@ -148,7 +148,7 @@
 						<ul class="space-y-2 text-sm">
 							@foreach ($topReminders as $r)
 								<li class="flex items-start gap-2">
-									<span class="text-xs text-[color:var(--color-ink-muted)] tabular-nums w-16 flex-shrink-0">{{ $r->due_at?->format('d-m') ?? '—' }}</span>
+									<span class="text-xs text-[color:var(--color-ink-muted)] tabular-nums w-16 flex-shrink-0">{{ $r->due_at?->format('d-m') ?? ', ' }}</span>
 									<div class="flex-1 min-w-0">
 										<div class="font-semibold truncate">{{ $r->title }}</div>
 										<div class="text-xs text-[color:var(--color-ink-muted)] truncate">{{ $r->description }}</div>
@@ -166,15 +166,15 @@
 			<ol class="space-y-2 text-sm list-decimal list-inside">
 				<li>
 					<a href="{{ route('tools.accessguard.people.index', ['locale' => app()->getLocale()]) }}" class="text-[color:var(--color-accent)] font-semibold hover:underline">{{ __('Voeg personen toe') }}</a>
-					— {{ __('medewerkers, contractors en externe partijen waarvoor je toegang wilt bijhouden.') }}
+					, {{ __('medewerkers, contractors en externe partijen waarvoor je toegang wilt bijhouden.') }}
 				</li>
 				<li>
 					<a href="{{ route('tools.accessguard.systems.index', ['locale' => app()->getLocale()]) }}" class="text-[color:var(--color-accent)] font-semibold hover:underline">{{ __('Voeg systemen toe') }}</a>
-					— {{ __('apps en services waar zij toegang tot kunnen hebben.') }}
+					, {{ __('apps en services waar zij toegang tot kunnen hebben.') }}
 				</li>
 				<li>
 					<a href="{{ route('tools.accessguard.matrix', ['locale' => app()->getLocale()]) }}" class="text-[color:var(--color-accent)] font-semibold hover:underline">{{ __('Open de Access Matrix') }}</a>
-					— {{ __('klik op cellen om de toegang-status te zetten.') }}
+					, {{ __('klik op cellen om de toegang-status te zetten.') }}
 				</li>
 			</ol>
 		</div>

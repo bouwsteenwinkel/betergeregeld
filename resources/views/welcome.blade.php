@@ -1,27 +1,27 @@
 @extends('layouts.app')
 
-@section('title', 'Beter Geregeld ICT — maatwerk websites, portals, koppelingen & automatisering')
+@section('title', 'Beter Geregeld ICT, maatwerk websites, portals, koppelingen & automatisering')
 @section('description', 'Beter Geregeld ICT helpt bedrijven met maatwerk webapplicaties, klantportalen, API-koppelingen, procesautomatisering, beveiliging, performance en technische SEO.')
 
 @php
 	$locale = app()->getLocale();
 	// $isEn dient als binary-fallback voor de hardcoded NL/EN-content.
-	// Voor DE/FR/ES geven we EN i.p.v. NL — beter te begrijpen voor
+	// Voor DE/FR/ES geven we EN i.p.v. NL, beter te begrijpen voor
 	// internationale bezoekers tot we per-locale-varianten toevoegen
 	// (services_catalog.php + services_faq.php uitbreiden met _de/_fr/_es).
 	$isEn = $locale !== 'nl';
 
 	$services = [
 		['slug' => 'cookie-banner-instellen',     'badge' => 'CookieGeregeld',   'title_nl' => 'Cookie banner laten instellen',      'title_en' => 'Cookie banner setup',              'desc_nl' => 'Categorieën, scripts en een nette technische basis voor consent.', 'desc_en' => 'Categories, scripts and a clean technical basis for consent.'],
-		['slug' => 'mail-beveiliging-fix',        'badge' => 'Mail Security',    'title_nl' => 'E-mailbeveiliging instellen',         'title_en' => 'Email security setup',              'desc_nl' => 'SPF, DKIM en DMARC correct — voorkom spam, spoofing en slechte aflevering.', 'desc_en' => 'SPF, DKIM and DMARC done right — prevent spam, spoofing, bad delivery.'],
+		['slug' => 'mail-beveiliging-fix',        'badge' => 'Mail Security',    'title_nl' => 'E-mailbeveiliging instellen',         'title_en' => 'Email security setup',              'desc_nl' => 'SPF, DKIM en DMARC correct, voorkom spam, spoofing en slechte aflevering.', 'desc_en' => 'SPF, DKIM and DMARC done right, prevent spam, spoofing, bad delivery.'],
 		['slug' => 'toegang-check',               'badge' => 'Access',           'title_nl' => 'Toegang check',                        'title_en' => 'Access review',                      'desc_nl' => 'Accounts, rechten, leveranciers en oude toegangen in kaart.', 'desc_en' => 'Accounts, permissions, vendors and stale access mapped.'],
 		['slug' => 'website-meertalig-maken',     'badge' => 'Website',          'title_nl' => 'Website meertalig maken',              'title_en' => 'Make website multilingual',          'desc_nl' => 'Meertalig opzetten met sterke structuur, nette URLs en SEO.', 'desc_en' => 'Multilingual setup with strong structure, clean URLs and SEO.'],
 		['slug' => '2fa-implementeren',           'badge' => 'Security',         'title_nl' => '2FA implementeren',                    'title_en' => 'Implement 2FA',                      'desc_nl' => 'Extra loginbeveiliging voor webshop, portal of admin-omgeving.', 'desc_en' => 'Extra login security for shop, portal or admin area.'],
 		['slug' => 'seo-check',                   'badge' => 'SEO',              'title_nl' => 'SEO check & optimalisatie',            'title_en' => 'SEO check & optimisation',           'desc_nl' => 'Technische SEO, indexatie, structuur en concrete quick wins.', 'desc_en' => 'Technical SEO, indexation, structure and concrete quick wins.'],
-		['slug' => 'website-snelheid-verbeteren', 'badge' => 'Performance',      'title_nl' => 'Website snelheid verbeteren',          'title_en' => 'Improve website speed',              'desc_nl' => 'Afbeeldingen, scripts, caching en server — sneller voor bezoekers.', 'desc_en' => 'Images, scripts, caching and server — faster for visitors.'],
+		['slug' => 'website-snelheid-verbeteren', 'badge' => 'Performance',      'title_nl' => 'Website snelheid verbeteren',          'title_en' => 'Improve website speed',              'desc_nl' => 'Afbeeldingen, scripts, caching en server, sneller voor bezoekers.', 'desc_en' => 'Images, scripts, caching and server, faster for visitors.'],
 		['slug' => 'website-onderhoud-uitbesteden','badge' => 'Onderhoud',       'title_nl' => 'Website onderhoud uitbesteden',        'title_en' => 'Outsource website maintenance',      'desc_nl' => 'Updates, controles en technisch beheer zonder er zelf achteraan te hoeven.', 'desc_en' => 'Updates, checks and technical management handled for you.'],
 		['slug' => 'website-beveiligen',          'badge' => 'Beveiliging',      'title_nl' => 'Website beveiligen',                   'title_en' => 'Secure your website',                'desc_nl' => 'Zwakke instellingen, oude plugins en onduidelijke toegang aanpakken.', 'desc_en' => 'Address weak settings, outdated plugins and unclear access.'],
-		['slug' => 'website-backup-en-herstel',   'badge' => 'Back-up',          'title_nl' => 'Website back-up en herstel',           'title_en' => 'Website backup & recovery',          'desc_nl' => 'Back-up en recovery goed geregeld — minder impact van fouten.', 'desc_en' => 'Backup and recovery sorted — less impact from mistakes.'],
+		['slug' => 'website-backup-en-herstel',   'badge' => 'Back-up',          'title_nl' => 'Website back-up en herstel',           'title_en' => 'Website backup & recovery',          'desc_nl' => 'Back-up en recovery goed geregeld, minder impact van fouten.', 'desc_en' => 'Backup and recovery sorted, less impact from mistakes.'],
 		['slug' => 'wordpress-opschonen',         'badge' => 'WordPress',        'title_nl' => 'WordPress opschonen',                  'title_en' => 'Clean up WordPress',                 'desc_nl' => 'Oude plugins, dubbele functies en vervuiling opruimen.', 'desc_en' => 'Clear out old plugins, duplicates and clutter.'],
 		['slug' => 'website-migratie-zonder-gedoe','badge' => 'Migratie',        'title_nl' => 'Website migratie zonder gedoe',        'title_en' => 'Website migration without hassle',   'desc_nl' => 'Veilig verhuizen naar nieuwe hosting zonder dataverlies of chaos.', 'desc_en' => 'Safely move to new hosting without data loss or chaos.'],
 		['slug' => 'website-structuur-check',     'badge' => 'Structuur',        'title_nl' => 'Website structuur check',              'title_en' => 'Website structure check',            'desc_nl' => 'Sitemap, URL-structuur, interne links en SEO-basis.', 'desc_en' => 'Sitemap, URL structure, internal links and SEO basis.'],
@@ -83,9 +83,9 @@
 
 	<div class="relative max-w-[1400px] mx-auto px-6 py-24 sm:py-32">
 		<div class="max-w-4xl">
-			<span class="pill pill-dark mb-6">
+			<span class="pill pill-dark mb-6 max-w-full">
 				<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
-				{{ $isEn ? 'Since 1989 — modern tech, no fuss' : 'Sinds 1989 — moderne techniek, zonder gedoe' }}
+				{{ $isEn ? 'Since 1989, modern tech, no fuss' : 'Sinds 1989, moderne techniek, zonder gedoe' }}
 			</span>
 			<h1 class="display-1 mb-6">
 				{{ $isEn ? 'We build what' : 'Wij bouwen wat' }}
@@ -137,15 +137,15 @@
 				<h2 class="display-2 max-w-2xl">{{ $isEn ? 'Ready-made solutions, ready to use.' : 'Kant-en-klare oplossingen, direct inzetbaar.' }}</h2>
 			</div>
 			<p class="text-[color:var(--color-ink-muted)] max-w-md">
-				{{ $isEn ? 'Our own products for topics we see come up time and again — from consent to access and free tooling.' : 'Eigen producten voor onderwerpen die we steeds zien terugkomen — van consent tot toegang en gratis tooling.' }}
+				{{ $isEn ? 'Our own products for topics we see come up time and again, from consent to access and free tooling.' : 'Eigen producten voor onderwerpen die we steeds zien terugkomen, van consent tot toegang en gratis tooling.' }}
 			</p>
 		</div>
 		<div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
 			@foreach ([
-				['href' => 'https://cookie.betergeregeld.com', 'title' => 'CookieGeregeld', 'nl' => 'Cookie banner, categorieën en consent technisch goed geregeld.', 'en' => 'Cookie banner, categories and consent — technically sorted.', 'icon' => '🍪'],
+				['href' => 'https://cookie.betergeregeld.com', 'title' => 'CookieGeregeld', 'nl' => 'Cookie banner, categorieën en consent technisch goed geregeld.', 'en' => 'Cookie banner, categories and consent, technically sorted.', 'icon' => '🍪'],
 				['href' => 'https://toegang.betergeregeld.com', 'title' => 'AccessGuard', 'nl' => 'Grip op accounts, rechten, leveranciers en oude toegangen.', 'en' => 'Grip on accounts, permissions, vendors and stale access.', 'icon' => '🔐'],
 				['href' => '/' . $locale . '/tools/iban-check', 'title' => $isEn ? 'Free tools' : 'Gratis tools', 'nl' => 'Praktische hulpmiddelen voor websites, processen en basischecks.', 'en' => 'Practical helpers for websites, processes and baseline checks.', 'icon' => '⚡'],
-				['href' => '/' . $locale . '/contact', 'title' => $isEn ? 'Custom work' : 'Maatwerk', 'nl' => 'Van analyse tot uitvoering — optimalisatie en doorontwikkeling.', 'en' => 'From analysis to execution — optimisation and ongoing development.', 'icon' => '⚙️'],
+				['href' => '/' . $locale . '/contact', 'title' => $isEn ? 'Custom work' : 'Maatwerk', 'nl' => 'Van analyse tot uitvoering, optimalisatie en doorontwikkeling.', 'en' => 'From analysis to execution, optimisation and ongoing development.', 'icon' => '⚙️'],
 			] as $b)
 				<a href="{{ $b['href'] }}" class="card card-accent group">
 					<div class="w-11 h-11 rounded-lg bg-[color:var(--color-accent-soft)] flex items-center justify-center text-xl mb-4">{{ $b['icon'] }}</div>

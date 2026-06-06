@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Profielen') . ' — AccessGuard')
+@section('title', __('Profielen') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -27,7 +27,7 @@
 			@if ($profiles->isEmpty())
 				<div class="p-6 text-center text-sm text-[color:var(--color-ink-muted)]">
 					<p class="mb-2">{{ __('Nog geen profielen. Maak er één om toegang voor een hele rol in één klik toe te passen.') }}</p>
-					<p class="text-xs">{{ __('Voorbeelden: "Sales", "Developer", "Office Manager" — elk met een vaste set systemen en items.') }}</p>
+					<p class="text-xs">{{ __('Voorbeelden: "Sales", "Developer", "Office Manager", elk met een vaste set systemen en items.') }}</p>
 				</div>
 			@else
 				<table class="w-full text-sm">
@@ -52,7 +52,7 @@
 										</span>
 									@endif
 								</td>
-								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)]">{{ $p->description ?: '—' }}</td>
+								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)]">{{ $p->description ?: ', ' }}</td>
 								<td class="py-2 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">{{ $p->items_count }}</td>
 								<td class="py-2 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">{{ $p->members_count }}</td>
 								<td class="py-2 px-3">

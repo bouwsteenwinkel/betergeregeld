@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($relation ? __('Relatie bewerken') : __('Nieuwe relatie')) . ' — ' . config('app.name'))
+@section('title', ($relation ? __('Relatie bewerken') : __('Nieuwe relatie')) . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();

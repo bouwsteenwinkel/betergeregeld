@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('WHOIS lookup + domain expiry') . ' — ' . config('app.name'))
+@section('title', __('WHOIS lookup + domain expiry') . ', ' . config('app.name'))
 @section('description', __('Wie heeft dit domein geregistreerd, bij welke registrar, en wanneer verloopt het?'))
 
 @section('content')
@@ -70,11 +70,11 @@
 					</div>
 
 					<dl class="grid sm:grid-cols-[180px_1fr] gap-y-2 gap-x-4 text-sm">
-						<dt class="text-[color:var(--color-ink-muted)]">Registrar</dt><dd>{{ $result['registrar'] ?? '—' }}</dd>
-						<dt class="text-[color:var(--color-ink-muted)]">Registrant</dt><dd>{{ $result['registrant'] ?? '—' }}</dd>
-						<dt class="text-[color:var(--color-ink-muted)]">{{ __('Aangemaakt') }}</dt><dd>{{ $result['created_at'] ?? '—' }}</dd>
-						<dt class="text-[color:var(--color-ink-muted)]">{{ __('Laatst bijgewerkt') }}</dt><dd>{{ $result['updated_at'] ?? '—' }}</dd>
-						<dt class="text-[color:var(--color-ink-muted)]">{{ __('Verloopt') }}</dt><dd class="font-semibold">{{ $result['expiry_at'] ?? '—' }}</dd>
+						<dt class="text-[color:var(--color-ink-muted)]">Registrar</dt><dd>{{ $result['registrar'] ?? ', ' }}</dd>
+						<dt class="text-[color:var(--color-ink-muted)]">Registrant</dt><dd>{{ $result['registrant'] ?? ', ' }}</dd>
+						<dt class="text-[color:var(--color-ink-muted)]">{{ __('Aangemaakt') }}</dt><dd>{{ $result['created_at'] ?? ', ' }}</dd>
+						<dt class="text-[color:var(--color-ink-muted)]">{{ __('Laatst bijgewerkt') }}</dt><dd>{{ $result['updated_at'] ?? ', ' }}</dd>
+						<dt class="text-[color:var(--color-ink-muted)]">{{ __('Verloopt') }}</dt><dd class="font-semibold">{{ $result['expiry_at'] ?? ', ' }}</dd>
 						<dt class="text-[color:var(--color-ink-muted)]">WHOIS server</dt><dd class="font-mono text-xs">{{ $result['whois_server'] }}</dd>
 					</dl>
 
@@ -118,7 +118,7 @@
 			<div class="mt-10 card bg-[color:var(--color-surface)]">
 				<h3 class="font-bold mb-2">{{ __('Domein bijna verlopen of verkeerd geregistreerd?') }}</h3>
 				<p class="text-sm text-[color:var(--color-ink-muted)] mb-4">
-					{{ __('Wij helpen met verlengen, verhuizen of het rechtzetten van de registratie-gegevens — zonder dataverlies of downtime.') }}
+					{{ __('Wij helpen met verlengen, verhuizen of het rechtzetten van de registratie-gegevens, zonder dataverlies of downtime.') }}
 				</p>
 				<a href="/{{ app()->getLocale() }}/diensten/website-migratie-zonder-gedoe" class="btn-accent">
 					{{ __('Migratie of verhuizing laten regelen') }}

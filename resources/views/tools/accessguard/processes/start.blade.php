@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Nieuw proces') . ' — AccessGuard')
+@section('title', __('Nieuw proces') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -55,7 +55,7 @@
 					<option value="">{{ __('Gebruik standaard-template') }}</option>
 					@foreach ($templates as $t)
 						<option value="{{ $t->id }}" data-kind="{{ $t->kind }}">
-							{{ $t->name }} ({{ $t->kind }}){{ $t->is_default ? ' — ' . __('standaard') : '' }}
+							{{ $t->name }} ({{ $t->kind }}){{ $t->is_default ? ', ' . __('standaard') : '' }}
 						</option>
 					@endforeach
 				</select>

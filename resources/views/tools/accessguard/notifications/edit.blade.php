@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Notificaties') . ' — AccessGuard')
+@section('title', __('Notificaties') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -31,7 +31,7 @@
 				<input type="checkbox" name="digest_enabled" value="1" @checked($pref->digest_enabled) class="mt-1">
 				<div class="flex-1">
 					<div class="font-semibold text-sm">{{ __('Dagelijks overzicht (08:00)') }}</div>
-					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Open risico\'s, upcoming deadlines en open acties — alleen als er iets is te melden.') }}</div>
+					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Open risico\'s, upcoming deadlines en open acties, alleen als er iets is te melden.') }}</div>
 					@if ($pref->last_digest_sent_at)
 						<div class="text-xs text-[color:var(--color-ink-soft)] mt-1">{{ __('Laatst verstuurd: :ts', ['ts' => $pref->last_digest_sent_at->format('d-m-Y H:i')]) }}</div>
 					@endif
@@ -42,7 +42,7 @@
 				<input type="checkbox" name="instant_critical_enabled" value="1" @checked($pref->instant_critical_enabled) class="mt-1">
 				<div class="flex-1">
 					<div class="font-semibold text-sm">{{ __('Instant bij kritiek (severity 5)') }}</div>
-					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Bijvoorbeeld orphan access of verlopen credentials — zodra ze worden gedetecteerd.') }}</div>
+					<div class="text-xs text-[color:var(--color-ink-muted)] mt-1">{{ __('Bijvoorbeeld orphan access of verlopen credentials, zodra ze worden gedetecteerd.') }}</div>
 				</div>
 			</label>
 

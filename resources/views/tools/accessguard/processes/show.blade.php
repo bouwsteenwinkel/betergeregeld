@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $process->title . ' — AccessGuard')
+@section('title', $process->title . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -80,7 +80,7 @@
 					<strong class="text-sm">{{ __('Proces afronden') }}</strong>
 					<span class="text-xs text-[color:var(--color-ink-muted)]">
 						@if ($hasUnfinished)
-							{{ __('Nog :n open items — mark ze als done, blocked of n.v.t. eerst.', ['n' => $counts['todo'] + $counts['in_progress']]) }}
+							{{ __('Nog :n open items, mark ze als done, blocked of n.v.t. eerst.', ['n' => $counts['todo'] + $counts['in_progress']]) }}
 						@else
 							@if ($process->kind === 'offboarding')
 								{{ __('Bij afronden worden alle has_access cellen van deze persoon omgezet in revoke-acties.') }}

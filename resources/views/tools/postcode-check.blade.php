@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Postcode sanity check') . ' — ' . config('app.name'))
+@section('title', __('Postcode sanity check') . ', ' . config('app.name'))
 
 @section('content')
 

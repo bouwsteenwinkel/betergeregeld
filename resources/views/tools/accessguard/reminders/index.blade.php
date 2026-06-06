@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Reminders') . ' — AccessGuard')
+@section('title', __('Reminders') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -67,7 +67,7 @@
 								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] whitespace-nowrap">{{ $kindLabels[$r->kind] ?? $r->kind }}</td>
 								<td class="py-2 px-3 font-semibold">{{ $r->title }}</td>
 								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)]">{{ $r->description }}</td>
-								<td class="py-2 px-3 text-xs tabular-nums whitespace-nowrap">{{ $r->due_at?->format('d-m-Y') ?? '—' }}</td>
+								<td class="py-2 px-3 text-xs tabular-nums whitespace-nowrap">{{ $r->due_at?->format('d-m-Y') ?? ', ' }}</td>
 								<td class="py-2 px-3">
 									<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $statusColors[$r->status] ?? '' }}">
 										{{ __(ucfirst($r->status)) }}

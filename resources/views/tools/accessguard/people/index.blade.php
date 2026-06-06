@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Personen') . ' — AccessGuard')
+@section('title', __('Personen') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -63,9 +63,9 @@
 						@foreach ($people as $p)
 							<tr class="border-b border-[color:var(--color-line)]/60 hover:bg-[color:var(--color-surface-soft,#fafafa)]">
 								<td class="py-2 px-3 font-semibold">{{ $p->full_name }}</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $p->job_title ?: '—' }}</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $p->department ?: '—' }}</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $p->email ?: '—' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $p->job_title ?: ', ' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $p->department ?: ', ' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $p->email ?: ', ' }}</td>
 								<td class="py-2 px-3">
 									<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $statusColors[$p->status] ?? 'bg-slate-100 text-slate-700' }}">
 										{{ $statusLabels[$p->status] ?? $p->status }}

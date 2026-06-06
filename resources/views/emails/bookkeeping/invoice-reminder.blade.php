@@ -8,10 +8,10 @@
 		default => 'Beste ' . ($relation->name ?? 'relatie') . ',',
 	};
 	$opener = match ($kind) {
-		'pre_due' => 'Dit is een vriendelijke herinnering dat onderstaande factuur binnen enkele dagen vervalt. Indien deze al voldaan is, dank u wel — dan kunt u deze mail negeren.',
+		'pre_due' => 'Dit is een vriendelijke herinnering dat onderstaande factuur binnen enkele dagen vervalt. Indien deze al voldaan is, dank u wel, dan kunt u deze mail negeren.',
 		'due' => 'Onderstaande factuur vervalt vandaag. Indien deze al voldaan is, dank u wel.',
 		'overdue_7' => 'Onderstaande factuur is inmiddels vervallen. Wilt u de betaling zo spoedig mogelijk voldoen of ons laten weten wanneer we die kunnen verwachten?',
-		'overdue_21' => 'Onderstaande factuur is inmiddels drie weken vervallen. Dit is een laatste herinnering — blijft betaling uit, dan dragen we de vordering verder over.',
+		'overdue_21' => 'Onderstaande factuur is inmiddels drie weken vervallen. Dit is een laatste herinnering, blijft betaling uit, dan dragen we de vordering verder over.',
 		default => 'Zie onderstaande factuur.',
 	};
 @endphp

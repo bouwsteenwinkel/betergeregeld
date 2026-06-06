@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Processen') . ' — AccessGuard')
+@section('title', __('Processen') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -58,7 +58,7 @@
 							<tr class="border-b border-[color:var(--color-line)]/60 hover:bg-[color:var(--color-surface-soft,#fafafa)]">
 								<td class="py-2 px-3 font-semibold">
 									<a href="{{ route('tools.accessguard.processes.show', ['locale' => $locale, 'id' => $p->id]) }}" class="hover:underline">
-										{{ $p->person?->full_name ?? '—' }}
+										{{ $p->person?->full_name ?? ', ' }}
 									</a>
 								</td>
 								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $kindLabels[$p->kind] ?? $p->kind }}</td>
@@ -67,8 +67,8 @@
 										{{ __(ucfirst($p->status)) }}
 									</span>
 								</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $p->started_at?->format('d-m-Y') ?? '—' }}</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $p->due_at?->format('d-m-Y') ?? '—' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $p->started_at?->format('d-m-Y') ?? ', ' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $p->due_at?->format('d-m-Y') ?? ', ' }}</td>
 								<td class="py-2 px-3 text-right tabular-nums">
 									<span class="text-xs text-[color:var(--color-ink-muted)]">{{ $p->done_count }} / {{ $p->items_count }}</span>
 									<div class="inline-block w-20 h-1.5 bg-slate-200 rounded overflow-hidden align-middle ml-2">

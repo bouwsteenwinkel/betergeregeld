@@ -9,7 +9,7 @@
 		: route('tools.accessguard.people.store', ['locale' => $locale]);
 @endphp
 
-@section('title', $crumb . ' — AccessGuard')
+@section('title', $crumb . ', AccessGuard')
 
 @section('content')
 

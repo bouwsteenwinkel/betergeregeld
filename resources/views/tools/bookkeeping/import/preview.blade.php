@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('CSV-import voorbeeld') . ' — ' . config('app.name'))
+@section('title', __('CSV-import voorbeeld') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -62,12 +62,12 @@
 								$defaultAction = $match ? 'link' : ($row['date'] && $row['amount'] !== null ? 'create' : 'skip');
 							@endphp
 							<tr class="border-b border-[color:var(--color-line)]/60 {{ $match ? 'bg-emerald-50/50' : '' }}">
-								<td class="py-2 pr-3 tabular-nums text-[color:var(--color-ink-muted)] whitespace-nowrap">{{ $row['date'] ?? '—' }}</td>
+								<td class="py-2 pr-3 tabular-nums text-[color:var(--color-ink-muted)] whitespace-nowrap">{{ $row['date'] ?? ', ' }}</td>
 								<td class="py-2 px-3 text-right tabular-nums font-medium {{ $row['amount'] !== null && $row['amount'] < 0 ? 'text-red-700' : ($row['amount'] !== null ? 'text-emerald-700' : '') }}">
-									{{ $row['amount'] !== null ? ($row['amount'] < 0 ? '−' : '+') . $fmt($row['amount']) : '—' }}
+									{{ $row['amount'] !== null ? ($row['amount'] < 0 ? '−' : '+') . $fmt($row['amount']) : ', ' }}
 								</td>
 								<td class="py-2 px-3">
-									<div class="font-medium">{{ $row['counterparty'] ?: $row['description'] ?: '—' }}</div>
+									<div class="font-medium">{{ $row['counterparty'] ?: $row['description'] ?: ', ' }}</div>
 									@if ($row['counterparty'] && $row['description'])
 										<div class="text-xs text-[color:var(--color-ink-soft)] truncate max-w-[24rem]">{{ $row['description'] }}</div>
 									@endif

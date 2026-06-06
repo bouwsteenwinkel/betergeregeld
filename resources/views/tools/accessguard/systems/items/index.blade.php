@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Items') . ' — ' . $system->name . ' — AccessGuard')
+@section('title', __('Items') . ', ' . $system->name . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -49,7 +49,7 @@
 			@if ($items->isEmpty())
 				<div class="p-6 text-center text-sm text-[color:var(--color-ink-muted)]">
 					<p class="mb-2">{{ __('Nog geen items voor dit systeem.') }}</p>
-					<p class="text-xs">{{ __('Voorbeelden: "Admin role", "Read-only", "Finance dashboard viewer" — of per licentietype bij SaaS.') }}</p>
+					<p class="text-xs">{{ __('Voorbeelden: "Admin role", "Read-only", "Finance dashboard viewer", of per licentietype bij SaaS.') }}</p>
 				</div>
 			@else
 				<table class="w-full text-sm">
@@ -68,7 +68,7 @@
 							<tr class="border-b border-[color:var(--color-line)]/60 hover:bg-[color:var(--color-surface-soft,#fafafa)]">
 								<td class="py-2 px-3 font-semibold">{{ $item->name }}</td>
 								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $typeLabels[$item->type] ?? $item->type }}</td>
-								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)]">{{ $item->description ?: '—' }}</td>
+								<td class="py-2 px-3 text-xs text-[color:var(--color-ink-muted)]">{{ $item->description ?: ', ' }}</td>
 								<td class="py-2 px-3">
 									<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $item->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500' }}">
 										{{ $item->is_active ? __('Actief') : __('Inactief') }}

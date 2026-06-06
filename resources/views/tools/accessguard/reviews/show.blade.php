@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $cycle->title . ' — AccessGuard')
+@section('title', $cycle->title . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -168,7 +168,7 @@
 												<div class="text-xs text-[color:var(--color-ink-muted)] mt-0.5">{{ $item->decision_note }}</div>
 											@endif
 										@else
-											<span class="text-xs text-[color:var(--color-ink-muted)]">—</span>
+											<span class="text-xs text-[color:var(--color-ink-muted)]">, </span>
 										@endif
 									</td>
 									@if ($cycle->isOpen())

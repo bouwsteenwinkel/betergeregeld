@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Dashboard') . ' — ' . config('app.name'))
+@section('title', __('Dashboard') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -77,7 +77,7 @@
 				@if ($plan->price_monthly > 0)
 					<p class="text-sm text-[color:var(--color-ink-muted)]">€{{ (int) $plan->price_monthly }}/{{ __('maand') }}</p>
 				@else
-					<p class="text-sm text-[color:var(--color-ink-muted)]">€0 — {{ __('altijd') }}</p>
+					<p class="text-sm text-[color:var(--color-ink-muted)]">€0, {{ __('altijd') }}</p>
 				@endif
 			</div>
 
@@ -141,7 +141,7 @@
 							</a>
 							<span class="text-[color:var(--color-ink-muted)]">
 								<span class="font-semibold text-[color:var(--color-ink)]">{{ $t['today'] }}</span>
-								/ {{ $t['unlimited'] ? ($isEn ? 'unlimited' : 'onbeperkt') : ($t['limit'] ?? '—') }}
+								/ {{ $t['unlimited'] ? ($isEn ? 'unlimited' : 'onbeperkt') : ($t['limit'] ?? ', ') }}
 							</span>
 						</div>
 						<div class="h-2 rounded-full bg-[color:var(--color-line)] overflow-hidden">
@@ -180,7 +180,7 @@
 								<td class="py-3 px-3 text-right tabular-nums">{{ $t['week'] }}</td>
 								<td class="py-3 px-3 text-right tabular-nums">{{ $t['month'] }}</td>
 								<td class="py-3 px-3 text-right tabular-nums text-[color:var(--color-ink-muted)]">
-									{{ $t['unlimited'] ? ($isEn ? 'unlimited' : 'onbeperkt') : ($t['limit'] ?? '—') }}
+									{{ $t['unlimited'] ? ($isEn ? 'unlimited' : 'onbeperkt') : ($t['limit'] ?? ', ') }}
 								</td>
 							</tr>
 						@endforeach
@@ -196,7 +196,7 @@
 			<div class="card lg:col-span-3">
 				<div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
 					<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)]">
-						{{ __('Boekhouden — snapshot') }}
+						{{ __('Boekhouden, snapshot') }}
 					</h2>
 					<a href="{{ route('tools.bookkeeping.index', ['locale' => $locale]) }}" class="text-xs text-[color:var(--color-accent)] hover:underline">
 						{{ __('Naar boekhouden') }} →
@@ -239,9 +239,9 @@
 											{{ $inv->invoice_number }}
 										</a>
 									</td>
-									<td class="py-1.5 px-3 text-[color:var(--color-ink-muted)]">{{ $inv->relation?->name ?? '—' }}</td>
+									<td class="py-1.5 px-3 text-[color:var(--color-ink-muted)]">{{ $inv->relation?->name ?? ', ' }}</td>
 									<td class="py-1.5 px-3 text-[color:var(--color-ink-soft)] tabular-nums text-xs">
-										{{ $inv->paid_at?->format('d-m-Y') ?? '—' }}
+										{{ $inv->paid_at?->format('d-m-Y') ?? ', ' }}
 									</td>
 									<td class="py-1.5 pl-3 text-right tabular-nums font-medium text-emerald-700">+{{ $fmt($inv->total) }}</td>
 								</tr>

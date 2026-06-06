@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Reviews') . ' — AccessGuard')
+@section('title', __('Reviews') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -58,8 +58,8 @@
 										{{ __(ucfirst($c->status)) }}
 									</span>
 								</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $c->starts_at?->format('d-m-Y') ?? '—' }}</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $c->due_at?->format('d-m-Y') ?? '—' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $c->starts_at?->format('d-m-Y') ?? ', ' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)] tabular-nums">{{ $c->due_at?->format('d-m-Y') ?? ', ' }}</td>
 								<td class="py-2 px-3 text-right tabular-nums">
 									<span class="text-xs text-[color:var(--color-ink-muted)]">{{ $c->decided_count }} / {{ $c->items_count }}</span>
 									<div class="inline-block w-24 h-1.5 bg-slate-200 rounded overflow-hidden align-middle ml-2">

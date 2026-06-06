@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Factuur-instellingen') . ' — ' . config('app.name'))
+@section('title', __('Factuur-instellingen') . ', ' . config('app.name'))
 
 @php $locale = app()->getLocale(); @endphp
 

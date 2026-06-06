@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Security Radar — ' . config('app.name'))
+@section('title', 'Security Radar, ' . config('app.name'))
 
 @section('content')
 @include('tools.radar._header')
@@ -32,7 +32,7 @@
 				<span class="font-semibold ml-1">{{ $planLimits['scans_per_day'] ?: '∞' }}</span>
 				<span class="text-[color:var(--color-ink-muted)] mx-2">·</span>
 				<span class="text-[color:var(--color-ink-muted)]">{{ __('Checks') }}:</span>
-				<span class="font-semibold ml-1">{{ implode(', ', $planLimits['checks_allowed']) ?: '—' }}</span>
+				<span class="font-semibold ml-1">{{ implode(', ', $planLimits['checks_allowed']) ?: ', ' }}</span>
 			</div>
 			<a href="{{ route('pricing', ['locale' => $locale]) }}" class="text-xs px-3 py-1.5 rounded border border-[color:var(--color-line)] hover:bg-[color:var(--color-surface-soft)]">
 				{{ __('Plan upgraden') }}

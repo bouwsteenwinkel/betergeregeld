@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>AccessGuard {{ $isEn ? 'manual' : 'handleiding' }}</title>
 <style>
-	/* dompdf-friendly CSS — matches the /accessguard landing palette */
+	/* dompdf-friendly CSS, matches the /accessguard landing palette */
 	@page { margin: 24mm 20mm; }
 	body {
 		font-family: DejaVu Sans, sans-serif;
@@ -231,8 +231,8 @@
 	</h1>
 	<p class="cover-lead">
 		{{ $isEn
-			? 'Complete reference for using AccessGuard — from first matrix to periodic reviews, from onboarding new staff to offboarding leavers without any access staying open.'
-			: 'Volledige referentie voor het gebruik van AccessGuard — van je eerste matrix tot periodieke reviews, van het onboarden van nieuwe medewerkers tot het waterdicht afsluiten bij uitdiensttreding.' }}
+			? 'Complete reference for using AccessGuard, from first matrix to periodic reviews, from onboarding new staff to offboarding leavers without any access staying open.'
+			: 'Volledige referentie voor het gebruik van AccessGuard, van je eerste matrix tot periodieke reviews, van het onboarden van nieuwe medewerkers tot het waterdicht afsluiten bij uitdiensttreding.' }}
 	</p>
 
 	<div class="cover-meta">
@@ -280,21 +280,21 @@
 <p class="chapter-intro">
 	{{ $isEn
 		? 'AccessGuard is access management for SMBs without an IT department. This manual covers everything from the first setup to daily operation.'
-		: 'AccessGuard is toegangsbeheer voor MKB zonder IT-afdeling. Deze handleiding behandelt alles — van de eerste opzet tot dagelijks gebruik.' }}
+		: 'AccessGuard is toegangsbeheer voor MKB zonder IT-afdeling. Deze handleiding behandelt alles, van de eerste opzet tot dagelijks gebruik.' }}
 </p>
 
 <h3>{{ $isEn ? 'What problem does this solve?' : 'Welk probleem lost dit op?' }}</h3>
 <p>
 	{{ $isEn
-		? 'In most SMBs, access management is scattered across Excel sheets, emails and people\'s memory. Nobody has a reliable answer to "who has access to Salesforce?" or "did we revoke everything when Lisa left?". This chaos is invisible — until there\'s an audit, an incident, or a former employee who still has access to sensitive data.'
-		: 'In de meeste MKB-bedrijven is toegangsbeheer verspreid over Excel-sheets, e-mails en geheugens van mensen. Niemand heeft een betrouwbaar antwoord op "wie heeft toegang tot Salesforce?" of "hebben we alles ingetrokken toen Lisa vertrok?". Deze chaos zie je niet — tot er een audit is, een incident, of een ex-medewerker die nog steeds bij gevoelige data kan.' }}
+		? 'In most SMBs, access management is scattered across Excel sheets, emails and people\'s memory. Nobody has a reliable answer to "who has access to Salesforce?" or "did we revoke everything when Lisa left?". This chaos is invisible, until there\'s an audit, an incident, or a former employee who still has access to sensitive data.'
+		: 'In de meeste MKB-bedrijven is toegangsbeheer verspreid over Excel-sheets, e-mails en geheugens van mensen. Niemand heeft een betrouwbaar antwoord op "wie heeft toegang tot Salesforce?" of "hebben we alles ingetrokken toen Lisa vertrok?". Deze chaos zie je niet, tot er een audit is, een incident, of een ex-medewerker die nog steeds bij gevoelige data kan.' }}
 </p>
 
 <h3>{{ $isEn ? 'Who is this for?' : 'Voor wie is dit?' }}</h3>
 <ul>
-	<li>{{ $isEn ? 'Organisations of 10–200 staff' : 'Organisaties van 10–200 medewerkers' }}</li>
+	<li>{{ $isEn ? 'Organisations of 10-200 staff' : 'Organisaties van 10-200 medewerkers' }}</li>
 	<li>{{ $isEn ? 'No dedicated IT or IAM team' : 'Geen dedicated IT-afdeling of IAM-team' }}</li>
-	<li>{{ $isEn ? 'Using 5–30 SaaS systems (M365, Slack, Salesforce, Exact, etc.)' : 'Gebruik van 5–30 SaaS-systemen (M365, Slack, Salesforce, Exact, etc.)' }}</li>
+	<li>{{ $isEn ? 'Using 5-30 SaaS systems (M365, Slack, Salesforce, Exact, etc.)' : 'Gebruik van 5-30 SaaS-systemen (M365, Slack, Salesforce, Exact, etc.)' }}</li>
 	<li>{{ $isEn ? 'Compliance requirements (ISO 27001, NEN 7510, GDPR audits)' : 'Compliance-eisen (ISO 27001, NEN 7510, GDPR-audits)' }}</li>
 	<li>{{ $isEn ? 'External suppliers and temporary staff that also get access' : 'Externe leveranciers en tijdelijke krachten die ook toegang krijgen' }}</li>
 </ul>
@@ -348,8 +348,8 @@
 		<span class="steps-n">01.</span><strong class="steps-title">{{ $isEn ? 'Add your people' : 'Voeg je personen toe' }}</strong>
 		<p class="muted small" style="margin-top: 1mm;">
 			{{ $isEn
-				? 'Go to AccessGuard → Personen. Add every employee, contractor and external party whose access you want to track. You don\'t need to import from HR — a handful of rows to start with is fine.'
-				: 'Ga naar AccessGuard → Personen. Voeg elke medewerker, inhuur-kracht en externe partij toe wiens toegang je wilt bijhouden. Je hoeft niet vanuit HR te importeren — een handvol rijen is prima om mee te starten.' }}
+				? 'Go to AccessGuard → Personen. Add every employee, contractor and external party whose access you want to track. You don\'t need to import from HR, a handful of rows to start with is fine.'
+				: 'Ga naar AccessGuard → Personen. Voeg elke medewerker, inhuur-kracht en externe partij toe wiens toegang je wilt bijhouden. Je hoeft niet vanuit HR te importeren, een handvol rijen is prima om mee te starten.' }}
 		</p>
 	</div>
 	<div class="steps-item">
@@ -399,10 +399,10 @@
 	</tr>
 	<tr>
 		<td><span class="chip chip-flag">? needs_review</span></td>
-		<td>{{ $isEn ? 'Not sure — flag for the next review. Used when state is unclear or suspicious.' : 'Niet zeker — markeer voor volgende review. Gebruikt als de status onduidelijk of verdacht is.' }}</td>
+		<td>{{ $isEn ? 'Not sure, flag for the next review. Used when state is unclear or suspicious.' : 'Niet zeker, markeer voor volgende review. Gebruikt als de status onduidelijk of verdacht is.' }}</td>
 	</tr>
 	<tr>
-		<td><span class="chip chip-unknown">— unknown</span></td>
+		<td><span class="chip chip-unknown">, unknown</span></td>
 		<td>{{ $isEn ? 'Never decided. The default state for new cells. Aim to reduce this to zero.' : 'Nooit beslist. De standaardstatus voor nieuwe cellen. Streef ernaar dit naar nul te brengen.' }}</td>
 	</tr>
 </table>
@@ -410,15 +410,15 @@
 <h3>{{ $isEn ? 'How to click through the matrix' : 'Hoe klik je door de matrix' }}</h3>
 <p>
 	{{ $isEn
-		? 'Click any cell without items to cycle through the four states in order. Click again to continue. Every click is timestamped in last_verified_at — useful for the review cycle to see "when did we last confirm this?".'
-		: 'Klik op elke cel zonder items om door de vier statussen te rouleren in volgorde. Klik nog eens om door te gaan. Elke klik wordt geregistreerd in last_verified_at — nuttig voor de review-cyclus om te zien "wanneer hebben we dit voor het laatst bevestigd?".' }}
+		? 'Click any cell without items to cycle through the four states in order. Click again to continue. Every click is timestamped in last_verified_at, useful for the review cycle to see "when did we last confirm this?".'
+		: 'Klik op elke cel zonder items om door de vier statussen te rouleren in volgorde. Klik nog eens om door te gaan. Elke klik wordt geregistreerd in last_verified_at, nuttig voor de review-cyclus om te zien "wanneer hebben we dit voor het laatst bevestigd?".' }}
 </p>
 
 <div class="info-box">
 	<div class="info-box-title">{{ $isEn ? 'Tip' : 'Tip' }}</div>
 	{{ $isEn
-		? 'Start by filling in only has_access cells — the people who definitely have access. That alone already shows you where access is excessive. Everything else can stay "unknown" until the first review cycle.'
-		: 'Vul eerst alleen has_access cellen in — de mensen die zeker toegang hebben. Dat alleen al laat zien waar toegang te ruim is. De rest mag "unknown" blijven tot de eerste review-cyclus.' }}
+		? 'Start by filling in only has_access cells, the people who definitely have access. That alone already shows you where access is excessive. Everything else can stay "unknown" until the first review cycle.'
+		: 'Vul eerst alleen has_access cellen in, de mensen die zeker toegang hebben. Dat alleen al laat zien waar toegang te ruim is. De rest mag "unknown" blijven tot de eerste review-cyclus.' }}
 </div>
 
 {{-- ============ 04 ACCESS ITEMS ============ --}}
@@ -462,8 +462,8 @@
 <h2 class="chapter"><span class="num">05</span>{{ $isEn ? 'Review cycles' : 'Review-cycli' }}</h2>
 <p class="chapter-intro">
 	{{ $isEn
-		? 'A review cycle is a periodic exercise — quarterly or annually — where someone goes through every matrix cell and decides: keep this access, revoke it, or change it.'
-		: 'Een review-cyclus is een periodieke exercitie — per kwartaal of jaarlijks — waarin iemand elke matrix-cel doorloopt en beslist: deze toegang behouden, intrekken of wijzigen.' }}
+		? 'A review cycle is a periodic exercise, quarterly or annually, where someone goes through every matrix cell and decides: keep this access, revoke it, or change it.'
+		: 'Een review-cyclus is een periodieke exercitie, per kwartaal of jaarlijks, waarin iemand elke matrix-cel doorloopt en beslist: deze toegang behouden, intrekken of wijzigen.' }}
 </p>
 
 <h3>{{ $isEn ? 'Cycle lifecycle' : 'Cyclus-levensloop' }}</h3>
@@ -472,8 +472,8 @@
 <h3>{{ $isEn ? 'Starting a cycle' : 'Een cyclus starten' }}</h3>
 <p>
 	{{ $isEn
-		? 'AccessGuard → Reviews → Nieuwe cyclus. Pick a title ("Q1 2026 access review"), a scope (active people, or everyone including inactive), an optional deadline, and notes for the reviewer. On save, the current matrix is snapshotted into review_items — one row per cell (or per item when the system has items).'
-		: 'AccessGuard → Reviews → Nieuwe cyclus. Kies een titel ("Q1 2026 access review"), een scope (actieve personen, of iedereen inclusief inactief), een optionele deadline, en notities voor de reviewer. Bij opslaan wordt de huidige matrix gesnapshot in review_items — één rij per cel (of per item als het systeem items heeft).' }}
+		? 'AccessGuard → Reviews → Nieuwe cyclus. Pick a title ("Q1 2026 access review"), a scope (active people, or everyone including inactive), an optional deadline, and notes for the reviewer. On save, the current matrix is snapshotted into review_items, one row per cell (or per item when the system has items).'
+		: 'AccessGuard → Reviews → Nieuwe cyclus. Kies een titel ("Q1 2026 access review"), een scope (actieve personen, of iedereen inclusief inactief), een optionele deadline, en notities voor de reviewer. Bij opslaan wordt de huidige matrix gesnapshot in review_items, één rij per cel (of per item als het systeem items heeft).' }}
 </p>
 
 <div class="warning-box">
@@ -509,8 +509,8 @@
 
 <h3>{{ $isEn ? 'Two action kinds' : 'Twee actie-soorten' }}</h3>
 <ul>
-	<li><strong>revoke_access</strong> — {{ $isEn ? 'Remove this access. On "mark done", the matrix cell flips to no_access (or the individual item if item-scoped).' : 'Verwijder deze toegang. Bij "afronden" flipt de matrix-cel naar no_access (of het individuele item als item-scoped).' }}</li>
-	<li><strong>review_level</strong> — {{ $isEn ? 'Change the level (e.g. admin → read-only). On "mark done", only the verified timestamp is bumped; you handle the actual level change externally and note it here.' : 'Wijzig het niveau (bv. admin → read-only). Bij "afronden" wordt alleen de verified timestamp bijgewerkt; je handelt de daadwerkelijke niveau-wijziging extern af en noteert het hier.' }}</li>
+	<li><strong>revoke_access</strong>, {{ $isEn ? 'Remove this access. On "mark done", the matrix cell flips to no_access (or the individual item if item-scoped).' : 'Verwijder deze toegang. Bij "afronden" flipt de matrix-cel naar no_access (of het individuele item als item-scoped).' }}</li>
+	<li><strong>review_level</strong>, {{ $isEn ? 'Change the level (e.g. admin → read-only). On "mark done", only the verified timestamp is bumped; you handle the actual level change externally and note it here.' : 'Wijzig het niveau (bv. admin → read-only). Bij "afronden" wordt alleen de verified timestamp bijgewerkt; je handelt de daadwerkelijke niveau-wijziging extern af en noteert het hier.' }}</li>
 </ul>
 
 <h3>{{ $isEn ? 'Typical flow' : 'Typische flow' }}</h3>
@@ -518,7 +518,7 @@
 	<li>{{ $isEn ? 'Reviewer closes a cycle with 6 revoke decisions' : 'Reviewer sluit een cyclus met 6 revoke-beslissingen' }}</li>
 	<li>{{ $isEn ? '6 revoke_access actions appear in the queue with status=open' : '6 revoke_access acties verschijnen in de queue met status=open' }}</li>
 	<li>{{ $isEn ? 'IT disables the accounts in the actual systems (M365 admin centre, Slack, etc.)' : 'IT deactiveert de accounts in de daadwerkelijke systemen (M365 admin centre, Slack, etc.)' }}</li>
-	<li>{{ $isEn ? 'IT clicks "Afronden" on each action — the corresponding matrix cell flips to no_access' : 'IT klikt "Afronden" op elke actie — de bijbehorende matrix-cel flipt naar no_access' }}</li>
+	<li>{{ $isEn ? 'IT clicks "Afronden" on each action, the corresponding matrix cell flips to no_access' : 'IT klikt "Afronden" op elke actie, de bijbehorende matrix-cel flipt naar no_access' }}</li>
 	<li>{{ $isEn ? 'The audit log records who marked done + when + what was applied' : 'De audit-log registreert wie afgerond heeft + wanneer + wat is toegepast' }}</li>
 </ol>
 
@@ -536,15 +536,15 @@
 	<li><strong>todo</strong>: {{ $isEn ? 'default, not started' : 'standaard, niet gestart' }}</li>
 	<li><strong>in_progress</strong>: {{ $isEn ? 'being worked on' : 'wordt aan gewerkt' }}</li>
 	<li><strong>done</strong>: {{ $isEn ? 'completed successfully' : 'succesvol afgerond' }}</li>
-	<li><strong>blocked</strong>: {{ $isEn ? 'waiting for something external — reason required' : 'wacht op iets externs — reden verplicht' }}</li>
-	<li><strong>na</strong>: {{ $isEn ? 'not applicable for this case — reason required' : 'niet van toepassing voor dit geval — reden verplicht' }}</li>
+	<li><strong>blocked</strong>: {{ $isEn ? 'waiting for something external, reason required' : 'wacht op iets externs, reden verplicht' }}</li>
+	<li><strong>na</strong>: {{ $isEn ? 'not applicable for this case, reason required' : 'niet van toepassing voor dit geval, reden verplicht' }}</li>
 </ul>
 
 <h3>{{ $isEn ? 'Offboarding → automatic revokes' : 'Offboarding → automatische revokes' }}</h3>
 <p>
 	{{ $isEn
-		? 'Completing an offboarding process has a powerful side-effect: every has_access cell or item of the subject person automatically becomes a revoke_access action. This means you physically cannot "forget" to revoke access — the system surfaces every open door.'
-		: 'Het afronden van een offboarding heeft een krachtig neveneffect: elke has_access cel of item van de betreffende persoon wordt automatisch een revoke_access actie. Hierdoor kun je fysiek niet "vergeten" om toegang in te trekken — het systeem toont elke open deur.' }}
+		? 'Completing an offboarding process has a powerful side-effect: every has_access cell or item of the subject person automatically becomes a revoke_access action. This means you physically cannot "forget" to revoke access, the system surfaces every open door.'
+		: 'Het afronden van een offboarding heeft een krachtig neveneffect: elke has_access cel of item van de betreffende persoon wordt automatisch een revoke_access actie. Hierdoor kun je fysiek niet "vergeten" om toegang in te trekken, het systeem toont elke open deur.' }}
 </p>
 
 <div class="info-box">
@@ -568,18 +568,18 @@
 	<tr><td><strong>stale_admin</strong></td><td>4</td><td>{{ $isEn ? 'Admin-like item with has_access but no verification for 90+ days' : 'Admin-achtig item met has_access maar geen verificatie voor 90+ dagen' }}</td></tr>
 	<tr><td><strong>orphan_access</strong></td><td>5</td><td>{{ $isEn ? 'Inactive person still has active has_access cells or items' : 'Inactieve persoon heeft nog actieve has_access cellen of items' }}</td></tr>
 	<tr><td><strong>excessive_access</strong></td><td>3</td><td>{{ $isEn ? 'Person has has_access on ≥10 different systems' : 'Persoon heeft has_access op ≥10 verschillende systemen' }}</td></tr>
-	<tr><td><strong>overdue_review</strong></td><td>4–5</td><td>{{ $isEn ? 'Open cycle past its due_at (5 if >30 days overdue)' : 'Open cyclus voorbij due_at (5 bij >30 dagen over)' }}</td></tr>
-	<tr><td><strong>overdue_action</strong></td><td>3–4</td><td>{{ $isEn ? 'Open action older than 14 days (4 if >30 days)' : 'Open actie ouder dan 14 dagen (4 bij >30 dagen)' }}</td></tr>
+	<tr><td><strong>overdue_review</strong></td><td>4-5</td><td>{{ $isEn ? 'Open cycle past its due_at (5 if >30 days overdue)' : 'Open cyclus voorbij due_at (5 bij >30 dagen over)' }}</td></tr>
+	<tr><td><strong>overdue_action</strong></td><td>3-4</td><td>{{ $isEn ? 'Open action older than 14 days (4 if >30 days)' : 'Open actie ouder dan 14 dagen (4 bij >30 dagen)' }}</td></tr>
 	<tr><td><strong>pending_onboarding</strong></td><td>3</td><td>{{ $isEn ? 'Person scheduled_in but no active onboarding process' : 'Persoon scheduled_in maar geen actief onboarding-proces' }}</td></tr>
-	<tr><td><strong>stale_credential</strong></td><td>4–5</td><td>{{ $isEn ? 'Vault credential past expires_at (5) or rotation overdue (4)' : 'Vault credential voorbij expires_at (5) of rotatie overdue (4)' }}</td></tr>
+	<tr><td><strong>stale_credential</strong></td><td>4-5</td><td>{{ $isEn ? 'Vault credential past expires_at (5) or rotation overdue (4)' : 'Vault credential voorbij expires_at (5) of rotatie overdue (4)' }}</td></tr>
 </table>
 
 <h3>{{ $isEn ? 'Working risks' : 'Risico\'s afhandelen' }}</h3>
 <p>{{ $isEn ? 'For each open risk flag you have three actions:' : 'Voor elke open risk-flag heb je drie acties:' }}</p>
 <ul>
-	<li><strong>{{ $isEn ? 'Acknowledge' : 'Bevestig' }}</strong> — {{ $isEn ? 'I\'ve seen this, will act on it. Moves to "acknowledged" status.' : 'Ik heb dit gezien, ga erop handelen. Gaat naar "acknowledged" status.' }}</li>
-	<li><strong>{{ $isEn ? 'Resolve' : 'Opgelost' }}</strong> — {{ $isEn ? 'The underlying problem is fixed (account revoked, review completed, etc.). Moves to "resolved".' : 'Het onderliggende probleem is opgelost (account ingetrokken, review afgerond, etc.). Gaat naar "resolved".' }}</li>
-	<li><strong>{{ $isEn ? 'Reopen' : 'Heropen' }}</strong> — {{ $isEn ? 'If something was resolved prematurely, you can reopen it.' : 'Als iets te vroeg opgelost is, kun je het heropenen.' }}</li>
+	<li><strong>{{ $isEn ? 'Acknowledge' : 'Bevestig' }}</strong>, {{ $isEn ? 'I\'ve seen this, will act on it. Moves to "acknowledged" status.' : 'Ik heb dit gezien, ga erop handelen. Gaat naar "acknowledged" status.' }}</li>
+	<li><strong>{{ $isEn ? 'Resolve' : 'Opgelost' }}</strong>, {{ $isEn ? 'The underlying problem is fixed (account revoked, review completed, etc.). Moves to "resolved".' : 'Het onderliggende probleem is opgelost (account ingetrokken, review afgerond, etc.). Gaat naar "resolved".' }}</li>
+	<li><strong>{{ $isEn ? 'Reopen' : 'Heropen' }}</strong>, {{ $isEn ? 'If something was resolved prematurely, you can reopen it.' : 'Als iets te vroeg opgelost is, kun je het heropenen.' }}</li>
 </ul>
 
 {{-- ============ 09 REMINDERS ============ --}}
@@ -601,16 +601,16 @@
 
 <p>
 	{{ $isEn
-		? 'Dismissing a reminder marks it permanently dismissed — the next scheduled run will not resurrect it. Marking "Klaar" closes it cleanly.'
-		: 'Een reminder wegklikken markeert hem permanent dismissed — de volgende geplande run zal hem niet terugbrengen. "Klaar" sluit hem schoon af.' }}
+		? 'Dismissing a reminder marks it permanently dismissed, the next scheduled run will not resurrect it. Marking "Klaar" closes it cleanly.'
+		: 'Een reminder wegklikken markeert hem permanent dismissed, de volgende geplande run zal hem niet terugbrengen. "Klaar" sluit hem schoon af.' }}
 </p>
 
 {{-- ============ 10 VAULT ============ --}}
 <h2 class="chapter"><span class="num">10</span>{{ $isEn ? 'Vault (encrypted credentials)' : 'Vault (versleutelde credentials)' }}</h2>
 <p class="chapter-intro">
 	{{ $isEn
-		? 'Store passwords, tokens, API keys, SSH keys and certificates — linked to systems or access items. Secrets are encrypted with AES-256 + HMAC; every view or decrypt is logged.'
-		: 'Bewaar wachtwoorden, tokens, API keys, SSH keys en certificaten — gekoppeld aan systemen of access items. Secrets worden versleuteld met AES-256 + HMAC; elke view of decrypt wordt gelogd.' }}
+		? 'Store passwords, tokens, API keys, SSH keys and certificates, linked to systems or access items. Secrets are encrypted with AES-256 + HMAC; every view or decrypt is logged.'
+		: 'Bewaar wachtwoorden, tokens, API keys, SSH keys en certificaten, gekoppeld aan systemen of access items. Secrets worden versleuteld met AES-256 + HMAC; elke view of decrypt wordt gelogd.' }}
 </p>
 
 <h3>{{ $isEn ? 'Access model' : 'Access-model' }}</h3>
@@ -630,8 +630,8 @@
 <div class="warning-box">
 	<div class="warning-box-title">{{ $isEn ? 'Audit trail' : 'Audit-trail' }}</div>
 	{{ $isEn
-		? 'Every action on a credential is logged: created, updated, viewed (metadata), decrypted, rotated, deleted, and ACL grants/revokes. Each log row includes the user and a hashed IP. Keep this in mind — secret access is NOT silent.'
-		: 'Elke actie op een credential wordt gelogd: aangemaakt, bijgewerkt, bekeken (metadata), gedecrypteerd, geroteerd, verwijderd, en ACL-grants/revokes. Elke log-rij bevat de gebruiker en een gehashed IP-adres. Houd dit in gedachten — secret-toegang is NIET stil.' }}
+		? 'Every action on a credential is logged: created, updated, viewed (metadata), decrypted, rotated, deleted, and ACL grants/revokes. Each log row includes the user and a hashed IP. Keep this in mind, secret access is NOT silent.'
+		: 'Elke actie op een credential wordt gelogd: aangemaakt, bijgewerkt, bekeken (metadata), gedecrypteerd, geroteerd, verwijderd, en ACL-grants/revokes. Elke log-rij bevat de gebruiker en een gehashed IP-adres. Houd dit in gedachten, secret-toegang is NIET stil.' }}
 </div>
 
 <h3>{{ $isEn ? 'Offboarding → automatic ACL revoke' : 'Offboarding → automatische ACL-revoke' }}</h3>
@@ -645,24 +645,24 @@
 <h2 class="chapter"><span class="num">11</span>{{ $isEn ? 'AI-powered explanations' : 'AI-aangedreven uitleg' }}</h2>
 <p class="chapter-intro">
 	{{ $isEn
-		? 'Not everyone on your team is a security person. The AI-explain widget translates a risk flag into plain-language advice — what it is, why it matters, and three or four concrete next steps.'
-		: 'Niet iedereen in je team is een security-persoon. De AI-explain widget vertaalt een risk-flag naar begrijpelijke taal — wat het is, waarom het belangrijk is, en drie of vier concrete vervolgstappen.' }}
+		? 'Not everyone on your team is a security person. The AI-explain widget translates a risk flag into plain-language advice, what it is, why it matters, and three or four concrete next steps.'
+		: 'Niet iedereen in je team is een security-persoon. De AI-explain widget vertaalt een risk-flag naar begrijpelijke taal, wat het is, waarom het belangrijk is, en drie of vier concrete vervolgstappen.' }}
 </p>
 
 <h3>{{ $isEn ? 'How it works' : 'Hoe het werkt' }}</h3>
 <p>{{ $isEn ? 'Click the 🤖 Uitleg button on any risk flag. A modal opens with:' : 'Klik op de 🤖 Uitleg knop bij een risk-flag. Een modal opent met:' }}</p>
 <ul>
-	<li><strong>{{ $isEn ? 'Summary' : 'Samenvatting' }}</strong> — {{ $isEn ? 'two-three sentences describing the risk' : 'twee-drie zinnen die het risico beschrijven' }}</li>
-	<li><strong>{{ $isEn ? 'Why it matters' : 'Waarom dit ertoe doet' }}</strong> — {{ $isEn ? 'business + security context' : 'business + security context' }}</li>
-	<li><strong>{{ $isEn ? 'Recommended steps' : 'Aanbevolen stappen' }}</strong> — {{ $isEn ? 'three or four concrete actions in AccessGuard' : 'drie of vier concrete acties in AccessGuard' }}</li>
-	<li><strong>{{ $isEn ? 'Warnings' : 'Waarschuwingen' }}</strong> — {{ $isEn ? 'what to watch out for' : 'waar je op moet letten' }}</li>
+	<li><strong>{{ $isEn ? 'Summary' : 'Samenvatting' }}</strong>, {{ $isEn ? 'two-three sentences describing the risk' : 'twee-drie zinnen die het risico beschrijven' }}</li>
+	<li><strong>{{ $isEn ? 'Why it matters' : 'Waarom dit ertoe doet' }}</strong>, {{ $isEn ? 'business + security context' : 'business + security context' }}</li>
+	<li><strong>{{ $isEn ? 'Recommended steps' : 'Aanbevolen stappen' }}</strong>, {{ $isEn ? 'three or four concrete actions in AccessGuard' : 'drie of vier concrete acties in AccessGuard' }}</li>
+	<li><strong>{{ $isEn ? 'Warnings' : 'Waarschuwingen' }}</strong>, {{ $isEn ? 'what to watch out for' : 'waar je op moet letten' }}</li>
 </ul>
 
 <div class="info-box">
 	<div class="info-box-title">{{ $isEn ? 'Privacy' : 'Privacy' }}</div>
 	{{ $isEn
-		? 'Only the risk flag\'s metadata is sent to OpenAI — never secrets, never full email addresses, never vault content. The payload is whitelisted to safe keys (ids, counts, dates). Every AI call is logged with tokens used. Rate-limited to 10 calls per tenant per hour; identical prompts are cached 24 hours.'
-		: 'Alleen de risk-flag metadata wordt naar OpenAI gestuurd — nooit secrets, nooit volledige e-mailadressen, nooit vault-inhoud. De payload is whitelist-gebaseerd op veilige keys (ids, counts, datums). Elke AI-call wordt gelogd met het aantal tokens. Rate-limited op 10 calls per tenant per uur; identieke prompts worden 24 uur gecached.' }}
+		? 'Only the risk flag\'s metadata is sent to OpenAI, never secrets, never full email addresses, never vault content. The payload is whitelisted to safe keys (ids, counts, dates). Every AI call is logged with tokens used. Rate-limited to 10 calls per tenant per hour; identical prompts are cached 24 hours.'
+		: 'Alleen de risk-flag metadata wordt naar OpenAI gestuurd, nooit secrets, nooit volledige e-mailadressen, nooit vault-inhoud. De payload is whitelist-gebaseerd op veilige keys (ids, counts, datums). Elke AI-call wordt gelogd met het aantal tokens. Rate-limited op 10 calls per tenant per uur; identieke prompts worden 24 uur gecached.' }}
 </div>
 
 {{-- ============ 12 PLANS ============ --}}
@@ -680,13 +680,13 @@
 		<th>Pro<br><span class="muted small">€12/mo</span></th>
 		<th>Business<br><span class="muted small">€39/mo</span></th>
 	</tr>
-	<tr><td>{{ $isEn ? 'Access Matrix + items' : 'Access Matrix + items' }}</td><td>—</td><td>✓</td><td>✓</td></tr>
-	<tr><td>{{ $isEn ? 'Review cycles' : 'Review-cycli' }}</td><td>—</td><td>✓</td><td>✓</td></tr>
-	<tr><td>{{ $isEn ? 'Onboarding / offboarding' : 'Onboarding / offboarding' }}</td><td>—</td><td>✓</td><td>✓</td></tr>
-	<tr><td>{{ $isEn ? 'Risk flags + reminders' : 'Risk flags + reminders' }}</td><td>—</td><td>✓</td><td>✓</td></tr>
-	<tr><td>Vault</td><td>—</td><td>✓</td><td>✓</td></tr>
-	<tr><td>{{ $isEn ? 'AI explanations' : 'AI-uitleg' }}</td><td>—</td><td>{{ $isEn ? '10/h' : '10/u' }}</td><td>{{ $isEn ? 'unlimited' : 'unlimited' }}</td></tr>
-	<tr><td>{{ $isEn ? 'Multi-user access' : 'Multi-user toegang' }}</td><td>—</td><td>—</td><td>✓</td></tr>
+	<tr><td>{{ $isEn ? 'Access Matrix + items' : 'Access Matrix + items' }}</td><td>, </td><td>✓</td><td>✓</td></tr>
+	<tr><td>{{ $isEn ? 'Review cycles' : 'Review-cycli' }}</td><td>, </td><td>✓</td><td>✓</td></tr>
+	<tr><td>{{ $isEn ? 'Onboarding / offboarding' : 'Onboarding / offboarding' }}</td><td>, </td><td>✓</td><td>✓</td></tr>
+	<tr><td>{{ $isEn ? 'Risk flags + reminders' : 'Risk flags + reminders' }}</td><td>, </td><td>✓</td><td>✓</td></tr>
+	<tr><td>Vault</td><td>, </td><td>✓</td><td>✓</td></tr>
+	<tr><td>{{ $isEn ? 'AI explanations' : 'AI-uitleg' }}</td><td>, </td><td>{{ $isEn ? '10/h' : '10/u' }}</td><td>{{ $isEn ? 'unlimited' : 'unlimited' }}</td></tr>
+	<tr><td>{{ $isEn ? 'Multi-user access' : 'Multi-user toegang' }}</td><td>, </td><td>, </td><td>✓</td></tr>
 </table>
 
 {{-- ============ 13 GLOSSARY ============ --}}
@@ -699,19 +699,19 @@
 
 <table class="data">
 	<tr><th>{{ $isEn ? 'Term' : 'Begrip' }}</th><th>{{ $isEn ? 'Meaning' : 'Betekenis' }}</th></tr>
-	<tr><td><strong>ACL</strong></td><td>{{ $isEn ? 'Access Control List — the per-user permission rows on a vault credential.' : 'Access Control List — de per-gebruiker permissie-rijen op een vault credential.' }}</td></tr>
+	<tr><td><strong>ACL</strong></td><td>{{ $isEn ? 'Access Control List, the per-user permission rows on a vault credential.' : 'Access Control List, de per-gebruiker permissie-rijen op een vault credential.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Access cell' : 'Access cel' }}</strong></td><td>{{ $isEn ? 'The intersection of a person and a system in the matrix.' : 'Het kruispunt van persoon en systeem in de matrix.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Access item' : 'Access item' }}</strong></td><td>{{ $isEn ? 'A fine-grained permission within a system (role, licence, account).' : 'Een fijnmazige permissie binnen een systeem (rol, licentie, account).' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Cycle' : 'Cyclus' }}</strong></td><td>{{ $isEn ? 'A review cycle: a time-bound exercise of reviewing every cell in a snapshot.' : 'Een review-cyclus: een tijdgebonden exercitie waarbij elke cel in een snapshot wordt beoordeeld.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'has_access' : 'has_access' }}</strong></td><td>{{ $isEn ? 'Cell state: person currently has confirmed access.' : 'Cel-status: persoon heeft momenteel bevestigde toegang.' }}</td></tr>
-	<tr><td><strong>IAM</strong></td><td>{{ $isEn ? 'Identity and Access Management — the broader discipline AccessGuard sits in.' : 'Identity and Access Management — de bredere discipline waar AccessGuard onder valt.' }}</td></tr>
+	<tr><td><strong>IAM</strong></td><td>{{ $isEn ? 'Identity and Access Management, the broader discipline AccessGuard sits in.' : 'Identity and Access Management, de bredere discipline waar AccessGuard onder valt.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'last_verified_at' : 'last_verified_at' }}</strong></td><td>{{ $isEn ? 'Timestamp of when a cell/item was last confirmed. Drives stale-admin detection.' : 'Tijdstip waarop een cel/item voor het laatst is bevestigd. Drijft stale-admin detectie.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'needs_review' : 'needs_review' }}</strong></td><td>{{ $isEn ? 'Cell state: status unclear, flag for next cycle.' : 'Cel-status: status onduidelijk, markeer voor volgende cyclus.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'no_access' : 'no_access' }}</strong></td><td>{{ $isEn ? 'Cell state: person deliberately has no access.' : 'Cel-status: persoon heeft bewust geen toegang.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Offboarding' : 'Offboarding' }}</strong></td><td>{{ $isEn ? 'The process for someone leaving the organisation. Completion triggers automatic revoke actions.' : 'Het proces voor iemand die de organisatie verlaat. Afronding triggert automatische revoke-acties.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Onboarding' : 'Onboarding' }}</strong></td><td>{{ $isEn ? 'The process for someone joining the organisation. Checklist-based with evidence uploads.' : 'Het proces voor iemand die bij de organisatie komt. Checklist-gebaseerd met bewijs-uploads.' }}</td></tr>
-	<tr><td><strong>{{ $isEn ? 'Person' : 'Persoon' }}</strong></td><td>{{ $isEn ? 'Someone whose access you track — employee, contractor or external.' : 'Iemand wiens toegang je bijhoudt — medewerker, inhuur of extern.' }}</td></tr>
-	<tr><td><strong>{{ $isEn ? 'Risk flag' : 'Risk flag' }}</strong></td><td>{{ $isEn ? 'A detected risk pattern. Has severity 1–5 and states open / acknowledged / resolved.' : 'Een gedetecteerd risico-patroon. Heeft severity 1–5 en statussen open / acknowledged / resolved.' }}</td></tr>
+	<tr><td><strong>{{ $isEn ? 'Person' : 'Persoon' }}</strong></td><td>{{ $isEn ? 'Someone whose access you track, employee, contractor or external.' : 'Iemand wiens toegang je bijhoudt, medewerker, inhuur of extern.' }}</td></tr>
+	<tr><td><strong>{{ $isEn ? 'Risk flag' : 'Risk flag' }}</strong></td><td>{{ $isEn ? 'A detected risk pattern. Has severity 1-5 and states open / acknowledged / resolved.' : 'Een gedetecteerd risico-patroon. Heeft severity 1-5 en statussen open / acknowledged / resolved.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Scope' : 'Scope' }}</strong></td><td>{{ $isEn ? 'A cycle scope: "active people" (default) or "everyone incl. inactive" (for yearly audit).' : 'Een cyclus scope: "actieve personen" (default) of "iedereen incl. inactief" (voor jaarlijkse audit).' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'Snapshot' : 'Snapshot' }}</strong></td><td>{{ $isEn ? 'A frozen copy of the matrix at cycle-start. Later changes don\'t affect the cycle.' : 'Een bevroren kopie van de matrix bij cyclus-start. Latere wijzigingen beïnvloeden de cyclus niet.' }}</td></tr>
 	<tr><td><strong>{{ $isEn ? 'System' : 'Systeem' }}</strong></td><td>{{ $isEn ? 'An app or service where people can have access. Can have items (for fine-grained tracking).' : 'Een app of service waar mensen toegang kunnen hebben. Kan items hebben (voor fijnmazige tracking).' }}</td></tr>
@@ -722,8 +722,8 @@
 
 <div class="footnote">
 	{{ $isEn
-		? 'AccessGuard is a product of Beter Geregeld ICT. This manual is generated automatically — the digital version on the website is always authoritative.'
-		: 'AccessGuard is een product van Beter Geregeld ICT. Deze handleiding wordt automatisch gegenereerd — de digitale versie op de website is altijd leidend.' }}
+		? 'AccessGuard is a product of Beter Geregeld ICT. This manual is generated automatically, the digital version on the website is always authoritative.'
+		: 'AccessGuard is een product van Beter Geregeld ICT. Deze handleiding wordt automatisch gegenereerd, de digitale versie op de website is altijd leidend.' }}
 	<br>
 	{{ $isEn ? 'Contact:' : 'Contact:' }} info@betergeregeld.com · {{ $isEn ? 'Manual generated:' : 'Handleiding gegenereerd:' }} {{ $generatedAt }}
 </div>

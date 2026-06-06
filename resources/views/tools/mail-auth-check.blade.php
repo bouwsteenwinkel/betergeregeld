@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('SPF / DKIM / DMARC checker') . ' — ' . config('app.name'))
+@section('title', __('SPF / DKIM / DMARC checker') . ', ' . config('app.name'))
 @section('description', __('Controleer of de e-mailbeveiliging van een domein klopt: SPF, DKIM en DMARC in één keer.'))
 
 @section('content')
@@ -46,7 +46,7 @@
 		@if ($result)
 			@php
 				$verdictColor = ['ok' => 'green', 'warn' => 'amber', 'err' => 'red', 'missing' => 'red'];
-				$verdictLabel = ['ok' => '✓ OK', 'warn' => '⚠ Aandachtspunt', 'err' => '✕ Probleem', 'missing' => '— Ontbreekt'];
+				$verdictLabel = ['ok' => '✓ OK', 'warn' => '⚠ Aandachtspunt', 'err' => '✕ Probleem', 'missing' => ', Ontbreekt'];
 				$renderBlock = function ($label, $data) use ($verdictColor, $verdictLabel) {
 					$color = $verdictColor[$data['verdict']] ?? 'gray';
 					return [$color, $verdictLabel[$data['verdict']] ?? '?', $label, $data];
@@ -96,7 +96,7 @@
 			<div class="mt-10 card bg-[color:var(--color-surface)]">
 				<h3 class="font-bold mb-2">{{ __('Een of meer rode/gele blokken?') }}</h3>
 				<p class="text-sm text-[color:var(--color-ink-muted)] mb-4">
-					{{ __('Wij regelen SPF, DKIM en DMARC voor je in — inclusief de stappenplan-aanpak van p=none naar p=reject zonder dat legitieme mail in spam belandt.') }}
+					{{ __('Wij regelen SPF, DKIM en DMARC voor je in, inclusief de stappenplan-aanpak van p=none naar p=reject zonder dat legitieme mail in spam belandt.') }}
 				</p>
 				<a href="/{{ app()->getLocale() }}/diensten/mail-beveiliging-fix" class="btn-accent">
 					{{ __('E-mail-beveiliging laten regelen') }}

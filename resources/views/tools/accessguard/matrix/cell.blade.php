@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', $person->full_name . ' × ' . $system->name . ' — AccessGuard')
+@section('title', $person->full_name . ' × ' . $system->name . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
 	$crumb = $person->full_name . ' / ' . $system->name;
 	$stateColors = [
-		'unknown' => ['bg' => 'bg-slate-100', 'border' => 'border-slate-200', 'text' => 'text-slate-500', 'label' => '—', 'name' => __('Onbekend')],
+		'unknown' => ['bg' => 'bg-slate-100', 'border' => 'border-slate-200', 'text' => 'text-slate-500', 'label' => ', ', 'name' => __('Onbekend')],
 		'has_access' => ['bg' => 'bg-emerald-100', 'border' => 'border-emerald-300', 'text' => 'text-emerald-800', 'label' => '✓', 'name' => __('Toegang')],
 		'no_access' => ['bg' => 'bg-slate-300', 'border' => 'border-slate-400', 'text' => 'text-slate-700', 'label' => '×', 'name' => __('Geen toegang')],
 		'needs_review' => ['bg' => 'bg-amber-100', 'border' => 'border-amber-300', 'text' => 'text-amber-800', 'label' => '?', 'name' => __('Heroverwegen')],
@@ -97,7 +97,7 @@
 (function () {
 	const CYCLE = ['unknown', 'has_access', 'no_access', 'needs_review'];
 	const CLASSES = {
-		unknown: {bg:'bg-slate-100', border:'border-slate-200', text:'text-slate-500', label:'—', name: @json(__('Onbekend'))},
+		unknown: {bg:'bg-slate-100', border:'border-slate-200', text:'text-slate-500', label:', ', name: @json(__('Onbekend'))},
 		has_access: {bg:'bg-emerald-100', border:'border-emerald-300', text:'text-emerald-800', label:'✓', name: @json(__('Toegang'))},
 		no_access: {bg:'bg-slate-300', border:'border-slate-400', text:'text-slate-700', label:'×', name: @json(__('Geen toegang'))},
 		needs_review: {bg:'bg-amber-100', border:'border-amber-300', text:'text-amber-800', label:'?', name: @json(__('Heroverwegen'))},

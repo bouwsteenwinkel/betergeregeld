@@ -125,8 +125,8 @@ class ReminderBuilder
 				'kind' => 'person_starting',
 				'subject_type' => 'person',
 				'subject_id' => (string) $p->id,
-				'title' => trim($p->first_name . ' ' . $p->last_name) . ' — ' . __('start binnenkort'),
-				'description' => __('Start op :date — onboarding plannen.', ['date' => $p->start_date->format('d-m-Y')]),
+				'title' => trim($p->first_name . ' ' . $p->last_name) . ', ' . __('start binnenkort'),
+				'description' => __('Start op :date, onboarding plannen.', ['date' => $p->start_date->format('d-m-Y')]),
 				'due_at' => $p->start_date->toDateString(),
 			], $now);
 			$count++;
@@ -151,8 +151,8 @@ class ReminderBuilder
 				'kind' => 'person_leaving',
 				'subject_type' => 'person',
 				'subject_id' => (string) $p->id,
-				'title' => trim($p->first_name . ' ' . $p->last_name) . ' — ' . __('vertrekt binnenkort'),
-				'description' => __('Einddatum :date — offboarding afronden.', ['date' => $p->end_date->format('d-m-Y')]),
+				'title' => trim($p->first_name . ' ' . $p->last_name) . ', ' . __('vertrekt binnenkort'),
+				'description' => __('Einddatum :date, offboarding afronden.', ['date' => $p->end_date->format('d-m-Y')]),
 				'due_at' => $p->end_date->toDateString(),
 			], $now);
 			$count++;

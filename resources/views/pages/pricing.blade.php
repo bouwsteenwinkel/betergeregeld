@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Prijzen') . ' — ' . config('app.name'))
+@section('title', __('Prijzen') . ', ' . config('app.name'))
 @section('description', __('Eenvoudige, transparante prijzen voor alle tools. Start gratis, upgrade als je meer nodig hebt.'))
 
 @php
@@ -30,14 +30,14 @@
 			'tagline_nl' => 'Voor ZZP en individuele professionals.',
 			'tagline_en' => 'For freelancers and individual professionals.',
 			'highlights_nl' => [
-				'Ruime daglimieten — 1000 checks/dag',
+				'Ruime daglimieten, 1000 checks/dag',
 				'IBAN risk-details en VIES historie',
 				'PDF merge 50 files, 500 MB',
 				'Geschiedenis 90 dagen',
 				'E-mail support (2 werkdagen)',
 			],
 			'highlights_en' => [
-				'High daily limits — 1000 checks/day',
+				'High daily limits, 1000 checks/day',
 				'IBAN risk details and VIES history',
 				'PDF merge 50 files, 500 MB',
 				'90-day history',
@@ -66,7 +66,7 @@
 
 	$fmt = fn ($value, $key) => match (true) {
 		strtolower((string) $value) === 'unlimited' => $isEn ? 'Unlimited' : 'Onbeperkt',
-		$value === '0' || $value === 0 || $value === null || $value === '' => '—',
+		$value === '0' || $value === 0 || $value === null || $value === '' => ', ',
 		$value === '1' || $value === 1 || $value === true => '✓',
 		default => (string) $value,
 	};
@@ -103,7 +103,7 @@
 				['nl' => 'Geen watermerk op PDF merge', 'en' => 'Watermark-free PDF merge', 'key' => 'tool.pdf_merge.watermark', 'invert' => true],
 				['nl' => 'PDF merge met OCR', 'en' => 'PDF merge with OCR', 'key' => 'tool.pdf_merge.ocr'],
 				['nl' => 'PDF redact', 'en' => 'PDF redact', 'key' => 'tool.pdf_redact.enabled'],
-				['nl' => 'PDF redact — pattern mode', 'en' => 'PDF redact — pattern mode', 'key' => 'tool.pdf_redact.pattern_mode'],
+				['nl' => 'PDF redact, pattern mode', 'en' => 'PDF redact, pattern mode', 'key' => 'tool.pdf_redact.pattern_mode'],
 			],
 		],
 		[
@@ -207,7 +207,7 @@
 							<span class="text-sm text-[color:var(--color-ink-muted)]">/ {{ __('maand') }}</span>
 						</div>
 						<p class="text-xs text-[color:var(--color-ink-soft)] mt-1">
-							{{ __('of €:y/jaar — effectief €:m/mnd', ['y' => (int) $plan['price_yearly'], 'm' => $yearlyEq]) }}
+							{{ __('of €:y/jaar, effectief €:m/mnd', ['y' => (int) $plan['price_yearly'], 'm' => $yearlyEq]) }}
 						</p>
 					@endif
 				</div>
@@ -243,7 +243,7 @@
 								<input type="hidden" name="plan" value="{{ $plan['key'] }}">
 								<input type="hidden" name="period" value="monthly">
 								<button type="submit" class="{{ $isPro ? 'btn-accent' : 'btn-dark' }} w-full justify-center text-sm">
-									{{ __('Nu abonneren — €:price/mnd', ['price' => (int) $plan['price_monthly']]) }}
+									{{ __('Nu abonneren, €:price/mnd', ['price' => (int) $plan['price_monthly']]) }}
 								</button>
 							</form>
 							@if ($plan['trial_days'] > 0)
@@ -314,11 +314,11 @@
 										if (($row['invert'] ?? false) && in_array($raw, ['0', 0, null, ''], true)) {
 											$cell = '✓';
 										} elseif (($row['invert'] ?? false) && in_array($raw, ['1', 1, true], true)) {
-											$cell = '—';
+											$cell = ', ';
 										}
 									@endphp
 									<td class="py-3 px-3 text-center {{ $plan['key'] === 'tools_pro' ? 'bg-[color:var(--color-accent)]/5' : '' }}">
-										<span class="{{ $cell === '—' ? 'text-[color:var(--color-ink-soft)]' : ($cell === '✓' ? 'text-[color:var(--color-accent)] font-bold' : 'font-medium') }}">
+										<span class="{{ $cell === ', ' ? 'text-[color:var(--color-ink-soft)]' : ($cell === '✓' ? 'text-[color:var(--color-accent)] font-bold' : 'font-medium') }}">
 											{{ $cell }}
 										</span>
 									</td>
@@ -360,8 +360,8 @@
 			<h2 class="text-2xl md:text-3xl font-bold mb-3">{{ $isEn ? 'See how our tools are used in practice' : 'Kijk hoe onze tools in de praktijk werken' }}</h2>
 			<p class="text-[color:var(--color-ink-muted)]">
 				{{ $isEn
-					? 'Over 115 guides on access management, compliance, PDF redaction, invoicing and SMB security — written for operators, not consultants.'
-					: 'Ruim 115 gidsen over toegangsbeheer, compliance, PDF-redactie, facturatie en MKB-security — geschreven voor ondernemers, niet voor consultants.' }}
+					? 'Over 115 guides on access management, compliance, PDF redaction, invoicing and SMB security, written for operators, not consultants.'
+					: 'Ruim 115 gidsen over toegangsbeheer, compliance, PDF-redactie, facturatie en MKB-security, geschreven voor ondernemers, niet voor consultants.' }}
 			</p>
 		</div>
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -369,7 +369,7 @@
 				class="card hover:shadow-md transition-shadow block group">
 				<p class="text-xs uppercase tracking-wider font-bold text-[color:var(--color-accent)] mb-2">★ {{ __('AccessGuard') }}</p>
 				<h3 class="font-bold text-lg mb-2 group-hover:text-[color:var(--color-accent)] transition-colors">{{ __('Toegangsbeheer voor het MKB') }}</h3>
-				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Complete gids — van eerste matrix tot directory-sync, reviews en automatisering.') }}</p>
+				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Complete gids, van eerste matrix tot directory-sync, reviews en automatisering.') }}</p>
 			</a>
 			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'pdf-redactie-voor-mkb-complete-gids']) }}"
 				class="card hover:shadow-md transition-shadow block group">
@@ -381,7 +381,7 @@
 				class="card hover:shadow-md transition-shadow block group">
 				<p class="text-xs uppercase tracking-wider font-bold text-[color:var(--color-accent)] mb-2">★ {{ __('Bookkeeping') }}</p>
 				<h3 class="font-bold text-lg mb-2 group-hover:text-[color:var(--color-accent)] transition-colors">{{ __('MKB-facturatie van quote tot betaling') }}</h3>
-				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Offerte, factuur, herinnering, BTW, UBL — de hele keten uitgelegd.') }}</p>
+				<p class="text-sm text-[color:var(--color-ink-muted)]">{{ __('Offerte, factuur, herinnering, BTW, UBL, de hele keten uitgelegd.') }}</p>
 			</a>
 		</div>
 		<div class="text-center mt-8">

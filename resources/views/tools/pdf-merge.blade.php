@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('PDF merge') . ' — ' . config('app.name'))
+@section('title', __('PDF merge') . ', ' . config('app.name'))
 
 @section('content')
 

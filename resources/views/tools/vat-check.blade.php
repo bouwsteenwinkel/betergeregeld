@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('VAT Check (VIES)') . ' — ' . config('app.name'))
+@section('title', __('VAT Check (VIES)') . ', ' . config('app.name'))
 
 @section('content')
 

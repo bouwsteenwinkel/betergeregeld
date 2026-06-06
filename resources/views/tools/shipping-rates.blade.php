@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Verzendtarieven') . ' — ' . config('app.name'))
+@section('title', __('Verzendtarieven') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -9,7 +9,7 @@
 		$fmtG = fn (int $g) => $g >= 1000
 			? rtrim(rtrim(number_format($g / 1000, 2, ',', '.'), '0'), ',') . ' kg'
 			: $g . ' g';
-		return $fmtG($from) . ' – ' . $fmtG($to);
+		return $fmtG($from) . ' - ' . $fmtG($to);
 	};
 @endphp
 

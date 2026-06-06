@@ -5,7 +5,7 @@
 	$crumb = __('Profile toepassen') . ' · ' . $profile->name;
 @endphp
 
-@section('title', $crumb . ' — AccessGuard')
+@section('title', $crumb . ', AccessGuard')
 
 @section('content')
 
@@ -35,7 +35,7 @@
 					@foreach ($people as $p)
 						<option value="{{ $p->id }}">
 							{{ trim($p->first_name . ' ' . ($p->middle_name ?? '') . ' ' . $p->last_name) }}
-							@if ($p->job_title) — {{ $p->job_title }} @endif
+							@if ($p->job_title), {{ $p->job_title }} @endif
 						</option>
 					@endforeach
 				</select>
@@ -48,7 +48,7 @@
 						<input type="radio" name="strategy" value="dry_run" checked class="mt-1">
 						<span>
 							<strong>{{ __('Dry-run') }}</strong>
-							<span class="text-[color:var(--color-ink-muted)] block text-xs">{{ __('Alleen tellen — niks schrijven. Test wat er zou veranderen.') }}</span>
+							<span class="text-[color:var(--color-ink-muted)] block text-xs">{{ __('Alleen tellen, niks schrijven. Test wat er zou veranderen.') }}</span>
 						</span>
 					</label>
 					<label class="flex items-start gap-2">

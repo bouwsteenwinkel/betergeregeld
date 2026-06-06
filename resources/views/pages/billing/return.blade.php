@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Betaling verwerken') . ' — ' . config('app.name'))
+@section('title', __('Betaling verwerken') . ', ' . config('app.name'))
 
 @section('content')
 
@@ -33,7 +33,7 @@
 			@if ($isFakeMode)
 				<div class="rounded-[var(--radius-control)] border border-amber-300/30 bg-amber-500/10 p-4 text-sm text-amber-100 max-w-md mx-auto">
 					<p class="font-semibold mb-1">{{ __('Dev-modus actief') }}</p>
-					<p class="opacity-90">{{ __('MOLLIE_KEY is niet gezet — deze checkout is een simulatie en is direct na confirm gemarkeerd als betaald.') }}</p>
+					<p class="opacity-90">{{ __('MOLLIE_KEY is niet gezet, deze checkout is een simulatie en is direct na confirm gemarkeerd als betaald.') }}</p>
 				</div>
 			@endif
 		@else

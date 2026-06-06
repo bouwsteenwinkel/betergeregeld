@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', __('Access Matrix') . ' — AccessGuard')
+@section('title', __('Access Matrix') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
 	$crumb = __('Access Matrix');
 	$stateColors = [
-		'unknown' => ['bg' => 'bg-slate-100', 'border' => 'border-slate-200', 'text' => 'text-slate-500', 'label' => '—'],
+		'unknown' => ['bg' => 'bg-slate-100', 'border' => 'border-slate-200', 'text' => 'text-slate-500', 'label' => ', '],
 		'has_access' => ['bg' => 'bg-emerald-100', 'border' => 'border-emerald-300', 'text' => 'text-emerald-800', 'label' => '✓'],
 		'no_access' => ['bg' => 'bg-slate-300', 'border' => 'border-slate-400', 'text' => 'text-slate-700', 'label' => '×'],
 		'needs_review' => ['bg' => 'bg-amber-100', 'border' => 'border-amber-300', 'text' => 'text-amber-800', 'label' => '?'],
@@ -71,7 +71,7 @@
 							<tr>
 								<td class="sticky left-0 z-10 bg-white p-3 border-b border-r border-[color:var(--color-line)]">
 									<div class="font-semibold">{{ $p->full_name }}</div>
-									<div class="text-xs text-[color:var(--color-ink-muted)]">{{ $p->job_title ?: '—' }}</div>
+									<div class="text-xs text-[color:var(--color-ink-muted)]">{{ $p->job_title ?: ', ' }}</div>
 								</td>
 								@foreach ($systems as $s)
 									@php
@@ -113,7 +113,7 @@
 (function () {
 	const CYCLE = ['unknown', 'has_access', 'no_access', 'needs_review'];
 	const CLASSES = {
-		unknown: {bg:'bg-slate-100', border:'border-slate-200', text:'text-slate-500', label:'—'},
+		unknown: {bg:'bg-slate-100', border:'border-slate-200', text:'text-slate-500', label:', '},
 		has_access: {bg:'bg-emerald-100', border:'border-emerald-300', text:'text-emerald-800', label:'✓'},
 		no_access: {bg:'bg-slate-300', border:'border-slate-400', text:'text-slate-700', label:'×'},
 		needs_review: {bg:'bg-amber-100', border:'border-amber-300', text:'text-amber-800', label:'?'},

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Uitgeschreven') . ' — AccessGuard')
+@section('title', __('Uitgeschreven') . ', AccessGuard')
 
 @section('content')
 

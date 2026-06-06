@@ -27,7 +27,7 @@
 	$ctaText  = $tx('cta_text');
 @endphp
 
-@section('title', $h1 . ' — Beter Geregeld ICT')
+@section('title', $h1 . ', Beter Geregeld ICT')
 @section('description', $lead)
 
 @push('head')
@@ -120,7 +120,7 @@
 				</a>
 				<div class="mt-5 pt-5 border-t border-[color:var(--color-line)] text-xs text-[color:var(--color-ink-soft)] space-y-1">
 					<div><a href="mailto:info@betergeregeld.com" class="hover:text-[color:var(--color-ink)]">info@betergeregeld.com</a></div>
-					<div><a href="tel:+31352011729" class="hover:text-[color:var(--color-ink)]">+31 35 201 1729</a></div>
+					<div><a href="tel:+31882545101" class="hover:text-[color:var(--color-ink)]">088-2545101</a></div>
 				</div>
 			</div>
 		</aside>
@@ -147,7 +147,7 @@
 	</div>
 </section>
 
-{{-- Verwante artikelen — internal-linking + visitor-retention. Alleen
+{{-- Verwante artikelen, internal-linking + visitor-retention. Alleen
 	 zichtbaar als ServiceController posts vond via category/tag-match
 	 (config/service_blog_links.php). --}}
 @if (!empty($relatedPosts) && $relatedPosts->isNotEmpty())

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Directory') . ' — AccessGuard')
+@section('title', __('Directory') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -47,7 +47,7 @@
 				<dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 mt-4 text-sm">
 					<div>
 						<dt class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Tenant') }}</dt>
-						<dd class="font-mono">{{ $connection->display_name ?? $connection->external_tenant_id ?? '—' }}</dd>
+						<dd class="font-mono">{{ $connection->display_name ?? $connection->external_tenant_id ?? ', ' }}</dd>
 					</div>
 					<div>
 						<dt class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Laatste sync') }}</dt>
@@ -55,7 +55,7 @@
 					</div>
 					<div>
 						<dt class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Token verloopt') }}</dt>
-						<dd>{{ $connection->expires_at?->diffForHumans() ?? '—' }}</dd>
+						<dd>{{ $connection->expires_at?->diffForHumans() ?? ', ' }}</dd>
 					</div>
 					<div>
 						<dt class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)]">{{ __('Users in laatste sync') }}</dt>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('LEGO Element Finder') . ' — ' . config('app.name'))
+@section('title', __('LEGO Element Finder') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -86,12 +86,12 @@
 							<div class="grid grid-cols-2 gap-4">
 								<div>
 									<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)] font-bold mb-1">{{ __('Part (design)') }}</div>
-									<div class="font-mono text-sm">{{ $result['part_num'] ?? '—' }}</div>
+									<div class="font-mono text-sm">{{ $result['part_num'] ?? ', ' }}</div>
 								</div>
 								<div>
 									<div class="text-xs uppercase tracking-wider text-[color:var(--color-ink-muted)] font-bold mb-1">{{ __('Kleur') }}</div>
 									<div class="text-sm">
-										{{ $result['color_name'] ?? '—' }}
+										{{ $result['color_name'] ?? ', ' }}
 										@if ($result['color_id'] !== null)
 											<span class="text-xs text-[color:var(--color-ink-muted)] font-mono ml-1">#{{ $result['color_id'] }}</span>
 										@endif
@@ -126,7 +126,7 @@
 						@endif
 					</div>
 					<p class="text-sm text-[color:var(--color-ink-soft)]">
-						{{ __('Geen match in onze database of bij Rebrickable. Probeer het zonder extra tekens — alleen het numerieke Element ID.') }}
+						{{ __('Geen match in onze database of bij Rebrickable. Probeer het zonder extra tekens, alleen het numerieke Element ID.') }}
 					</p>
 					@if ($result['element_id'])
 						<div class="mt-4">

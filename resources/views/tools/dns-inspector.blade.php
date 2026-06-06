@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('DNS records inspector') . ' — ' . config('app.name'))
+@section('title', __('DNS records inspector') . ', ' . config('app.name'))
 @section('description', __('Bekijk alle DNS-records (A, AAAA, MX, NS, TXT, CNAME, SOA) van een domein in één keer.'))
 
 @section('content')
@@ -32,7 +32,7 @@
 				<input id="domain" name="domain" type="text" required value="{{ $domain }}" autocomplete="off"
 					placeholder="example.com" class="field-input font-mono">
 				<p class="text-xs text-[color:var(--color-ink-muted)] mt-1">
-					{{ __('Plak een hostname of URL — we strippen automatisch protocol/pad/www.') }}
+					{{ __('Plak een hostname of URL, we strippen automatisch protocol/pad/www.') }}
 				</p>
 			</div>
 			@if ($error)
@@ -98,7 +98,7 @@
 			<div class="mt-10 card bg-[color:var(--color-surface)]">
 				<h3 class="font-bold mb-2">{{ __('Iets vreemds gezien?') }}</h3>
 				<p class="text-sm text-[color:var(--color-ink-muted)] mb-4">
-					{{ __('Onbekende MX-records, ontbrekende SPF/DKIM/DMARC, ongebruikte CNAMEs — wij helpen met opschonen en correcte mail-beveiliging.') }}
+					{{ __('Onbekende MX-records, ontbrekende SPF/DKIM/DMARC, ongebruikte CNAMEs, wij helpen met opschonen en correcte mail-beveiliging.') }}
 				</p>
 				<a href="/{{ app()->getLocale() }}/diensten/mail-beveiliging-fix" class="btn-accent">
 					{{ __('E-mail-beveiliging laten regelen') }}

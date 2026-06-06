@@ -27,7 +27,7 @@ class BillingController extends Controller
 
 		return redirect()
 			->route('dashboard', ['locale' => $locale])
-			->with('billing_message', __('Proefperiode geactiveerd — geniet van :plan tot :date.', [
+			->with('billing_message', __('Proefperiode geactiveerd, geniet van :plan tot :date.', [
 				'plan' => $sub->plan->name,
 				'date' => $sub->trial_ends_at->format('d-m-Y'),
 			]));
@@ -65,7 +65,7 @@ class BillingController extends Controller
 		if ($intentModel->isPaid()) {
 			return redirect()
 				->route('dashboard', ['locale' => $locale])
-				->with('billing_message', __('Betaling gelukt — :plan is nu actief.', [
+				->with('billing_message', __('Betaling gelukt, :plan is nu actief.', [
 					'plan' => $intentModel->plan->name,
 				]));
 		}

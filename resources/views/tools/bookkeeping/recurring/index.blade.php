@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Terugkerende facturen') . ' — ' . config('app.name'))
+@section('title', __('Terugkerende facturen') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -66,18 +66,18 @@
 						@foreach ($templates as $tpl)
 							<tr class="border-b border-[color:var(--color-line)]/60">
 								<td class="py-2 pr-3 font-medium">{{ $tpl->title }}</td>
-								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $tpl->relation?->name ?? '—' }}</td>
+								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">{{ $tpl->relation?->name ?? ', ' }}</td>
 								<td class="py-2 px-3 text-[color:var(--color-ink-muted)]">
 									{{ __('recurring.frequency.' . $tpl->frequency) }} · {{ __('dag') }} {{ $tpl->day_of_month }}
 								</td>
 								<td class="py-2 px-3 tabular-nums text-[color:var(--color-ink-muted)]">
-									{{ $tpl->next_run_at?->format('d-m-Y') ?? '—' }}
+									{{ $tpl->next_run_at?->format('d-m-Y') ?? ', ' }}
 								</td>
 								<td class="py-2 px-3 text-center">
-									@if ($tpl->auto_send_email)<span class="text-emerald-700">✓</span>@else<span class="text-[color:var(--color-ink-soft)]">—</span>@endif
+									@if ($tpl->auto_send_email)<span class="text-emerald-700">✓</span>@else<span class="text-[color:var(--color-ink-soft)]">, </span>@endif
 								</td>
 								<td class="py-2 px-3 text-center">
-									@if ($tpl->is_active)<span class="text-emerald-700">✓</span>@else<span class="text-[color:var(--color-ink-soft)]">—</span>@endif
+									@if ($tpl->is_active)<span class="text-emerald-700">✓</span>@else<span class="text-[color:var(--color-ink-soft)]">, </span>@endif
 								</td>
 								<td class="py-2 pl-3 text-right whitespace-nowrap">
 									<form method="POST" action="{{ route('tools.bookkeeping.recurring.run-now', ['locale' => $locale, 'id' => $tpl->id]) }}" class="inline"

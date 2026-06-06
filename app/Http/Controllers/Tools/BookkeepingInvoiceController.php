@@ -244,7 +244,7 @@ class BookkeepingInvoiceController extends Controller
 			'already_sent' => __('Deze herinnering is eerder al verstuurd.'),
 			'no_email' => __('Relatie heeft geen e-mail ingevuld.'),
 			'no_settings' => __('Vul eerst je factuur-instellingen in.'),
-			'send_failed' => __('Versturen mislukt — zie logs.'),
+			'send_failed' => __('Versturen mislukt, zie logs.'),
 			default => __('Versturen niet gelukt (:r).', ['r' => $result]),
 		};
 

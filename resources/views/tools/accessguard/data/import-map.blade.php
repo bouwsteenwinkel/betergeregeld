@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Kolommen mappen') . ' — AccessGuard')
+@section('title', __('Kolommen mappen') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -42,7 +42,7 @@
 								<th class="p-3 text-left align-top" style="min-width:160px">
 									<div class="font-bold text-[color:var(--color-ink)] mb-2">{{ $h }}</div>
 									<select name="mapping[{{ $idx }}]" class="field-input py-1 text-xs w-full">
-										<option value="">— {{ __('negeren') }} —</option>
+										<option value="">, {{ __('negeren') }}, </option>
 										@foreach ($fields as $fieldKey => $fieldLabel)
 											<option value="{{ $fieldKey }}" @selected(isset($suggested[$fieldKey]) && $suggested[$fieldKey] === $idx)>{{ $fieldLabel }}</option>
 										@endforeach

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($transaction ? __('Transactie bewerken') : __('Nieuwe transactie')) . ' — ' . config('app.name'))
+@section('title', ($transaction ? __('Transactie bewerken') : __('Nieuwe transactie')) . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -76,7 +76,7 @@
 				<div>
 					<label for="category_id" class="block text-sm font-semibold mb-2">{{ __('Categorie') }}</label>
 					<select id="category_id" name="category_id" class="field-input">
-						<option value="">—</option>
+						<option value="">, </option>
 						@foreach ($categories as $cat)
 							<option value="{{ $cat->id }}" @selected((int) $old('category_id') === $cat->id) data-type="{{ $cat->type }}">
 								{{ $cat->name }}
@@ -90,7 +90,7 @@
 				<div>
 					<label for="relation_id" class="block text-sm font-semibold mb-2">{{ __('Relatie') }}</label>
 					<select id="relation_id" name="relation_id" class="field-input">
-						<option value="">— {{ __('of los invullen hieronder') }} —</option>
+						<option value="">, {{ __('of los invullen hieronder') }}, </option>
 						@foreach ($relations as $rel)
 							<option value="{{ $rel->id }}" @selected((int) $old('relation_id', $transaction->relation_id ?? 0) === $rel->id)>
 								{{ $rel->name }}@if ($rel->city) · {{ $rel->city }}@endif
@@ -100,7 +100,7 @@
 					@if ($relations->isEmpty())
 						<p class="text-xs text-[color:var(--color-ink-soft)] mt-1.5">
 							<a href="{{ route('tools.bookkeeping.relations.create', ['locale' => app()->getLocale()]) }}" class="underline hover:text-[color:var(--color-ink)]">
-								{{ __('Nog geen relaties — voeg er een toe') }}
+								{{ __('Nog geen relaties, voeg er een toe') }}
 							</a>
 						</p>
 					@endif
@@ -180,7 +180,7 @@
 					@if ($isEdit && $t->receipt_path)
 						{{ __('Upload een nieuw bestand om het bestaande bonnetje te vervangen.') }}
 					@else
-						{{ __('PDF, JPG of PNG — max 10 MB. Optioneel.') }}
+						{{ __('PDF, JPG of PNG, max 10 MB. Optioneel.') }}
 					@endif
 				</p>
 			</div>

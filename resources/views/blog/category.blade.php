@@ -2,7 +2,7 @@
 
 @php $locale = app()->getLocale(); @endphp
 
-@section('title', $category->name . ' — Blog — ' . config('app.name'))
+@section('title', $category->name . ', Blog, ' . config('app.name'))
 @section('description', $category->intro ?: ('Artikelen over ' . $category->name . ' op het Betergeregeld-blog.'))
 
 @section('content')

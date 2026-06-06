@@ -21,10 +21,10 @@
 Een korte samenvatting van wat je aandacht nodig heeft in AccessGuard.
 
 @if ($digest['open_risks_count'] > 0)
-## Open risico's — {{ $digest['open_risks_count'] }} totaal
+## Open risico's, {{ $digest['open_risks_count'] }} totaal
 
 @foreach ($digest['open_risks'] as $r)
-**[Sev {{ $r->severity }}] {{ $r->title }}** — {{ $kindLabels[$r->kind] ?? $r->kind }}
+**[Sev {{ $r->severity }}] {{ $r->title }}**, {{ $kindLabels[$r->kind] ?? $r->kind }}
 {{ $r->description }}
 
 @endforeach
@@ -33,7 +33,7 @@ Een korte samenvatting van wat je aandacht nodig heeft in AccessGuard.
 @endif
 
 @if ($digest['upcoming_reminders_count'] > 0)
-## Reminders — {{ $digest['upcoming_reminders_count'] }} open
+## Reminders, {{ $digest['upcoming_reminders_count'] }} open
 
 @foreach ($digest['upcoming_reminders'] as $rem)
 **{{ $rem->title }}**

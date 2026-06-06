@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Upload CSV') . ' — AccessGuard')
+@section('title', __('Upload CSV') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -23,7 +23,7 @@
 			@csrf
 			<input type="hidden" name="kind" value="{{ $kind }}">
 
-			<h2 class="text-lg font-bold">{{ __('Upload CSV — :kind', ['kind' => $kindLabels[$kind] ?? $kind]) }}</h2>
+			<h2 class="text-lg font-bold">{{ __('Upload CSV, :kind', ['kind' => $kindLabels[$kind] ?? $kind]) }}</h2>
 
 			<div>
 				<label class="block text-xs font-semibold mb-1">{{ __('CSV-bestand') }} *</label>

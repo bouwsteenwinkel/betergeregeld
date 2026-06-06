@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('JSON formatter & validator') . ' — ' . config('app.name'))
+@section('title', __('JSON formatter & validator') . ', ' . config('app.name'))
 
 @section('content')
 

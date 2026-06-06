@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Winst & verlies') . ' — ' . config('app.name'))
+@section('title', __('Winst & verlies') . ', ' . config('app.name'))
 
 @php
 	$locale = app()->getLocale();
@@ -73,7 +73,7 @@
 					@if ($incomeTotal > 0)
 						{{ __('marge') }}: {{ number_format($result / $incomeTotal * 100, 1, ',', '.') }}%
 					@else
-						—
+						, 
 					@endif
 				</div>
 			</div>

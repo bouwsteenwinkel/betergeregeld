@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Data') . ' — AccessGuard')
+@section('title', __('Data') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -35,7 +35,7 @@
 			<div class="card">
 				<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">📥 {{ __('Importeren') }}</h2>
 				<p class="text-sm text-[color:var(--color-ink-muted)] mb-4">
-					{{ __('Upload een CSV met je personen of systemen. Eigen kolomnamen zijn prima — je mapt ze in de volgende stap.') }}
+					{{ __('Upload een CSV met je personen of systemen. Eigen kolomnamen zijn prima, je mapt ze in de volgende stap.') }}
 				</p>
 				<div class="space-y-2">
 					<a href="{{ route('tools.accessguard.data.import-start', ['locale' => $locale, 'kind' => 'people']) }}" class="block p-3 rounded border border-[color:var(--color-line)] hover:bg-[color:var(--color-surface-soft,#fafafa)]">
@@ -48,7 +48,7 @@
 					</a>
 					<a href="{{ route('tools.accessguard.data.screenshot-start', ['locale' => $locale]) }}" class="block p-3 rounded border border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 hover:bg-[color:var(--color-accent)]/10">
 						<div class="font-semibold text-sm">🤖 {{ __('Screenshot → personen') }}</div>
-						<div class="text-xs text-[color:var(--color-ink-muted)] mt-0.5">{{ __('Plak een screenshot van je M365/Google/Salesforce admin — AI extraheert automatisch') }}</div>
+						<div class="text-xs text-[color:var(--color-ink-muted)] mt-0.5">{{ __('Plak een screenshot van je M365/Google/Salesforce admin, AI extraheert automatisch') }}</div>
 					</a>
 				</div>
 			</div>
@@ -56,7 +56,7 @@
 			<div class="card">
 				<h2 class="text-sm font-bold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-3">📤 {{ __('Exporteren') }}</h2>
 				<p class="text-sm text-[color:var(--color-ink-muted)] mb-4">
-					{{ __('CSV-exports voor auditors, Excel-bewerking of een tweede opinie. UTF-8 met BOM — Excel opent direct correct.') }}
+					{{ __('CSV-exports voor auditors, Excel-bewerking of een tweede opinie. UTF-8 met BOM, Excel opent direct correct.') }}
 				</p>
 				<div class="space-y-2">
 					<a href="{{ route('tools.accessguard.data.export-matrix-wide', ['locale' => $locale]) }}" class="block p-3 rounded border border-[color:var(--color-line)] hover:bg-[color:var(--color-surface-soft,#fafafa)]">

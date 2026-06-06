@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Acties') . ' — AccessGuard')
+@section('title', __('Acties') . ', AccessGuard')
 
 @php
 	$locale = app()->getLocale();
@@ -68,7 +68,7 @@
 									@elseif ($a->process_id)
 										<a href="{{ route('tools.accessguard.processes.show', ['locale' => $locale, 'id' => $a->process_id]) }}" class="text-[color:var(--color-accent)] hover:underline">{{ __('Offboarding') }} #{{ $a->process_id }}</a>
 									@else
-										<span class="text-xs text-[color:var(--color-ink-muted)]">—</span>
+										<span class="text-xs text-[color:var(--color-ink-muted)]">, </span>
 									@endif
 								</td>
 								<td class="py-2 px-3">

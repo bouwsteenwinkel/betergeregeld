@@ -29,7 +29,7 @@ de vorige run. Onderstaand per check een korte status.
 ## Top open bevindingen
 
 @foreach ($openFindings as $f)
-- **{{ ucfirst($f->check_type) }} — {{ $f->title }}** ({{ $f->severity }}, score {{ $f->risk_score }})
+- **{{ ucfirst($f->check_type) }}, {{ $f->title }}** ({{ $f->severity }}, score {{ $f->risk_score }})
   {{ \Illuminate\Support\Str::limit($f->detail, 180) }}
 @endforeach
 @endif

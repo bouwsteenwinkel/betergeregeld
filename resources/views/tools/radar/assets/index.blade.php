@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Radar Assets — ' . config('app.name'))
+@section('title', 'Radar Assets, ' . config('app.name'))
 
 @php $crumb = __('Assets'); $locale = app()->getLocale(); @endphp
 
