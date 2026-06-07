@@ -17,7 +17,8 @@ Platform (Betergeregeld, super-admin)
 
 > **Modelbeslissing (2026-06-07):** een klant = één `tenant` met een **eigen sites-laag** eronder
 > (meerdere websites/applicaties). **Elke** site krijgt SEO + uptime + PageSpeed (ook apps).
-> Zie [ROADMAP.md](ROADMAP.md) — de sites-laag wordt nog gebouwd; nu is het nog 1 site per klant.
+> De sites-laag is gebouwd (commit 7649762): site = `seo_property` (+ type website/app),
+> uptime per site (`monitor_checks.property_id`), siteswitcher op het dashboard, sites-beheer in het bureau-panel.
 
 ## Toegang & panels
 
@@ -40,8 +41,8 @@ dus een bureau kan principieel niets van het platform zien. `User::canAccessPane
   - `seo_psi_daily` — PageSpeed: performance/lcp/cls/inp per strategy (mobile/desktop).
 - `monitor_checks.tenant_id` (per site uptime) + `monitor_check_results` — beschikbaarheid.
 
-> Nu hangen SEO-property en uptime-check direct aan de tenant (1 site). In de sites-laag
-> verhuizen ze naar een site-entiteit onder de klant — zie ROADMAP.
+> Een **site** = een `seo_property` (met `type` website/app); een klant (tenant) kan er meerdere hebben.
+> De uptime-check hangt per site via `monitor_checks.property_id`.
 
 ## Onderdelen (code)
 

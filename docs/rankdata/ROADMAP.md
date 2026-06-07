@@ -19,16 +19,15 @@
 | Bureau uit platform-admin (security) + tijdelijke front-end portal | 9046dc9 |
 | Fix: `/rankdata/{tenant}` 404 (locale positioneel gebonden) | c79da3c |
 | Afgeschermd bureau-panel `/bureau` + klantbeheer + branding | a6da41a |
+| **Sites-laag** — klant met meerdere websites/applicaties | 7649762 |
+
+Sites-laag (7649762): site = `seo_property` (+ `type` website/app); uptime-check per site
+(`monitor_checks.property_id`); klant-dashboard met siteswitcher (`?site=`); bureau-panel
+sites-relatiemanager (toevoegen/bewerken, maakt ook de uptime-check); demo-klant FietsXL = 2 websites.
 
 ## Nog te bouwen
 
-1. **Sites-laag** (de eerstvolgende grote stap)
-   - Site-entiteit onder de klant (naam, URL, type website/app, is_active).
-   - `seo_property` en `monitor_check` koppelen aan een site i.p.v. direct aan de tenant.
-   - Bureau-panel: per klant sites toevoegen/beheren ("website toevoegen").
-   - Klant-dashboard: meerdere sites tonen (overzicht + per-site view / siteswitcher).
-   - Demo-klant met 2 websites.
-2. **Echte Search Console-koppeling per klant** (de geparkeerde "stap 1")
+1. **Echte Search Console-koppeling per klant** (de geparkeerde "stap 1")
    - Per klant-property service-account-toegang verifiëren + `seo:import-gsc` per property laten lopen.
    - Nu draait alles op `RankdataDemoSeeder` (geseede cijfers).
 3. **PageSpeed API-key** — eigen Google-key voor genoeg dagquota over meerdere klanten.
