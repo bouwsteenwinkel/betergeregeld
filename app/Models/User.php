@@ -39,8 +39,23 @@ class User extends Authenticatable implements FilamentUser, HasName
 	public function canAccessPanel(Panel $panel): bool
 	{
 		return $panel->getId() === 'admin'
-			&& $this->role === 'admin'
+			&& in_array($this->role, ['admin', 'agency'], true)
 			&& $this->is_active;
+	}
+
+	/**
+	 * Bureau-beheerder (Rankdata-type): mag het admin-panel in, maar ziet er
+	 * alleen de eigen klanten — niet de platform-brede super-admin-resources.
+	 */
+	public function isAgencyAdmin(): bool
+	{
+		return $this->role === 'agency' && $this->agency_id !== null;
+	}
+
+	/** Klantgebruiker: geen admin-panel, wel het eigen front-end dashboard. */
+	public function isClient(): bool
+	{
+		return $this->role === 'client';
 	}
 
 	public function getFilamentName(): string
@@ -69,6 +84,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 
 	protected $fillable = [
 		'tenant_id',
+		'agency_id',
 		'email',
 		'password_hash',
 		'role',
@@ -90,6 +106,11 @@ class User extends Authenticatable implements FilamentUser, HasName
 	public function tenant()
 	{
 		return $this->belongsTo(Tenant::class);
+	}
+
+	public function agency()
+	{
+		return $this->belongsTo(Agency::class);
 	}
 
 	public function cases()

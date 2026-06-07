@@ -46,11 +46,17 @@ class Tenant extends Model
 	];
 
 	protected $fillable = [
+		'agency_id',
 		'name',
 		'plan',
 		'is_active',
 		'server_id'
 	];
+
+	public function agency()
+	{
+		return $this->belongsTo(Agency::class);
+	}
 
 	public function server()
 	{
