@@ -135,6 +135,7 @@ Route::prefix('{locale}')
 			Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 			// Rankdata — leesbaar statistieken-dashboard per klant (SEO/PSI/uptime).
+			Route::get('/mijn-statistieken', [\App\Http\Controllers\RankdataDashboardController::class, 'me'])->name('rankdata.me');
 			Route::get('/rankdata/{tenant}', [\App\Http\Controllers\RankdataDashboardController::class, 'show'])->name('rankdata.client');
 
 			Route::post('/billing/trial', [BillingController::class, 'startTrial'])->name('billing.trial');

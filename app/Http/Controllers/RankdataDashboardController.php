@@ -14,6 +14,15 @@ use Illuminate\Support\Facades\DB;
  */
 class RankdataDashboardController extends Controller
 {
+	/** Nette entree voor de ingelogde klant: toont z'n eigen dashboard. */
+	public function me(Request $request)
+	{
+		$tenantId = $request->user()->tenant_id;
+		abort_unless($tenantId, 404);
+
+		return $this->show($request, $tenantId);
+	}
+
 	public function show(Request $request, string $tenant)
 	{
 		$t = Tenant::with('agency')->findOrFail($tenant);
