@@ -18,8 +18,11 @@ class RankdataDashboardController extends Controller
 	public function me(Request $request)
 	{
 		$u = $request->user();
-		if ($u->isAgencyAdmin() || $u->isSuperAdmin()) {
-			return redirect()->route('rankdata.agency', ['locale' => app()->getLocale()]);
+		if ($u->isAgencyAdmin()) {
+			return redirect('/bureau');
+		}
+		if ($u->isSuperAdmin()) {
+			return redirect('/admin/clients');
 		}
 		abort_unless($u->tenant_id, 404);
 
@@ -27,57 +30,20 @@ class RankdataDashboardController extends Controller
 	}
 
 	/**
-	 * Bureau-portal: leesbaar overzicht van de klanten van het bureau (white-label,
-	 * los van het platform-admin). Bureau ziet eigen klanten, super-admin alle.
+	 * Oude front-end bureau-portal — vervangen door het afgeschermde /bureau
+	 * Filament-panel. Redirect zodat bestaande links/bookmarks blijven werken.
 	 */
 	public function agency(Request $request)
 	{
 		$u = $request->user();
-		abort_unless($u->isAgencyAdmin() || $u->isSuperAdmin(), 403);
-
-		$q = Tenant::with('agency')->whereNotNull('agency_id');
 		if ($u->isAgencyAdmin()) {
-			$q->where('agency_id', $u->agency_id);
+			return redirect('/bureau');
 		}
-		$clients = $q->orderBy('name')->get()->map(fn (Tenant $t) => $this->clientSummary($t));
-
-		return view('rankdata.agency', [
-			'agency'  => $u->agency,
-			'brand'   => $u->agency?->brandColor() ?? '#0f766e',
-			'isSuper' => $u->isSuperAdmin(),
-			'clients' => $clients,
-		]);
-	}
-
-	/** Samenvatting per klant voor het bureau-overzicht. */
-	private function clientSummary(Tenant $t): array
-	{
-		$prop = DB::table('seo_properties')->where('tenant_id', $t->id)->first();
-		$clicks = 0; $impr = 0; $pos = null; $domain = null;
-		if ($prop) {
-			$domain = preg_replace('/^sc-domain:/', '', $prop->site_url);
-			$row = DB::table('seo_query_daily')->where('property_id', $prop->id)
-				->where('date', '>=', now()->subDays(30)->toDateString())
-				->selectRaw('SUM(clicks) c, SUM(impressions) i, AVG(position) p')->first();
-			$clicks = (int) ($row->c ?? 0);
-			$impr = (int) ($row->i ?? 0);
-			$pos = $row->p !== null ? round($row->p, 1) : null;
+		if ($u->isSuperAdmin()) {
+			return redirect('/admin/clients');
 		}
 
-		$uptime = null; $current = 'unknown';
-		$check = DB::table('monitor_checks')->where('tenant_id', $t->id)->value('id');
-		if ($check) {
-			$res = DB::table('monitor_check_results')->where('check_id', $check)->where('checked_at', '>=', now()->subDays(7));
-			$total = (clone $res)->count();
-			$uptime = $total ? round((clone $res)->where('status', 'up')->count() / $total * 100, 1) : null;
-			$current = DB::table('monitor_check_results')->where('check_id', $check)->orderByDesc('checked_at')->value('status') ?? 'unknown';
-		}
-
-		return [
-			'tenant' => $t, 'name' => $t->name, 'agencyName' => $t->agency?->name,
-			'domain' => $domain, 'clicks' => $clicks, 'impr' => $impr, 'pos' => $pos,
-			'uptime' => $uptime, 'current' => $current,
-		];
+		abort(403);
 	}
 
 	/**

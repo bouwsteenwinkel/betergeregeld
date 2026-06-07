@@ -65,7 +65,7 @@ class LoginController extends Controller
 		]);
 
 		$dest = match (true) {
-			$user->isAgencyAdmin() => route('rankdata.agency', ['locale' => app()->getLocale()]),
+			$user->isAgencyAdmin() => '/bureau',
 			$user->isClient()      => route('rankdata.me', ['locale' => app()->getLocale()]),
 			default                => route('home'),
 		};

@@ -34,6 +34,8 @@ class Agency extends Model
 		'slug',
 		'contact_email',
 		'primary_color',
+		'logo_path',
+		'subdomain',
 		'is_active',
 	];
 
@@ -64,5 +66,11 @@ class Agency extends Model
 	public function brandColor(): string
 	{
 		return $this->primary_color ?: '#0f766e';
+	}
+
+	/** Publieke logo-URL (uit de public-disk) of null. */
+	public function logoUrl(): ?string
+	{
+		return $this->logo_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->logo_path) : null;
 	}
 }

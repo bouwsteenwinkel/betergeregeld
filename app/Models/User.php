@@ -38,12 +38,18 @@ class User extends Authenticatable implements FilamentUser, HasName
 
 	public function canAccessPanel(Panel $panel): bool
 	{
-		// Alleen het platform-team (role 'admin') mag het volledige Filament-
-		// platform-admin in. Bureaus (role 'agency') en klanten (role 'client')
-		// hebben hun eigen afgeschermde front-end portal — nooit het platform-admin.
-		return $panel->getId() === 'admin'
-			&& $this->role === 'admin'
-			&& $this->is_active;
+		if (! $this->is_active) {
+			return false;
+		}
+
+		// Platform-admin: alleen het platform-team. Bureau-panel: alleen
+		// bureau-beheerders (afgeschermd tot eigen klanten). Klanten hebben
+		// geen Filament-panel maar hun eigen front-end dashboard.
+		return match ($panel->getId()) {
+			'admin'  => $this->role === 'admin',
+			'bureau' => $this->role === 'agency' && $this->agency_id !== null,
+			default  => false,
+		};
 	}
 
 	/**

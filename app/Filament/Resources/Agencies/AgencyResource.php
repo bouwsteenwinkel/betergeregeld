@@ -11,6 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -56,7 +57,12 @@ class AgencyResource extends Resource
 					->placeholder('rankdata')->helperText('Leeg = automatisch uit de naam.'),
 				TextInput::make('contact_email')->label('Contact-e-mail')->email()->maxLength(190),
 				ColorPicker::make('primary_color')->label('Merkkleur')
-					->helperText('Voor het white-label klant-dashboard.'),
+					->helperText('Voor het white-label klant-dashboard + bureau-panel.'),
+				TextInput::make('subdomain')->label('Subdomein')->maxLength(80)
+					->placeholder('rankdata')->helperText('Voor latere eigen-(sub)domein-routing.'),
+				FileUpload::make('logo_path')->label('Logo')->image()
+					->disk('public')->directory('agency-logos')->maxSize(1024)
+					->helperText('Getoond in het bureau-panel.')->columnSpanFull(),
 				Toggle::make('is_active')->label('Actief')->default(true),
 			]),
 		]);
