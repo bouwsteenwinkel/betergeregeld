@@ -52,7 +52,7 @@ class CmpConsentResource extends Resource
                 TextColumn::make('tenant_key')->label('Tenant')->searchable()->sortable()->toggleable(),
                 TextColumn::make('domain.domain')->label('Domein')->toggleable(),
                 TextColumn::make('status')->label('Status')->badge()
-                    ->color(fn (string $s) => $s === 'accepted' ? 'success' : ($s === 'rejected' ? 'gray' : 'warning')),
+                    ->color(fn (string $state) => $state === 'accepted' ? 'success' : ($state === 'rejected' ? 'gray' : 'warning')),
                 TextColumn::make('policy_version')->label('Policy v')->sortable(),
                 TextColumn::make('choices_json')->label('Keuzes')->limit(40),
                 TextColumn::make('last_updated_at')->label('Laatst bijgewerkt')->dateTime('d-m H:i')->sortable(),

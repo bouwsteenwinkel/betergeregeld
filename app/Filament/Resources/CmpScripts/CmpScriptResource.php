@@ -86,7 +86,7 @@ class CmpScriptResource extends Resource
                 TextColumn::make('name')->label('Naam')->searchable()->sortable(),
                 TextColumn::make('category_key')->label('Categorie')->badge()->sortable(),
                 TextColumn::make('script_type')->label('Type')->badge()
-                    ->color(fn (string $s) => $s === 'src' ? 'info' : 'warning'),
+                    ->color(fn (string $state) => $state === 'src' ? 'info' : 'warning'),
                 TextColumn::make('src_url')->label('URL')->limit(50)->toggleable(),
                 IconColumn::make('is_enabled')->label('Actief')->boolean(),
             ])

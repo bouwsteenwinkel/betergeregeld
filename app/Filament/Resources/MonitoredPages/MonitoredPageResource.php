@@ -80,7 +80,7 @@ class MonitoredPageResource extends Resource
 					->description(fn (MonitoredPage $r) => $r->url),
 				TextColumn::make('site.label')->label('Site')->badge()->color('gray'),
 				TextColumn::make('scan_frequency')->label('Frequentie')
-					->formatStateUsing(fn (string $s) => match ($s) {
+					->formatStateUsing(fn (string $state) => match ($state) {
 						'daily' => 'Dagelijks', 'monthly' => 'Maandelijks', default => 'Wekelijks',
 					})->badge()->color('gray'),
 				TextColumn::make('score')->label('Laatste score')

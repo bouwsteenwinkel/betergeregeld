@@ -31,10 +31,10 @@ class ScansRelationManager extends RelationManager
 			->columns([
 				TextColumn::make('created_at')->label('Datum')->dateTime('d-m-Y H:i'),
 				TextColumn::make('status')->label('Status')->badge()
-					->formatStateUsing(fn (string $s) => match ($s) {
+					->formatStateUsing(fn (string $state) => match ($state) {
 						'completed' => 'Voltooid', 'failed' => 'Mislukt', 'running' => 'Bezig', default => 'Wachtend',
 					})
-					->color(fn (string $s) => match ($s) {
+					->color(fn (string $state) => match ($state) {
 						'completed' => 'success', 'failed' => 'danger', 'running' => 'info', default => 'gray',
 					}),
 				TextColumn::make('score')->label('Score')->badge()->placeholder('—')
