@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Tenant;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * Leesbaar statistieken-dashboard per klant (tenant): SEO / Search Console,
+ * PageSpeed en uptime. Toegankelijk voor de klant zelf, de bureau-beheerder van
+ * dat bureau, en de platform-super-admin.
+ */
+class RankdataDashboardController extends Controller
+{
+	public function show(Request $request, string $tenant)
+	{
+		$t = Tenant::with('agency')->findOrFail($tenant);
+		$user = $request->user();
+
+		$allowed = $user->isSuperAdmin()
+			|| ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id)
+			|| ($user->tenant_id === $t->id);
+		abort_unless($allowed, 403);
+
+		$property = DB::table('seo_properties')->where('tenant_id', $t->id)->first();
+		$check = DB::table('monitor_checks')->where('tenant_id', $t->id)->first();
+
+		return view('rankdata.dashboard', [
+			'tenant'  => $t,
+			'agency'  => $t->agency,
+			'brand'   => $t->agency?->brandColor() ?? '#0f766e',
+			'domain'  => $property ? preg_replace('/^sc-domain:/', '', $property->site_url) : null,
+			'seo'     => $property ? $this->seoStats((int) $property->id) : null,
+			'psi'     => $property ? $this->psiStats((int) $property->id) : null,
+			'uptime'  => $check ? $this->uptimeStats($check->id) : null,
+			'canPickClient' => $user->isSuperAdmin() || $user->isAgencyAdmin(),
+		]);
+	}
+
+	private function seoStats(int $propertyId): array
+	{
+		$since = now()->subDays(30)->toDateString();
+		$base = DB::table('seo_query_daily')->where('property_id', $propertyId)->where('date', '>=', $since);
+
+		$tot = (clone $base)->selectRaw('SUM(clicks) c, SUM(impressions) i, AVG(position) p')->first();
+		$clicks = (int) ($tot->c ?? 0);
+		$impr = (int) ($tot->i ?? 0);
+
+		// Dagreeks voor de grafiek
+		$daily = (clone $base)->selectRaw('date, SUM(clicks) c, SUM(impressions) i')
+			->groupBy('date')->orderBy('date')->get()
+			->map(fn ($r) => ['date' => $r->date, 'clicks' => (int) $r->c, 'impr' => (int) $r->i])->values()->all();
+
+		// 7d-trend (laatste 7d vs de 7d ervoor)
+		$last7 = array_slice($daily, -7);
+		$prev7 = array_slice($daily, -14, 7);
+		$sum = fn ($a, $k) => array_sum(array_column($a, $k));
+		$prevClicks = $sum($prev7, 'clicks');
+		$trend = $prevClicks > 0 ? round(($sum($last7, 'clicks') - $prevClicks) / $prevClicks * 100) : null;
+
+		$topQueries = (clone $base)->select('query')
+			->selectRaw('SUM(clicks) c, SUM(impressions) i, AVG(position) p')
+			->groupBy('query')->orderByRaw('SUM(clicks) DESC, SUM(impressions) DESC')->limit(8)->get()
+			->map(fn ($r) => ['query' => $r->query, 'clicks' => (int) $r->c, 'impr' => (int) $r->i, 'pos' => round($r->p, 1)])->all();
+
+		$topPages = (clone $base)->select('page')
+			->selectRaw('SUM(clicks) c, SUM(impressions) i')
+			->groupBy('page')->orderByRaw('SUM(impressions) DESC')->limit(6)->get()
+			->map(fn ($r) => ['page' => $r->page, 'clicks' => (int) $r->c, 'impr' => (int) $r->i])->all();
+
+		return [
+			'clicks' => $clicks,
+			'impressions' => $impr,
+			'ctr' => $impr ? round($clicks / $impr * 100, 1) : 0,
+			'position' => round($tot->p ?? 0, 1),
+			'trend' => $trend,
+			'daily' => $daily,
+			'topQueries' => $topQueries,
+			'topPages' => $topPages,
+		];
+	}
+
+	private function psiStats(int $propertyId): array
+	{
+		$out = [];
+		foreach (['mobile', 'desktop'] as $strategy) {
+			$row = DB::table('seo_psi_daily')->where('property_id', $propertyId)->where('strategy', $strategy)
+				->orderByDesc('date')->first();
+			$out[$strategy] = $row ? [
+				'performance' => (int) $row->performance_score,
+				'lcp' => round($row->lcp_ms / 1000, 1),
+				'cls' => (float) $row->cls,
+				'inp' => (int) $row->inp_ms,
+				'seo' => (int) $row->seo_score,
+				'accessibility' => (int) $row->accessibility_score,
+			] : null;
+		}
+
+		return $out;
+	}
+
+	private function uptimeStats(string $checkId): array
+	{
+		$since = now()->subDays(7);
+		$rows = DB::table('monitor_check_results')->where('check_id', $checkId)
+			->where('checked_at', '>=', $since)->orderBy('checked_at')->get();
+
+		$total = $rows->count();
+		$up = $rows->where('status', 'up')->count();
+		$latencies = $rows->where('status', 'up')->pluck('latency_ms')->filter()->all();
+
+		// Storingen: aaneengesloten down-reeksen
+		$incidents = [];
+		$open = null;
+		foreach ($rows as $r) {
+			if ($r->status === 'down' && ! $open) {
+				$open = ['from' => $r->checked_at];
+			} elseif ($r->status === 'up' && $open) {
+				$open['to'] = $r->checked_at;
+				$incidents[] = $open;
+				$open = null;
+			}
+		}
+		if ($open) {
+			$open['to'] = null;
+			$incidents[] = $open;
+		}
+
+		return [
+			'percent' => $total ? round($up / $total * 100, 2) : null,
+			'avg_latency' => $latencies ? (int) round(array_sum($latencies) / count($latencies)) : null,
+			'current' => $rows->last()->status ?? 'unknown',
+			'incidents' => array_map(fn ($i) => [
+				'from' => Carbon::parse($i['from'])->format('d-m H:i'),
+				'to' => $i['to'] ? Carbon::parse($i['to'])->format('H:i') : 'nu',
+			], $incidents),
+		];
+	}
+}
