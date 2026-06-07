@@ -64,7 +64,13 @@ class LoginController extends Controller
 			'created_at' => now(),
 		]);
 
-		return redirect()->intended(route('home'));
+		$dest = match (true) {
+			$user->isAgencyAdmin() => route('rankdata.agency', ['locale' => app()->getLocale()]),
+			$user->isClient()      => route('rankdata.me', ['locale' => app()->getLocale()]),
+			default                => route('home'),
+		};
+
+		return redirect()->intended($dest);
 	}
 
 	public function logout(Request $request): RedirectResponse

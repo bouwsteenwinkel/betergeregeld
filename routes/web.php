@@ -134,7 +134,8 @@ Route::prefix('{locale}')
 		Route::middleware('auth')->group(function () {
 			Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-			// Rankdata — leesbaar statistieken-dashboard per klant (SEO/PSI/uptime).
+			// Rankdata — bureau-portal (overzicht klanten) + leesbaar klant-dashboard.
+			Route::get('/bureau', [\App\Http\Controllers\RankdataDashboardController::class, 'agency'])->name('rankdata.agency');
 			Route::get('/mijn-statistieken', [\App\Http\Controllers\RankdataDashboardController::class, 'me'])->name('rankdata.me');
 			Route::get('/rankdata/{tenant}', [\App\Http\Controllers\RankdataDashboardController::class, 'show'])->name('rankdata.client');
 
