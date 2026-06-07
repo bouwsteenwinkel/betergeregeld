@@ -40,6 +40,12 @@ Schedule::command('cron:provision-internal')
     ->onOneServer()
     ->withoutOverlapping();
 
+// AI-kwaliteitscheck — dispatch scans voor pagina's die toe zijn aan een nieuwe run.
+Schedule::command('quality-scan:dispatch-due')
+    ->dailyAt('06:30')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // De onderstaande dagelijkse jobs bewaken zichzelf: CronMonitorPinger::watch()
 // hangt success/failure-hooks aan de taak en pingt de bijbehorende cron-monitor
 // (config('monitor.internal_crons')) in-process. Zo zien we het meteen als een
