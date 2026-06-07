@@ -44,6 +44,7 @@ class SeoRunPsi extends Command
 		$strategies = ['mobile', 'desktop'];
 		$totalOk = 0;
 		$totalFail = 0;
+		$totalQuota = 0;
 
 		foreach ($properties as $prop) {
 			$urls = $this->selectUrls($prop->id, $top, $this->option('url'));
@@ -63,7 +64,16 @@ class SeoRunPsi extends Command
 						'date'                 => $today,
 					];
 					if ($m === null) {
-						$row['error_message'] = mb_substr((string) $psi->lastError, 0, 500);
+						// Een PSI-dagquota (HTTP 429) is een transiënte rate-limit, geen
+						// kapotte job: overslaan zonder de run te laten falen, zodat de
+						// cron-monitor niet elke dag onterecht op 'failed' springt.
+						$err = (string) $psi->lastError;
+						if (str_contains($err, '429') || stripos($err, 'quota') !== false || stripos($err, 'rate') !== false) {
+							$this->warn("  ⏳ {$strategy} {$url}: PSI-quota bereikt — overgeslagen");
+							$totalQuota++;
+							continue;
+						}
+						$row['error_message'] = mb_substr($err, 0, 500);
 						$this->error("  ✕ {$strategy} {$url}: {$psi->lastError}");
 						$totalFail++;
 					} else {
@@ -88,7 +98,9 @@ class SeoRunPsi extends Command
 		}
 
 		$this->newLine();
-		$this->info("Klaar: {$totalOk} OK, {$totalFail} fout.");
+		$this->info("Klaar: {$totalOk} OK, {$totalFail} fout, {$totalQuota} quota-overgeslagen.");
+
+		// Alleen échte meetfouten laten de job falen; een opgebruikte dagquota niet.
 		return $totalFail === 0 ? self::SUCCESS : self::FAILURE;
 	}
 
