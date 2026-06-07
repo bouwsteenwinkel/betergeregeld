@@ -23,7 +23,7 @@ class RankdataDashboardController extends Controller
 		}
 		abort_unless($u->tenant_id, 404);
 
-		return $this->show($request, $u->tenant_id);
+		return $this->render($request, $u->tenant_id);
 	}
 
 	/**
@@ -80,7 +80,18 @@ class RankdataDashboardController extends Controller
 		];
 	}
 
-	public function show(Request $request, string $tenant)
+	/**
+	 * Route-entree. LET OP: onder de /{locale}-prefix bindt Laravel string-params
+	 * POSITIONEEL — daarom moet $locale hier éérst staan, anders krijgt $tenant de
+	 * locale ("nl") binnen i.p.v. de tenant-id. Zie [[feedback_laravel_string_params]].
+	 */
+	public function show(Request $request, string $locale, string $tenant)
+	{
+		return $this->render($request, $tenant);
+	}
+
+	/** Gedeelde dashboard-render (aangeroepen door show() én me()). */
+	private function render(Request $request, string $tenant)
 	{
 		$t = Tenant::with('agency')->findOrFail($tenant);
 		$user = $request->user();
