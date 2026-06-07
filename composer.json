@@ -18,7 +18,8 @@
         "phpoffice/phpspreadsheet": "^5.7",
         "pragmarx/google2fa": "^9.0",
         "pragmarx/google2fa-qrcode": "^3.0",
-        "setasign/fpdf": "^1.8"
+        "setasign/fpdf": "^1.8",
+        "symfony/dom-crawler": "^7.4"
     },
     "require-dev": {
         "doctrine/dbal": "^4.4",
