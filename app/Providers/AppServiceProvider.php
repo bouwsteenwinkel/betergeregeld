@@ -17,7 +17,19 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Quality-scan services: interface → implementatie (mockbaar in tests).
+        $this->app->bind(
+            \App\Services\QualityScan\Contracts\PageFetcherInterface::class,
+            \App\Services\QualityScan\PageFetcher::class,
+        );
+        $this->app->bind(
+            \App\Services\QualityScan\Contracts\ContentExtractorInterface::class,
+            \App\Services\QualityScan\ContentExtractor::class,
+        );
+        $this->app->bind(
+            \App\Services\QualityScan\Contracts\ClaudeAnalyzerInterface::class,
+            \App\Services\QualityScan\ClaudeAnalyzer::class,
+        );
     }
 
     public function boot(): void
