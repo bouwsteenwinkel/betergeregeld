@@ -45,4 +45,12 @@ return [
         'scope' => env('MICROSOFT_SCOPE', 'User.Read.All Directory.Read.All offline_access'),
     ],
 
+    // Anthropic (Claude) — gebruikt door AnthropicClient (blog, vertalingen,
+    // quality-scan). Via config zodat de key na `config:cache` beschikbaar
+    // blijft; env() buiten config-files geeft dan namelijk null.
+    'anthropic' => [
+        'api_key'  => env('ANTHROPIC_API_KEY'),
+        'key_path' => env('ANTHROPIC_KEY_PATH'),
+    ],
+
 ];

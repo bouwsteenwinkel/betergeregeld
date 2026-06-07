@@ -30,12 +30,15 @@ class AnthropicClient
 
 	public function apiKey(): string
 	{
-		$key = (string) env('ANTHROPIC_API_KEY', '');
+		// config() i.p.v. env() zodat de key na `config:cache` op prod
+		// gevonden blijft (env() buiten config-files geeft dan null).
+		// env() blijft als fallback voor niet-gecachete omgevingen.
+		$key = (string) (config('services.anthropic.api_key') ?: env('ANTHROPIC_API_KEY', ''));
 		if ($key !== '') {
 			return $key;
 		}
 
-		$path = env('ANTHROPIC_KEY_PATH', '');
+		$path = (string) (config('services.anthropic.key_path') ?: env('ANTHROPIC_KEY_PATH', ''));
 		if ($path === '') {
 			// Lokale dev-fallback: hergebruik BSW V3's config als die naast V2 staat.
 			$candidate = base_path('../bouwsteenwinkel_v3/config/anthropic.php');
