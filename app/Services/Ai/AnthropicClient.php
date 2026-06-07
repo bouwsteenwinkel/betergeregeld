@@ -40,10 +40,16 @@ class AnthropicClient
 
 		$path = (string) (config('services.anthropic.key_path') ?: env('ANTHROPIC_KEY_PATH', ''));
 		if ($path === '') {
-			// Lokale dev-fallback: hergebruik BSW V3's config als die naast V2 staat.
-			$candidate = base_path('../bouwsteenwinkel_v3/config/anthropic.php');
-			if (is_file($candidate)) {
-				$path = $candidate;
+			// Fallback-bestanden (geen .env nodig): drop een config-file met
+			// return ['api_key' => 'sk-ant-...'] op een van deze paden.
+			//   1. storage/app/anthropic.php — productie-vriendelijk, gitignored,
+			//      overleeft deploys en config:cache.
+			//   2. ../bouwsteenwinkel_v3/config/anthropic.php — lokale dev-fallback.
+			foreach ([storage_path('app/anthropic.php'), base_path('../bouwsteenwinkel_v3/config/anthropic.php')] as $candidate) {
+				if (is_file($candidate)) {
+					$path = $candidate;
+					break;
+				}
 			}
 		}
 		if ($path !== '' && is_file($path)) {
