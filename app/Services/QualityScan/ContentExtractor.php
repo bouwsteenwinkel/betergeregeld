@@ -146,17 +146,25 @@ class ContentExtractor implements ContentExtractorInterface
 		return $best !== null ? mb_substr($best, 0, 1500) : null;
 	}
 
-	/** Houdt het totale pakket onder de limiet door de body-tekst af te kappen. */
+	/** Houdt het totale pakket onder de limiet door de body-tekst iteratief af te kappen. */
 	private function fitToLimit(ExtractedContent $content, int $maxPackage): ExtractedContent
 	{
-		$json = json_encode($content->toArray(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-		if (mb_strlen($json) <= $maxPackage) {
+		$arr = $content->toArray();
+		if (mb_strlen(json_encode($arr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) <= $maxPackage) {
 			return $content;
 		}
 
-		$overhead = mb_strlen($json) - mb_strlen($content->bodyText);
-		$room = max(200, $maxPackage - $overhead - 12);
-		$body = mb_substr($content->bodyText, 0, $room) . ' [afgekapt]';
+		$base = $content->bodyText;
+		$body = $base;
+		for ($i = 0; $i < 6; $i++) {
+			$arr['body_text'] = $body;
+			$len = mb_strlen(json_encode($arr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			if ($len <= $maxPackage) {
+				break;
+			}
+			$cut = max(0, mb_strlen($body) - ($len - $maxPackage) - 20); // -20 marge voor JSON-escaping
+			$body = ($cut > 0 ? mb_substr($base, 0, $cut) : '') . ' [afgekapt]';
+		}
 
 		return new ExtractedContent(
 			$content->title, $content->metaDescription, $content->metaRobots, $content->canonical,
