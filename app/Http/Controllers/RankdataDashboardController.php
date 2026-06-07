@@ -67,17 +67,33 @@ class RankdataDashboardController extends Controller
 			|| ($user->tenant_id === $t->id);
 		abort_unless($allowed, 403);
 
-		$property = DB::table('seo_properties')->where('tenant_id', $t->id)->first();
-		$check = DB::table('monitor_checks')->where('tenant_id', $t->id)->first();
+		// Een klant kan meerdere sites (websites/applicaties) hebben. Toon de
+		// gekozen site (?site=) of anders de eerste, met een siteswitcher.
+		$sites = DB::table('seo_properties')->where('tenant_id', $t->id)->where('is_active', 1)
+			->orderBy('id')->get();
+		$selectedId = (int) $request->query('site', 0);
+		$selected = $sites->firstWhere('id', $selectedId) ?: $sites->first();
+
+		$seo = $psi = $uptime = null;
+		$domain = null;
+		if ($selected) {
+			$domain = preg_replace('/^sc-domain:/', '', $selected->site_url);
+			$seo = $this->seoStats((int) $selected->id);
+			$psi = $this->psiStats((int) $selected->id);
+			$check = DB::table('monitor_checks')->where('property_id', $selected->id)->first();
+			$uptime = $check ? $this->uptimeStats($check->id) : null;
+		}
 
 		return view('rankdata.dashboard', [
 			'tenant'  => $t,
 			'agency'  => $t->agency,
 			'brand'   => $t->agency?->brandColor() ?? '#0f766e',
-			'domain'  => $property ? preg_replace('/^sc-domain:/', '', $property->site_url) : null,
-			'seo'     => $property ? $this->seoStats((int) $property->id) : null,
-			'psi'     => $property ? $this->psiStats((int) $property->id) : null,
-			'uptime'  => $check ? $this->uptimeStats($check->id) : null,
+			'sites'   => $sites,
+			'selected' => $selected,
+			'domain'  => $domain,
+			'seo'     => $seo,
+			'psi'     => $psi,
+			'uptime'  => $uptime,
 			'canPickClient' => $user->isSuperAdmin() || $user->isAgencyAdmin(),
 		]);
 	}

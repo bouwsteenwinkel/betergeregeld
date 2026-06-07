@@ -124,6 +124,13 @@ class ClientResource extends Resource
 			]);
 	}
 
+	public static function getRelations(): array
+	{
+		return [
+			\App\Filament\Bureau\Resources\RelationManagers\SitesRelationManager::class,
+		];
+	}
+
 	public static function getPages(): array
 	{
 		return [

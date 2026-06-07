@@ -28,6 +28,11 @@
         .topbar .brand { font-weight: 800; letter-spacing: .3px; opacity: .92; font-size: 14px; text-transform: uppercase; }
         .topbar h1 { margin: 2px 0 0; font-size: 22px; }
         .topbar .domain { opacity: .85; font-size: 13px; }
+        .siteswitch { background: #fff; border-bottom: 1px solid #e7e9ee; }
+        .siteswitch-inner { max-width: 1040px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .sw-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .4px; margin-right: 4px; }
+        .sw-pill { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #374151; background: #f1f2f5; border: 1px solid transparent; }
+        .sw-pill.active { background: var(--brand); color: #fff; }
         .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 20px 60px; }
         .grid { display: grid; gap: 16px; }
         .kpis { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 8px; }
@@ -58,15 +63,37 @@
         <div>
             <div class="brand">{{ $agency?->name ?? 'Rankdata' }}</div>
             <h1>{{ $tenant->name }}</h1>
-            <div class="domain">{{ $domain ?? '—' }} · statistieken laatste 30 dagen</div>
+            <div class="domain">
+                @if ($selected)
+                    {{ $selected->label }} · {{ $domain }}@if(($selected->type ?? 'website') === 'app') · applicatie @endif · laatste 30 dagen
+                @else
+                    nog geen sites gekoppeld
+                @endif
+            </div>
         </div>
         @if ($canPickClient)
             <div style="font-size:13px;opacity:.9">Bureau-/beheerweergave</div>
         @endif
     </div>
 
+    @if ($sites->count() > 1)
+        <div class="siteswitch">
+            <div class="siteswitch-inner">
+                <span class="sw-label">Sites:</span>
+                @foreach ($sites as $s)
+                    <a class="sw-pill {{ $selected && $s->id === $selected->id ? 'active' : '' }}"
+                       href="{{ route('rankdata.client', ['locale' => app()->getLocale(), 'tenant' => $tenant->id]) }}?site={{ $s->id }}">
+                        {{ $s->label }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="wrap">
-        @if ($seo)
+        @if (! $selected)
+            <div class="card" style="margin-top:20px">Deze klant heeft nog geen sites. Voeg een website of applicatie toe in het bureau-panel.</div>
+        @elseif ($seo)
             {{-- KPI's --}}
             <div class="grid kpis">
                 <div class="card kpi">

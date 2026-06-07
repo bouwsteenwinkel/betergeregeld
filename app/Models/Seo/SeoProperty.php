@@ -18,7 +18,7 @@ class SeoProperty extends Model
 	protected $table = 'seo_properties';
 
 	protected $fillable = [
-		'tenant_id', 'site_url', 'label', 'is_active',
+		'tenant_id', 'site_url', 'label', 'type', 'is_active',
 		'last_imported_date', 'last_import_error',
 		'freshness_alert_state', 'freshness_alerted_at',
 	];
@@ -31,6 +31,18 @@ class SeoProperty extends Model
 	public function queries(): HasMany
 	{
 		return $this->hasMany(SeoQueryDaily::class, 'property_id');
+	}
+
+	/** De uptime-check van deze site (monitor_checks.property_id). */
+	public function check(): HasMany
+	{
+		return $this->hasMany(\App\Models\Monitor\Check::class, 'property_id');
+	}
+
+	/** Schoon domein zonder de sc-domain:-prefix. */
+	public function domain(): string
+	{
+		return preg_replace('/^sc-domain:/', '', (string) $this->site_url);
 	}
 
 	protected function casts(): array
