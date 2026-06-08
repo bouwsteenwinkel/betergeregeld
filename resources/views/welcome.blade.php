@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Beter Geregeld ICT, maatwerk websites, portals, koppelingen & automatisering')
-@section('description', 'Beter Geregeld ICT helpt bedrijven met maatwerk webapplicaties, klantportalen, API-koppelingen, procesautomatisering, beveiliging, performance en technische SEO.')
+@section('title', 'Beter Geregeld ICT – maatwerk websites & automatisering')
+@section('description', 'Beter Geregeld ICT helpt bedrijven met maatwerk webapplicaties, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische SEO.')
 
 @php
 	$locale = app()->getLocale();
