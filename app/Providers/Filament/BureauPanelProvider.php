@@ -11,6 +11,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -38,6 +39,21 @@ class BureauPanelProvider extends PanelProvider
 			->maxContentWidth(Width::Full)
 			->sidebarWidth('15rem')
 			->colors(['primary' => Color::Indigo])
+			// White-label: overschrijf de primary-kleur per bureau (na auth, bij render)
+			// met de merkkleur van de agency. Filament v5 emit --primary-{shade} als
+			// oklch; we overschrijven dezelfde variabelen na Filaments eigen styles.
+			->renderHook(PanelsRenderHook::HEAD_END, function (): string {
+				$hex = auth()->user()?->agency?->primary_color;
+				if (! $hex || ! preg_match('/^#[0-9a-fA-F]{6}$/', $hex)) {
+					return '';
+				}
+				$vars = '';
+				foreach (Color::hex($hex) as $shade => $value) {
+					$vars .= "--primary-{$shade}:{$value};";
+				}
+
+				return '<style>:root{' . $vars . '}</style>';
+			})
 			->font('Inter')
 			->discoverResources(in: app_path('Filament/Bureau/Resources'), for: 'App\\Filament\\Bureau\\Resources')
 			->discoverPages(in: app_path('Filament/Bureau/Pages'), for: 'App\\Filament\\Bureau\\Pages')
