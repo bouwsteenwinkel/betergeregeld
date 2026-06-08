@@ -4,6 +4,7 @@ namespace App\Filament\Bureau\Resources\RelationManagers;
 
 use App\Filament\Actions\GscPropertyActions;
 use App\Models\Seo\SeoProperty;
+use App\Services\Rankdata\SiteProvisioner;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -17,8 +18,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * Websites/applicaties (sites) onder een klant. Een site = een seo_property;
@@ -64,19 +63,20 @@ class SitesRelationManager extends RelationManager
 			->headerActions([
 				CreateAction::make()->label('Site toevoegen')
 					->mutateDataUsing(fn (array $data) => $this->withSiteUrl($data))
-					->after(fn (Model $record) => $this->ensureSiteMonitoring($record)),
+					->after(fn (Model $record) => app(SiteProvisioner::class)->provision($record)),
 			])
 			->recordActions([
 				Action::make('dashboard')->label('Dashboard')->icon('heroicon-m-arrow-top-right-on-square')->color('primary')
 					->url(fn (SeoProperty $r) => route('rankdata.client', ['locale' => 'nl', 'tenant' => $r->tenant_id]) . '?site=' . $r->id)
 					->openUrlInNewTab(),
+				GscPropertyActions::onboardingStatus(),
 				GscPropertyActions::testAccess(),
 				GscPropertyActions::importNow(),
 				GscPropertyActions::securityAgent(),
 				EditAction::make()
 					->mutateRecordDataUsing(fn (array $data) => $data + ['domain' => preg_replace('/^sc-domain:/', '', $data['site_url'] ?? '')])
 					->mutateDataUsing(fn (array $data) => $this->withSiteUrl($data))
-					->after(fn (Model $record) => $this->ensureSiteMonitoring($record)),
+					->after(fn (Model $record) => app(SiteProvisioner::class)->provision($record)),
 				DeleteAction::make(),
 			]);
 	}
@@ -91,50 +91,4 @@ class SitesRelationManager extends RelationManager
 		return $data;
 	}
 
-	/** Richt de standaard-monitoring voor een nieuwe/bewerkte site in. */
-	private function ensureSiteMonitoring(Model $record): void
-	{
-		$this->ensureCheck($record);
-		$this->ensureMonitoredPage($record);
-	}
-
-	/** Zorgt dat de site een homepage-pagina heeft om op kwaliteit te scannen. */
-	private function ensureMonitoredPage(Model $record): void
-	{
-		if (DB::table('monitored_pages')->where('site_id', $record->id)->exists()) {
-			return;
-		}
-		$domain = preg_replace('/^sc-domain:/', '', $record->site_url);
-		DB::table('monitored_pages')->insert([
-			'site_id'        => $record->id,
-			'url'            => 'https://' . $domain . '/',
-			'label'          => 'Homepage',
-			'is_active'      => 1,
-			'scan_frequency' => 'weekly',
-			'created_at'     => now(),
-			'updated_at'     => now(),
-		]);
-	}
-
-	/** Zorgt dat de site een uptime-check heeft (maakt 'm aan als die ontbreekt). */
-	private function ensureCheck(Model $record): void
-	{
-		if (DB::table('monitor_checks')->where('property_id', $record->id)->exists()) {
-			return;
-		}
-		DB::table('monitor_checks')->insert([
-			'id' => (string) Str::orderedUuid(),
-			'server_id' => DB::table('monitor_servers')->value('id'),
-			'tenant_id' => $record->tenant_id,
-			'property_id' => $record->id,
-			'name' => 'Website bereikbaar',
-			'type' => 'http',
-			'target' => 'https://' . preg_replace('/^sc-domain:/', '', $record->site_url) . '/',
-			'expected_code' => 200,
-			'timeout_seconds' => 10,
-			'is_active' => 1,
-			'created_at' => now(),
-			'updated_at' => now(),
-		]);
-	}
 }

@@ -3,6 +3,8 @@
 namespace App\Models\Seo;
 
 use App\Models\Tenant;
+use App\Observers\SeoPropertyObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * GSC API, maar 'sc-domain' is doorgaans accurater omdat het alle
  * sub-domeinen en protocollen samenvoegt.
  */
+#[ObservedBy([SeoPropertyObserver::class])]
 class SeoProperty extends Model
 {
 	protected $table = 'seo_properties';

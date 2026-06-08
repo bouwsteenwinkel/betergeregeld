@@ -52,6 +52,7 @@ class SeoPropertiesTable
 					->toggleable(),
 			])
 			->recordActions([
+				GscPropertyActions::onboardingStatus(),
 				GscPropertyActions::testAccess(),
 				GscPropertyActions::importNow(),
 				GscPropertyActions::securityAgent(),

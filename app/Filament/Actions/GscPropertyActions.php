@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -50,6 +51,34 @@ class GscPropertyActions
 				}
 
 				Notification::make()->title('Fout bij toegangscontrole')->body($result['message'])->danger()->persistent()->send();
+			});
+	}
+
+	/** Live onboarding-checklist per site: wat is ingericht, wat staat nog open. */
+	public static function onboardingStatus(): Action
+	{
+		return Action::make('onboarding')
+			->label('Onboarding')
+			->icon('heroicon-m-clipboard-document-check')
+			->color('gray')
+			->modalHeading('Onboarding-status')
+			->modalSubmitAction(false)
+			->modalCancelActionLabel('Sluiten')
+			->modalContent(function (SeoProperty $record): View {
+				$id = $record->id;
+				$pageIds = DB::table('monitored_pages')->where('site_id', $id)->pluck('id');
+
+				$steps = [
+					['label' => 'Site aangemaakt', 'done' => true, 'hint' => $record->site_url],
+					['label' => 'Uptime-check actief', 'done' => DB::table('monitor_checks')->where('property_id', $id)->exists(), 'hint' => 'automatisch aangemaakt'],
+					['label' => 'GSC-data binnen', 'done' => (bool) $record->last_imported_date, 'hint' => 'klant geeft toegang → knop "Nu importeren"'],
+					['label' => 'PageSpeed gemeten', 'done' => DB::table('seo_psi_daily')->where('property_id', $id)->exists(), 'hint' => 'draait dagelijks (seo:run-psi)'],
+					['label' => 'Kwaliteitsscan gedraaid', 'done' => $pageIds->isNotEmpty() && DB::table('quality_scans')->whereIn('monitored_page_id', $pageIds)->where('status', 'completed')->exists(), 'hint' => 'wekelijks (quality-scan:dispatch-due)'],
+					['label' => 'Security-scan gedraaid', 'done' => DB::table('security_scans')->where('property_id', $id)->where('status', 'completed')->exists(), 'hint' => 'wekelijks (security:scan)'],
+					['label' => 'Beveiligingsagent gekoppeld', 'done' => (bool) $record->software_reported_at, 'hint' => 'installeer de companion-plugin (knop "Beveiligingsagent")'],
+				];
+
+				return view('filament.security.onboarding-status', ['steps' => $steps]);
 			});
 	}
 
