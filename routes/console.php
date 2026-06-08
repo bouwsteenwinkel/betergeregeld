@@ -120,6 +120,17 @@ CronMonitorPinger::watch(
     'rankdata:invoice-bureaus'
 );
 
+// Security (fase 1) — malware/blacklist + mixed content/broken links per site.
+// Wekelijks; de crawl is de zwaarste stap. Alerts bij blacklist/malware lopen
+// via monitor:check-alerts (transitie-gebaseerd).
+CronMonitorPinger::watch(
+    Schedule::command('security:scan')
+        ->weeklyOn(1, '05:30')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'security:scan'
+);
+
 // Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
 // gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
 // de mail rond koffietijd binnenkomt.

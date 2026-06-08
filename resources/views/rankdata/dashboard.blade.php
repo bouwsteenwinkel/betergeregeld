@@ -232,6 +232,35 @@
             </div>
         @endif
 
+        {{-- Beveiliging --}}
+        @if ($security ?? null)
+            @php $catLabels = ['safe_browsing' => 'Malware', 'blacklist' => 'Blacklist', 'mixed_content' => 'Mixed content', 'broken_link' => 'Broken link']; @endphp
+            <div class="section-title">Beveiliging</div>
+            <div class="card">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <span class="pill {{ $security['safe_browsing'] === 'ok' ? 'green' : ($security['safe_browsing'] === 'flagged' ? 'red' : 'amber') }}">
+                        Malware: {{ $security['safe_browsing'] === 'ok' ? 'schoon' : ($security['safe_browsing'] === 'flagged' ? 'GEMARKEERD' : 'onbekend') }}
+                    </span>
+                    <span class="pill {{ $security['blacklisted'] ? 'red' : 'green' }}">{{ $security['blacklisted'] ? 'Op blacklist' : 'Geen blacklist' }}</span>
+                    <span class="pill {{ $security['mixed'] > 0 ? 'amber' : 'green' }}">{{ $security['mixed'] }} mixed content</span>
+                    <span class="pill {{ $security['broken'] > 0 ? 'amber' : 'green' }}">{{ $security['broken'] }} broken link{{ $security['broken'] === 1 ? '' : 's' }}</span>
+                    <span class="muted" style="font-size:12px;margin-left:auto">gescand {{ \Illuminate\Support\Carbon::parse($security['scanned_at'])->format('d-m-Y') }} · {{ $security['links_checked'] }} links</span>
+                </div>
+                @if (count($security['findings']))
+                    <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+                        @foreach ($security['findings'] as $f)
+                            <div style="font-size:13px;display:flex;gap:8px;align-items:flex-start">
+                                <span class="pill {{ $f['severity'] === 'hoog' ? 'red' : ($f['severity'] === 'middel' ? 'amber' : 'green') }}" style="flex:none">{{ $catLabels[$f['category']] ?? $f['category'] }}</span>
+                                <span>{{ $f['finding'] }}@if ($f['url']) — <span class="muted">{{ \Illuminate\Support\Str::limit($f['url'], 70) }}</span>@endif</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="muted" style="font-size:13px;margin-top:10px">Geen beveiligingsproblemen gevonden. ✅</div>
+                @endif
+            </div>
+        @endif
+
         {{-- Abonnement / facturatie --}}
         @if (($canManageBilling ?? false) && ($monthlyCost['plan'] ?? null))
             <div class="section-title">Abonnement</div>

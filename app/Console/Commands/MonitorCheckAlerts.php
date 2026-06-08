@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Monitor\Check;
 use App\Models\Monitor\Server;
+use App\Models\Security\SecurityScan;
 use App\Models\Seo\SeoImportsLog;
 use App\Models\Seo\SeoProperty;
 use Illuminate\Console\Command;
@@ -49,8 +50,75 @@ class MonitorCheckAlerts extends Command
 
 		$this->checkSeoFreshness($to);
 		$this->checkUptimeChecks();
+		$this->checkSecurity();
 
 		return self::SUCCESS;
+	}
+
+	/**
+	 * Security-alerting: mailt bij een OVERGANG naar/uit 'flagged' (op een
+	 * blacklist of door Safe Browsing gemarkeerd) op basis van de laatste
+	 * security-scan. Mixed content/broken links zijn dashboard-only (geen mail).
+	 */
+	private function checkSecurity(): void
+	{
+		foreach (SeoProperty::query()->where('is_active', true)->with('tenant.agency')->get() as $prop) {
+			$scan = SecurityScan::query()->where('property_id', $prop->id)
+				->where('status', 'completed')->latest('completed_at')->first();
+			if (! $scan) {
+				continue;
+			}
+
+			$condition = $scan->isFlagged() ? 'flagged' : 'ok';
+			$previous = $prop->security_alert_state;
+			if ($condition === $previous) {
+				continue;
+			}
+
+			$shouldMail = $previous !== null || $condition === 'flagged';
+			$prop->forceFill(['security_alert_state' => $condition, 'security_alerted_at' => now()])->save();
+			if (! $shouldMail) {
+				continue;
+			}
+
+			$recipients = $this->recipientsFor($prop);
+			if (empty($recipients)) {
+				continue;
+			}
+
+			[$subject, $body] = $this->securityMessage($prop, $scan, $condition);
+			Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
+			$this->info("SECURITY [{$prop->label}]: " . ($previous ?? 'init') . " → {$condition}");
+		}
+	}
+
+	/**
+	 * @return array{0:string,1:string}
+	 */
+	private function securityMessage(SeoProperty $prop, SecurityScan $scan, string $condition): array
+	{
+		$domain = $prop->domain();
+
+		if ($condition === 'ok') {
+			return [
+				"[Security] HERSTELD: {$prop->label} weer schoon",
+				"De beveiligingswaarschuwing voor '{$prop->label}' ({$domain}) is opgeheven — niet langer op een blacklist of door Safe Browsing gemarkeerd.",
+			];
+		}
+
+		$reasons = [];
+		if ($scan->blacklisted) {
+			$reasons[] = 'staat op een blacklist';
+		}
+		if ($scan->safe_browsing === 'flagged') {
+			$reasons[] = 'is door Google Safe Browsing gemarkeerd (malware/phishing)';
+		}
+
+		return [
+			"[Security] ALERT: {$prop->label} — beveiligingsprobleem",
+			"De site '{$prop->label}' ({$domain}) " . implode(' en ', $reasons) . ".\n\n"
+				. 'Controleer de site direct en onderneem actie.',
+		];
 	}
 
 	/**

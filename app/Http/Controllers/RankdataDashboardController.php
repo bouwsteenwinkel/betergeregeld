@@ -89,7 +89,7 @@ class RankdataDashboardController extends Controller
 		$selectedId = (int) $request->query('site', 0);
 		$selected = $sites->firstWhere('id', $selectedId) ?: $sites->first();
 
-		$seo = $psi = $uptime = $quality = null;
+		$seo = $psi = $uptime = $quality = $security = null;
 		$domain = null;
 		if ($selected) {
 			$domain = preg_replace('/^sc-domain:/', '', $selected->site_url);
@@ -98,6 +98,7 @@ class RankdataDashboardController extends Controller
 			$check = DB::table('monitor_checks')->where('property_id', $selected->id)->first();
 			$uptime = $check ? $this->uptimeStats($check->id) : null;
 			$quality = $this->qualityStats((int) $selected->id);
+			$security = $this->securityStats((int) $selected->id);
 		}
 
 		$subscription = DB::table('tenant_subscriptions')
@@ -117,6 +118,7 @@ class RankdataDashboardController extends Controller
 			'psi'     => $psi,
 			'uptime'  => $uptime,
 			'quality' => $quality,
+			'security' => $security,
 			'subscription' => $subscription,
 			'monthlyCost' => $monthlyCost,
 			'canManageBilling' => $user->isSuperAdmin() || ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id) || $user->tenant_id === $t->id,
@@ -226,6 +228,32 @@ class RankdataDashboardController extends Controller
 			'warn'       => (int) ($counts['warn'] ?? 0),
 			'fail'       => (int) ($counts['fail'] ?? 0),
 			'top'        => $top,
+		];
+	}
+
+	/** Laatste security-scan voor een site: samenvatting + belangrijkste findings. */
+	private function securityStats(int $siteId): ?array
+	{
+		$scan = DB::table('security_scans')->where('property_id', $siteId)
+			->where('status', 'completed')->orderByDesc('completed_at')->first();
+		if (! $scan) {
+			return null;
+		}
+
+		$findings = DB::table('security_findings')->where('security_scan_id', $scan->id)
+			->orderByRaw("FIELD(severity,'hoog','middel','laag')")
+			->limit(8)->get()
+			->map(fn ($f) => ['category' => $f->category, 'severity' => $f->severity, 'finding' => (string) $f->finding, 'url' => $f->url])
+			->all();
+
+		return [
+			'safe_browsing' => $scan->safe_browsing,
+			'blacklisted'   => (bool) $scan->blacklisted,
+			'mixed'         => (int) $scan->mixed_content_count,
+			'broken'        => (int) $scan->broken_link_count,
+			'links_checked' => (int) $scan->links_checked,
+			'scanned_at'    => $scan->completed_at,
+			'findings'      => $findings,
 		];
 	}
 
