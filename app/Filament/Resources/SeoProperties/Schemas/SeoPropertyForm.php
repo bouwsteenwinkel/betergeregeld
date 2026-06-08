@@ -17,6 +17,19 @@ class SeoPropertyForm
 	{
 		return $schema
 			->components([
+				Section::make('Uitleg & klant-instructies')
+					->icon('heroicon-m-question-mark-circle')
+					->description('Hoe je een website aan Search Console koppelt — en wat de klant daarvoor moet doen.')
+					->collapsible()
+					->collapsed()
+					->columnSpanFull()
+					->components([
+						Placeholder::make('gsc_help')
+							->hiddenLabel()
+							->content(fn () => view('filament.seo.gsc-help', [
+								'serviceAccount' => app(GoogleApiAuth::class)->serviceAccountEmail(),
+							])),
+					]),
 				Section::make('Property')
 					->columns(2)
 					->components([
