@@ -202,6 +202,36 @@
             </div>
         @endif
 
+        {{-- Paginakwaliteit (AI-scan) --}}
+        @if ($quality)
+            <div class="section-title">Paginakwaliteit</div>
+            <div class="card">
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                    <span class="gauge"><span class="score" style="color:{{ $perfColor($quality['score']) }}">{{ $quality['score'] }}</span><span class="muted">/ 100</span></span>
+                    @if (! is_null($quality['trend']))
+                        <span class="{{ $quality['trend'] >= 0 ? 'up' : 'down' }}">{{ $quality['trend'] >= 0 ? '▲' : '▼' }} {{ abs($quality['trend']) }}</span>
+                    @endif
+                    <span style="display:flex;gap:6px">
+                        @if ($quality['fail'])<span class="pill red">{{ $quality['fail'] }} kritiek</span>@endif
+                        @if ($quality['warn'])<span class="pill amber">{{ $quality['warn'] }} aandachtspunt{{ $quality['warn'] === 1 ? '' : 'en' }}</span>@endif
+                        <span class="pill green">{{ $quality['pass'] }} ok</span>
+                    </span>
+                    <span class="muted" style="font-size:12px;margin-left:auto">gescand {{ \Illuminate\Support\Carbon::parse($quality['scanned_at'])->format('d-m-Y') }}</span>
+                </div>
+                <div class="bar" style="margin-top:10px"><span style="width:{{ $quality['score'] }}%;background:{{ $perfColor($quality['score']) }}"></span></div>
+                @if (count($quality['top']))
+                    <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+                        @foreach ($quality['top'] as $f)
+                            <div style="font-size:13px;display:flex;gap:8px;align-items:flex-start">
+                                <span class="pill {{ $f['status'] === 'fail' ? 'red' : 'amber' }}" style="flex:none">{{ $f['status'] === 'fail' ? 'Kritiek' : 'Let op' }}</span>
+                                <span>{{ $f['finding'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <div class="foot">Statistieken via {{ $agency?->name ?? 'Rankdata' }} · powered by Beter Geregeld</div>
     </div>
 </body>

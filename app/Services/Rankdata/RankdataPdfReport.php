@@ -118,6 +118,7 @@ class RankdataPdfReport extends FPDF
 		$this->Ln(4);
 
 		$this->psiBlock($s['psi']);
+		$this->qualityBlock($s['quality'] ?? null);
 
 		if (! empty($seo['topQueries'])) {
 			$this->subHeading('Top zoekwoorden');
@@ -146,6 +147,36 @@ class RankdataPdfReport extends FPDF
 		}
 
 		$this->Ln(6);
+	}
+
+	private function qualityBlock(?array $q): void
+	{
+		$this->subHeading('Paginakwaliteit (AI-scan)');
+
+		if (! $q) {
+			$this->SetFont('Helvetica', 'I', 9);
+			$this->SetTextColor(150);
+			$this->Cell(0, 6, $this->t('Nog geen kwaliteitsscan voor deze site.'), 0, 1, 'L');
+			$this->SetTextColor(17);
+			$this->Ln(2);
+
+			return;
+		}
+
+		$this->SetFont('Helvetica', 'B', 16);
+		$this->Cell(16, 8, (string) $q['score'], 0, 0, 'L');
+		$this->SetFont('Helvetica', '', 9);
+		$this->SetTextColor(110);
+		$this->Cell(0, 8, $this->t('/ 100   -   ' . $q['fail'] . ' kritiek, ' . $q['warn'] . ' aandachtspunten, ' . $q['pass'] . ' ok'), 0, 1, 'L');
+		$this->SetTextColor(17);
+
+		foreach ($q['top'] as $f) {
+			$tag = $f['status'] === 'fail' ? '[Kritiek] ' : '[Let op] ';
+			$this->SetFont('Helvetica', '', 8.5);
+			$this->MultiCell(0, 4.5, $this->t($tag . $f['finding']), 0, 'L');
+			$this->Ln(0.5);
+		}
+		$this->Ln(2);
 	}
 
 	private function psiBlock(array $psi): void

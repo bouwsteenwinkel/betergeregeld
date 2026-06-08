@@ -74,7 +74,7 @@ class RankdataDashboardController extends Controller
 		$selectedId = (int) $request->query('site', 0);
 		$selected = $sites->firstWhere('id', $selectedId) ?: $sites->first();
 
-		$seo = $psi = $uptime = null;
+		$seo = $psi = $uptime = $quality = null;
 		$domain = null;
 		if ($selected) {
 			$domain = preg_replace('/^sc-domain:/', '', $selected->site_url);
@@ -82,6 +82,7 @@ class RankdataDashboardController extends Controller
 			$psi = $this->psiStats((int) $selected->id);
 			$check = DB::table('monitor_checks')->where('property_id', $selected->id)->first();
 			$uptime = $check ? $this->uptimeStats($check->id) : null;
+			$quality = $this->qualityStats((int) $selected->id);
 		}
 
 		return view('rankdata.dashboard', [
@@ -94,6 +95,7 @@ class RankdataDashboardController extends Controller
 			'seo'     => $seo,
 			'psi'     => $psi,
 			'uptime'  => $uptime,
+			'quality' => $quality,
 			'canPickClient' => $user->isSuperAdmin() || $user->isAgencyAdmin(),
 		]);
 	}
@@ -158,6 +160,49 @@ class RankdataDashboardController extends Controller
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Laatste AI-kwaliteitsscan voor een site (over al z'n monitored_pages):
+	 * score + trend t.o.v. de vorige scan + telling pass/warn/fail + de
+	 * belangrijkste aandachtspunten. Null als er nog niet gescand is.
+	 */
+	private function qualityStats(int $siteId): ?array
+	{
+		$pageIds = DB::table('monitored_pages')->where('site_id', $siteId)->pluck('id');
+		if ($pageIds->isEmpty()) {
+			return null;
+		}
+
+		$scans = DB::table('quality_scans')
+			->whereIn('monitored_page_id', $pageIds)
+			->where('status', 'completed')->whereNotNull('score')
+			->orderByDesc('completed_at')->limit(2)->get();
+		if ($scans->isEmpty()) {
+			return null;
+		}
+
+		$latest = $scans[0];
+		$prev = $scans[1] ?? null;
+
+		$counts = DB::table('quality_findings')->where('quality_scan_id', $latest->id)
+			->selectRaw('status, COUNT(*) c')->groupBy('status')->pluck('c', 'status');
+
+		$top = DB::table('quality_findings')->where('quality_scan_id', $latest->id)
+			->whereIn('status', ['fail', 'warn'])
+			->orderByRaw("FIELD(severity,'hoog','middel','laag'), FIELD(status,'fail','warn')")
+			->limit(6)->get()
+			->map(fn ($f) => ['status' => $f->status, 'finding' => (string) $f->finding])->all();
+
+		return [
+			'score'      => (int) $latest->score,
+			'trend'      => $prev ? (int) $latest->score - (int) $prev->score : null,
+			'scanned_at' => $latest->completed_at,
+			'pass'       => (int) ($counts['pass'] ?? 0),
+			'warn'       => (int) ($counts['warn'] ?? 0),
+			'fail'       => (int) ($counts['fail'] ?? 0),
+			'top'        => $top,
+		];
 	}
 
 	private function uptimeStats(string $checkId): array

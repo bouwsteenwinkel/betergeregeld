@@ -64,7 +64,7 @@ class SitesRelationManager extends RelationManager
 			->headerActions([
 				CreateAction::make()->label('Site toevoegen')
 					->mutateDataUsing(fn (array $data) => $this->withSiteUrl($data))
-					->after(fn (Model $record) => $this->ensureCheck($record)),
+					->after(fn (Model $record) => $this->ensureSiteMonitoring($record)),
 			])
 			->recordActions([
 				Action::make('dashboard')->label('Dashboard')->icon('heroicon-m-arrow-top-right-on-square')->color('primary')
@@ -75,7 +75,7 @@ class SitesRelationManager extends RelationManager
 				EditAction::make()
 					->mutateRecordDataUsing(fn (array $data) => $data + ['domain' => preg_replace('/^sc-domain:/', '', $data['site_url'] ?? '')])
 					->mutateDataUsing(fn (array $data) => $this->withSiteUrl($data))
-					->after(fn (Model $record) => $this->ensureCheck($record)),
+					->after(fn (Model $record) => $this->ensureSiteMonitoring($record)),
 				DeleteAction::make(),
 			]);
 	}
@@ -88,6 +88,31 @@ class SitesRelationManager extends RelationManager
 		unset($data['domain']);
 
 		return $data;
+	}
+
+	/** Richt de standaard-monitoring voor een nieuwe/bewerkte site in. */
+	private function ensureSiteMonitoring(Model $record): void
+	{
+		$this->ensureCheck($record);
+		$this->ensureMonitoredPage($record);
+	}
+
+	/** Zorgt dat de site een homepage-pagina heeft om op kwaliteit te scannen. */
+	private function ensureMonitoredPage(Model $record): void
+	{
+		if (DB::table('monitored_pages')->where('site_id', $record->id)->exists()) {
+			return;
+		}
+		$domain = preg_replace('/^sc-domain:/', '', $record->site_url);
+		DB::table('monitored_pages')->insert([
+			'site_id'        => $record->id,
+			'url'            => 'https://' . $domain . '/',
+			'label'          => 'Homepage',
+			'is_active'      => 1,
+			'scan_frequency' => 'weekly',
+			'created_at'     => now(),
+			'updated_at'     => now(),
+		]);
 	}
 
 	/** Zorgt dat de site een uptime-check heeft (maakt 'm aan als die ontbreekt). */

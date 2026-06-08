@@ -29,6 +29,7 @@ class RankdataReport
 				'seo'      => $this->seo((int) $site->id, $days),
 				'psi'      => $this->psi((int) $site->id),
 				'uptime'   => $check ? $this->uptime((string) $check->id, 7) : null,
+				'quality'  => $this->quality((int) $site->id),
 			];
 		}
 
@@ -95,6 +96,39 @@ class RankdataReport
 		}
 
 		return $out;
+	}
+
+	private function quality(int $siteId): ?array
+	{
+		$pageIds = DB::table('monitored_pages')->where('site_id', $siteId)->pluck('id');
+		if ($pageIds->isEmpty()) {
+			return null;
+		}
+
+		$latest = DB::table('quality_scans')->whereIn('monitored_page_id', $pageIds)
+			->where('status', 'completed')->whereNotNull('score')
+			->orderByDesc('completed_at')->first();
+		if (! $latest) {
+			return null;
+		}
+
+		$counts = DB::table('quality_findings')->where('quality_scan_id', $latest->id)
+			->selectRaw('status, COUNT(*) c')->groupBy('status')->pluck('c', 'status');
+
+		$top = DB::table('quality_findings')->where('quality_scan_id', $latest->id)
+			->whereIn('status', ['fail', 'warn'])
+			->orderByRaw("FIELD(severity,'hoog','middel','laag'), FIELD(status,'fail','warn')")
+			->limit(5)->get()
+			->map(fn ($f) => ['status' => (string) $f->status, 'finding' => (string) $f->finding])->all();
+
+		return [
+			'score'      => (int) $latest->score,
+			'pass'       => (int) ($counts['pass'] ?? 0),
+			'warn'       => (int) ($counts['warn'] ?? 0),
+			'fail'       => (int) ($counts['fail'] ?? 0),
+			'scanned_at' => $latest->completed_at,
+			'top'        => $top,
+		];
 	}
 
 	private function uptime(string $checkId, int $days): ?array
