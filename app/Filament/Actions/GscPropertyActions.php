@@ -6,7 +6,9 @@ use App\Models\Seo\SeoProperty;
 use App\Services\Seo\GscAccessChecker;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
 /**
  * Gedeelde GSC-onboarding-acties, gebruikt door zowel de super-admin
@@ -48,6 +50,29 @@ class GscPropertyActions
 				}
 
 				Notification::make()->title('Fout bij toegangscontrole')->body($result['message'])->danger()->persistent()->send();
+			});
+	}
+
+	/** Toont de installatie-instructie + per-site token voor de security-companion-plugin. */
+	public static function securityAgent(): Action
+	{
+		return Action::make('securityAgent')
+			->label('Beveiligingsagent')
+			->icon('heroicon-m-shield-check')
+			->color('gray')
+			->modalHeading('Beveiligingsagent (CMS/plugin-monitoring)')
+			->modalSubmitAction(false)
+			->modalCancelActionLabel('Sluiten')
+			->modalContent(function (SeoProperty $record): View {
+				if (! $record->security_ingest_token) {
+					$record->forceFill(['security_ingest_token' => Str::random(48)])->save();
+				}
+
+				return view('filament.security.agent-help', [
+					'token'    => $record->security_ingest_token,
+					'endpoint' => url('/security/ingest'),
+					'download' => route('security.agent-plugin'),
+				]);
 			});
 	}
 

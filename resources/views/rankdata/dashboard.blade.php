@@ -261,6 +261,35 @@
             </div>
         @endif
 
+        {{-- Software & updates --}}
+        @if ($software ?? null)
+            <div class="section-title">Software &amp; updates</div>
+            <div class="card">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <span class="muted" style="font-size:13px">{{ $software['components'] }} componenten</span>
+                    <span class="pill {{ $software['updates'] > 0 ? 'amber' : 'green' }}">{{ $software['updates'] }} update{{ $software['updates'] === 1 ? '' : 's' }} beschikbaar</span>
+                    <span class="pill {{ $software['vuln_count'] > 0 ? 'red' : 'green' }}">{{ $software['vuln_count'] }} kwetsbaarhe{{ $software['vuln_count'] === 1 ? 'id' : 'den' }}</span>
+                    <span class="muted" style="font-size:12px;margin-left:auto">bijgewerkt {{ \Illuminate\Support\Carbon::parse($software['reported_at'])->format('d-m-Y') }}</span>
+                </div>
+                @if (count($software['vulns']))
+                    <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+                        @foreach ($software['vulns'] as $v)
+                            <div style="font-size:13px;display:flex;gap:8px;align-items:flex-start">
+                                <span class="pill {{ in_array($v['severity'], ['critical','high']) ? 'red' : ($v['severity'] === 'medium' ? 'amber' : 'green') }}" style="flex:none">{{ ucfirst($v['severity'] ?? 'onbekend') }}</span>
+                                <span>
+                                    <strong>{{ $v['name'] }}</strong>@if ($v['version']) {{ $v['version'] }}@endif — {{ $v['title'] }}
+                                    @if ($v['patched_in'])<span class="muted"> (opgelost in {{ $v['patched_in'] }})</span>@endif
+                                    @if ($v['cve'])<span class="muted"> · {{ $v['cve'] }}</span>@endif
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="muted" style="font-size:13px;margin-top:10px">Geen bekende kwetsbaarheden in de gerapporteerde software. ✅</div>
+                @endif
+            </div>
+        @endif
+
         {{-- Abonnement / facturatie --}}
         @if (($canManageBilling ?? false) && ($monthlyCost['plan'] ?? null))
             <div class="section-title">Abonnement</div>

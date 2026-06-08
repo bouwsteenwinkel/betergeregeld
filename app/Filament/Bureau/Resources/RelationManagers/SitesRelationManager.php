@@ -72,6 +72,7 @@ class SitesRelationManager extends RelationManager
 					->openUrlInNewTab(),
 				GscPropertyActions::testAccess(),
 				GscPropertyActions::importNow(),
+				GscPropertyActions::securityAgent(),
 				EditAction::make()
 					->mutateRecordDataUsing(fn (array $data) => $data + ['domain' => preg_replace('/^sc-domain:/', '', $data['site_url'] ?? '')])
 					->mutateDataUsing(fn (array $data) => $this->withSiteUrl($data))

@@ -89,7 +89,7 @@ class RankdataDashboardController extends Controller
 		$selectedId = (int) $request->query('site', 0);
 		$selected = $sites->firstWhere('id', $selectedId) ?: $sites->first();
 
-		$seo = $psi = $uptime = $quality = $security = null;
+		$seo = $psi = $uptime = $quality = $security = $software = null;
 		$domain = null;
 		if ($selected) {
 			$domain = preg_replace('/^sc-domain:/', '', $selected->site_url);
@@ -99,6 +99,7 @@ class RankdataDashboardController extends Controller
 			$uptime = $check ? $this->uptimeStats($check->id) : null;
 			$quality = $this->qualityStats((int) $selected->id);
 			$security = $this->securityStats((int) $selected->id);
+			$software = $this->softwareStats((int) $selected->id);
 		}
 
 		$subscription = DB::table('tenant_subscriptions')
@@ -119,6 +120,7 @@ class RankdataDashboardController extends Controller
 			'uptime'  => $uptime,
 			'quality' => $quality,
 			'security' => $security,
+			'software' => $software,
 			'subscription' => $subscription,
 			'monthlyCost' => $monthlyCost,
 			'canManageBilling' => $user->isSuperAdmin() || ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id) || $user->tenant_id === $t->id,
@@ -228,6 +230,30 @@ class RankdataDashboardController extends Controller
 			'warn'       => (int) ($counts['warn'] ?? 0),
 			'fail'       => (int) ($counts['fail'] ?? 0),
 			'top'        => $top,
+		];
+	}
+
+	/** Software-inventaris (gepusht door de companion-agent): updates + kwetsbaarheden. */
+	private function softwareStats(int $siteId): ?array
+	{
+		$reportedAt = DB::table('seo_properties')->where('id', $siteId)->value('software_reported_at');
+		if (! $reportedAt) {
+			return null; // agent nog niet geïnstalleerd
+		}
+
+		$vulns = DB::table('site_vulnerabilities')->where('property_id', $siteId)
+			->orderByRaw("FIELD(severity,'critical','high','medium','low')")
+			->limit(12)->get()
+			->map(fn ($v) => ['name' => $v->name, 'type' => $v->type, 'title' => (string) $v->title,
+				'severity' => $v->severity, 'cve' => $v->cve, 'patched_in' => $v->patched_in, 'version' => $v->version])
+			->all();
+
+		return [
+			'reported_at' => $reportedAt,
+			'components'  => (int) DB::table('site_components')->where('property_id', $siteId)->count(),
+			'updates'     => (int) DB::table('site_components')->where('property_id', $siteId)->where('has_update', true)->count(),
+			'vuln_count'  => (int) DB::table('site_vulnerabilities')->where('property_id', $siteId)->count(),
+			'vulns'       => $vulns,
 		];
 	}
 

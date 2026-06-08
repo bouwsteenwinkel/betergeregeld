@@ -89,6 +89,7 @@ Route::options('/cmp/consent',[\App\Http\Controllers\CmpController::class, 'cons
 // VPS monitoring ingest — host collectors POST samples here, authenticated by a
 // per-server token (Bearer / X-Monitor-Token). Locale-agnostic + CSRF-exempt.
 Route::post('/monitor/ingest', \App\Http\Controllers\Monitor\IngestController::class)->name('monitor.ingest');
+Route::post('/security/ingest/{token}', \App\Http\Controllers\Security\SoftwareIngestController::class)->name('security.ingest');
 
 // Cron-monitoring heartbeat — bewaakte jobs pingen hun ping_token (GET of POST).
 // {signal} = success (default) | start | fail. Locale-agnostisch + CSRF-exempt.
@@ -139,6 +140,11 @@ Route::prefix('{locale}')
 			Route::get('/mijn-statistieken', [\App\Http\Controllers\RankdataDashboardController::class, 'me'])->name('rankdata.me');
 			Route::get('/rankdata/{tenant}', [\App\Http\Controllers\RankdataDashboardController::class, 'show'])->name('rankdata.client');
 			Route::post('/rankdata/{tenant}/checkout', [\App\Http\Controllers\RankdataDashboardController::class, 'checkout'])->name('rankdata.checkout');
+			Route::get('/security/agent-plugin', function () {
+				abort_unless(auth()->user()?->isSuperAdmin() || auth()->user()?->isAgencyAdmin(), 403);
+
+				return response()->download(resource_path('security-agent/beter-geregeld-monitor.php'), 'beter-geregeld-monitor.php');
+			})->name('security.agent-plugin');
 
 			Route::post('/billing/trial', [BillingController::class, 'startTrial'])->name('billing.trial');
 			Route::post('/billing/checkout', [BillingController::class, 'startCheckout'])->name('billing.checkout');

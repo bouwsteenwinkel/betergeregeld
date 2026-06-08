@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tools/speedtest/upload',
             'cmp/consent',
             'monitor/ingest',
+            'security/ingest/*',
             'cron/ping/*',
         ]);
 

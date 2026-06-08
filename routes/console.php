@@ -131,6 +131,16 @@ CronMonitorPinger::watch(
     'security:scan'
 );
 
+// Security (fase 2) — dagelijkse import van de Wordfence vuln-feed (lokale cache
+// waartegen de gepushte site-software gematcht wordt).
+CronMonitorPinger::watch(
+    Schedule::command('security:import-vulns')
+        ->dailyAt('04:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'security:import-vulns'
+);
+
 // Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
 // gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
 // de mail rond koffietijd binnenkomt.

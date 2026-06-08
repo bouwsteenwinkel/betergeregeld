@@ -54,6 +54,7 @@ class SeoPropertiesTable
 			->recordActions([
 				GscPropertyActions::testAccess(),
 				GscPropertyActions::importNow(),
+				GscPropertyActions::securityAgent(),
 				EditAction::make(),
 			])
 			->toolbarActions([

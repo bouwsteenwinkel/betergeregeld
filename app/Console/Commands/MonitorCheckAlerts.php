@@ -8,6 +8,7 @@ use App\Models\Security\SecurityScan;
 use App\Models\Seo\SeoImportsLog;
 use App\Models\Seo\SeoProperty;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -51,8 +52,53 @@ class MonitorCheckAlerts extends Command
 		$this->checkSeoFreshness($to);
 		$this->checkUptimeChecks();
 		$this->checkSecurity();
+		$this->checkSoftware();
 
 		return self::SUCCESS;
+	}
+
+	/**
+	 * Software-alerting: mailt bij een OVERGANG naar/uit kwetsbaar (≥1 gematchte
+	 * kwetsbaarheid in de gerapporteerde CMS/plugins/thema's). Alleen voor sites
+	 * waar de companion-agent al heeft gerapporteerd.
+	 */
+	private function checkSoftware(): void
+	{
+		$props = SeoProperty::query()->where('is_active', true)
+			->whereNotNull('software_reported_at')->with('tenant.agency')->get();
+
+		foreach ($props as $prop) {
+			$vulnCount = (int) DB::table('site_vulnerabilities')->where('property_id', $prop->id)->count();
+			$condition = $vulnCount > 0 ? 'flagged' : 'ok';
+			$previous = $prop->software_alert_state;
+			if ($condition === $previous) {
+				continue;
+			}
+
+			$shouldMail = $previous !== null || $condition === 'flagged';
+			$prop->forceFill(['software_alert_state' => $condition, 'software_alerted_at' => now()])->save();
+			if (! $shouldMail) {
+				continue;
+			}
+
+			$recipients = $this->recipientsFor($prop);
+			if (empty($recipients)) {
+				continue;
+			}
+
+			if ($condition === 'flagged') {
+				$subject = "[Security] Kwetsbare software op {$prop->label}";
+				$body = "Op de site '{$prop->label}' ({$prop->domain()}) zijn {$vulnCount} bekende kwetsbaarhe"
+					. ($vulnCount === 1 ? 'id' : 'den') . " gevonden in de geïnstalleerde software (CMS/plugins/thema's).\n\n"
+					. 'Bekijk de details in het dashboard en werk de betreffende onderdelen bij.';
+			} else {
+				$subject = "[Security] Software weer veilig op {$prop->label}";
+				$body = "De eerder gemelde kwetsbaarheden op '{$prop->label}' ({$prop->domain()}) zijn opgelost.";
+			}
+
+			Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
+			$this->info("SOFTWARE [{$prop->label}]: " . ($previous ?? 'init') . " → {$condition}");
+		}
 	}
 
 	/**
