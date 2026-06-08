@@ -25,3 +25,6 @@ Thumbs.db
 
 # GeoLite2 MMDB files — download fresh copies from MaxMind
 /storage/geoip/*.mmdb
+
+# Lokale secrets — nooit committen
+/docs/Pagespeed-api-key.txt
