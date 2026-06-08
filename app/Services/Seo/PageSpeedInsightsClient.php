@@ -37,7 +37,8 @@ class PageSpeedInsightsClient
 			// Multiple categories: PSI accepteert herhaalde category-params.
 			'category' => 'performance',
 		];
-		if ($key = env('PSI_API_KEY')) {
+		// config() i.p.v. kale env() zodat de key na `config:cache` op prod blijft werken.
+		if ($key = (config('seo.psi_api_key') ?: env('PSI_API_KEY'))) {
 			$query['key'] = $key;
 		}
 

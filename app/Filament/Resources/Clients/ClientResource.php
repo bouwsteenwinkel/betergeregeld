@@ -107,6 +107,7 @@ class ClientResource extends Resource
 					->color('primary')
 					->url(fn (Tenant $r) => route('rankdata.client', ['locale' => 'nl', 'tenant' => $r->id]))
 					->openUrlInNewTab(),
+				\App\Filament\Actions\RankdataReportAction::make(),
 			]);
 	}
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Bureau\Resources\RelationManagers;
 
+use App\Filament\Actions\GscPropertyActions;
 use App\Models\Seo\SeoProperty;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -69,6 +70,8 @@ class SitesRelationManager extends RelationManager
 				Action::make('dashboard')->label('Dashboard')->icon('heroicon-m-arrow-top-right-on-square')->color('primary')
 					->url(fn (SeoProperty $r) => route('rankdata.client', ['locale' => 'nl', 'tenant' => $r->tenant_id]) . '?site=' . $r->id)
 					->openUrlInNewTab(),
+				GscPropertyActions::testAccess(),
+				GscPropertyActions::importNow(),
 				EditAction::make()
 					->mutateRecordDataUsing(fn (array $data) => $data + ['domain' => preg_replace('/^sc-domain:/', '', $data['site_url'] ?? '')])
 					->mutateDataUsing(fn (array $data) => $this->withSiteUrl($data))

@@ -120,6 +120,7 @@ class ClientResource extends Resource
 				Action::make('dashboard')->label('Dashboard')->icon('heroicon-m-arrow-top-right-on-square')->color('primary')
 					->url(fn (Tenant $r) => route('rankdata.client', ['locale' => 'nl', 'tenant' => $r->id]))
 					->openUrlInNewTab(),
+				\App\Filament\Actions\RankdataReportAction::make(),
 				EditAction::make(),
 			]);
 	}
