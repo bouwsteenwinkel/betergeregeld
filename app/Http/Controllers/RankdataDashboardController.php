@@ -56,6 +56,21 @@ class RankdataDashboardController extends Controller
 		return $this->render($request, $tenant);
 	}
 
+	/** Klant-direct: start een Mollie-checkout voor het Rankdata-abonnement van deze klant. */
+	public function checkout(Request $request, string $locale, string $tenant)
+	{
+		$t = Tenant::with('agency')->findOrFail($tenant);
+		$user = $request->user();
+		$allowed = $user->isSuperAdmin()
+			|| ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id)
+			|| $user->tenant_id === $t->id;
+		abort_unless($allowed, 403);
+
+		$intent = app(\App\Services\Billing\BillingService::class)->startRankdataCheckout($user, $t);
+
+		return redirect()->away($intent->mollie_checkout_url);
+	}
+
 	/** Gedeelde dashboard-render (aangeroepen door show() én me()). */
 	private function render(Request $request, string $tenant)
 	{
@@ -85,6 +100,12 @@ class RankdataDashboardController extends Controller
 			$quality = $this->qualityStats((int) $selected->id);
 		}
 
+		$subscription = DB::table('tenant_subscriptions')
+			->where('tenant_key', $t->id)
+			->whereIn('status', ['active', 'trial', 'trialing'])
+			->orderByDesc('current_period_ends_at')->first();
+		$monthlyCost = app(\App\Services\Rankdata\RankdataBilling::class)->costForTenant($t);
+
 		return view('rankdata.dashboard', [
 			'tenant'  => $t,
 			'agency'  => $t->agency,
@@ -96,6 +117,9 @@ class RankdataDashboardController extends Controller
 			'psi'     => $psi,
 			'uptime'  => $uptime,
 			'quality' => $quality,
+			'subscription' => $subscription,
+			'monthlyCost' => $monthlyCost,
+			'canManageBilling' => $user->isSuperAdmin() || ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id) || $user->tenant_id === $t->id,
 			'canPickClient' => $user->isSuperAdmin() || $user->isAgencyAdmin(),
 		]);
 	}

@@ -6,9 +6,12 @@ use App\Models\Agency;
 use App\Models\BookkeepingInvoice;
 use App\Models\BookkeepingRelation;
 use App\Models\BookkeepingVatRate;
+use App\Models\Plan;
+use App\Models\Tenant;
 use App\Services\InvoiceNumberer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 /**
  * Genereert de maandelijkse bureau-factuur (platform → bureau, te voldoen per
@@ -59,7 +62,13 @@ class RankdataInvoiceService
 			$sort = 0;
 			$discountTotal = 0.0;
 			$discountPct = 0.0;
+			$billed = 0;
+			$rankdataPlanIds = Plan::query()->where('product', 'rankdata')->pluck('id')->all();
 			foreach ($clients as $client) {
+				if ($this->isSelfPaying($client, $rankdataPlanIds)) {
+					continue; // klant betaalt zelf via Mollie — niet doorbelasten aan het bureau
+				}
+				$billed++;
 				$c = $this->billing->costForTenant($client, $agency);
 				$invoice->lines()->create([
 					'description' => 'Rankdata — ' . $client->name . ' (' . $c['sites'] . ' site' . ($c['sites'] === 1 ? '' : 's') . ')',
@@ -82,12 +91,31 @@ class RankdataInvoiceService
 				]);
 			}
 
+			if ($billed === 0) {
+				throw new RuntimeException('Geen door te belasten klanten — allen betalen zelf of er zijn geen klanten.');
+			}
+
 			$invoice->load('lines.vatRate');
 			$invoice->recalculate();
 			$invoice->save();
 
 			return $invoice;
 		});
+	}
+
+	/** Betaalt de klant z'n Rankdata-abonnement zelf (actieve TenantSubscription op een rankdata-plan)? */
+	private function isSelfPaying(Tenant $client, array $rankdataPlanIds): bool
+	{
+		if (empty($rankdataPlanIds)) {
+			return false;
+		}
+
+		return DB::table('tenant_subscriptions')
+			->where('tenant_key', $client->id)
+			->whereIn('plan_id', $rankdataPlanIds)
+			->whereIn('status', ['active', 'trial', 'trialing'])
+			->where(fn ($q) => $q->whereNull('current_period_ends_at')->orWhere('current_period_ends_at', '>=', now()))
+			->exists();
 	}
 
 	/** Btw-tarief van de platform-tenant; maakt een 21%-default aan als die ontbreekt. */

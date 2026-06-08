@@ -32,7 +32,12 @@ class RankdataInvoiceBureaus extends Command
 				continue;
 			}
 
-			$invoice = $service->generateForAgency($agency);
+			try {
+				$invoice = $service->generateForAgency($agency);
+			} catch (\RuntimeException $e) {
+				$this->line("[{$agency->name}] overgeslagen: " . $e->getMessage());
+				continue;
+			}
 			$made++;
 			$this->info("[{$agency->name}] {$invoice->invoice_number} — € " . number_format($invoice->total, 2, ',', '.'));
 		}

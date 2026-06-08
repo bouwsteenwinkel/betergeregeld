@@ -115,7 +115,13 @@ class AgencyResource extends Resource
 							return;
 						}
 
-						$invoice = app(RankdataInvoiceService::class)->generateForAgency($record);
+						try {
+							$invoice = app(RankdataInvoiceService::class)->generateForAgency($record);
+						} catch (\RuntimeException $e) {
+							Notification::make()->title('Geen factuur aangemaakt')->body($e->getMessage())->warning()->send();
+
+							return;
+						}
 
 						Notification::make()
 							->title('Concept-factuur ' . $invoice->invoice_number)

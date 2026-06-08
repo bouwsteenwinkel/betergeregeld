@@ -232,6 +232,28 @@
             </div>
         @endif
 
+        {{-- Abonnement / facturatie --}}
+        @if (($canManageBilling ?? false) && ($monthlyCost['plan'] ?? null))
+            <div class="section-title">Abonnement</div>
+            <div class="card">
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                    <strong style="font-size:18px">€ {{ number_format($monthlyCost['total'], 2, ',', '.') }}<span class="muted" style="font-size:13px;font-weight:400"> / maand</span></strong>
+                    <span class="muted" style="font-size:12px">{{ $monthlyCost['plan'] }} · {{ $monthlyCost['sites'] }} site{{ $monthlyCost['sites'] === 1 ? '' : 's' }}@if ($monthlyCost['discount_percent'] > 0) · {{ rtrim(rtrim(number_format($monthlyCost['discount_percent'], 2, ',', '.'), '0'), ',') }}% korting @endif</span>
+                    @if ($subscription)
+                        <span class="pill green" style="margin-left:auto">Actief t/m {{ \Illuminate\Support\Carbon::parse($subscription->current_period_ends_at)->format('d-m-Y') }}</span>
+                    @else
+                        <span class="pill amber" style="margin-left:auto">Nog niet geactiveerd</span>
+                    @endif
+                </div>
+                <form method="POST" action="{{ route('rankdata.checkout', ['locale' => 'nl', 'tenant' => $tenant->id]) }}" style="margin-top:12px">
+                    @csrf
+                    <button type="submit" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer">
+                        {{ $subscription ? 'Verleng / betaal nu' : 'Abonnement activeren & betalen' }}
+                    </button>
+                </form>
+            </div>
+        @endif
+
         <div class="foot">Statistieken via {{ $agency?->name ?? 'Rankdata' }} · powered by Beter Geregeld</div>
     </div>
 </body>

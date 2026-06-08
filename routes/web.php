@@ -138,6 +138,7 @@ Route::prefix('{locale}')
 			Route::get('/bureau', [\App\Http\Controllers\RankdataDashboardController::class, 'agency'])->name('rankdata.agency');
 			Route::get('/mijn-statistieken', [\App\Http\Controllers\RankdataDashboardController::class, 'me'])->name('rankdata.me');
 			Route::get('/rankdata/{tenant}', [\App\Http\Controllers\RankdataDashboardController::class, 'show'])->name('rankdata.client');
+			Route::post('/rankdata/{tenant}/checkout', [\App\Http\Controllers\RankdataDashboardController::class, 'checkout'])->name('rankdata.checkout');
 
 			Route::post('/billing/trial', [BillingController::class, 'startTrial'])->name('billing.trial');
 			Route::post('/billing/checkout', [BillingController::class, 'startCheckout'])->name('billing.checkout');

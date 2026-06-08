@@ -92,6 +92,47 @@ class BillingService
 	}
 
 	/**
+	 * Rankdata klant-direct: de klant (tenant) betaalt zélf z'n abonnement via
+	 * Mollie. Het bedrag is dynamisch (basis + extra sites − korting) i.p.v. een
+	 * vaste plan-prijs. Activatie loopt verder via dezelfde syncFromGateway-flow.
+	 */
+	public function startRankdataCheckout(User $user, \App\Models\Tenant $tenant): BillingIntent
+	{
+		$billing = app(\App\Services\Rankdata\RankdataBilling::class);
+		$plan = $billing->planFor($tenant->agency);
+		if (! $plan) {
+			throw new RuntimeException('Geen Rankdata-plan ingesteld.');
+		}
+
+		$cost = $billing->costForTenant($tenant);
+		if ($cost['total'] <= 0) {
+			throw new RuntimeException('Geen te factureren bedrag voor deze klant.');
+		}
+
+		$intent = BillingIntent::create([
+			'tenant_id' => $tenant->id,
+			'user_id'   => $user->getAuthIdentifier(),
+			'plan_id'   => $plan->id,
+			'period'    => 'monthly',
+			'amount'    => $cost['total'],
+			'currency'  => 'EUR',
+			'status'    => 'pending',
+		]);
+
+		$description = 'Rankdata-abonnement — ' . $tenant->name
+			. ' (' . $cost['sites'] . ' site' . ($cost['sites'] === 1 ? '' : 's') . ')';
+
+		$result = $this->gateway->createPayment($intent, $description);
+		$intent->update([
+			'mollie_payment_id'   => $result['mollie_payment_id'],
+			'mollie_checkout_url' => $result['checkout_url'],
+			'status'              => 'open',
+		]);
+
+		return $intent;
+	}
+
+	/**
 	 * Called both by the real Mollie webhook and by /billing/fake-confirm.
 	 * Looks the intent up, syncs status from Mollie (or fakes it), and
 	 * extends/creates the tenant subscription when paid. Idempotent.
