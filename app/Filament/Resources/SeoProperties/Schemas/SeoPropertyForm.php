@@ -55,6 +55,12 @@ class SeoPropertyForm
 							->columnSpanFull()
 							->content(fn (): string => app(GoogleApiAuth::class)->serviceAccountEmail()
 								?? 'Service-account JSON ontbreekt op deze omgeving (storage/app/google-api.json).'),
+						TextInput::make('notify_email')
+							->label('Alert-e-mail (optioneel)')
+							->email()
+							->maxLength(190)
+							->placeholder('leeg = bureau-contact, anders platform')
+							->helperText('Waarheen downtime- en SEO-alerts voor deze site gaan. Leeg laten = naar het bureau-contact, en anders naar het platform.'),
 						Toggle::make('is_active')
 							->label('Actief')
 							->default(true)

@@ -28,12 +28,15 @@ class Check extends Model
 
 	protected $fillable = [
 		'server_id',
+		'property_id',
 		'name',
 		'type',
 		'target',
 		'expected_code',
 		'timeout_seconds',
 		'is_active',
+		'alert_state',
+		'alerted_at',
 	];
 
 	protected $casts = [
@@ -43,11 +46,18 @@ class Check extends Model
 		'last_code' => 'integer',
 		'last_latency_ms' => 'integer',
 		'last_checked_at' => 'datetime',
+		'alerted_at' => 'datetime',
 	];
 
 	public function server(): BelongsTo
 	{
 		return $this->belongsTo(Server::class);
+	}
+
+	/** De site (seo_property) waar deze uptime-check bij hoort (null = los/server-check). */
+	public function property(): BelongsTo
+	{
+		return $this->belongsTo(\App\Models\Seo\SeoProperty::class, 'property_id');
 	}
 
 	public function results(): HasMany

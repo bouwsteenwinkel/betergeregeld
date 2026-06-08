@@ -18,7 +18,7 @@ class SeoProperty extends Model
 	protected $table = 'seo_properties';
 
 	protected $fillable = [
-		'tenant_id', 'site_url', 'label', 'type', 'is_active',
+		'tenant_id', 'site_url', 'label', 'type', 'is_active', 'notify_email',
 		'last_imported_date', 'last_import_error',
 		'freshness_alert_state', 'freshness_alerted_at',
 	];

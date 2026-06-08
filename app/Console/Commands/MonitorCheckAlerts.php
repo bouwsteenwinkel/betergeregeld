@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Monitor\Check;
 use App\Models\Monitor\Server;
 use App\Models\Seo\SeoImportsLog;
 use App\Models\Seo\SeoProperty;
@@ -47,8 +48,105 @@ class MonitorCheckAlerts extends Command
 		$this->info("Klaar — {$changes} overgang(en) van " . $servers->count() . ' server(s).');
 
 		$this->checkSeoFreshness($to);
+		$this->checkUptimeChecks();
 
 		return self::SUCCESS;
+	}
+
+	/**
+	 * Downtime-alerting voor uptime-checks: mailt bij up->down en weer bij
+	 * down->up, state-based (één mail per overgang) net als de server-alerts.
+	 * Een nieuwe check wordt stil geïnitialiseerd, behalve als hij meteen down
+	 * is — dat is direct actiewaardig.
+	 */
+	private function checkUptimeChecks(): void
+	{
+		$checks = Check::query()
+			->where('is_active', true)
+			->whereIn('last_status', ['up', 'down'])
+			->with('property.tenant.agency')
+			->get();
+
+		$changes = 0;
+
+		foreach ($checks as $check) {
+			$current = (string) $check->last_status;
+			$previous = $check->alert_state;
+
+			if ($current === $previous) {
+				continue;
+			}
+
+			$shouldMail = $previous !== null || $current === 'down';
+			$check->forceFill(['alert_state' => $current, 'alerted_at' => now()])->save();
+
+			if (! $shouldMail) {
+				continue; // stille initialisatie van een nieuwe, bereikbare check
+			}
+
+			$recipients = $this->recipientsFor($check->property);
+			if (! empty($recipients)) {
+				[$subject, $body] = $this->checkMessage($check, $current);
+				Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
+			}
+
+			$label = $check->property?->label ?? $check->name;
+			$this->info("CHECK [{$label}]: " . ($previous ?? 'init') . " → {$current}");
+			$changes++;
+		}
+
+		$this->info("Klaar — {$changes} check-overgang(en) van " . $checks->count() . ' check(s).');
+	}
+
+	/**
+	 * Aan wie gaat een melding over deze site? Per-klant notify_email →
+	 * bureau-contact → platform-vangnet. Minstens één adres, of leeg.
+	 *
+	 * @return string[]
+	 */
+	private function recipientsFor(?SeoProperty $prop): array
+	{
+		$emails = [];
+		if ($prop) {
+			$emails[] = $prop->notify_email;
+			$emails[] = $prop->tenant?->agency?->contact_email;
+		}
+		$emails = array_values(array_unique(array_filter($emails)));
+
+		if (! empty($emails)) {
+			return $emails;
+		}
+
+		$platform = config('monitor.alert_email');
+
+		return $platform ? [$platform] : [];
+	}
+
+	/**
+	 * @return array{0:string,1:string}
+	 */
+	private function checkMessage(Check $check, string $condition): array
+	{
+		$label   = $check->property?->label ?? $check->name;
+		$target  = $check->target;
+		$when    = $check->last_checked_at?->diffForHumans() ?? 'zojuist';
+		$code    = $check->last_code ?? '-';
+		$latency = $check->last_latency_ms !== null ? "{$check->last_latency_ms} ms" : '-';
+
+		if ($condition === 'up') {
+			return [
+				"[Monitoring] HERSTELD: {$label} is weer bereikbaar",
+				"De site '{$label}' ({$target}) is weer online.\n\n"
+					. "HTTP-status: {$code}\nResponstijd: {$latency}\nGecontroleerd: {$when}",
+			];
+		}
+
+		return [
+			"[Monitoring] OFFLINE: {$label} is onbereikbaar",
+			"De site '{$label}' ({$target}) reageert niet zoals verwacht.\n\n"
+				. "HTTP-status: {$code}\nResponstijd: {$latency}\nGecontroleerd: {$when}\n\n"
+				. 'Controleer de site en de server.',
+		];
 	}
 
 	/**
@@ -62,7 +160,7 @@ class MonitorCheckAlerts extends Command
 	{
 		$days = (int) config('seo.freshness_alert_days', 3);
 
-		foreach (SeoProperty::query()->where('is_active', true)->get() as $prop) {
+		foreach (SeoProperty::query()->where('is_active', true)->with('tenant.agency')->get() as $prop) {
 			$condition = $prop->freshnessCondition($days);
 			$previous = $prop->freshness_alert_state ?? 'ok';
 
@@ -77,7 +175,8 @@ class MonitorCheckAlerts extends Command
 
 			$this->info("SEO [{$prop->label}]: {$previous} → {$condition}");
 
-			if (! $to) {
+			$recipients = $this->recipientsFor($prop);
+			if (empty($recipients)) {
 				continue;
 			}
 
@@ -100,12 +199,12 @@ class MonitorCheckAlerts extends Command
 					. "  • staat de service-account-JSON er (storage/app/google-api.json of GOOGLE_API_KEY_PATH)?\n\n"
 					. 'Handmatig bijwerken: php artisan seo:import-gsc';
 
-				Mail::raw($body, fn ($m) => $m->to($to)->subject($subject));
+				Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
 			} elseif ($previous === 'stale') {
 				$subject = "[SEO] HERSTELD: Search Console-import draait weer — {$prop->label}";
 				$body = "De Search Console-import voor '{$prop->label}' ({$prop->site_url}) is weer up-to-date.";
 
-				Mail::raw($body, fn ($m) => $m->to($to)->subject($subject));
+				Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
 			}
 		}
 	}

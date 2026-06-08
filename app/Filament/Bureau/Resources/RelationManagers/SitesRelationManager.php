@@ -39,6 +39,10 @@ class SitesRelationManager extends RelationManager
 				->default('website')->required(),
 			TextInput::make('domain')->label('Domein')->required()->maxLength(190)
 				->placeholder('klant.nl')->helperText('Zonder https:// — bv. klant.nl')->columnSpanFull(),
+			TextInput::make('notify_email')->label('Alert-e-mail (optioneel)')->email()->maxLength(190)
+				->placeholder('leeg = naar bureau-contact')
+				->helperText('Waarheen downtime-/SEO-alerts voor deze site gaan. Leeg = bureau-contact.')
+				->columnSpanFull(),
 			Toggle::make('is_active')->label('Actief')->default(true),
 		]);
 	}
