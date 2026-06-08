@@ -7,11 +7,14 @@ use App\Filament\Resources\Agencies\Pages\EditAgency;
 use App\Filament\Resources\Agencies\Pages\ListAgencies;
 use App\Models\Agency;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use App\Models\Plan;
 use App\Services\Rankdata\RankdataBilling;
+use App\Services\Rankdata\RankdataInvoiceService;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -96,7 +99,38 @@ class AgencyResource extends Resource
 					->state(fn (Agency $r) => '€ ' . number_format(app(RankdataBilling::class)->costForAgency($r)['total'], 2, ',', '.')),
 				IconColumn::make('is_active')->label('Actief')->boolean(),
 			])
-			->recordActions([EditAction::make()])
+			->recordActions([
+				Action::make('invoice')
+					->label('Maandfactuur')
+					->icon('heroicon-m-document-text')
+					->color('gray')
+					->requiresConfirmation()
+					->modalHeading('Concept-maandfactuur aanmaken')
+					->modalDescription(fn (Agency $r) => 'Maakt een concept-factuur voor ' . $r->name . ' aan ('
+						. $r->tenants()->where('is_active', true)->count() . ' actieve klanten). Je kijkt hem daarna na in Boekhouding voordat je verstuurt.')
+					->action(function (Agency $record): void {
+						if ($record->tenants()->where('is_active', true)->count() === 0) {
+							Notification::make()->title('Geen actieve klanten')->body('Dit bureau heeft geen actieve klanten om te factureren.')->warning()->send();
+
+							return;
+						}
+
+						$invoice = app(RankdataInvoiceService::class)->generateForAgency($record);
+
+						Notification::make()
+							->title('Concept-factuur ' . $invoice->invoice_number)
+							->body('Totaal € ' . number_format($invoice->total, 2, ',', '.') . ' incl. btw. Klaargezet als concept in Boekhouding.')
+							->success()
+							->persistent()
+							->actions([
+								\Filament\Notifications\Actions\Action::make('view')
+									->label('Open factuur')
+									->url(route('tools.bookkeeping.invoices.show', ['locale' => 'nl', 'id' => $invoice->id]), shouldOpenInNewTab: true),
+							])
+							->send();
+					}),
+				EditAction::make(),
+			])
 			->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
 	}
 

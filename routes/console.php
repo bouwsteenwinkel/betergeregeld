@@ -110,6 +110,16 @@ CronMonitorPinger::watch(
     'seo:run-psi'
 );
 
+// Rankdata — maandelijkse bureaufacturen (concept) op de 1e van de maand.
+// Blijven 'draft' zodat ze nagekeken worden vóór verzending.
+CronMonitorPinger::watch(
+    Schedule::command('rankdata:invoice-bureaus')
+        ->monthlyOn(1, '06:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'rankdata:invoice-bureaus'
+);
+
 // Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
 // gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
 // de mail rond koffietijd binnenkomt.
