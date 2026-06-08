@@ -10,8 +10,11 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use App\Models\Plan;
+use App\Services\Rankdata\RankdataBilling;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -65,6 +68,15 @@ class AgencyResource extends Resource
 					->helperText('Getoond in het bureau-panel.')->columnSpanFull(),
 				Toggle::make('is_active')->label('Actief')->default(true),
 			]),
+			Section::make('Facturatie (Rankdata)')->columns(2)->components([
+				Select::make('rankdata_plan_id')->label('Rankdata-plan')
+					->options(fn () => Plan::query()->where('product', 'rankdata')->where('is_active', true)->orderBy('sort_order')->pluck('name', 'id'))
+					->placeholder('Standaardplan')
+					->helperText('Leeg = het standaard actieve Rankdata-plan.'),
+				TextInput::make('discount_percent')->label('Korting % (override)')->numeric()->suffix('%')
+					->placeholder('plan-standaard')
+					->helperText('Leeg = de standaardkorting van het plan.'),
+			]),
 		]);
 	}
 
@@ -80,6 +92,8 @@ class AgencyResource extends Resource
 				TextColumn::make('primary_color')->label('Kleur')->badge()
 					->color(fn () => 'gray')->formatStateUsing(fn (?string $s) => $s ?: '—'),
 				TextColumn::make('tenants_count')->label('Klanten')->badge()->color('primary'),
+				TextColumn::make('monthly_total')->label('Maandtotaal')->badge()->color('success')
+					->state(fn (Agency $r) => '€ ' . number_format(app(RankdataBilling::class)->costForAgency($r)['total'], 2, ',', '.')),
 				IconColumn::make('is_active')->label('Actief')->boolean(),
 			])
 			->recordActions([EditAction::make()])

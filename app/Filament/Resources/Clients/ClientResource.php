@@ -101,6 +101,8 @@ class ClientResource extends Resource
 				TextColumn::make('uptime')->label('Uptime 7d')->badge()
 					->state(fn (Tenant $r) => ($u = self::summary($r)['uptime']) !== null ? number_format($u, 1, ',', '.') . '%' : '—')
 					->color(fn (Tenant $r) => ($u = self::summary($r)['uptime']) === null ? 'gray' : ($u >= 99.5 ? 'success' : ($u >= 98 ? 'warning' : 'danger'))),
+				TextColumn::make('monthly_price')->label('Maandprijs')->badge()->color('success')
+					->state(fn (Tenant $r) => '€ ' . number_format(app(\App\Services\Rankdata\RankdataBilling::class)->costForTenant($r)['total'], 2, ',', '.')),
 			])
 			->recordActions([
 				Action::make('dashboard')->label('Dashboard')->icon('heroicon-m-arrow-top-right-on-square')

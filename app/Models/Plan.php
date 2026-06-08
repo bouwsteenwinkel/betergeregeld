@@ -38,6 +38,9 @@ class Plan extends Model
 		'trial_days' => 'int',
 		'is_active' => 'bool',
 		'sort_order' => 'int',
+		'included_sites' => 'int',
+		'price_per_site' => 'float',
+		'discount_percent' => 'float',
 	];
 
 	protected $fillable = [
@@ -49,6 +52,9 @@ class Plan extends Model
 		'trial_days',
 		'is_active',
 		'sort_order',
+		'included_sites',
+		'price_per_site',
+		'discount_percent',
 	];
 
 	public function scopeProduct($q, string $product)

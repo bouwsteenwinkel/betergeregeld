@@ -37,11 +37,20 @@ class Agency extends Model
 		'logo_path',
 		'subdomain',
 		'is_active',
+		'rankdata_plan_id',
+		'discount_percent',
 	];
 
 	protected $casts = [
 		'is_active' => 'bool',
+		'discount_percent' => 'float',
 	];
+
+	/** Het Rankdata-plan van dit bureau (null = het standaard actieve rankdata-plan). */
+	public function rankdataPlan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+	{
+		return $this->belongsTo(Plan::class, 'rankdata_plan_id');
+	}
 
 	protected static function booted(): void
 	{
