@@ -28,10 +28,10 @@ daar hoeft de klant niets voor te doen.
 ## Wat er aan onze kant gebeurt
 
 1. Bureau maakt in `/bureau` één **klant** aan (tenant + login).
-2. **Per site**:
-   - `seo_property` aanmaken (`sc-domain:domein`).
-   - Verifiëren dat het service-account toegang heeft tot de GSC-property.
-   - **Initiële import**: `php artisan seo:import-gsc` haalt tot ~16 maanden historie op; daarna draait de dagelijkse cron automatisch.
+2. **Per site** (super-admin: **SEO → GSC Properties**):
+   - `seo_property` aanmaken met de exacte `site_url` (`sc-domain:domein` of `https://domein/`). Het formulier toont het service-account-mailadres dat de klant moet toevoegen.
+   - **Verifiëren met de knop "Toegang testen"** (per rij): toont direct of de klant ons account toegang heeft gegeven — en zo niet, welke properties ons account wél mag lezen (handig om de juiste `site_url` te kiezen). Geen wachten op de geplande import om een 403 te ontdekken.
+   - **Eerste import met de knop "Nu importeren"** (30 dagen backfill); daarna draait de dagelijkse cron `seo:import-gsc` automatisch verder. CLI-alternatief: `php artisan seo:import-gsc --property=ID --days=30` (haalt tot ~16 maanden historie op).
    - **Uptime-check** aanmaken op de URL (begint meteen te meten).
    - **PageSpeed** inplannen (`seo:run-psi`).
 3. Klant logt in op `/nl/login` → ziet al z'n sites met hun cijfers.
@@ -44,6 +44,6 @@ daar hoeft de klant niets voor te doen.
 
 ## Aandachtspunten / nog te bouwen
 
-- **Multi-site** (klant met meerdere sites) en de **echte GSC-koppeling per klant-property** moeten nog gebouwd worden — nu draait de demo op geseede data en 1 site per klant. Zie [ROADMAP.md](ROADMAP.md).
+- **Echte GSC-koppeling per klant-property werkt** (import loopt al per actieve property; onboarding-verificatie via "Toegang testen" + "Nu importeren"). Demo-tenants draaien nog op geseede data — die staan los van echte properties. Bureau-panel (`/bureau`) heeft de toegang-test-actie nog niet; daar gebeurt onboarding nu via de super-admin **GSC Properties**-resource. Zie [ROADMAP.md](ROADMAP.md).
 - **PageSpeed-quota**: de gratis (key-loze) PSI-API heeft een lage dagquota; voor meerdere klanten is een eigen Google PageSpeed API-key nodig.
 - **Uptime**: de checker draait al; alleen per-site-koppeling moet mee in de sites-laag.

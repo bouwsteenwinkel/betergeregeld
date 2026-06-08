@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\SeoProperties\Schemas;
 
 use App\Models\Tenant;
+use App\Services\Seo\GoogleApiAuth;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -34,7 +36,12 @@ class SeoPropertyForm
 							->maxLength(255)
 							->columnSpanFull()
 							->placeholder('sc-domain:klant.nl  of  https://klant.nl/')
-							->helperText('Exact zoals in Search Console. Het service-account-mailadres moet als gebruiker zijn toegevoegd aan deze property.'),
+							->helperText('Exact zoals in Search Console (domein-property = sc-domain:..., anders de volledige https-URL). Na opslaan: gebruik "Toegang testen" om te verifiëren.'),
+						Placeholder::make('service_account_hint')
+							->label('Service-account (door klant toe te voegen in Search Console)')
+							->columnSpanFull()
+							->content(fn (): string => app(GoogleApiAuth::class)->serviceAccountEmail()
+								?? 'Service-account JSON ontbreekt op deze omgeving (storage/app/google-api.json).'),
 						Toggle::make('is_active')
 							->label('Actief')
 							->default(true)

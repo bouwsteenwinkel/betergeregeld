@@ -33,6 +33,20 @@ class GoogleApiAuth
 		return is_string($path) && $path !== '' ? $path : storage_path('app/google-api.json');
 	}
 
+	/**
+	 * Het service-account-mailadres dat een klant als gebruiker aan zijn
+	 * Search Console-property moet toevoegen. Null als de JSON ontbreekt.
+	 */
+	public function serviceAccountEmail(): ?string
+	{
+		try {
+			$email = $this->loadServiceAccount()['client_email'] ?? null;
+			return is_string($email) && $email !== '' ? $email : null;
+		} catch (\Throwable) {
+			return null;
+		}
+	}
+
 	public function loadServiceAccount(): array
 	{
 		$path = $this->keyPath();

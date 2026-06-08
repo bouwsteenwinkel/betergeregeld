@@ -42,4 +42,28 @@ class GoogleSearchConsoleClient
 			'json'   => $resp->json(),
 		];
 	}
+
+	/**
+	 * Lijst alle properties die ons service-account mag lezen.
+	 * GET /sites → {siteEntry: [{siteUrl, permissionLevel}, ...]}.
+	 * Gebruikt voor onboarding-verificatie (toegang verleend?) zonder te
+	 * hoeven wachten op de geplande import om een 403 te ontdekken.
+	 *
+	 * @return array{status:int, json:array|null}
+	 */
+	public function listSites(): array
+	{
+		$token = $this->auth->accessToken();
+
+		$resp = Http::withToken($token)
+			->timeout(30)
+			->acceptJson()
+			->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
+			->get(self::API_BASE . '/sites');
+
+		return [
+			'status' => $resp->status(),
+			'json'   => $resp->json(),
+		];
+	}
 }
