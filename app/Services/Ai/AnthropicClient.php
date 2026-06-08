@@ -30,6 +30,18 @@ class AnthropicClient
 
 	public function apiKey(): string
 	{
+		// TIJDELIJKE DIAGNOSE — verwijderen zodra het key-mysterie is opgelost.
+		\Illuminate\Support\Facades\Log::warning('AIKEY-DIAG', [
+			'sapi'         => PHP_SAPI,
+			'pid'          => getmypid(),
+			'cfg_len'      => strlen((string) config('services.anthropic.api_key')),
+			'env_len'      => strlen((string) env('ANTHROPIC_API_KEY')),
+			'cached'       => app()->configurationIsCached(),
+			'base'         => base_path(),
+			'storage_file' => is_file(storage_path('app/anthropic.php')),
+			'storage_path' => storage_path('app/anthropic.php'),
+		]);
+
 		// config() i.p.v. env() zodat de key na `config:cache` op prod
 		// gevonden blijft (env() buiten config-files geeft dan null).
 		// env() blijft als fallback voor niet-gecachete omgevingen.
