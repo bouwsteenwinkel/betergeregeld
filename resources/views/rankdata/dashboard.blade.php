@@ -269,6 +269,9 @@
                     <span class="muted" style="font-size:13px">{{ $software['components'] }} componenten</span>
                     <span class="pill {{ $software['updates'] > 0 ? 'amber' : 'green' }}">{{ $software['updates'] }} update{{ $software['updates'] === 1 ? '' : 's' }} beschikbaar</span>
                     <span class="pill {{ $software['vuln_count'] > 0 ? 'red' : 'green' }}">{{ $software['vuln_count'] }} kwetsbaarhe{{ $software['vuln_count'] === 1 ? 'id' : 'den' }}</span>
+                    @if ($software['integrity_checked'])
+                        <span class="pill {{ $software['integrity_count'] > 0 ? 'red' : 'green' }}">{{ $software['integrity_count'] }} gewijzigde core-bestand{{ $software['integrity_count'] === 1 ? '' : 'en' }}</span>
+                    @endif
                     <span class="muted" style="font-size:12px;margin-left:auto">bijgewerkt {{ \Illuminate\Support\Carbon::parse($software['reported_at'])->format('d-m-Y') }}</span>
                 </div>
                 @if (count($software['vulns']))
@@ -286,6 +289,19 @@
                     </div>
                 @else
                     <div class="muted" style="font-size:13px;margin-top:10px">Geen bekende kwetsbaarheden in de gerapporteerde software. ✅</div>
+                @endif
+                @if ($software['integrity_checked'] && count($software['integrity_issues']))
+                    <div style="margin-top:14px">
+                        <div class="muted" style="font-size:12px;margin-bottom:4px">Afwijkende core-bestanden (t.o.v. officiële WP-checksums):</div>
+                        <div style="display:flex;flex-direction:column;gap:4px">
+                            @foreach ($software['integrity_issues'] as $i)
+                                <div style="font-size:13px;display:flex;gap:8px;align-items:flex-start">
+                                    <span class="pill {{ $i['type'] === 'missing' ? 'amber' : 'red' }}" style="flex:none">{{ $i['type'] === 'missing' ? 'Ontbreekt' : ($i['type'] === 'unexpected' ? 'Onverwacht' : 'Gewijzigd') }}</span>
+                                    <span class="font-mono" style="font-family:monospace">{{ $i['path'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 @endif
             </div>
         @endif

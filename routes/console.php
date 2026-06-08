@@ -141,6 +141,16 @@ CronMonitorPinger::watch(
     'security:import-vulns'
 );
 
+// Security (fase 3) — wekelijkse composer/npm dependency-audit op de eigen
+// code-projecten (config security.audit_paths).
+CronMonitorPinger::watch(
+    Schedule::command('security:audit-deps')
+        ->weeklyOn(1, '05:45')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'security:audit-deps'
+);
+
 // Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
 // gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
 // de mail rond koffietijd binnenkomt.

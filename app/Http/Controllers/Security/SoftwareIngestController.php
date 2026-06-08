@@ -35,9 +35,14 @@ class SoftwareIngestController extends Controller
 			'components.*.latest_version' => ['nullable', 'string', 'max:40'],
 			'components.*.has_update'     => ['nullable', 'boolean'],
 			'components.*.active'         => ['nullable', 'boolean'],
+			'integrity'                   => ['nullable', 'array'],
+			'integrity.checked'           => ['nullable', 'boolean'],
+			'integrity.issues'            => ['nullable', 'array'],
+			'integrity.issues.*.type'     => ['required_with:integrity.issues', 'string', 'in:modified,missing,unexpected'],
+			'integrity.issues.*.path'     => ['required_with:integrity.issues', 'string', 'max:500'],
 		]);
 
-		$result = $service->ingest($site, $data['components']);
+		$result = $service->ingest($site, $data['components'], $data['integrity'] ?? null);
 
 		return response()->json(['ok' => true] + $result);
 	}

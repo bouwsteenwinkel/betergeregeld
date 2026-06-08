@@ -248,12 +248,19 @@ class RankdataDashboardController extends Controller
 				'severity' => $v->severity, 'cve' => $v->cve, 'patched_in' => $v->patched_in, 'version' => $v->version])
 			->all();
 
+		$integrityIssues = DB::table('site_integrity_issues')->where('property_id', $siteId)
+			->orderBy('type')->limit(15)->get()
+			->map(fn ($i) => ['type' => $i->type, 'path' => $i->path])->all();
+
 		return [
-			'reported_at' => $reportedAt,
-			'components'  => (int) DB::table('site_components')->where('property_id', $siteId)->count(),
-			'updates'     => (int) DB::table('site_components')->where('property_id', $siteId)->where('has_update', true)->count(),
-			'vuln_count'  => (int) DB::table('site_vulnerabilities')->where('property_id', $siteId)->count(),
-			'vulns'       => $vulns,
+			'reported_at'        => $reportedAt,
+			'components'         => (int) DB::table('site_components')->where('property_id', $siteId)->count(),
+			'updates'           => (int) DB::table('site_components')->where('property_id', $siteId)->where('has_update', true)->count(),
+			'vuln_count'        => (int) DB::table('site_vulnerabilities')->where('property_id', $siteId)->count(),
+			'vulns'             => $vulns,
+			'integrity_checked' => (bool) DB::table('seo_properties')->where('id', $siteId)->value('integrity_checked_at'),
+			'integrity_count'   => (int) DB::table('site_integrity_issues')->where('property_id', $siteId)->count(),
+			'integrity_issues'  => $integrityIssues,
 		];
 	}
 

@@ -3,6 +3,7 @@
 namespace App\Services\Security;
 
 use App\Models\Security\SiteComponent;
+use App\Models\Security\SiteIntegrityIssue;
 use App\Models\Security\SiteVulnerability;
 use App\Models\Seo\SeoProperty;
 use Illuminate\Support\Facades\DB;
@@ -20,11 +21,12 @@ class SoftwareIngestService
 
 	/**
 	 * @param  array<int,array<string,mixed>>  $components
-	 * @return array{components:int,updates:int,vulnerabilities:int}
+	 * @param  array{checked?:bool,issues?:array<int,array{type:string,path:string}>}|null  $integrity
+	 * @return array{components:int,updates:int,vulnerabilities:int,integrity_issues:int}
 	 */
-	public function ingest(SeoProperty $site, array $components): array
+	public function ingest(SeoProperty $site, array $components, ?array $integrity = null): array
 	{
-		return DB::transaction(function () use ($site, $components) {
+		return DB::transaction(function () use ($site, $components, $integrity) {
 			SiteComponent::where('property_id', $site->id)->delete();
 			SiteVulnerability::where('property_id', $site->id)->delete();
 
@@ -77,9 +79,26 @@ class SoftwareIngestService
 				}
 			}
 
-			DB::table('seo_properties')->where('id', $site->id)->update(['software_reported_at' => now()]);
+			$integrityCount = 0;
+			$siteUpdate = ['software_reported_at' => now()];
 
-			return ['components' => count($components), 'updates' => $updates, 'vulnerabilities' => $vulns];
+			if ($integrity !== null && ($integrity['checked'] ?? false)) {
+				SiteIntegrityIssue::where('property_id', $site->id)->delete();
+				foreach (($integrity['issues'] ?? []) as $issue) {
+					$type = in_array($issue['type'] ?? '', ['modified', 'missing', 'unexpected'], true) ? $issue['type'] : 'modified';
+					$path = trim((string) ($issue['path'] ?? ''));
+					if ($path === '') {
+						continue;
+					}
+					SiteIntegrityIssue::create(['property_id' => $site->id, 'type' => $type, 'path' => mb_substr($path, 0, 500)]);
+					$integrityCount++;
+				}
+				$siteUpdate['integrity_checked_at'] = now();
+			}
+
+			DB::table('seo_properties')->where('id', $site->id)->update($siteUpdate);
+
+			return ['components' => count($components), 'updates' => $updates, 'vulnerabilities' => $vulns, 'integrity_issues' => $integrityCount];
 		});
 	}
 }

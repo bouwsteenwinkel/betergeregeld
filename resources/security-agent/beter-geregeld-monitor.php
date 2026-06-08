@@ -91,16 +91,55 @@ function bg_monitor_collect() {
 	return $components;
 }
 
-/** Pusht de inventaris naar het platform. */
+/**
+ * File-integrity van WP-core: vergelijkt elk core-bestand tegen de officiële
+ * WP.org-checksums en geeft de afwijkingen terug (gewijzigd/ontbrekend).
+ * wp-content (gebruikersbestanden) wordt overgeslagen.
+ */
+function bg_monitor_integrity() {
+	require_once ABSPATH . 'wp-admin/includes/update.php';
+	global $wp_version;
+
+	$locale = get_locale();
+	$checksums = function_exists('get_core_checksums') ? get_core_checksums($wp_version, $locale ? $locale : 'en_US') : false;
+	if (! is_array($checksums) || empty($checksums)) {
+		return array('checked' => false, 'issues' => array());
+	}
+
+	$issues = array();
+	foreach ($checksums as $file => $md5) {
+		if (0 === strpos($file, 'wp-content/')) {
+			continue; // geen core
+		}
+		$path = ABSPATH . $file;
+		if (! file_exists($path)) {
+			$issues[] = array('type' => 'missing', 'path' => $file);
+			continue;
+		}
+		if (md5_file($path) !== $md5) {
+			$issues[] = array('type' => 'modified', 'path' => $file);
+		}
+		if (count($issues) >= 200) {
+			break; // begrenzing
+		}
+	}
+
+	return array('checked' => true, 'issues' => $issues);
+}
+
+/** Pusht de inventaris + integriteit naar het platform. */
 function bg_monitor_push() {
 	if (! defined('BG_MONITOR_TOKEN') || 'PLAK-HIER-DE-TOKEN' === BG_MONITOR_TOKEN) {
 		return;
 	}
 	$url = rtrim(BG_MONITOR_ENDPOINT, '/') . '/' . rawurlencode(BG_MONITOR_TOKEN);
 	wp_remote_post($url, array(
-		'timeout' => 20,
+		'timeout' => 30,
 		'headers' => array('Content-Type' => 'application/json', 'Accept' => 'application/json'),
-		'body'    => wp_json_encode(array('components' => bg_monitor_collect())),
+		'body'    => wp_json_encode(array(
+			'components' => bg_monitor_collect(),
+			'integrity'  => bg_monitor_integrity(),
+		)),
 	));
 }
 

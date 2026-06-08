@@ -53,8 +53,54 @@ class MonitorCheckAlerts extends Command
 		$this->checkUptimeChecks();
 		$this->checkSecurity();
 		$this->checkSoftware();
+		$this->checkIntegrity();
 
 		return self::SUCCESS;
+	}
+
+	/**
+	 * File-integrity-alerting: mailt bij een OVERGANG naar/uit afwijkende
+	 * WP-core-bestanden (gewijzigd/onverwacht t.o.v. de officiële checksums) —
+	 * een sterk hack-/malware-signaal.
+	 */
+	private function checkIntegrity(): void
+	{
+		$props = SeoProperty::query()->where('is_active', true)
+			->whereNotNull('integrity_checked_at')->with('tenant.agency')->get();
+
+		foreach ($props as $prop) {
+			$count = (int) DB::table('site_integrity_issues')->where('property_id', $prop->id)
+				->whereIn('type', ['modified', 'unexpected'])->count();
+			$condition = $count > 0 ? 'flagged' : 'ok';
+			$previous = $prop->integrity_alert_state;
+			if ($condition === $previous) {
+				continue;
+			}
+
+			$shouldMail = $previous !== null || $condition === 'flagged';
+			$prop->forceFill(['integrity_alert_state' => $condition, 'integrity_alerted_at' => now()])->save();
+			if (! $shouldMail) {
+				continue;
+			}
+
+			$recipients = $this->recipientsFor($prop);
+			if (empty($recipients)) {
+				continue;
+			}
+
+			if ($condition === 'flagged') {
+				$subject = "[Security] Gewijzigde core-bestanden op {$prop->label}";
+				$body = "Op '{$prop->label}' ({$prop->domain()}) wijken {$count} WordPress-core-bestand"
+					. ($count === 1 ? '' : 'en') . " af van de officiële WP.org-checksums.\n\n"
+					. 'Dit kan wijzen op een hack of malware-injectie — controleer de site direct.';
+			} else {
+				$subject = "[Security] Core-bestanden weer intact op {$prop->label}";
+				$body = "De eerder gemelde afwijkingen in core-bestanden op '{$prop->label}' ({$prop->domain()}) zijn opgelost.";
+			}
+
+			Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
+			$this->info("INTEGRITY [{$prop->label}]: " . ($previous ?? 'init') . " → {$condition}");
+		}
 	}
 
 	/**
