@@ -3,6 +3,7 @@
 namespace App\Filament\Actions;
 
 use App\Models\Seo\SeoProperty;
+use App\Services\Rankdata\OnboardingPdf;
 use App\Services\Seo\GscAccessChecker;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -79,6 +80,23 @@ class GscPropertyActions
 				];
 
 				return view('filament.security.onboarding-status', ['steps' => $steps]);
+			});
+	}
+
+	/** Genereert een klant-instructie-PDF (Search Console-toegang + plugin + token) per site. */
+	public static function onboardingPdf(): Action
+	{
+		return Action::make('onboardingPdf')
+			->label('Klant-instructie (PDF)')
+			->icon('heroicon-m-document-arrow-down')
+			->color('gray')
+			->action(function (SeoProperty $record): \Symfony\Component\HttpFoundation\StreamedResponse {
+				$pdf = (new OnboardingPdf())->build($record);
+				$name = 'onboarding-' . Str::slug($record->domain()) . '.pdf';
+
+				return response()->streamDownload(function () use ($pdf) {
+					echo $pdf;
+				}, $name, ['Content-Type' => 'application/pdf']);
 			});
 	}
 

@@ -35,11 +35,19 @@ class RankdataSeedDemo extends Command
 				'primary_color' => '#7c3aed', 'subdomain' => 'demo', 'is_active' => true, 'is_demo' => true],
 		);
 
+		// Bureau-login (rol agency) zodat je /bureau als het demo-bureau kunt tonen.
+		User::updateOrCreate(
+			['email' => 'bureau@demo-bureau.nl'],
+			['tenant_id' => null, 'agency_id' => $agency->id, 'role' => 'agency',
+				'password_hash' => Hash::make(self::PASSWORD), 'is_active' => true,
+				'status' => 'active', 'email_verified_at' => now()],
+		);
+
 		$this->client($agency, 'Demo Webshop', 'demo-webshop.nl', true);
 		$this->client($agency, 'Demo Dienstverlener', 'demo-dienstverlener.nl', false);
 
 		$this->info("Klaar — Demo-bureau + 2 demoklanten geseed. Logins (wachtwoord '" . self::PASSWORD . "'):");
-		$this->line('  info@demo-webshop.nl / info@demo-dienstverlener.nl');
+		$this->line('  bureau: bureau@demo-bureau.nl  ·  klanten: info@demo-webshop.nl / info@demo-dienstverlener.nl');
 
 		return self::SUCCESS;
 	}
