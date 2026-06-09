@@ -4,11 +4,14 @@ namespace App\Filament\Resources\DependencyAdvisories;
 
 use App\Filament\Resources\DependencyAdvisories\Pages\ListDependencyAdvisories;
 use App\Models\Security\DependencyAdvisory;
+use App\Services\Security\AdvisoryExplainer;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
 
 /**
  * Read-only overzicht van composer/npm-advisories (security:audit-deps) op de
@@ -72,7 +75,19 @@ class DependencyAdvisoryResource extends Resource
 				TextColumn::make('imported_at')->label('Gescand')->since()->toggleable(),
 			])
 			->filters([])
-			->recordActions([])
+			->recordActions([
+				Action::make('explain')
+					->label('Uitleg')
+					->icon('heroicon-m-light-bulb')
+					->color('gray')
+					->modalHeading(fn (DependencyAdvisory $record) => 'Uitleg — ' . $record->package)
+					->modalSubmitAction(false)
+					->modalCancelActionLabel('Sluiten')
+					->modalContent(fn (DependencyAdvisory $record): View => view('filament.security.advisory-explanation', [
+						'advisory'    => $record,
+						'explanation' => app(AdvisoryExplainer::class)->explain($record),
+					])),
+			])
 			->toolbarActions([]);
 	}
 
