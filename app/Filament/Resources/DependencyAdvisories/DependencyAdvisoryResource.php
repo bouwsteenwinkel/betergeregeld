@@ -54,7 +54,7 @@ class DependencyAdvisoryResource extends Resource
 			->columns([
 				TextColumn::make('project')->label('Project')->badge()->color('gray')->searchable(),
 				TextColumn::make('ecosystem')->label('Type')->badge()
-					->color(fn (string $s) => $s === 'composer' ? 'warning' : 'info'),
+					->color(fn (string $state) => $state === 'composer' ? 'warning' : 'info'),
 				TextColumn::make('package')->label('Package')->weight('bold')->searchable(),
 				TextColumn::make('severity')->label('Ernst')->badge()
 					->color(fn (?string $state) => match (strtolower((string) $state)) {
