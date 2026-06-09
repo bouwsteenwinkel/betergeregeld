@@ -89,7 +89,7 @@ class RankdataDashboardController extends Controller
 		$selectedId = (int) $request->query('site', 0);
 		$selected = $sites->firstWhere('id', $selectedId) ?: $sites->first();
 
-		$seo = $psi = $uptime = $quality = $security = $software = null;
+		$seo = $psi = $uptime = $quality = $security = $software = $advice = null;
 		$domain = null;
 		if ($selected) {
 			$domain = preg_replace('/^sc-domain:/', '', $selected->site_url);
@@ -100,6 +100,7 @@ class RankdataDashboardController extends Controller
 			$quality = $this->qualityStats((int) $selected->id);
 			$security = $this->securityStats((int) $selected->id);
 			$software = $this->softwareStats((int) $selected->id);
+			$advice = app(\App\Services\Rankdata\SiteAdviceService::class)->for((int) $selected->id);
 		}
 
 		$subscription = DB::table('tenant_subscriptions')
@@ -121,6 +122,7 @@ class RankdataDashboardController extends Controller
 			'quality' => $quality,
 			'security' => $security,
 			'software' => $software,
+			'advice' => $advice,
 			'subscription' => $subscription,
 			'monthlyCost' => $monthlyCost,
 			'canManageBilling' => $user->isSuperAdmin() || ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id) || $user->tenant_id === $t->id,

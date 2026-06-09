@@ -98,6 +98,14 @@
     @endif
 
     <div class="wrap">
+        {{-- Aanbevolen acties (AI, op basis van openstaande issues) --}}
+        @if ($advice ?? null)
+            <div class="card" style="margin-top:20px;border-left:4px solid var(--brand)">
+                <div class="section-title" style="margin:0 0 8px">Aanbevolen acties</div>
+                <div style="font-size:14px;line-height:1.5">{!! \Illuminate\Support\Str::markdown($advice) !!}</div>
+            </div>
+        @endif
+
         @if (! $selected)
             <div class="card" style="margin-top:20px">Deze klant heeft nog geen sites. Voeg een website of applicatie toe in het bureau-panel.</div>
         @elseif ($seo)
