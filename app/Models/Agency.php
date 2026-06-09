@@ -52,6 +52,30 @@ class Agency extends Model
 		return $this->belongsTo(Plan::class, 'rankdata_plan_id');
 	}
 
+	/**
+	 * Vind het bureau bij een hostnaam, op basis van het subdomein t.o.v. het
+	 * platform-domein (config('app.url')). Bijv. rankdata.betergeregeld.com →
+	 * agency met subdomain 'rankdata'. Voor white-label-branding per subdomein.
+	 */
+	public static function resolveFromHost(?string $host): ?self
+	{
+		if (! $host) {
+			return null;
+		}
+		$host = preg_replace('/^www\./', '', strtolower($host));
+		$base = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+
+		if ($base === '' || ! str_ends_with($host, '.' . $base)) {
+			return null;
+		}
+		$sub = substr($host, 0, -(strlen($base) + 1));
+		if ($sub === '' || str_contains($sub, '.')) {
+			return null; // alleen een enkel subdomein-label
+		}
+
+		return static::query()->where('subdomain', $sub)->where('is_active', true)->first();
+	}
+
 	protected static function booted(): void
 	{
 		static::creating(function (Agency $agency): void {

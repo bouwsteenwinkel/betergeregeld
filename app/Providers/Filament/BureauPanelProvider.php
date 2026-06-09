@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
+use App\Models\Agency;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
@@ -33,8 +34,8 @@ class BureauPanelProvider extends PanelProvider
 			->id('bureau')
 			->path('bureau')
 			->login()
-			->brandName(fn (): string => auth()->user()?->agency?->name ?? 'Bureau-portal')
-			->brandLogo(fn () => auth()->user()?->agency?->logoUrl())
+			->brandName(fn (): string => self::brandingAgency()?->name ?? 'Bureau-portal')
+			->brandLogo(fn () => self::brandingAgency()?->logoUrl())
 			->favicon(asset('favicon.ico'))
 			->maxContentWidth(Width::Full)
 			->sidebarWidth('15rem')
@@ -43,7 +44,7 @@ class BureauPanelProvider extends PanelProvider
 			// met de merkkleur van de agency. Filament v5 emit --primary-{shade} als
 			// oklch; we overschrijven dezelfde variabelen na Filaments eigen styles.
 			->renderHook(PanelsRenderHook::HEAD_END, function (): string {
-				$hex = auth()->user()?->agency?->primary_color;
+				$hex = self::brandingAgency()?->primary_color;
 				if (! $hex || ! preg_match('/^#[0-9a-fA-F]{6}$/', $hex)) {
 					return '';
 				}
@@ -74,5 +75,14 @@ class BureauPanelProvider extends PanelProvider
 			->authMiddleware([
 				Authenticate::class,
 			]);
+	}
+
+	/**
+	 * Het bureau dat de branding bepaalt: de agency van de ingelogde gebruiker,
+	 * of — vóór inloggen — de agency die bij het subdomein hoort (white-label).
+	 */
+	private static function brandingAgency(): ?Agency
+	{
+		return auth()->user()?->agency ?? Agency::resolveFromHost(request()?->getHost());
 	}
 }
