@@ -18,7 +18,7 @@ class MonitorRunChecks extends Command
 
 	public function handle(CheckRunner $runner): int
 	{
-		$checks = Check::query()->where('is_active', true)->get();
+		$checks = Check::query()->where('is_active', true)->where('is_demo', false)->get();
 
 		foreach ($checks as $check) {
 			$result = $runner->run($check);

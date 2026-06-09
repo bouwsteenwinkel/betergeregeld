@@ -31,7 +31,7 @@ class SeoRunPsi extends Command
 		$top = max(1, (int) $this->option('top'));
 		$today = now()->toDateString();
 
-		$query = SeoProperty::query()->where('is_active', true);
+		$query = SeoProperty::query()->where('is_active', true)->where('is_demo', false);
 		if ($pid = $this->option('property')) {
 			$query->where('id', (int) $pid);
 		}

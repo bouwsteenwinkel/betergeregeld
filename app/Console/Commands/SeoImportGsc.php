@@ -33,7 +33,7 @@ class SeoImportGsc extends Command
 		$earliest  = Carbon::now()->subDays((int) $this->option('days'))->toDateString();
 		$onlyDate  = $this->option('date');
 
-		$query = SeoProperty::query()->where('is_active', true);
+		$query = SeoProperty::query()->where('is_active', true)->where('is_demo', false);
 		if ($pid = $this->option('property')) {
 			$query->where('id', (int) $pid);
 		}

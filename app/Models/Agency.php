@@ -37,12 +37,14 @@ class Agency extends Model
 		'logo_path',
 		'subdomain',
 		'is_active',
+		'is_demo',
 		'rankdata_plan_id',
 		'discount_percent',
 	];
 
 	protected $casts = [
 		'is_active' => 'bool',
+		'is_demo' => 'bool',
 		'discount_percent' => 'float',
 	];
 

@@ -18,7 +18,7 @@ class SecurityScanCommand extends Command
 
 	public function handle(SecurityScanService $service): int
 	{
-		$query = SeoProperty::query()->where('is_active', true);
+		$query = SeoProperty::query()->where('is_active', true)->where('is_demo', false);
 		if ($id = $this->option('property')) {
 			$query->where('id', (int) $id);
 		}

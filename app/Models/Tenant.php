@@ -42,7 +42,8 @@ class Tenant extends Model
 	public $incrementing = false;
 
 	protected $casts = [
-		'is_active' => 'bool'
+		'is_active' => 'bool',
+		'is_demo' => 'bool',
 	];
 
 	protected $fillable = [
@@ -50,6 +51,7 @@ class Tenant extends Model
 		'name',
 		'plan',
 		'is_active',
+		'is_demo',
 		'server_id'
 	];
 

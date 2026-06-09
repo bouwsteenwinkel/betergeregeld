@@ -99,6 +99,11 @@ class AgencyResource extends Resource
 					->state(fn (Agency $r) => '€ ' . number_format(app(RankdataBilling::class)->costForAgency($r)['total'], 2, ',', '.')),
 				IconColumn::make('is_active')->label('Actief')->boolean(),
 			])
+			->filters([
+				\Filament\Tables\Filters\TernaryFilter::make('is_demo')->label('Demo')
+					->placeholder('Alles')->trueLabel('Alleen demo')->falseLabel('Zonder demo')
+					->default(false),
+			])
 			->recordActions([
 				Action::make('invoice')
 					->label('Maandfactuur')

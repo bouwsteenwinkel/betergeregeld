@@ -104,6 +104,11 @@ class ClientResource extends Resource
 				TextColumn::make('monthly_price')->label('Maandprijs')->badge()->color('success')
 					->state(fn (Tenant $r) => '€ ' . number_format(app(\App\Services\Rankdata\RankdataBilling::class)->costForTenant($r)['total'], 2, ',', '.')),
 			])
+			->filters([
+				\Filament\Tables\Filters\TernaryFilter::make('is_demo')->label('Demo')
+					->placeholder('Alles')->trueLabel('Alleen demo')->falseLabel('Zonder demo')
+					->default(false),
+			])
 			->recordActions([
 				Action::make('dashboard')->label('Dashboard')->icon('heroicon-m-arrow-top-right-on-square')
 					->color('primary')

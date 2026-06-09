@@ -20,7 +20,9 @@ class QualityScanDispatchDue extends Command
 	{
 		$dispatched = 0;
 
-		MonitoredPage::where('is_active', true)->get()->each(function (MonitoredPage $page) use (&$dispatched) {
+		MonitoredPage::where('is_active', true)
+			->whereHas('site', fn ($q) => $q->where('is_demo', false))
+			->get()->each(function (MonitoredPage $page) use (&$dispatched) {
 			if ($page->isDue()) {
 				RunQualityScanJob::dispatch($page);
 				$dispatched++;

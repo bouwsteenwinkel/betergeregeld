@@ -35,12 +35,14 @@ class Check extends Model
 		'expected_code',
 		'timeout_seconds',
 		'is_active',
+		'is_demo',
 		'alert_state',
 		'alerted_at',
 	];
 
 	protected $casts = [
 		'is_active' => 'bool',
+		'is_demo' => 'bool',
 		'expected_code' => 'integer',
 		'timeout_seconds' => 'integer',
 		'last_code' => 'integer',

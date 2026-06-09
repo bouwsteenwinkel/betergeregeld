@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 
@@ -117,6 +118,11 @@ class SiteHealthResource extends Resource
 				TextColumn::make('quality')->label('Kwaliteit')->badge()
 					->state(fn (SeoProperty $r) => ($s = self::health($r)['score']) !== null ? (string) $s : '—')
 					->color(fn (SeoProperty $r) => ($s = self::health($r)['score']) === null ? 'gray' : ($s >= 70 ? 'success' : ($s >= 50 ? 'warning' : 'danger'))),
+			])
+			->filters([
+				TernaryFilter::make('is_demo')->label('Demo')
+					->placeholder('Alles')->trueLabel('Alleen demo')->falseLabel('Zonder demo')
+					->default(false),
 			])
 			->recordActions([])
 			->toolbarActions([]);

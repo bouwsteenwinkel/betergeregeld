@@ -65,7 +65,7 @@ class MonitorCheckAlerts extends Command
 	 */
 	private function checkIntegrity(): void
 	{
-		$props = SeoProperty::query()->where('is_active', true)
+		$props = SeoProperty::query()->where('is_active', true)->where('is_demo', false)
 			->whereNotNull('integrity_checked_at')->with('tenant.agency')->get();
 
 		foreach ($props as $prop) {
@@ -110,7 +110,7 @@ class MonitorCheckAlerts extends Command
 	 */
 	private function checkSoftware(): void
 	{
-		$props = SeoProperty::query()->where('is_active', true)
+		$props = SeoProperty::query()->where('is_active', true)->where('is_demo', false)
 			->whereNotNull('software_reported_at')->with('tenant.agency')->get();
 
 		foreach ($props as $prop) {
@@ -154,7 +154,7 @@ class MonitorCheckAlerts extends Command
 	 */
 	private function checkSecurity(): void
 	{
-		foreach (SeoProperty::query()->where('is_active', true)->with('tenant.agency')->get() as $prop) {
+		foreach (SeoProperty::query()->where('is_active', true)->where('is_demo', false)->with('tenant.agency')->get() as $prop) {
 			$scan = SecurityScan::query()->where('property_id', $prop->id)
 				->where('status', 'completed')->latest('completed_at')->first();
 			if (! $scan) {
@@ -223,6 +223,7 @@ class MonitorCheckAlerts extends Command
 	{
 		$checks = Check::query()
 			->where('is_active', true)
+			->where('is_demo', false)
 			->whereIn('last_status', ['up', 'down'])
 			->with('property.tenant.agency')
 			->get();
@@ -320,7 +321,7 @@ class MonitorCheckAlerts extends Command
 	{
 		$days = (int) config('seo.freshness_alert_days', 3);
 
-		foreach (SeoProperty::query()->where('is_active', true)->with('tenant.agency')->get() as $prop) {
+		foreach (SeoProperty::query()->where('is_active', true)->where('is_demo', false)->with('tenant.agency')->get() as $prop) {
 			$condition = $prop->freshnessCondition($days);
 			$previous = $prop->freshness_alert_state ?? 'ok';
 
