@@ -151,6 +151,15 @@ CronMonitorPinger::watch(
     'security:audit-deps'
 );
 
+// Rankdata — maandelijks PDF-klantrapport mailen op de 1e (na de bureaufacturen).
+CronMonitorPinger::watch(
+    Schedule::command('rankdata:send-reports')
+        ->monthlyOn(1, '07:00')
+        ->onOneServer()
+        ->withoutOverlapping(),
+    'rankdata:send-reports'
+);
+
 // Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
 // gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
 // de mail rond koffietijd binnenkomt.

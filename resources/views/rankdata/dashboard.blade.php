@@ -76,10 +76,19 @@
                 <span style="opacity:.85">Bureau-/beheerweergave</span>
             @endif
             <span style="opacity:.9">Ingelogd als <strong>{{ ($authUser ?? auth()->user())?->email }}</strong></span>
-            <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) }}" style="margin:0">
-                @csrf
-                <button type="submit" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer">Uitloggen</button>
-            </form>
+            <div style="display:flex;gap:8px;align-items:center">
+                <form method="POST" action="{{ route('rankdata.report', ['locale' => app()->getLocale(), 'tenant' => $tenant->id]) }}" style="margin:0">
+                    @csrf
+                    <button type="submit" style="background:#fff;color:var(--brand);border:none;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:700;cursor:pointer">Rapport e-mailen</button>
+                </form>
+                <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) }}" style="margin:0">
+                    @csrf
+                    <button type="submit" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer">Uitloggen</button>
+                </form>
+            </div>
+            @if ($tenant->report_sent_at)
+                <span style="opacity:.7;font-size:11px">Rapport laatst verzonden {{ \Illuminate\Support\Carbon::parse($tenant->report_sent_at)->format('d-m-Y H:i') }}</span>
+            @endif
         </div>
     </div>
 
@@ -98,6 +107,10 @@
     @endif
 
     <div class="wrap">
+        @if (session('rapport_message'))
+            <div class="card" style="margin-top:20px;border-left:4px solid #16a34a">{{ session('rapport_message') }}</div>
+        @endif
+
         {{-- Aanbevolen acties (AI, op basis van openstaande issues) --}}
         @if ($advice ?? null)
             <div class="card" style="margin-top:20px;border-left:4px solid var(--brand)">

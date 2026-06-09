@@ -71,6 +71,23 @@ class RankdataDashboardController extends Controller
 		return redirect()->away($intent->mollie_checkout_url);
 	}
 
+	/** Mailt het PDF-rapport naar de ingelogde gebruiker (handmatig vanaf het dashboard). */
+	public function mailReport(Request $request, string $locale, string $tenant)
+	{
+		$t = Tenant::with('agency')->findOrFail($tenant);
+		$user = $request->user();
+		$allowed = $user->isSuperAdmin()
+			|| ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id)
+			|| $user->tenant_id === $t->id;
+		abort_unless($allowed, 403);
+
+		$ok = app(\App\Services\Rankdata\RankdataReportSender::class)->send($t, [$user->email]);
+
+		return back()->with('rapport_message', $ok
+			? "Rapport verzonden naar {$user->email}."
+			: 'Versturen mislukt — geen geldig e-mailadres.');
+	}
+
 	/** Gedeelde dashboard-render (aangeroepen door show() én me()). */
 	private function render(Request $request, string $tenant)
 	{

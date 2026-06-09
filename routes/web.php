@@ -140,6 +140,7 @@ Route::prefix('{locale}')
 			Route::get('/mijn-statistieken', [\App\Http\Controllers\RankdataDashboardController::class, 'me'])->name('rankdata.me');
 			Route::get('/rankdata/{tenant}', [\App\Http\Controllers\RankdataDashboardController::class, 'show'])->name('rankdata.client');
 			Route::post('/rankdata/{tenant}/checkout', [\App\Http\Controllers\RankdataDashboardController::class, 'checkout'])->name('rankdata.checkout');
+			Route::post('/rankdata/{tenant}/report', [\App\Http\Controllers\RankdataDashboardController::class, 'mailReport'])->name('rankdata.report');
 			Route::get('/security/agent-plugin', function () {
 				abort_unless(auth()->user()?->isSuperAdmin() || auth()->user()?->isAgencyAdmin(), 403);
 
