@@ -84,7 +84,7 @@ class SiteHealthResource extends Resource
 	public static function table(Table $table): Table
 	{
 		return $table
-			->modifyQueryUsing(fn ($q) => $q->where('is_active', true)->with('tenant'))
+			->modifyQueryUsing(fn ($query) => $query->where('is_active', true)->with('tenant'))
 			->defaultSort('label')
 			->columns([
 				TextColumn::make('overall')->label('Status')->badge()

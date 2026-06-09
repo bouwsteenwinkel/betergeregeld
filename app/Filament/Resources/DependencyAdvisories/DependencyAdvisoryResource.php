@@ -57,18 +57,18 @@ class DependencyAdvisoryResource extends Resource
 					->color(fn (string $s) => $s === 'composer' ? 'warning' : 'info'),
 				TextColumn::make('package')->label('Package')->weight('bold')->searchable(),
 				TextColumn::make('severity')->label('Ernst')->badge()
-					->color(fn (?string $s) => match (strtolower((string) $s)) {
+					->color(fn (?string $state) => match (strtolower((string) $state)) {
 						'critical', 'high' => 'danger',
 						'medium', 'moderate' => 'warning',
 						'low' => 'gray',
 						default => 'gray',
 					})
-					->formatStateUsing(fn (?string $s) => $s ? ucfirst($s) : '—'),
+					->formatStateUsing(fn (?string $state) => $state ? ucfirst($state) : '—'),
 				TextColumn::make('title')->label('Kwetsbaarheid')->wrap()->limit(90)->tooltip(fn (DependencyAdvisory $r) => $r->title),
 				TextColumn::make('cve')->label('CVE')->placeholder('—')->toggleable(),
 				TextColumn::make('fixed_in')->label('Opgelost in')->placeholder('—')->toggleable(),
 				TextColumn::make('link')->label('Bron')->url(fn (DependencyAdvisory $r) => $r->link, true)
-					->formatStateUsing(fn (?string $s) => $s ? 'openen' : '—')->color('primary'),
+					->formatStateUsing(fn (?string $state) => $state ? 'openen' : '—')->color('primary'),
 				TextColumn::make('imported_at')->label('Gescand')->since()->toggleable(),
 			])
 			->filters([])
