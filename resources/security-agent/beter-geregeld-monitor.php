@@ -124,6 +124,31 @@ function bg_monitor_integrity() {
 		}
 	}
 
+	// Onverwachte PHP-bestanden in de core-mappen (mogelijke malware-injectie):
+	// alles in wp-admin/wp-includes dat niet in de officiële checksums staat.
+	$expected = array_fill_keys(array_keys($checksums), true);
+	foreach (array('wp-admin', 'wp-includes') as $dir) {
+		$base = ABSPATH . $dir;
+		if (! is_dir($base) || count($issues) >= 200) {
+			continue;
+		}
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS)
+		);
+		foreach ($iterator as $info) {
+			if (count($issues) >= 200) {
+				break;
+			}
+			if (! $info->isFile() || 'php' !== strtolower($info->getExtension())) {
+				continue;
+			}
+			$rel = str_replace('\\', '/', substr($info->getPathname(), strlen(ABSPATH)));
+			if (! isset($expected[$rel])) {
+				$issues[] = array('type' => 'unexpected', 'path' => $rel);
+			}
+		}
+	}
+
 	return array('checked' => true, 'issues' => $issues);
 }
 
