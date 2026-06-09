@@ -125,6 +125,7 @@ class RankdataDashboardController extends Controller
 			'monthlyCost' => $monthlyCost,
 			'canManageBilling' => $user->isSuperAdmin() || ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id) || $user->tenant_id === $t->id,
 			'canPickClient' => $user->isSuperAdmin() || $user->isAgencyAdmin(),
+			'authUser' => $user,
 		]);
 	}
 

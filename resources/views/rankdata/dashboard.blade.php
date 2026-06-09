@@ -71,9 +71,16 @@
                 @endif
             </div>
         </div>
-        @if ($canPickClient)
-            <div style="font-size:13px;opacity:.9">Bureau-/beheerweergave</div>
-        @endif
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:13px">
+            @if ($canPickClient)
+                <span style="opacity:.85">Bureau-/beheerweergave</span>
+            @endif
+            <span style="opacity:.9">Ingelogd als <strong>{{ ($authUser ?? auth()->user())?->email }}</strong></span>
+            <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) }}" style="margin:0">
+                @csrf
+                <button type="submit" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer">Uitloggen</button>
+            </form>
+        </div>
     </div>
 
     @if ($sites->count() > 1)
