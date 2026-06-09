@@ -141,6 +141,8 @@ Route::prefix('{locale}')
 			Route::get('/rankdata/{tenant}', [\App\Http\Controllers\RankdataDashboardController::class, 'show'])->name('rankdata.client');
 			Route::post('/rankdata/{tenant}/checkout', [\App\Http\Controllers\RankdataDashboardController::class, 'checkout'])->name('rankdata.checkout');
 			Route::post('/rankdata/{tenant}/report', [\App\Http\Controllers\RankdataDashboardController::class, 'mailReport'])->name('rankdata.report');
+			Route::post('/rankdata/{tenant}/vraag', [\App\Http\Controllers\RankdataDashboardController::class, 'ask'])
+				->middleware('throttle:20,1')->name('rankdata.ask');
 			Route::get('/security/agent-plugin', function () {
 				abort_unless(auth()->user()?->isSuperAdmin() || auth()->user()?->isAgencyAdmin(), 403);
 

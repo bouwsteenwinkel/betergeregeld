@@ -88,6 +88,43 @@ class RankdataDashboardController extends Controller
 			: 'Versturen mislukt — geen geldig e-mailadres.');
 	}
 
+	/**
+	 * "Vraag het je rapport": de klant stelt een vraag, Claude antwoordt op basis
+	 * van de data van de gekozen site. Geeft JSON terug voor het chatvak.
+	 */
+	public function ask(Request $request, string $locale, string $tenant)
+	{
+		$t = Tenant::with('agency')->findOrFail($tenant);
+		$user = $request->user();
+		$allowed = $user->isSuperAdmin()
+			|| ($user->isAgencyAdmin() && $t->agency_id === $user->agency_id)
+			|| $user->tenant_id === $t->id;
+		abort_unless($allowed, 403);
+
+		$question = trim((string) $request->input('question'));
+		if ($question === '') {
+			return response()->json(['answer' => 'Stel gerust een vraag over je website.']);
+		}
+		if (mb_strlen($question) > 500) {
+			$question = mb_substr($question, 0, 500);
+		}
+
+		// Site moet bij deze klant horen; val terug op de eerste actieve site.
+		$siteId = (int) $request->input('site', 0);
+		$site = DB::table('seo_properties')->where('tenant_id', $t->id)->where('id', $siteId)->first()
+			?: DB::table('seo_properties')->where('tenant_id', $t->id)->where('is_active', 1)->orderBy('id')->first();
+		if (! $site) {
+			return response()->json(['answer' => 'Er is nog geen website gekoppeld om vragen over te beantwoorden.']);
+		}
+
+		$answer = app(\App\Services\Rankdata\SiteChatService::class)->answer((int) $site->id, $question);
+
+		return response()->json([
+			'answer' => $answer,
+			'html'   => \Illuminate\Support\Str::markdown($answer, ['html_input' => 'strip', 'allow_unsafe_links' => false]),
+		]);
+	}
+
 	/** Gedeelde dashboard-render (aangeroepen door show() én me()). */
 	private function render(Request $request, string $tenant)
 	{

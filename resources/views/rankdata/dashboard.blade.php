@@ -56,6 +56,26 @@
         .bar > span { display: block; height: 100%; }
         .foot { margin-top: 36px; font-size: 12px; color: #9aa1ad; text-align: center; }
         .trunc { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .chat-log { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+        .chat-log:empty { display: none; }
+        .msg { max-width: 88%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+        .msg.q { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
+        .msg.a { align-self: flex-start; background: #f1f2f5; color: #1f2430; border-bottom-left-radius: 4px; }
+        .msg.a.typing { color: #9aa1ad; font-style: italic; }
+        .msg.a h1, .msg.a h2, .msg.a h3 { font-size: 14px; margin: 8px 0 4px; }
+        .msg.a h1:first-child, .msg.a h2:first-child, .msg.a h3:first-child { margin-top: 0; }
+        .msg.a p { margin: 6px 0; }
+        .msg.a ul, .msg.a ol { margin: 6px 0; padding-left: 20px; }
+        .msg.a li { margin: 2px 0; }
+        .msg.a { white-space: normal; }
+        .chat-suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .chat-suggest .sugg { background: #f1f2f5; border: 1px solid #e7e9ee; color: #374151; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; cursor: pointer; }
+        .chat-suggest .sugg:hover { border-color: var(--brand); color: var(--brand); }
+        .chat-form { display: flex; gap: 8px; }
+        .chat-form input { flex: 1; border: 1px solid #d7dae1; border-radius: 10px; padding: 11px 13px; font-size: 14px; font-family: inherit; }
+        .chat-form input:focus { outline: none; border-color: var(--brand); }
+        .chat-form button { background: var(--brand); color: #fff; border: none; border-radius: 10px; padding: 0 20px; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .chat-form button:disabled { opacity: .55; cursor: default; }
     </style>
 </head>
 <body>
@@ -116,6 +136,25 @@
             <div class="card" style="margin-top:20px;border-left:4px solid var(--brand)">
                 <div class="section-title" style="margin:0 0 8px">Aanbevolen acties</div>
                 <div style="font-size:14px;line-height:1.5">{!! \Illuminate\Support\Str::markdown($advice) !!}</div>
+            </div>
+        @endif
+
+        {{-- "Vraag het je rapport" — chat-AI op basis van de data van deze site --}}
+        @if ($selected)
+            <div class="card chat" style="margin-top:20px">
+                <div class="section-title" style="margin:0 0 4px">Vraag het je rapport</div>
+                <div class="muted" style="font-size:13px;margin-bottom:10px">Stel een vraag over <strong>{{ $selected->label }}</strong> — bijvoorbeeld over je vindbaarheid, snelheid, beveiliging of bezoekers.</div>
+                <div id="chat-log" class="chat-log" aria-live="polite"></div>
+                <div class="chat-suggest" id="chat-suggest">
+                    <button type="button" class="sugg">Waarom is mijn verkeer veranderd?</button>
+                    <button type="button" class="sugg">Op welke zoekwoorden word ik gevonden?</button>
+                    <button type="button" class="sugg">Wat kan ik verbeteren aan mijn website?</button>
+                    <button type="button" class="sugg">Hoe staat mijn beveiliging ervoor?</button>
+                </div>
+                <form id="chat-form" class="chat-form" autocomplete="off">
+                    <input id="chat-input" type="text" maxlength="500" placeholder="Typ je vraag…" required>
+                    <button type="submit" id="chat-send">Vraag</button>
+                </form>
             </div>
         @endif
 
@@ -358,5 +397,74 @@
 
         <div class="foot">Statistieken via {{ $agency?->name ?? 'Rankdata' }} · powered by Beter Geregeld</div>
     </div>
+
+    @if ($selected)
+    <script>
+    (function () {
+        var form = document.getElementById('chat-form');
+        if (!form) return;
+        var input = document.getElementById('chat-input');
+        var send = document.getElementById('chat-send');
+        var log = document.getElementById('chat-log');
+        var suggest = document.getElementById('chat-suggest');
+        var url = @json(route('rankdata.ask', ['locale' => app()->getLocale(), 'tenant' => $tenant->id]));
+        var token = @json(csrf_token());
+        var siteId = @json((int) $selected->id);
+
+        function bubble(cls, text) {
+            var el = document.createElement('div');
+            el.className = 'msg ' + cls;
+            el.textContent = text;
+            log.appendChild(el);
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return el;
+        }
+
+        function ask(question) {
+            question = (question || '').trim();
+            if (!question) return;
+            if (suggest) suggest.style.display = 'none';
+            bubble('q', question);
+            input.value = '';
+            input.disabled = send.disabled = true;
+            send.textContent = '…';
+            var typing = bubble('a typing', 'Aan het nadenken…');
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+                body: JSON.stringify({ question: question, site: siteId })
+            })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) {
+                typing.classList.remove('typing');
+                if (data && data.html) {
+                    typing.innerHTML = data.html;
+                } else {
+                    typing.textContent = (data && data.answer) ? data.answer : 'Er ging iets mis. Probeer het opnieuw.';
+                }
+            })
+            .catch(function (err) {
+                typing.classList.remove('typing');
+                typing.textContent = err === 429
+                    ? 'Even rustig aan — je hebt veel vragen achter elkaar gesteld. Probeer het zo opnieuw.'
+                    : 'Er ging iets mis bij het ophalen van het antwoord. Probeer het opnieuw.';
+            })
+            .finally(function () {
+                input.disabled = send.disabled = false;
+                send.textContent = 'Vraag';
+                input.focus();
+            });
+        }
+
+        form.addEventListener('submit', function (e) { e.preventDefault(); ask(input.value); });
+        if (suggest) {
+            suggest.querySelectorAll('.sugg').forEach(function (b) {
+                b.addEventListener('click', function () { ask(b.textContent); });
+            });
+        }
+    })();
+    </script>
+    @endif
 </body>
 </html>
