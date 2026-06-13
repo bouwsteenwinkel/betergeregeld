@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Monitor\CronPing;
 use App\Models\Monitor\Metric;
+use App\Models\Monitor\SocketLabsEvent;
 use Illuminate\Console\Command;
 
 /**
@@ -41,7 +42,16 @@ class MonitorPruneMetrics extends Command
 			$pings += $deleted;
 		} while ($deleted > 0);
 
-		$this->info("Verwijderd: {$total} metric-samples + {$pings} cron-pings ouder dan {$days} dagen (vóór {$cutoff->toDateTimeString()}).");
+		// SocketLabs-events hebben een eigen retentie (config/socketlabs.php).
+		$slDays = (int) ($this->option('days') ?: config('socketlabs.retention_days', 30));
+		$slCutoff = now()->subDays(max(1, $slDays));
+		$slEvents = 0;
+		do {
+			$deleted = SocketLabsEvent::where('occurred_at', '<', $slCutoff)->limit(5000)->delete();
+			$slEvents += $deleted;
+		} while ($deleted > 0);
+
+		$this->info("Verwijderd: {$total} metric-samples + {$pings} cron-pings ouder dan {$days} dagen + {$slEvents} SocketLabs-events ouder dan {$slDays} dagen.");
 
 		return self::SUCCESS;
 	}

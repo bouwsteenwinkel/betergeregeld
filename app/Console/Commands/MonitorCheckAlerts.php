@@ -54,6 +54,7 @@ class MonitorCheckAlerts extends Command
 		$this->checkSecurity();
 		$this->checkSoftware();
 		$this->checkIntegrity();
+		$this->checkSocketLabs($to);
 
 		return self::SUCCESS;
 	}
@@ -101,6 +102,83 @@ class MonitorCheckAlerts extends Command
 			Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
 			$this->info("INTEGRITY [{$prop->label}]: " . ($previous ?? 'init') . " → {$condition}");
 		}
+	}
+
+	/**
+	 * SocketLabs-mailmonitoring: mailt bij een OVERGANG per dimensie — queue
+	 * (Deferred/Queued-backlog), failures (bezorgfouten), complaints (klachten)
+	 * en silence (geen events meer). State-based, dus één mail per overgang.
+	 */
+	private function checkSocketLabs(?string $to): void
+	{
+		$eval = app(\App\Services\Monitor\SocketLabsEvaluator::class);
+		if (! $eval->isActive()) {
+			return;
+		}
+
+		$c = $eval->conditions();
+		$status = \App\Models\Monitor\SocketLabsStatus::instance();
+
+		$dims = [
+			'queue'     => ['state' => 'queue_state',     'at' => 'queue_alerted_at'],
+			'failure'   => ['state' => 'failure_state',   'at' => 'failure_alerted_at'],
+			'complaint' => ['state' => 'complaint_state', 'at' => 'complaint_alerted_at'],
+			'silence'   => ['state' => 'silence_state',   'at' => 'silence_alerted_at'],
+			'api'       => ['state' => 'api_state',       'at' => 'api_alerted_at'],
+		];
+
+		foreach ($dims as $dim => $col) {
+			$current = $c[$dim];
+			$previous = $status->{$col['state']};
+			if ($current === $previous) {
+				continue;
+			}
+
+			$shouldMail = $previous !== null || $current === 'alert';
+			$status->forceFill([$col['state'] => $current, $col['at'] => now()])->save();
+
+			if ($shouldMail && $to) {
+				[$subject, $body] = $this->socketLabsMessage($dim, $current, $c);
+				Mail::raw($body, fn ($m) => $m->to($to)->subject($subject));
+			}
+
+			$this->info("SOCKETLABS [{$dim}]: " . ($previous ?? 'init') . " → {$current}");
+		}
+
+		$status->forceFill(['counts' => $c['counts'], 'last_evaluated_at' => now()])->save();
+	}
+
+	/**
+	 * @param array<string,mixed> $c
+	 * @return array{0:string,1:string}
+	 */
+	private function socketLabsMessage(string $dim, string $condition, array $c): array
+	{
+		$n = $c['counts'];
+		$stat = "Venster: laatste {$c['window']} min\n"
+			. "Delivered {$n['Delivered']} · Failed {$n['Failed']} · Deferred {$n['Deferred']} · Queued {$n['Queued']} · Complaint {$n['Complaint']}";
+
+		if ($condition === 'ok') {
+			$ok = [
+				'queue'     => 'SocketLabs-queue weer normaal',
+				'failure'   => 'SocketLabs-bezorging weer normaal',
+				'complaint' => 'SocketLabs-klachten weer normaal',
+				'silence'   => 'SocketLabs ontvangt weer events',
+				'api'       => 'SocketLabs-API weer bereikbaar',
+			];
+			return ["[Mail] HERSTELD: {$ok[$dim]}", "{$ok[$dim]}.\n\n{$stat}"];
+		}
+
+		$alert = [
+			'queue'     => ['[Mail] ALERT: SocketLabs-queue loopt vol', 'Er stapelen Deferred/Queued-events op — uitgaande mail wordt uitgesteld of de queue loopt vol.'],
+			'failure'   => ['[Mail] ALERT: veel SocketLabs-bezorgfouten', "Het Failed-aandeel is {$c['failure_rate']}% (drempel " . config('socketlabs.failure_rate_pct') . '%).'],
+			'complaint' => ['[Mail] ALERT: SocketLabs-klachten (spam)', "Er zijn {$n['Complaint']} klacht(en) binnengekomen — let op de sender-reputatie."],
+			'silence'   => ['[Mail] ALERT: SocketLabs stil', 'Er zijn ' . config('socketlabs.silence_minutes') . ' min geen events meer ontvangen — mogelijk verstuurt de site geen mail of vallen de webhooks uit.'],
+			'api'       => ['[Mail] ALERT: SocketLabs-API onbereikbaar', 'De periodieke SocketLabs-API-poll faalt — controleer de API-key/ServerID en of de API bereikbaar is.'],
+		];
+
+		[$subject, $reason] = $alert[$dim];
+		return [$subject, "{$reason}\n\n{$stat}\n\nControleer SocketLabs en de mailconfiguratie."];
 	}
 
 	/**

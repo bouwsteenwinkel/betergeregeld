@@ -91,6 +91,10 @@ Route::options('/cmp/consent',[\App\Http\Controllers\CmpController::class, 'cons
 Route::post('/monitor/ingest', \App\Http\Controllers\Monitor\IngestController::class)->name('monitor.ingest');
 Route::post('/security/ingest/{token}', \App\Http\Controllers\Security\SoftwareIngestController::class)->name('security.ingest');
 
+// SocketLabs event-webhook — deliverability/queue-events. Auth via SecretKey +
+// ServerID in de payload (zie config/socketlabs.php). Locale-agnostisch + CSRF-exempt.
+Route::post('/monitor/socketlabs/webhook', \App\Http\Controllers\Monitor\SocketLabsWebhookController::class)->name('monitor.socketlabs.webhook');
+
 // Cron-monitoring heartbeat — bewaakte jobs pingen hun ping_token (GET of POST).
 // {signal} = success (default) | start | fail. Locale-agnostisch + CSRF-exempt.
 Route::match(['get', 'post'], '/cron/ping/{token}/{signal?}', \App\Http\Controllers\Monitor\CronPingController::class)

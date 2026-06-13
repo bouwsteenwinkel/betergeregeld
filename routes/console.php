@@ -28,6 +28,13 @@ Schedule::command('monitor:run-checks')
     ->onOneServer()
     ->withoutOverlapping();
 
+// SocketLabs-mailmonitoring — vangnet-poll van de v2 API (realtime gaat via de
+// event-webhooks; alerts lopen via monitor:check-alerts, dimensie 'api').
+Schedule::command('monitor:socketlabs-poll')
+    ->everyFifteenMinutes()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Cron-monitoring — mail bij overgangen (ok/late/failed) van bewaakte cron-jobs.
 Schedule::command('cron:check-monitors')
     ->everyFiveMinutes()
