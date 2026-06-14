@@ -82,8 +82,13 @@ class CmpService
             'texts'          => (object)$texts,
             'branding'       => (object)$brandingArr,
             'script_counts'  => (object)$scriptCounts,
-            'endpoint_consent' => '/cmp/consent',
-            'endpoint_scripts' => '/cmp/scripts.js',
+            // ABSOLUUT (niet relatief): de loader draait cross-origin op
+            // klant-domeinen (bv. rd003.betergeregeld.com / hemkes-maritime.nl).
+            // Een relatieve '/cmp/consent' zou daar op het KLANT-domein landen
+            // (404 → consent nooit gelogd). De consent-endpoint heeft CORS '*';
+            // scripts.js wordt als <script src> geladen (cross-origin prima).
+            'endpoint_consent' => url('/cmp/consent'),
+            'endpoint_scripts' => url('/cmp/scripts.js'),
         ];
     }
 
