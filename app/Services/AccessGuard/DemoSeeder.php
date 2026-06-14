@@ -78,9 +78,15 @@ class DemoSeeder
 				Cycle::query()->whereIn('id', $cycleIds)->delete();
 			}
 
-			// Risk + reminder with demo-ish subjects
+			// Risk + reminder with demo-ish subjects. Naast de persoon-
+			// gekoppelde flags ook de flags met een statisch demo-subject
+			// (bv. 'demo:cfo-global-admin') opruimen, anders blijft die staan
+			// en botst de volgende seed op de unique-index.
 			RiskFlag::query()->where('tenant_id', $tenantId)
-				->whereIn('subject_id', $peopleIds->map(fn ($i) => (string) $i))
+				->where(function ($q) use ($peopleIds) {
+					$q->whereIn('subject_id', $peopleIds->map(fn ($i) => (string) $i))
+						->orWhere('subject_id', 'like', 'demo:%');
+				})
 				->delete();
 			Reminder::query()->where('tenant_id', $tenantId)
 				->where(function ($q) use ($peopleIds) {
@@ -398,14 +404,25 @@ class DemoSeeder
 		];
 
 		foreach ($rows as $r) {
-			RiskFlag::create([
-				'tenant_id' => $tenantId,
-				'kind' => $r['kind'], 'severity' => $r['severity'],
-				'subject_type' => $r['subject_type'], 'subject_id' => $r['subject_id'],
-				'title' => $r['title'], 'description' => $r['description'],
-				'status' => 'open', 'detected_at' => $now,
-				'payload' => $r['payload'],
-			]);
+			// Idempotent: een re-seed mag nooit op de unique-index
+			// (tenant_id, kind, subject_type, subject_id / 'agrf_tksub_uq')
+			// botsen. Demo-flags met een statisch subject (bv.
+			// 'demo:cfo-global-admin') worden door wipe() niet altijd
+			// verwijderd, dus updateOrCreate i.p.v. create.
+			RiskFlag::updateOrCreate(
+				[
+					'tenant_id' => $tenantId,
+					'kind' => $r['kind'],
+					'subject_type' => $r['subject_type'],
+					'subject_id' => $r['subject_id'],
+				],
+				[
+					'severity' => $r['severity'],
+					'title' => $r['title'], 'description' => $r['description'],
+					'status' => 'open', 'detected_at' => $now,
+					'payload' => $r['payload'],
+				]
+			);
 		}
 		return count($rows);
 	}
