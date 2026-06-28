@@ -102,75 +102,8 @@
                 </div>
             </div>
 
-            {{-- Contact + locatie --}}
-            <div class="rounded-2xl border border-[#e7e7ea] bg-white p-6">
-                <h2 class="text-lg font-semibold mb-4">Contact & afspraak-vorm</h2>
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="{{ $lbl }}">Naam *</label>
-                        <input type="text" name="contact_name" value="{{ old('contact_name') }}" class="{{ $inp }}" required>
-                        @error('contact_name')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label class="{{ $lbl }}">E-mail *</label>
-                        <input type="email" name="email" value="{{ old('email') }}" class="{{ $inp }}" required>
-                        @error('email')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label class="{{ $lbl }}">Telefoon *</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}" class="{{ $inp }}" required>
-                        @error('phone')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="{{ $lbl }}">Postcode *</label>
-                            <input type="text" name="postcode" value="{{ old('postcode') }}" placeholder="1400 AA" class="{{ $inp }}" required>
-                            @error('postcode')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label class="{{ $lbl }}">Plaats</label>
-                            <input type="text" name="city" value="{{ old('city') }}" class="{{ $inp }}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <label class="{{ $lbl }}">Hoe wil je het gesprek? *</label>
-                    <div class="grid sm:grid-cols-2 gap-2">
-                        <label class="flex items-start gap-2.5 rounded-lg border border-[#e3e3e6] px-3 py-2.5 cursor-pointer hover:border-[#111]/30">
-                            <input type="radio" name="appointment_pref" value="onsite" @checked(old('appointment_pref') === 'onsite') class="mt-0.5 text-[#111] focus:ring-[#111]/20">
-                            <span class="text-sm text-[#222]"><strong>Bij ons langs / wij komen</strong><br><span class="text-[#777] text-xs">Binnen {{ $radiusKm }} km van Bussum</span></span>
-                        </label>
-                        <label class="flex items-start gap-2.5 rounded-lg border border-[#e3e3e6] px-3 py-2.5 cursor-pointer hover:border-[#111]/30">
-                            <input type="radio" name="appointment_pref" value="meet" @checked(old('appointment_pref', 'meet') === 'meet') class="mt-0.5 text-[#111] focus:ring-[#111]/20">
-                            <span class="text-sm text-[#222]"><strong>Online via Google Meet</strong><br><span class="text-[#777] text-xs">Overal, ook buiten de regio</span></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Tijdslot --}}
-            <div class="rounded-2xl border border-[#e7e7ea] bg-white p-6">
-                <h2 class="text-lg font-semibold mb-1">Kies een tijdslot</h2>
-                <p class="text-sm text-[#666] mb-4">Binnen 1–2 werkdagen — zo zit je voorbeeld-website snel klaar.</p>
-                @error('appointment_slot')<p class="text-xs text-red-600 mb-2">{{ $message }}</p>@enderror
-
-                @forelse ($slotDays as $day)
-                    <div class="mb-4">
-                        <div class="text-sm font-semibold text-[#111] mb-2 capitalize">{{ $day['label'] }}</div>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach ($day['slots'] as $slot)
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="appointment_slot" value="{{ $slot['value'] }}" class="peer sr-only" @checked(old('appointment_slot') === $slot['value']) required>
-                                    <span class="inline-block rounded-lg border border-[#dcdce0] px-4 py-2 text-sm peer-checked:bg-[#111] peer-checked:text-white peer-checked:border-[#111] hover:border-[#111]/50">{{ $slot['time'] }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-sm text-[#666]">Geen slots beschikbaar — bel of mail ons, dan plannen we het direct.</p>
-                @endforelse
-            </div>
+            @include('pages.partials.intake-contact')
+            @include('pages.partials.intake-slots')
 
             <div class="flex items-center justify-between gap-4">
                 <p class="text-xs text-[#888]">Je gegevens komen alleen bij ons binnen voor deze aanvraag.</p>

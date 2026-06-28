@@ -472,4 +472,8 @@ Route::prefix('{locale}')
 		Route::get('/website-laten-maken', [WebsiteIntakeController::class, 'show'])->name('intake');
 		Route::post('/website-laten-maken', [WebsiteIntakeController::class, 'store'])->middleware('throttle:10,1')->name('intake.store');
 		Route::get('/website-laten-maken/bedankt', [WebsiteIntakeController::class, 'sent'])->name('intake.sent');
+
+		// Per-kanaal promotie-landingspagina's (config/promo.php) → lead getagd met channel.
+		Route::get('/p/{channel}', [WebsiteIntakeController::class, 'showChannel'])->name('promo');
+		Route::post('/p/{channel}', [WebsiteIntakeController::class, 'storeChannel'])->middleware('throttle:10,1')->name('promo.store');
 	});

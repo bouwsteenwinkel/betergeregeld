@@ -13,25 +13,90 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 /**
- * Publieke intake "website laten maken": branche-gestuurde uitvraag + afspraak
- * (bezoek <=50 km Bussum, anders Google Meet). Komt centraal binnen als
- * WebsiteLead in de admin, inclusief de antwoorden voor de 1-page-voorbereiding.
+ * Publieke intake "website laten maken". Twee ingangen, één centrale afhandeling:
+ *   - generiek (/website-laten-maken): klant kiest branche, vragen volgen de branche.
+ *   - per kanaal (/p/{kanaal}): eigen landingspagina met eigen ALGEMENE + SPECIFIEKE
+ *     vragen (config/promo.php). De lead wordt getagd met channel = kanaal-key, zodat
+ *     in de admin duidelijk is via welk kanaal de afspraak binnenkwam.
  */
 class WebsiteIntakeController extends Controller
 {
+    // ── Generiek ────────────────────────────────────────────────────────
+
     public function show(Request $request, string $locale): View
     {
         return view('pages.intake', [
-            'branches'    => WebsiteLead::BRANCHES,
-            'common'      => WebsiteLead::intakeCommonQuestions(),
-            'branchesDef' => (array) config('intake.branches', []),
-            'slotDays'    => AppointmentSlots::upcoming(2),
-            'radiusKm'    => GeoBussum::RADIUS_KM,
+            'branches'      => WebsiteLead::BRANCHES,
+            'common'        => WebsiteLead::intakeCommonQuestions(),
+            'branchesDef'   => (array) config('intake.branches', []),
+            'slotDays'      => AppointmentSlots::upcoming(2),
+            'radiusKm'      => GeoBussum::RADIUS_KM,
             'branchePreset' => (string) $request->query('branche', ''),
         ]);
     }
 
     public function store(Request $request, string $locale): RedirectResponse
+    {
+        $branche = (string) $request->input('branche');
+        if (! array_key_exists($branche, WebsiteLead::BRANCHES)) {
+            return back()->withErrors(['branche' => 'Kies een branche.'])->withInput();
+        }
+
+        return $this->persist($request, $locale, [
+            'branche'   => $branche,
+            'channel'   => 'intake',
+            'validQ'    => array_column(WebsiteLead::intakeAllQuestions($branche), 'key'),
+            'validF'    => array_keys(WebsiteLead::intakeFeaturesFor($branche)),
+            'redirect'  => 'intake.sent',
+        ], true);
+    }
+
+    // ── Per kanaal ──────────────────────────────────────────────────────
+
+    public function showChannel(Request $request, string $locale, string $channel): View
+    {
+        $cfg = config('promo.channels.' . $channel);
+        abort_unless(is_array($cfg), 404);
+
+        return view('pages.promo', [
+            'channel'    => $cfg,
+            'channelKey' => $channel,
+            'slotDays'   => AppointmentSlots::upcoming(2),
+            'radiusKm'   => GeoBussum::RADIUS_KM,
+        ]);
+    }
+
+    public function storeChannel(Request $request, string $locale, string $channel): RedirectResponse
+    {
+        $cfg = config('promo.channels.' . $channel);
+        abort_unless(is_array($cfg), 404);
+
+        $questions = array_merge($cfg['questions']['general'] ?? [], $cfg['questions']['specific'] ?? []);
+
+        return $this->persist($request, $locale, [
+            'branche'  => (string) ($cfg['branche'] ?? 'overig'),
+            'channel'  => $channel,
+            'validQ'   => array_column($questions, 'key'),
+            'validF'   => array_keys($cfg['features'] ?? []),
+            'redirect' => 'intake.sent',
+        ], false);
+    }
+
+    // ── Bedankt ─────────────────────────────────────────────────────────
+
+    public function sent(Request $request, string $locale): View
+    {
+        $done = $request->session()->get('intake_done');
+        abort_unless($done, 404);
+        return view('pages.intake-sent', ['done' => $done]);
+    }
+
+    // ── Gedeelde afhandeling ────────────────────────────────────────────
+
+    /**
+     * @param array{branche:string,channel:string,validQ:array,validF:array,redirect:string} $ctx
+     */
+    private function persist(Request $request, string $locale, array $ctx, bool $generic): RedirectResponse
     {
         // Honeypot: bots vullen 'website' in.
         if (filled($request->input('website'))) {
@@ -40,7 +105,6 @@ class WebsiteIntakeController extends Controller
 
         $data = $request->validate([
             'company'          => ['required', 'string', 'max:190'],
-            'branche'          => ['required', 'string', 'in:' . implode(',', array_keys(WebsiteLead::BRANCHES))],
             'contact_name'     => ['required', 'string', 'max:120'],
             'email'            => ['required', 'email', 'max:190'],
             'phone'            => ['required', 'string', 'max:60'],
@@ -62,18 +126,14 @@ class WebsiteIntakeController extends Controller
             return back()->withErrors(['appointment_slot' => 'Kies een geldig tijdslot.'])->withInput();
         }
 
-        $branche = $data['branche'];
-
-        // Antwoorden + functies saneren tot wat bij deze branche hoort.
-        $validQ = array_column(WebsiteLead::intakeAllQuestions($branche), 'key');
+        // Antwoorden + functies saneren tot wat bij dit kanaal/branche hoort.
         $answers = [];
         foreach ((array) ($data['answers'] ?? []) as $k => $v) {
-            if (in_array($k, $validQ, true) && $v !== '' && $v !== null) {
+            if (in_array($k, $ctx['validQ'], true) && $v !== '' && $v !== null) {
                 $answers[$k] = is_array($v) ? array_map('strval', $v) : (string) $v;
             }
         }
-        $validF = array_keys(WebsiteLead::intakeFeaturesFor($branche));
-        $features = array_values(array_intersect((array) ($data['features'] ?? []), $validF));
+        $features = array_values(array_intersect((array) ($data['features'] ?? []), $ctx['validF']));
 
         // Afstand tot Bussum → bezoek of Meet.
         $distance = GeoBussum::distanceKm($data['postcode']);
@@ -81,48 +141,29 @@ class WebsiteIntakeController extends Controller
         $type     = ($data['appointment_pref'] === 'onsite' && $within === true) ? 'onsite' : 'meet';
 
         $lead = WebsiteLead::create([
-            'company'         => $data['company'],
-            'branche'         => $branche,
-            'contact_name'    => $data['contact_name'],
-            'email'           => $data['email'],
-            'phone'           => $data['phone'],
-            'postcode'        => strtoupper(preg_replace('/\s+/', '', $data['postcode'])),
-            'city'            => $data['city'] ?? null,
-            'distance_km'     => $distance,
-            'within_radius'   => $within,
-            'current_website' => $data['current_website'] ?? null,
-            'message'         => $data['message'] ?? null,
-            'answers'         => $answers,
-            'features'        => $features,
-            'channel'         => 'intake',
-            'source'          => 'intake',
-            'status'          => 'appointment',
-            'preview_status'  => 'todo',
-            'appointment_at'  => $data['appointment_slot'],
-            'appointment_type'=> $type,
+            'company'            => $data['company'],
+            'branche'            => $ctx['branche'],
+            'contact_name'       => $data['contact_name'],
+            'email'              => $data['email'],
+            'phone'              => $data['phone'],
+            'postcode'           => strtoupper(preg_replace('/\s+/', '', $data['postcode'])),
+            'city'               => $data['city'] ?? null,
+            'distance_km'        => $distance,
+            'within_radius'      => $within,
+            'current_website'    => $data['current_website'] ?? null,
+            'message'            => $data['message'] ?? null,
+            'answers'            => $answers,
+            'features'           => $features,
+            'channel'            => $ctx['channel'],
+            'source'             => 'intake',
+            'status'             => 'appointment',
+            'preview_status'     => 'todo',
+            'appointment_at'     => $data['appointment_slot'],
+            'appointment_type'   => $type,
             'appointment_status' => 'requested',
         ]);
 
-        // Bevestiging naar klant + interne heads-up (best-effort).
-        try {
-            Mail::to($lead->email)->send(new IntakeConfirmation($lead));
-        } catch (\Throwable $e) {
-            Log::warning('intake_confirmation_mail: ' . $e->getMessage());
-        }
-        try {
-            $to = config('mail.from.address');
-            if ($to) {
-                Mail::raw(
-                    "Nieuwe website-lead via intake.\n\nBedrijf: {$lead->company}\nBranche: " . (WebsiteLead::BRANCHES[$branche] ?? $branche)
-                    . "\nContact: {$lead->contact_name} · {$lead->email} · {$lead->phone}\nAfspraak: "
-                    . AppointmentSlots::labelFor($data['appointment_slot']) . ' (' . ($type === 'onsite' ? 'bezoek' : 'Google Meet')
-                    . ")\nAfstand Bussum: " . ($distance !== null ? $distance . ' km' : 'onbekend') . "\n\nOpvolgen in de admin → Website-leads.",
-                    fn ($m) => $m->to($to)->subject('Nieuwe website-lead: ' . $lead->company)
-                );
-            }
-        } catch (\Throwable $e) {
-            Log::warning('intake_internal_mail: ' . $e->getMessage());
-        }
+        $this->notify($lead, $type, $data['appointment_slot']);
 
         $request->session()->put('intake_done', [
             'name'  => $lead->contact_name,
@@ -131,13 +172,31 @@ class WebsiteIntakeController extends Controller
             'email' => $lead->email,
         ]);
 
-        return redirect()->route('intake.sent', ['locale' => $locale]);
+        return redirect()->route($ctx['redirect'], ['locale' => $locale]);
     }
 
-    public function sent(Request $request, string $locale): View
+    private function notify(WebsiteLead $lead, string $type, string $slot): void
     {
-        $done = $request->session()->get('intake_done');
-        abort_unless($done, 404);
-        return view('pages.intake-sent', ['done' => $done]);
+        try {
+            Mail::to($lead->email)->send(new IntakeConfirmation($lead));
+        } catch (\Throwable $e) {
+            Log::warning('intake_confirmation_mail: ' . $e->getMessage());
+        }
+        try {
+            $to = config('mail.from.address');
+            if ($to) {
+                $branche = WebsiteLead::BRANCHES[$lead->branche] ?? $lead->branche;
+                Mail::raw(
+                    "Nieuwe website-lead.\n\nKanaal: {$lead->channel}\nBedrijf: {$lead->company}\nBranche: {$branche}\n"
+                    . "Contact: {$lead->contact_name} · {$lead->email} · {$lead->phone}\n"
+                    . 'Afspraak: ' . AppointmentSlots::labelFor($slot) . ' (' . ($type === 'onsite' ? 'bezoek' : 'Google Meet') . ")\n"
+                    . 'Afstand Bussum: ' . ($lead->distance_km !== null ? $lead->distance_km . ' km' : 'onbekend')
+                    . "\n\nOpvolgen in de admin → Website-leads.",
+                    fn ($m) => $m->to($to)->subject('Nieuwe lead (' . $lead->channel . '): ' . $lead->company)
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('intake_internal_mail: ' . $e->getMessage());
+        }
     }
 }

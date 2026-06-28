@@ -21,6 +21,12 @@ class WebsiteLeadsTable
             'quoted' => 'primary', 'won' => 'success', 'lost' => 'danger',
         ];
 
+        // Kanaal-opties: 'intake' (algemeen) + alle promotie-kanalen uit config/promo.php.
+        $channelOptions = ['intake' => 'Algemeen'];
+        foreach ((array) config('promo.channels', []) as $key => $cfg) {
+            $channelOptions[$key] = $cfg['title'] ?? $key;
+        }
+
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
@@ -32,6 +38,9 @@ class WebsiteLeadsTable
 
                 TextColumn::make('branche')->label('Branche')->badge()->color('info')
                     ->formatStateUsing(fn ($state) => WebsiteLead::BRANCHES[$state] ?? ($state ?: '—')),
+
+                TextColumn::make('channel')->label('Kanaal')->badge()->color('gray')
+                    ->formatStateUsing(fn ($state) => $channelOptions[$state] ?? ($state ?: '—')),
 
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn ($state) => WebsiteLead::STATUSES[$state] ?? $state)
@@ -49,12 +58,12 @@ class WebsiteLeadsTable
 
                 TextColumn::make('phone')->label('Telefoon')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('email')->label('E-mail')->toggleable()->toggledHiddenByDefault(),
-                TextColumn::make('channel')->label('Kanaal')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('assigned_to')->label('Toegewezen')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('contacted_at')->label('Benaderd')->dateTime('d-m-Y')->toggleable()->toggledHiddenByDefault(),
             ])
             ->filters([
                 SelectFilter::make('status')->label('Status')->options(WebsiteLead::STATUSES),
+                SelectFilter::make('channel')->label('Kanaal')->options($channelOptions),
                 SelectFilter::make('branche')->label('Branche')->options(WebsiteLead::BRANCHES),
                 SelectFilter::make('appointment_type')->label('Afspraak-type')->options(WebsiteLead::APPOINTMENT_TYPES),
                 TernaryFilter::make('appointment_at')->label('Heeft afspraak')
