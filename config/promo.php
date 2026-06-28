@@ -91,6 +91,7 @@ return [
             'pill'    => 'Voor dameskappers',
             'intro'   => 'Laat klanten 24/7 zelf online boeken en laat je coupe- en kleurwerk zien. We zetten vóór ons gesprek al een voorbeeld van jouw salon-site klaar.',
             'branche' => 'kapper_beauty',
+            'demo'    => 'dameskapper',   // channel-site key → voorbeeldsite (/_site/dameskapper)
             'features' => [
                 'online_booking' => 'Online afspraken maken (24/7)',
                 'price_list'     => 'Prijslijst / behandelingen',
@@ -113,6 +114,38 @@ return [
                     ['key' => 'specialties',   'label' => 'Waar ben je sterk in / specialisatie (bv. kleur, krullen, bruidskapsels)?', 'type' => 'text'],
                     ['key' => 'team_size',     'label' => 'Met hoeveel kapsters werk je?', 'type' => 'text'],
                     ['key' => 'booking_tool',  'label' => 'Gebruik je al een afsprakensysteem? Zo ja, welk (bv. Salonized, Treatwell)?', 'type' => 'text'],
+                ],
+            ],
+        ],
+
+        'herenkapper' => [
+            'title'   => 'Een website voor je barbershop — strak en stoer',
+            'pill'    => 'Voor herenkappers & barbers',
+            'intro'   => 'Klanten boeken zelf hun stoel en zien meteen je werk en prijzen. We zetten vóór ons gesprek al een voorbeeld van jouw barbershop klaar.',
+            'branche' => 'kapper_beauty',
+            'demo'    => 'herenkapper',
+            'features' => [
+                'online_booking' => 'Online afspraken / walk-in',
+                'price_list'     => 'Prijslijst',
+                'gallery'        => 'Foto-galerij (fades, baarden)',
+                'team'           => 'Team / barbers tonen',
+                'reviews'        => 'Reviews',
+                'opening_hours'  => 'Openingstijden + route',
+                'products'       => 'Verkoop van verzorgingsproducten',
+            ],
+            'questions' => [
+                'general' => [
+                    ['key' => 'goal',  'label' => 'Wat wil je vooral bereiken (meer klanten, minder telefoon, sterk merk)?', 'type' => 'textarea'],
+                    ['key' => 'style', 'label' => 'Welke uitstraling past bij je zaak?', 'type' => 'select',
+                        'options' => ['stoer' => 'Stoer / industrieel', 'classic' => 'Classic barber', 'modern' => 'Modern & strak', 'urban' => 'Urban']],
+                    ['key' => 'has_logo', 'label' => 'Heb je al een logo / huisstijl?', 'type' => 'boolean'],
+                ],
+                'specific' => [
+                    ['key' => 'services',     'label' => 'Welke diensten bied je (knippen, baard, scheren met mes, kids)?', 'type' => 'textarea'],
+                    ['key' => 'walk_in',      'label' => 'Werk je op afspraak, walk-in, of allebei?', 'type' => 'select',
+                        'options' => ['afspraak' => 'Alleen op afspraak', 'inloop' => 'Alleen walk-in', 'beide' => 'Allebei']],
+                    ['key' => 'team_size',    'label' => 'Met hoeveel barbers werk je?', 'type' => 'text'],
+                    ['key' => 'booking_tool', 'label' => 'Gebruik je al een afsprakensysteem? Zo ja, welk?', 'type' => 'text'],
                 ],
             ],
         ],

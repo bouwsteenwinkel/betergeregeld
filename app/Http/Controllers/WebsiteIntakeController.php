@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\IntakeConfirmation;
 use App\Models\WebsiteLead;
+use App\Services\ChannelSiteResolver;
 use App\Support\Geo\GeoBussum;
 use App\Support\Intake\AppointmentSlots;
 use Illuminate\Http\RedirectResponse;
@@ -61,6 +62,7 @@ class WebsiteIntakeController extends Controller
         return view('pages.promo', [
             'channel'    => $cfg,
             'channelKey' => $channel,
+            'demoUrl'    => $this->demoUrl($cfg),
             'slotDays'   => AppointmentSlots::upcoming(2),
             'radiusKm'   => GeoBussum::RADIUS_KM,
         ]);
@@ -74,12 +76,23 @@ class WebsiteIntakeController extends Controller
         $questions = array_merge($cfg['questions']['general'] ?? [], $cfg['questions']['specific'] ?? []);
 
         return $this->persist($request, $locale, [
-            'branche'  => (string) ($cfg['branche'] ?? 'overig'),
-            'channel'  => $channel,
-            'validQ'   => array_column($questions, 'key'),
-            'validF'   => array_keys($cfg['features'] ?? []),
-            'redirect' => 'intake.sent',
+            'branche'    => (string) ($cfg['branche'] ?? 'overig'),
+            'channel'    => $channel,
+            'validQ'     => array_column($questions, 'key'),
+            'validF'     => array_keys($cfg['features'] ?? []),
+            'previewUrl' => $this->demoUrl($cfg),   // koppelt de voorbeeldsite alvast aan de lead
+            'redirect'   => 'intake.sent',
         ], false);
+    }
+
+    /** Voorbeeldsite-URL voor een kanaal (channel-site key in 'demo'), of null. */
+    private function demoUrl(array $cfg): ?string
+    {
+        if (empty($cfg['demo'])) {
+            return null;
+        }
+        $site = app(ChannelSiteResolver::class)->byKey((string) $cfg['demo']);
+        return $site ? $site->baseUrl() : null;
     }
 
     // ── Bedankt ─────────────────────────────────────────────────────────
@@ -157,7 +170,8 @@ class WebsiteIntakeController extends Controller
             'channel'            => $ctx['channel'],
             'source'             => 'intake',
             'status'             => 'appointment',
-            'preview_status'     => 'todo',
+            'preview_url'        => $ctx['previewUrl'] ?? null,
+            'preview_status'     => ! empty($ctx['previewUrl']) ? 'ready' : 'todo',
             'appointment_at'     => $data['appointment_slot'],
             'appointment_type'   => $type,
             'appointment_status' => 'requested',

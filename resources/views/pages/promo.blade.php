@@ -18,7 +18,12 @@
         @if (!empty($channel['intro']))
             <p class="mt-3 text-[color:var(--color-on-dark-soft)] max-w-[60ch]">{{ $channel['intro'] }}</p>
         @endif
-        <p class="mt-2 text-[color:var(--color-on-dark-muted)] text-sm">Afspraak binnen 1–2 werkdagen · bezoek binnen {{ $radiusKm }} km van Bussum, anders Google Meet.</p>
+        @if (!empty($demoUrl))
+            <a href="{{ $demoUrl }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-5 rounded-xl border border-white/30 text-white font-semibold px-5 py-2.5 text-sm hover:bg-white/10">
+                Bekijk een voorbeeld-website <span aria-hidden="true">↗</span>
+            </a>
+        @endif
+        <p class="mt-4 text-[color:var(--color-on-dark-muted)] text-sm">Afspraak binnen 1–2 werkdagen · bezoek binnen {{ $radiusKm }} km van Bussum, anders Google Meet.</p>
     </div>
 </section>
 

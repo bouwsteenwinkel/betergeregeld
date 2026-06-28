@@ -252,5 +252,42 @@ return [
             'view' => 'channels.dameskapper.home',
         ],
 
+        /* ───────────────── HERENKAPPER / BARBERSHOP — 1-PAGE VOORBEELDSITE ─────
+         * Contrasterende, stoere stijl t.o.v. de dameskapper. Bespoke view.
+         */
+        'herenkapper' => [
+            'name'    => 'Brink Barbers',
+            'branche' => 'kapper_beauty',
+            'domain'  => null,
+            'status'  => 'draft',
+            'locale'  => 'nl',
+
+            'theme' => [
+                'primary' => '#c79a3a',        // goud
+                'accent'  => '#e6c068',
+                'ink'     => '#15120d',        // bijna zwart, warm
+                'muted'   => '#9a9186',
+                'bg'      => '#15120d',
+                'surface' => '#1f1b14',
+                'font'    => "'Barlow', system-ui, sans-serif",
+                'font_url'=> 'https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@300;400;500;600&display=swap',
+                'radius'  => '8px',
+            ],
+
+            'brand' => [
+                'logo_text' => 'Brink Barbers',
+                'phone'     => '035 765 43 21',
+                'email'     => 'info@brinkbarbers.nl',
+                'address'   => 'Brinklaan 48, Bussum',
+            ],
+
+            'meta' => [
+                'home_title'       => 'Brink Barbers — herenkapper & barbershop in Bussum',
+                'home_description' => 'Knippen, baard trimmen en scheren met het mes bij Brink Barbers in Bussum. Boek eenvoudig online je afspraak.',
+            ],
+
+            'view' => 'channels.herenkapper.home',
+        ],
+
     ],
 ];
