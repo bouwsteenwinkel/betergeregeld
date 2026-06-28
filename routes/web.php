@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\WebsiteIntakeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
@@ -466,4 +467,9 @@ Route::prefix('{locale}')
 		Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 		Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 		Route::get('/contact/sent', [ContactController::class, 'sent'])->name('contact.sent');
+
+		// Publieke intake "website laten maken" → centrale WebsiteLead + afspraak.
+		Route::get('/website-laten-maken', [WebsiteIntakeController::class, 'show'])->name('intake');
+		Route::post('/website-laten-maken', [WebsiteIntakeController::class, 'store'])->middleware('throttle:10,1')->name('intake.store');
+		Route::get('/website-laten-maken/bedankt', [WebsiteIntakeController::class, 'sent'])->name('intake.sent');
 	});
