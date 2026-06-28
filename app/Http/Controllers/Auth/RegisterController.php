@@ -24,6 +24,12 @@ class RegisterController extends Controller
 
 	public function store(Request $request): RedirectResponse
 	{
+		// Honeypot: bots vullen dit verborgen veld in. Stil weigeren (doen alsof
+		// het gelukt is) zodat de bot geen feedback krijgt en er niets ontstaat.
+		if (filled($request->input('website'))) {
+			return redirect(route('register.sent'))->with('email', (string) $request->input('email'));
+		}
+
 		$data = $request->validate([
 			'name' => ['required', 'string', 'max:190'],
 			'email' => ['required', 'email', 'max:190', 'unique:users,email'],
@@ -37,12 +43,15 @@ class RegisterController extends Controller
 				'is_active' => true,
 			]);
 
+			// Nieuwe self-signups krijgen NOOIT automatisch het admin-panel:
+			// rol 'client' (front-end dashboard) en geblokkeerd (is_active=false)
+			// tot de super-admin de aanvraag goedkeurt via de Users-resource.
 			$user = User::create([
 				'tenant_id' => $tenant->id,
 				'email' => $data['email'],
 				'password_hash' => Hash::make($data['password']),
-				'role' => 'admin',
-				'is_active' => true,
+				'role' => 'client',
+				'is_active' => false,
 				'status' => 'pending',
 			]);
 
@@ -64,7 +73,8 @@ class RegisterController extends Controller
 		Mail::raw(
 			"Welkom bij " . config('app.name') . ".\n\n" .
 			"Bevestig je e-mailadres via deze link:\n" . $verifyUrl . "\n\n" .
-			"De link is 24 uur geldig.",
+			"De link is 24 uur geldig.\n\n" .
+			"Na bevestiging beoordelen wij je aanvraag; je krijgt bericht zodra je account is geactiveerd.",
 			function ($msg) use ($user) {
 				$msg->to($user->email)
 					->subject(__('Bevestig je e-mailadres'));

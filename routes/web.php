@@ -122,7 +122,7 @@ Route::prefix('{locale}')
 			Route::post('/login', [LoginController::class, 'login']);
 
 			Route::get('/register', [RegisterController::class, 'show'])->name('register');
-			Route::post('/register', [RegisterController::class, 'store']);
+			Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1');
 			Route::get('/register/sent', [RegisterController::class, 'sent'])->name('register.sent');
 
 			Route::get('/verify/{user}/{token}', [VerifyEmailController::class, 'verify'])

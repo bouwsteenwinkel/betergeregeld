@@ -14,6 +14,12 @@
 		<form method="POST" action="{{ route('register') }}" class="card space-y-5">
 			@csrf
 
+			{{-- Honeypot: onzichtbaar voor mensen; bots vullen 'm in -> aanvraag wordt stil geweigerd. --}}
+			<div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden;">
+				<label>{{ __('Laat dit veld leeg') }}</label>
+				<input type="text" name="website" tabindex="-1" autocomplete="off" value="">
+			</div>
+
 			<div>
 				<label for="name" class="block text-sm font-semibold mb-2">{{ __('Naam / bedrijf') }}</label>
 				<input id="name" name="name" type="text" required autofocus value="{{ old('name') }}" class="field-input">
