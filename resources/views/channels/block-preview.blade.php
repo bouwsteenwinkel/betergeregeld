@@ -3,13 +3,12 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=1100">
 <meta name="robots" content="noindex,nofollow">
 @if (!empty($t['font_url']))<link href="{{ $t['font_url'] }}" rel="stylesheet">@endif
 <style>
     :root{ {!! $site->cssVars() !!} }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font,system-ui,sans-serif);color:var(--c-ink);background:var(--c-bg);line-height:1.6;width:1100px;overflow:hidden}
+    body{font-family:var(--font,system-ui,sans-serif);color:var(--c-ink);background:var(--c-bg);line-height:1.6;overflow:hidden}
     a{color:inherit;text-decoration:none}
     img{max-width:100%;display:block}
     .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
