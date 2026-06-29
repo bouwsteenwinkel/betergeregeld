@@ -12,9 +12,10 @@ class BlogPost extends Model
 	protected $table = 'blog_posts';
 
 	protected $fillable = [
-		'category_id', 'locale', 'translation_of_post_id',
+		'category_id', 'locale', 'translation_of_post_id', 'channel',
 		'slug', 'title', 'meta_title', 'excerpt', 'body',
 		'reading_time_min', 'is_pillar', 'featured', 'published_at',
+		'ai_generated', 'ai_model', 'ai_prompt_meta',
 	];
 
 	protected function casts(): array
@@ -23,7 +24,17 @@ class BlogPost extends Model
 			'is_pillar' => 'boolean',
 			'featured' => 'boolean',
 			'published_at' => 'datetime',
+			'ai_generated' => 'boolean',
+			'ai_prompt_meta' => 'array',
 		];
+	}
+
+	/** Posts van de hoofd-site (channel = null) of van een specifiek kanaal. */
+	public function scopeForChannel(Builder $q, ?string $channel): Builder
+	{
+		return $channel === null
+			? $q->whereNull('channel')
+			: $q->where('channel', $channel);
 	}
 
 	public function category(): BelongsTo
