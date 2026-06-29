@@ -25,7 +25,9 @@
  *   domain      productie-host zonder protocol, of null zolang concept
  *   status      'draft' (alleen via /_site/<key>) of 'live' (op domein)
  *   theme       kleur/font-tokens → als CSS-variabelen in de layout
- *   brand       logo-tekst, telefoon, e-mail, kvk (footer/contact)
+ *   brand       logo_text (HTML-wordmark) of logo_image (pad in public/ of URL),
+ *               telefoon, e-mail, kvk, + optioneel endorsement / endorsement_url
+ *               (override van het Groeidiamant-keurmerk onderaan)
  *   meta        <title>/description voor de homepage + default OG
  *   home        hero + usps + features + stappen + social proof
  *   about       over-ons content
@@ -35,11 +37,19 @@
 
 return [
 
-    // Standaard contactgegevens als een kanaal ze niet overschrijft.
+    // Standaard contactgegevens + merk-endorsement als een kanaal ze niet overschrijft.
+    //
+    // BRANDING-MODEL (besluit): elke niche-site heeft een EIGEN logo/merk (de
+    // bezoeker ziet 'm als zelfstandige specialist). Het moederbedrijf staat
+    // alleen discreet onderaan als keurmerk: "Volgens de Groeidiamant van
+    // Betergeregeld ICT". Override per kanaal kan via brand.endorsement /
+    // brand.endorsement_url.
     'defaults' => [
         'phone' => '085 1303 600',
         'email' => 'hallo@betergeregeld.nl',
         'kvk'   => '',
+        'endorsement'     => 'Volgens de Groeidiamant van Betergeregeld ICT',
+        'endorsement_url' => 'https://betergeregeld.nl',
     ],
 
     'channels' => [
@@ -66,8 +76,10 @@ return [
 
             'brand' => [
                 'logo_text' => 'Horeca<span>Sites</span>',
+                // 'logo_image' => 'channel-logos/horeca.svg', // eigen logo in public/ → vervangt de wordmark
                 'phone'     => '085 1303 600',
                 'email'     => 'horeca@betergeregeld.nl',
+                // 'endorsement' => '...', // override van het standaard Groeidiamant-keurmerk
             ],
 
             'meta' => [
@@ -209,6 +221,30 @@ return [
                 'city_h1'    => 'Salonwebsite laten maken in :city',
                 'city_intro' => 'Heb je een kapsalon of beautyzaak in :city? Wij bouwen een stijlvolle website met online boeken — en zetten vooraf een gratis voorbeeld van jóuw salon in :city klaar.',
                 'service'    => 'salonwebsite',
+            ],
+
+            // Groeidiamant-fase-overrides op de homepage. Geen entry = de 'home'
+            // hierboven (fase 'website'). SEO-instap: /groeifase/webshop.
+            'facets' => [
+                'webshop' => [
+                    'hero_eyebrow' => 'Voor kappers die al een website hebben',
+                    'hero_title'   => 'Verkoop je producten online — naast je salon',
+                    'hero_sub'     => 'Je hebt al een site; tijd voor de volgende stap. Een webshop voor je haarproducten en cadeaubonnen, netjes gekoppeld aan je bestaande site.',
+                    'hero_cta'     => 'Gratis voorbeeld van je webshop',
+                    'hero_note'    => 'Je huidige website blijft — we bouwen de webshop eraan vast.',
+                    'usps' => [
+                        'Haarproducten & cadeaubonnen online',
+                        'Veilig betalen met iDEAL',
+                        'Gekoppeld aan je bestaande site',
+                    ],
+                    'features' => [
+                        ['icon' => '🛍️', 'title' => 'Productshop',   'text' => 'Je producten netjes online, makkelijk bij te werken.'],
+                        ['icon' => '🎁', 'title' => 'Cadeaubonnen',  'text' => 'Online verkopen en in de salon inwisselen.'],
+                        ['icon' => '💳', 'title' => 'Veilig betalen', 'text' => 'iDEAL en kaart, zonder gedoe.'],
+                        ['icon' => '🔗', 'title' => 'Gekoppeld',     'text' => 'Eén geheel met je huidige website.'],
+                    ],
+                    'proof' => '“De cadeaubonnen lopen online storm — vooral rond de feestdagen.” — kapsalon in Bussum',
+                ],
             ],
 
             'view' => null,

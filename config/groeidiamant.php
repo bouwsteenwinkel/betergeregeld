@@ -33,26 +33,26 @@ return [
         'webshop' => [
             'nr'      => 2,
             'label'   => 'Webshop',
-            'tagline' => 'Verkoop online, gekoppeld aan je site',
+            'tagline' => 'Online verkopen, gekoppeld aan je site',
             'icon'    => '🛍️',
         ],
-        'vindbaarheid' => [
+        'klantenportaal' => [
             'nr'      => 3,
-            'label'   => 'Vindbaarheid / SEO',
-            'tagline' => 'Beter gevonden worden in Google',
-            'icon'    => '🔎',
+            'label'   => 'Klantenportaal',
+            'tagline' => 'Klanten zelf laten regelen (account, afspraken, facturen)',
+            'icon'    => '🔐',
         ],
-        'marketing' => [
+        'automatisering' => [
             'nr'      => 4,
-            'label'   => 'Marketing / automatisering',
-            'tagline' => 'Meer uit elke bezoeker halen',
-            'icon'    => '📣',
+            'label'   => 'Automatisering',
+            'tagline' => 'Koppelingen en processen die zichzelf doen',
+            'icon'    => '⚙️',
         ],
-        'onderhoud' => [
+        'ai' => [
             'nr'      => 5,
-            'label'   => 'Onderhoud / beveiliging',
-            'tagline' => 'Veilig, snel en up-to-date blijven',
-            'icon'    => '🛡️',
+            'label'   => 'AI',
+            'tagline' => 'Slimme assistentie die met je meewerkt',
+            'icon'    => '✨',
         ],
     ],
 ];
