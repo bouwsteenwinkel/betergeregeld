@@ -1,4 +1,4 @@
-@php /** @var \App\Support\ChannelSite $site */ @endphp
+@php /** @var \App\Support\ChannelSite $site */ $cta = $site->navCta(); @endphp
 <header class="nav">
 	<div class="wrap nav-inner">
 		<a href="{{ $site->url() }}" class="logo">
@@ -9,11 +9,10 @@
 			@endif
 		</a>
 		<nav class="nav-links">
-			<a href="{{ $site->url() }}">Home</a>
-			<a href="{{ $site->url('plaatsen') }}">Plaatsen</a>
-			<a href="{{ $site->url('blog') }}">Blog</a>
-			<a href="{{ $site->url('over-ons') }}">Over ons</a>
+			@foreach ($site->navMenu() as $item)
+				<a href="{{ $site->navHref($item['href'] ?? '') }}">{{ $item['label'] ?? '' }}</a>
+			@endforeach
 		</nav>
-		<a href="{{ $site->url() }}#contact" class="btn">Gratis voorbeeld</a>
+		<a href="{{ $site->navHref($cta['href']) }}" class="btn">{{ $cta['label'] }}</a>
 	</div>
 </header>

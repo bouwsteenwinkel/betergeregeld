@@ -145,6 +145,53 @@ class ChannelSite
         return implode(';', array_map(fn ($k, $v) => "$k:$v", array_keys($map), $map));
     }
 
+    /** @return array<string,mixed> site-specifieke header-config */
+    public function header(): array
+    {
+        return (array) ($this->cfg['header'] ?? []);
+    }
+
+    /** Menu-items voor de nav (site-specifiek), met een nette fallback. */
+    public function navMenu(): array
+    {
+        $menu = $this->header()['menu'] ?? null;
+        if (is_array($menu) && $menu) {
+            return $menu;
+        }
+        return [
+            ['label' => 'Home', 'href' => ''],
+            ['label' => 'Plaatsen', 'href' => 'plaatsen'],
+            ['label' => 'Blog', 'href' => 'blog'],
+            ['label' => 'Over ons', 'href' => 'over-ons'],
+        ];
+    }
+
+    /** Header-CTA-knop (label + bestemming), default naar de funnel. */
+    public function navCta(): array
+    {
+        $cta = (array) ($this->header()['cta'] ?? []);
+        return [
+            'label' => $cta['label'] ?? 'Gratis voorbeeld',
+            'href'  => $cta['href'] ?? '#gratis-voorbeeld',
+        ];
+    }
+
+    /** Lost een menu-href op: '' = home, '#anker' = anker op home, pad of absolute. */
+    public function navHref(string $href): string
+    {
+        $href = trim($href);
+        if ($href === '') {
+            return $this->url();
+        }
+        if (str_starts_with($href, '#')) {
+            return $this->url() . $href;
+        }
+        if (preg_match('#^(https?://|tel:|mailto:)#', $href)) {
+            return $href;
+        }
+        return $this->url($href);
+    }
+
     public function brand(string $key, mixed $default = null): mixed
     {
         return data_get($this->cfg, 'brand.' . $key)

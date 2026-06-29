@@ -10,6 +10,7 @@ use App\Models\Channel\Branche;
 use App\Models\Channel\Site;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -78,6 +79,24 @@ class ChannelSiteResource extends Resource
                 ->schema([
                     KeyValue::make('brand')->label('')->keyLabel('Veld')->valueLabel('Waarde')
                         ->helperText('logo_text, logo_image, phone, email, address, kvk, endorsement, endorsement_url'),
+                ]),
+
+            Section::make('Header (site-specifiek)')
+                ->description('Eigen menu + knop. Leeg = standaard (Home/Plaatsen/Blog/Over ons + “Gratis voorbeeld”).')
+                ->columns(2)
+                ->collapsed()
+                ->schema([
+                    Repeater::make('header.menu')->label('Menu-items')
+                        ->schema([
+                            TextInput::make('label')->label('Label')->required(),
+                            TextInput::make('href')->label('Link')
+                                ->placeholder('#galerij · over-ons · https://…')
+                                ->helperText('Leeg = home · #anker · pad · volledige URL'),
+                        ])
+                        ->columns(2)->columnSpanFull()->reorderable()->defaultItems(0)
+                        ->addActionLabel('Menu-item toevoegen'),
+                    TextInput::make('header.cta.label')->label('Knop-tekst')->placeholder('Gratis voorbeeld'),
+                    TextInput::make('header.cta.href')->label('Knop-link')->placeholder('#gratis-voorbeeld'),
                 ]),
 
             Section::make('SEO-meta')

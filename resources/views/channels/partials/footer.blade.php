@@ -14,16 +14,15 @@
 			</div>
 			<div>
 				<h3 style="font-size:1rem;margin-bottom:.6rem">Menu</h3>
-				<p><a href="{{ $site->url() }}">Home</a></p>
-				<p><a href="{{ $site->url('plaatsen') }}">Plaatsen</a></p>
-				<p><a href="{{ $site->url('blog') }}">Blog</a></p>
-				<p><a href="{{ $site->url('over-ons') }}">Over ons</a></p>
+				@foreach ($site->navMenu() as $item)
+					<p><a href="{{ $site->navHref($item['href'] ?? '') }}">{{ $item['label'] ?? '' }}</a></p>
+				@endforeach
 			</div>
 			<div>
 				<h3 style="font-size:1rem;margin-bottom:.6rem">Contact</h3>
 				@if ($site->brand('phone'))<p><a href="tel:{{ preg_replace('/\s+/', '', $site->brand('phone')) }}">{{ $site->brand('phone') }}</a></p>@endif
 				@if ($site->brand('email'))<p><a href="mailto:{{ $site->brand('email') }}">{{ $site->brand('email') }}</a></p>@endif
-				<p style="margin-top:.6rem"><a href="{{ $site->url() }}#contact">Gratis voorbeeld aanvragen</a></p>
+				<p style="margin-top:.6rem"><a href="{{ $site->navHref('#gratis-voorbeeld') }}">Gratis voorbeeld aanvragen</a></p>
 			</div>
 		</div>
 		<div class="foot-bottom">
