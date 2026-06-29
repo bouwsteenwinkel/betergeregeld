@@ -64,20 +64,9 @@ class ChannelBrancheResource extends Resource
                 ]),
 
             Section::make('Blueprint — standaard-blokkenlijst')
-                ->description('De blokken die een nieuwe site standaard krijgt (volgorde = hier).')
-                ->schema([
-                    Repeater::make('blueprint')->label('')
-                        ->schema([
-                            Select::make('type')->label('Blok')->options(Block::TYPES)->required(),
-                            Select::make('status')->label('Start-status')
-                                ->options(Block::STATUSES)->default('placeholder'),
-                            Toggle::make('locked')->label('Funnel (vast)')->default(false),
-                        ])
-                        ->columns(3)
-                        ->reorderable()->orderColumn()
-                        ->defaultItems(0)
-                        ->addActionLabel('Blok toevoegen'),
-                ]),
+                ->description('De standaard-blokken beheer je hieronder (na opslaan): sleep ze in volgorde — dat wordt direct opgeslagen.')
+                ->visible(fn (?Branche $record) => $record !== null)
+                ->schema([]),
         ]);
     }
 
@@ -95,6 +84,11 @@ class ChannelBrancheResource extends Resource
                 IconColumn::make('active')->label('Actief')->boolean(),
             ])
             ->defaultSort('name');
+    }
+
+    public static function getRelations(): array
+    {
+        return [\App\Filament\Resources\ChannelBranches\RelationManagers\BlueprintBlocksRelationManager::class];
     }
 
     public static function getPages(): array

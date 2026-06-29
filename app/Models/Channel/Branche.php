@@ -30,4 +30,10 @@ class Branche extends Model
     {
         return $this->hasMany(Site::class, 'channel_branche_id');
     }
+
+    /** Standaard-blokkenlijst (gesorteerd) — bron voor het genereren van sites. */
+    public function blueprintBlocks(): HasMany
+    {
+        return $this->hasMany(BlueprintBlock::class, 'channel_branche_id')->orderBy('sort');
+    }
 }

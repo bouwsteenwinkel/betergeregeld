@@ -68,6 +68,10 @@ require __DIR__ . '/channels.php';
 
 Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
 
+// Blok-template preview (thumbnail in de admin). Buiten de locale-prefix.
+Route::get('/blok-voorbeeld/{type}', [\App\Http\Controllers\ChannelSite\BlockPreviewController::class, 'show'])
+    ->where('type', '[a-z-]+');
+
 // Webhooks live outside the locale prefix and must not use CSRF.
 Route::post('/webhooks/mollie', [WebhookController::class, 'mollie'])->name('webhooks.mollie');
 

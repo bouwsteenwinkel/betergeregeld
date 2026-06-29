@@ -112,6 +112,8 @@ class BlocksRelationManager extends RelationManager
             ->reorderable('sort')
             ->defaultSort('sort')
             ->columns([
+                \Filament\Tables\Columns\ViewColumn::make('preview')->label('Voorbeeld')
+                    ->view('filament.columns.block-preview'),
                 TextColumn::make('type')->label('Type')->badge()
                     ->formatStateUsing(fn (string $s) => Block::TYPES[$s] ?? $s),
                 TextColumn::make('block_key')->label('Sleutel')->color('gray'),

@@ -50,7 +50,12 @@ class Site extends Model
      */
     public function generateBlocksFromBlueprint(bool $force = false): int
     {
-        $blueprint = (array) ($this->branche?->blueprint ?? []);
+        // Bron: de blueprint-relatie (sleepbaar in de admin); val terug op het
+        // oude JSON-veld zolang een branche nog geen relatie-rijen heeft.
+        $rows = $this->branche?->blueprintBlocks()->get();
+        $blueprint = ($rows && $rows->isNotEmpty())
+            ? $rows->map(fn ($r) => ['type' => $r->type, 'status' => $r->status, 'locked' => $r->locked])->all()
+            : (array) ($this->branche?->blueprint ?? []);
         if (! $blueprint) {
             return 0;
         }
