@@ -1,0 +1,95 @@
+# =====================================================================
+#  n8n self-host — Strato V-Server (VC 2-4: 2 vCores / 4 GB RAM)
+# =====================================================================
+#  Drie containers: caddy (reverse proxy + auto-HTTPS) -> n8n -> postgres.
+#  n8n's eigen poort (5678) is NIET publiek; alleen Caddy luistert op 80/443.
+#  Vul .env (zie .env.example) en draai:  docker compose up -d
+# =====================================================================
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - N8N_HOST=${N8N_HOST}
+      - UPTIME_HOST=${UPTIME_HOST}
+      - ACME_EMAIL=${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - n8n
+      - uptime-kuma
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest   # pin naar een vaste versie voor reproduceerbaarheid (zie README)
+    restart: unless-stopped
+    environment:
+      # --- URL / proxy ---
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - N8N_PROXY_HOPS=1                       # achter 1 reverse proxy (Caddy)
+      - WEBHOOK_URL=https://${N8N_HOST}/
+      - N8N_EDITOR_BASE_URL=https://${N8N_HOST}/
+      - GENERIC_TIMEZONE=Europe/Amsterdam
+      - TZ=Europe/Amsterdam
+      # --- Beveiliging ---
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}   # KRITIEK: bewaar offline; zonder deze key zijn opgeslagen credentials onbruikbaar na restore
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_HIRING_BANNER_ENABLED=false
+      - N8N_PERSONALIZATION_ENABLED=false
+      # --- Database (Postgres ipv default SQLite) ---
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # --- DB klein houden op 4 GB: oude executions prunen ---
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=336            # uren = 14 dagen
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=10000
+    volumes:
+      - n8n_data:/home/node/.n8n
+    expose:
+      - "5678"                                  # alleen intern bereikbaar voor Caddy — bewust GEEN ports:
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Amsterdam
+    volumes:
+      - uptime_kuma_data:/app/data
+    expose:
+      - "3001"                                  # alleen intern; route loopt via Caddy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  caddy_data:
+  caddy_config:
+  n8n_data:
+  uptime_kuma_data:
+  pg_data:

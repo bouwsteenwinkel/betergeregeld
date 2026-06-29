@@ -1,0 +1,55 @@
+# =====================================================================
+#  Caddy reverse proxy voor n8n — automatische HTTPS (Let's Encrypt)
+# =====================================================================
+#  Caddy regelt het TLS-certificaat zelf zodra:
+#    - de DNS A-record van {$N8N_HOST} naar dit server-IP wijst, en
+#    - poort 80 + 443 open staan in de firewall.
+# =====================================================================
+
+{
+	email {$ACME_EMAIL}
+	# Geen admin-API nodig op deze host:
+	admin off
+}
+
+{$N8N_HOST} {
+	encode zstd gzip
+	reverse_proxy n8n:5678 {
+		# n8n gebruikt websockets voor de live-editor:
+		flush_interval -1
+	}
+
+	# Basis-security-headers
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# ---------------------------------------------------------------
+	# FASE 3 — n8n-editor inbedden in de Betergeregeld-admin (iframe).
+	# Standaard blokkeert n8n iframing. Ontcommentarieer onderstaande
+	# wanneer je gaat embedden, zodat alleen de admin-origin mag iframen.
+	# (Verifieer daarna in de browser-console of n8n's eigen CSP niet
+	#  alsnog blokkeert — kan een extra n8n-config vergen.)
+	# ---------------------------------------------------------------
+	# header {
+	# 	-X-Frame-Options
+	# 	Content-Security-Policy "frame-ancestors https://betergeregeld.com https://admin.betergeregeld.com"
+	# }
+}
+
+# =====================================================================
+#  Uptime Kuma — monitoring-dashboard voor al je sites
+# =====================================================================
+{$UPTIME_HOST} {
+	encode zstd gzip
+	reverse_proxy uptime-kuma:3001
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}

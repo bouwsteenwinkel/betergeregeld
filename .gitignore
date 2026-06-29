@@ -28,3 +28,6 @@ Thumbs.db
 
 # Lokale secrets — nooit committen
 /docs/Pagespeed-api-key.txt
+
+# Lokale toegangsgegevens (RDP e.d.) — nooit committen
+/private/
