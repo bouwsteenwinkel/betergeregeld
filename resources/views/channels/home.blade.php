@@ -10,7 +10,7 @@
 		@include('channels.partials.facet-zone')
 	</div>
 
-	@include('channels.partials.lead-form')
+	@include('channels.partials.lead-wizard')
 
 	<script>
 	(function () {

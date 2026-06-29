@@ -167,9 +167,12 @@
 </section>
 
 <style>
-    /* Accent komt uit het host-thema: --primary (licht) of --gold (donker). */
-    .lwz-band{--lwz-accent:var(--primary,var(--gold,#b76e79));
-        padding:84px 0;background:color-mix(in srgb,var(--lwz-accent) 7%,var(--surface,#fff));
+    /* Accent + surface komen uit het host-thema, in welke conventie dan ook:
+       --primary (demo licht) / --gold (demo donker) / --c-primary (generieke layout). */
+    .lwz-band{
+        --lwz-accent:var(--primary,var(--gold,var(--c-primary,#b76e79)));
+        --lwz-surface:var(--surface,var(--c-surface,#fff));
+        padding:84px 0;background:color-mix(in srgb,var(--lwz-accent) 7%,var(--lwz-surface));
         border-top:1px solid color-mix(in srgb,currentColor 10%,transparent)}
     .lwz-wrap{max-width:680px;margin:0 auto;padding:0 24px}
     .lwz-head{text-align:center;margin-bottom:34px}
@@ -178,7 +181,7 @@
     .lwz-sub{color:color-mix(in srgb,currentColor 70%,transparent);font-size:16px;max-width:52ch;margin:0 auto}
     .lwz-reassure{display:block;margin-top:12px;font-size:13px;letter-spacing:.04em;color:var(--lwz-accent);font-weight:600}
 
-    .lwz{position:relative;background:var(--surface,#fff);border:1px solid color-mix(in srgb,currentColor 12%,transparent);
+    .lwz{position:relative;background:var(--lwz-surface,#fff);border:1px solid color-mix(in srgb,currentColor 12%,transparent);
         border-radius:calc(var(--radius,16px) * 1.2);padding:30px clamp(20px,4vw,40px) 26px;
         box-shadow:0 24px 60px color-mix(in srgb,var(--lwz-accent) 16%,transparent)}
     .lwz-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
