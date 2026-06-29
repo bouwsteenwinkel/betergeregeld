@@ -58,14 +58,34 @@ class Block extends Model
     /** Funnel-blokken die niet verwijderd mogen worden. */
     public const FUNNEL_TYPES = ['wizard'];
 
+    /** Actieve Groeidiamant-fase (transient) — stuurt facet-content-overrides. */
+    public ?string $activeFacet = null;
+
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class, 'channel_site_id');
     }
 
-    /** Per-blok content-veld met fallback. */
+    public function setActiveFacet(?string $facet): static
+    {
+        $this->activeFacet = $facet;
+
+        return $this;
+    }
+
+    /**
+     * Per-blok content-veld met fallback. Als er een actieve fase is en het blok
+     * een override heeft onder content.facets.{facet}.{key}, wint die.
+     */
     public function c(string $key, mixed $default = null): mixed
     {
+        if ($this->activeFacet) {
+            $override = data_get($this->content, 'facets.' . $this->activeFacet . '.' . $key);
+            if ($override !== null) {
+                return $override;
+            }
+        }
+
         return data_get($this->content, $key, $default);
     }
 }
