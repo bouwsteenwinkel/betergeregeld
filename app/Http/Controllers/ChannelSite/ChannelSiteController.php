@@ -123,30 +123,60 @@ class ChannelSiteController extends Controller
         }
 
         $data = $request->validate([
-            'company'      => ['nullable', 'string', 'max:190'],
-            'contact_name' => ['required', 'string', 'max:120'],
-            'email'        => ['required', 'email', 'max:190'],
-            'phone'        => ['required', 'string', 'max:60'],
-            'city'         => ['nullable', 'string', 'max:120'],
-            'message'      => ['nullable', 'string', 'max:4000'],
-            'facet'        => ['nullable', 'string', 'max:40'],
+            'company'          => ['nullable', 'string', 'max:190'],
+            'contact_name'     => ['required', 'string', 'max:120'],
+            'email'            => ['required', 'email', 'max:190'],
+            'phone'            => ['required', 'string', 'max:60'],
+            'city'             => ['nullable', 'string', 'max:120'],
+            'current_website'  => ['nullable', 'string', 'max:190'],
+            'message'          => ['nullable', 'string', 'max:4000'],
+            'facet'            => ['nullable', 'string', 'max:40'],
+            // Conversational wizard (lead-wizard.blade): vrije kwalificatie-antwoorden.
+            'goal'             => ['nullable', 'string', 'max:60'],
+            'style'            => ['nullable', 'string', 'max:60'],
+            'timing'           => ['nullable', 'string', 'max:60'],
+            'features'         => ['nullable', 'array'],
+            'features.*'       => ['string', 'max:60'],
+            'appointment_type' => ['nullable', 'in:onsite,meet'],
+            'appointment_note' => ['nullable', 'string', 'max:500'],
         ], [], [
             'contact_name' => 'naam', 'email' => 'e-mail', 'phone' => 'telefoon',
         ]);
 
+        // Groeidiamant-fase: expliciet meegestuurd, maar het doel "webshop" wint.
+        $facet = WebsiteLead::normalizeFacet($data['facet'] ?? null);
+        if (($data['goal'] ?? null) === 'webshop') {
+            $facet = WebsiteLead::normalizeFacet('webshop');
+        }
+
+        // Kwalificatie-antwoorden bundelen in answers (json) voor de admin.
+        $answers = array_filter([
+            'goal'             => $data['goal'] ?? null,
+            'style'            => $data['style'] ?? null,
+            'timing'           => $data['timing'] ?? null,
+            'appointment_note' => $data['appointment_note'] ?? null,
+        ], fn ($v) => filled($v));
+
+        $appointmentType = $data['appointment_type'] ?? null;
+
         $lead = WebsiteLead::create([
-            'company'        => $data['company'] ?? null,
-            'branche'        => $site->branche(),
-            'facet'          => WebsiteLead::normalizeFacet($data['facet'] ?? null),
-            'contact_name'   => $data['contact_name'],
-            'email'          => $data['email'],
-            'phone'          => $data['phone'],
-            'city'           => $data['city'] ?? null,
-            'message'        => $data['message'] ?? null,
-            'channel'        => $site->key,
-            'source'         => 'channel',
-            'status'         => 'new',
-            'preview_status' => 'todo',
+            'company'            => $data['company'] ?? null,
+            'branche'            => $site->branche(),
+            'facet'              => $facet,
+            'contact_name'       => $data['contact_name'],
+            'email'              => $data['email'],
+            'phone'              => $data['phone'],
+            'city'               => $data['city'] ?? null,
+            'current_website'    => $data['current_website'] ?? null,
+            'message'            => $data['message'] ?? null,
+            'answers'            => $answers ?: null,
+            'features'           => ! empty($data['features']) ? array_values($data['features']) : null,
+            'appointment_type'   => $appointmentType,
+            'appointment_status' => $appointmentType ? 'requested' : null,
+            'channel'            => $site->key,
+            'source'             => 'channel',
+            'status'             => 'new',
+            'preview_status'     => 'todo',
         ]);
 
         $this->notifyInternal($lead, $site);

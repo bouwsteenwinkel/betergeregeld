@@ -188,8 +188,10 @@
     </div>
 </div></section>
 
+@include('channels.partials.lead-wizard')
+
 <footer><div class="wrap">{{ $name }} · {{ $address }} · {{ $phone }} — © {{ date('Y') }}</div></footer>
 
-<div class="demo-flag">Voorbeeld door Beter Geregeld</div>
+<a href="#gratis-voorbeeld" class="demo-flag">Voorbeeld door Beter Geregeld · vraag je eigen voorbeeld aan →</a>
 </body>
 </html>
