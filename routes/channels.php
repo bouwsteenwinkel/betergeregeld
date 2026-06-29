@@ -23,6 +23,8 @@ $channelRoutes = function () {
     // SEO-instap op een Groeidiamant-fase: dezelfde homepage, maar toegesneden
     // op de fase waar de bezoeker al is (bv. /groeifase/webshop).
     Route::get('/groeifase/{facet}', [ChannelSiteController::class, 'home']);
+    // Alleen het facet-blok (AJAX) — live fase-switch zonder page-load.
+    Route::get('/groeifase/{facet}/fragment', [ChannelSiteController::class, 'homeFragment']);
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
 
     Route::get('/plaatsen', [ChannelSiteController::class, 'places']);

@@ -39,6 +39,21 @@ class ChannelSiteController extends Controller
         ]);
     }
 
+    /** Alleen de facet-afhankelijke blokken — voor de live (AJAX) fase-switch. */
+    public function homeFragment(Request $request): View
+    {
+        $site  = $this->site();
+        $facet = WebsiteLead::normalizeFacet($request->route('facet'));
+        $home  = array_replace((array) $site->get('home', []), (array) $site->get('facets.' . $facet, []));
+
+        return view('channels.partials.facet-zone', [
+            'site'   => $site,
+            'facet'  => $facet,
+            'home'   => $home,
+            'facets' => (array) config('groeidiamant.facets', []),
+        ]);
+    }
+
     public function about(): View
     {
         return view('channels.about', ['site' => $this->site()]);

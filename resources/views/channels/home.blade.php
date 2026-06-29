@@ -5,68 +5,44 @@
 @section('description', $site->homeDescription())
 
 @section('content')
-	<section class="hero">
-		<div class="wrap">
-			@if (!empty($h['hero_eyebrow']))<span class="eyebrow">{{ $h['hero_eyebrow'] }}</span>@endif
-			<h1>{{ $h['hero_title'] ?? $site->name() }}</h1>
-			<p class="lead">{{ $h['hero_sub'] ?? '' }}</p>
-			<a href="#contact" class="btn">{{ $h['hero_cta'] ?? 'Gratis voorbeeld aanvragen' }}</a>
-			@if (!empty($h['hero_note']))<p class="muted" style="margin-top:.8rem;font-size:.9rem">{{ $h['hero_note'] }}</p>@endif
-
-			@if (!empty($h['usps']))
-				<ul class="hero-usps">
-					@foreach ($h['usps'] as $usp)<li>{{ $usp }}</li>@endforeach
-				</ul>
-			@endif
-		</div>
-	</section>
-
-	@if (!empty($h['features']))
-		<section>
-			<div class="wrap">
-				<h2>Alles wat je zaak nodig heeft</h2>
-				<p class="muted" style="margin-bottom:2rem">In één strakke website — wij regelen de techniek.</p>
-				<div class="grid cols-4">
-					@foreach ($h['features'] as $f)
-						<div class="card">
-							<div style="font-size:2rem;margin-bottom:.5rem">{{ $f['icon'] ?? '•' }}</div>
-							<h3>{{ $f['title'] }}</h3>
-							<p class="muted" style="font-size:.95rem">{{ $f['text'] }}</p>
-						</div>
-					@endforeach
-				</div>
-			</div>
-		</section>
-	@endif
-
-	@if (!empty($h['steps']))
-		<section style="background:var(--c-surface)">
-			<div class="wrap">
-				<h2>Zo werkt het</h2>
-				<div class="grid cols-3" style="margin-top:1.6rem">
-					@foreach ($h['steps'] as $i => $s)
-						<div>
-							<div style="width:42px;height:42px;border-radius:50%;background:var(--c-primary);color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:.7rem">{{ $i + 1 }}</div>
-							<h3>{{ $s['title'] }}</h3>
-							<p class="muted">{{ $s['text'] }}</p>
-						</div>
-					@endforeach
-				</div>
-			</div>
-		</section>
-	@endif
-
-	@if (!empty($h['proof']))
-		<section>
-			<div class="wrap">
-				<blockquote class="card" style="font-size:1.3rem;font-weight:600;border-left:5px solid var(--c-accent)">
-					{{ $h['proof'] }}
-				</blockquote>
-			</div>
-		</section>
-	@endif
-
-	@include('channels.partials.groeipad')
+	{{-- Facet-afhankelijke blokken: worden bij een fase-keuze live (AJAX) vervangen. --}}
+	<div id="facet-zone" data-facet="{{ $facet ?? 'website' }}">
+		@include('channels.partials.facet-zone')
+	</div>
 
 	@include('channels.partials.lead-form')
+
+	<script>
+	(function () {
+		var zone = document.getElementById('facet-zone');
+		if (!zone) return;
+
+		// Klik op een fase in de groeiselector → live het facet-blok herrenderen
+		// (geen volledige page-load). Delegatie, zodat het ook werkt na herrender.
+		document.addEventListener('click', function (e) {
+			var a = e.target.closest('[data-facet-link]');
+			if (!a || !zone.contains(a)) return;
+			e.preventDefault();
+			var url = a.getAttribute('href');
+			var facet = (url.match(/groeifase\/([^\/?#]+)/) || [])[1] || 'website';
+			zone.style.transition = 'opacity .15s'; zone.style.opacity = '.45';
+
+			fetch(url.replace(/\/$/, '') + '/fragment', { headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })
+				.then(function (r) { if (!r.ok) throw new Error('http'); return r.text(); })
+				.then(function (html) {
+					zone.innerHTML = html;
+					zone.setAttribute('data-facet', facet);
+					zone.style.opacity = '';
+					// Lead-form taggen met de gekozen fase.
+					document.querySelectorAll('input[name="facet"]').forEach(function (i) { i.value = facet; });
+					try { history.pushState({ facet: facet }, '', url); } catch (err) {}
+					zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				})
+				.catch(function () { window.location.href = url; }); // fallback: gewone navigatie
+		});
+
+		// Terug/vooruit-knop: eenvoudig herladen zodat de juiste fase weer staat.
+		window.addEventListener('popstate', function () { location.reload(); });
+	})();
+	</script>
 @endsection
