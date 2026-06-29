@@ -81,7 +81,8 @@ class Block extends Model
     {
         if ($this->activeFacet) {
             $override = data_get($this->content, 'facets.' . $this->activeFacet . '.' . $key);
-            if ($override !== null) {
+            // Lege override (null/''/[]) telt als "niet ingesteld" → basis-inhoud.
+            if ($override !== null && $override !== '' && $override !== []) {
                 return $override;
             }
         }

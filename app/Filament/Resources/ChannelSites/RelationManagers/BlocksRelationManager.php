@@ -52,7 +52,57 @@ class BlocksRelationManager extends RelationManager
                 ->columns(2)
                 ->visible(fn ($get) => filled($get('type')) && ! in_array($get('type'), ['groeipad', 'wizard'], true))
                 ->schema(fn ($get) => BlockContentSchema::for((string) $get('type'))),
+
+            Section::make('Fase-varianten (Groeidiamant)')
+                ->description('Optioneel: per groeifase afwijkende inhoud. Leeg laten = de inhoud hierboven.')
+                ->visible(fn ($get) => filled($get('type')) && ! in_array($get('type'), ['groeipad', 'wizard'], true))
+                ->collapsed()
+                ->schema(fn ($get) => self::facetSections((string) $get('type'))),
         ]);
+    }
+
+    /** Per niet-default Groeidiamant-fase een (collapsed) override-sectie. */
+    private static function facetSections(string $type): array
+    {
+        if ($type === '' || in_array($type, ['groeipad', 'wizard'], true)) {
+            return [];
+        }
+        $default = (string) config('groeidiamant.default', 'website');
+        $out = [];
+        foreach ((array) config('groeidiamant.facets', []) as $key => $def) {
+            if ($key === $default) {
+                continue;
+            }
+            $label = $def['label'] ?? $key;
+            $out[] = Section::make(trim(($def['nr'] ?? '') . '. ' . $label, '. '))
+                ->description("Overschrijft de inhoud voor de fase “{$label}”. Leeg = standaard.")
+                ->columns(2)
+                ->collapsed()
+                ->schema(BlockContentSchema::for($type, 'content.facets.' . $key));
+        }
+        return $out;
+    }
+
+    /** Verwijdert lege fase-overrides zodat ze de basis-inhoud niet wissen. */
+    public static function pruneFacets(array $data): array
+    {
+        $facets = data_get($data, 'content.facets');
+        if (! is_array($facets)) {
+            return $data;
+        }
+        $clean = [];
+        foreach ($facets as $fk => $fv) {
+            $vals = array_filter((array) $fv, fn ($v) => ! ($v === null || $v === '' || $v === []));
+            if ($vals) {
+                $clean[$fk] = $vals;
+            }
+        }
+        if ($clean) {
+            data_set($data, 'content.facets', $clean);
+        } else {
+            unset($data['content']['facets']);
+        }
+        return $data;
     }
 
     public function table(Table $table): Table
@@ -77,13 +127,14 @@ class BlocksRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()->label('Blok toevoegen')
-                    ->mutateDataUsing(function (array $data): array {
+                    ->mutateFormDataUsing(function (array $data): array {
                         $data['locked'] = in_array($data['type'] ?? '', Block::FUNNEL_TYPES, true);
-                        return $data;
+                        return self::pruneFacets($data);
                     }),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateFormDataUsing(fn (array $data): array => self::pruneFacets($data)),
                 DeleteAction::make()->hidden(fn (Block $record) => $record->locked),
             ]);
     }
