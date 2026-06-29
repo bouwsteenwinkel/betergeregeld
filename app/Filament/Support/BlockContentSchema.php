@@ -24,6 +24,8 @@ class BlockContentSchema
                 Textarea::make('content.sub')->label('Subtekst')->rows(2)->columnSpanFull(),
                 TextInput::make('content.cta_label')->label('Knoptekst')->placeholder('Gratis voorbeeld aanvragen'),
                 TextInput::make('content.note')->label('Geruststelling onder de knop'),
+                TextInput::make('content.cta2_label')->label('2e knop (optioneel)'),
+                TextInput::make('content.cta2_href')->label('2e knop-link')->placeholder('#behandelingen'),
                 Repeater::make('content.usps')->label('USP\'s')->schema([
                     TextInput::make('text')->label('USP')->required(),
                 ])->columnSpanFull()->collapsed()->defaultItems(0),
@@ -54,9 +56,31 @@ class BlockContentSchema
                 ])->columns(2)->columnSpanFull(),
             ],
 
+            'about' => [
+                TextInput::make('content.eyebrow')->label('Eyebrow'),
+                TextInput::make('content.heading')->label('Kop')->columnSpanFull(),
+                Textarea::make('content.lead')->label('Lead (introzin)')->rows(2)->columnSpanFull(),
+                Textarea::make('content.body')->label('Tekst (lege regel = nieuwe alinea)')->rows(5)->columnSpanFull(),
+                Repeater::make('content.stats')->label('Kerncijfers')->schema([
+                    TextInput::make('value')->label('Waarde')->placeholder('15+'),
+                    TextInput::make('label')->label('Label')->placeholder('jaar ervaring'),
+                ])->columns(2)->columnSpanFull()->collapsed(),
+            ],
+
             'proof' => [
                 Textarea::make('content.quote')->label('Citaat')->rows(2)->columnSpanFull(),
                 TextInput::make('content.author')->label('Door (naam/zaak)'),
+            ],
+
+            'pricelist' => [
+                TextInput::make('content.eyebrow')->label('Eyebrow'),
+                TextInput::make('content.heading')->label('Kop'),
+                TextInput::make('content.sub')->label('Subtekst')->columnSpanFull(),
+                Repeater::make('content.items')->label('Diensten')->schema([
+                    TextInput::make('name')->label('Naam')->required(),
+                    TextInput::make('desc')->label('Omschrijving'),
+                    TextInput::make('price')->label('Prijs')->placeholder('€ 39'),
+                ])->columns(3)->columnSpanFull()->collapsed(),
             ],
 
             'reviews' => [
@@ -77,6 +101,7 @@ class BlockContentSchema
             ],
 
             'gallery' => [
+                TextInput::make('content.eyebrow')->label('Eyebrow'),
                 TextInput::make('content.heading')->label('Kop'),
                 TextInput::make('content.sub')->label('Subtekst'),
                 Repeater::make('content.tiles')->label('Tegels')->schema([
