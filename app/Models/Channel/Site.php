@@ -43,6 +43,58 @@ class Site extends Model
         return $this->blocks()->where('enabled', true);
     }
 
+    /**
+     * Genereert de basis-blokken uit de blueprint van de branche. Standaard alleen
+     * als de site nog géén blokken heeft (zo overschrijf je geen designer-edits).
+     * @return int aantal aangemaakte blokken
+     */
+    public function generateBlocksFromBlueprint(bool $force = false): int
+    {
+        $blueprint = (array) ($this->branche?->blueprint ?? []);
+        if (! $blueprint) {
+            return 0;
+        }
+        if (! $force && $this->blocks()->exists()) {
+            return 0;
+        }
+
+        $existingKeys  = $this->blocks()->pluck('block_key')->all();
+        $existingTypes = $this->blocks()->pluck('type')->all();
+        $sort = (int) $this->blocks()->max('sort');
+        $created = 0;
+
+        foreach ($blueprint as $b) {
+            $type = $b['type'] ?? null;
+            if (! $type) {
+                continue;
+            }
+            // Bij aanvullen (force): bestaande types overslaan i.p.v. dupliceren.
+            if ($force && in_array($type, $existingTypes, true)) {
+                continue;
+            }
+            $existingTypes[] = $type;
+            // Uniek block_key per site afdwingen (type, type-2, …).
+            $key = $type;
+            $i = 1;
+            while (in_array($key, $existingKeys, true)) {
+                $key = $type . '-' . (++$i);
+            }
+            $existingKeys[] = $key;
+
+            $this->blocks()->create([
+                'type'      => $type,
+                'block_key' => $key,
+                'sort'      => $sort += 10,
+                'enabled'   => true,
+                'locked'    => (bool) ($b['locked'] ?? false),
+                'status'    => $b['status'] ?? 'placeholder',
+            ]);
+            $created++;
+        }
+
+        return $created;
+    }
+
     /** Bouwt de render-wrapper (incl. blokken) die de channel-views gebruiken. */
     public function toChannelSite(): ChannelSite
     {

@@ -33,6 +33,29 @@ class Block extends Model
         'klaar'       => 'Klaar',
     ];
 
+    /** Blokken-bibliotheek (type => label) — bron voor de admin-selects. */
+    public const TYPES = [
+        'hero'     => 'Hero',
+        'uspbar'   => 'USP-balk',
+        'features' => 'Features',
+        'steps'    => 'Stappen',
+        'proof'    => 'Citaat / proof',
+        'reviews'  => 'Reviews',
+        'faq'      => 'FAQ',
+        'gallery'  => 'Galerij / portfolio',
+        'pricing'  => 'Pakketten',
+        'cta'      => 'CTA-band',
+        'logos'    => 'Logo\'s / partners',
+        'location' => 'Locatie + openingstijden',
+        'blog'     => 'Blog-uitgelicht',
+        'richtext' => 'Vrij tekstblok',
+        'groeipad' => 'Groeidiamant-selector',
+        'wizard'   => 'Lead-wizard (funnel)',
+    ];
+
+    /** Funnel-blokken die niet verwijderd mogen worden. */
+    public const FUNNEL_TYPES = ['wizard'];
+
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class, 'channel_site_id');

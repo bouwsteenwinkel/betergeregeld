@@ -9,8 +9,9 @@
                     @if (!empty($p['highlight']))<span class="eyebrow" style="position:absolute;top:-.8rem;left:1.6rem">Populair</span>@endif
                     <h3>{{ $p['name'] ?? '' }}</h3>
                     <div style="font-size:2rem;font-weight:800;margin:.4rem 0">{{ $p['price'] ?? '' }}<span class="muted" style="font-size:.9rem;font-weight:500">{{ !empty($p['period']) ? ' '.$p['period'] : '' }}</span></div>
+                    @php $feats = is_array($p['features'] ?? null) ? $p['features'] : preg_split('/\r?\n/', trim((string) ($p['features'] ?? ''))); @endphp
                     <ul style="list-style:none;margin:.8rem 0 1.2rem;display:grid;gap:.4rem">
-                        @foreach ((array) ($p['features'] ?? []) as $feat)<li style="padding-left:1.4rem;position:relative"><span style="position:absolute;left:0;color:var(--c-primary);font-weight:800">✓</span>{{ $feat }}</li>@endforeach
+                        @foreach (array_filter((array) $feats) as $feat)<li style="padding-left:1.4rem;position:relative"><span style="position:absolute;left:0;color:var(--c-primary);font-weight:800">✓</span>{{ is_array($feat) ? ($feat['value'] ?? '') : $feat }}</li>@endforeach
                     </ul>
                     <a href="#gratis-voorbeeld" class="btn @if(empty($p['highlight']))btn-ghost @endif" style="width:100%;text-align:center">{{ $p['cta'] ?? 'Kies' }}</a>
                 </div>
