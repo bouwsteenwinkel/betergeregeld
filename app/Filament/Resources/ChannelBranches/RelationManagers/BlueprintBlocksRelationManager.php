@@ -48,18 +48,8 @@ class BlueprintBlocksRelationManager extends RelationManager
             ->reorderable('sort')
             ->defaultSort('sort')
             ->columns([
-                \Filament\Tables\Columns\ViewColumn::make('preview')->label('Voorbeeld')
-                    ->view('filament.columns.block-preview'),
-                TextColumn::make('type')->label('Blok')->badge()
-                    ->formatStateUsing(fn (string $s) => Block::TYPES[$s] ?? $s),
-                TextColumn::make('status')->label('Start-status')->badge()
-                    ->formatStateUsing(fn (string $s) => Block::STATUSES[$s] ?? $s)
-                    ->color(fn (string $s) => match ($s) {
-                        'klaar' => 'success', 'bewerking' => 'warning', default => 'gray',
-                    }),
-                IconColumn::make('locked')->label('Funnel')->boolean()
-                    ->trueIcon('heroicon-m-lock-closed')->falseIcon('heroicon-m-lock-open')
-                    ->color(fn (bool $state) => $state ? 'warning' : 'gray'),
+                \Filament\Tables\Columns\ViewColumn::make('card')->label('Blok')
+                    ->view('filament.columns.block-card'),
             ])
             ->headerActions([
                 CreateAction::make()->label('Blok toevoegen')
