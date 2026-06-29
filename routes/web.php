@@ -63,6 +63,10 @@ use App\Http\Controllers\Tools\VatCheckController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
+// Channel-sites (eigen domeinen + /_site/{key} preview). MOET vóór de domein-
+// loze routes hieronder, anders vangt '/' het channel-domein af.
+require __DIR__ . '/channels.php';
+
 Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
 
 // Webhooks live outside the locale prefix and must not use CSRF.
@@ -473,7 +477,9 @@ Route::prefix('{locale}')
 		Route::post('/website-laten-maken', [WebsiteIntakeController::class, 'store'])->middleware('throttle:10,1')->name('intake.store');
 		Route::get('/website-laten-maken/bedankt', [WebsiteIntakeController::class, 'sent'])->name('intake.sent');
 
-		// Per-kanaal promotie-landingspagina's (config/promo.php) → lead getagd met channel.
-		Route::get('/p/{channel}', [WebsiteIntakeController::class, 'showChannel'])->name('promo');
-		Route::post('/p/{channel}', [WebsiteIntakeController::class, 'storeChannel'])->middleware('throttle:10,1')->name('promo.store');
+		// Per-kanaal promotie-landingspagina's (config/promo.php). Optioneel facet
+		// (Groeidiamant-fase): /p/{branche}/{facet} → SEO-instap op de juiste fase.
+		// Lead wordt getagd met channel + facet.
+		Route::get('/p/{channel}/{facet?}', [WebsiteIntakeController::class, 'showChannel'])->name('promo');
+		Route::post('/p/{channel}/{facet?}', [WebsiteIntakeController::class, 'storeChannel'])->middleware('throttle:10,1')->name('promo.store');
 	});

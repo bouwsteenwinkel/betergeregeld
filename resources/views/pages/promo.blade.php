@@ -13,7 +13,10 @@
 <section class="section-dark relative overflow-hidden">
     <div class="absolute inset-0 grid-pattern opacity-40"></div>
     <div class="relative max-w-[820px] mx-auto px-6 pt-16 pb-10">
-        @if (!empty($channel['pill']))<span class="pill pill-dark mb-5">{{ $channel['pill'] }}</span>@endif
+        <div class="flex items-center gap-2 mb-5 flex-wrap">
+            @if (!empty($channel['pill']))<span class="pill pill-dark">{{ $channel['pill'] }}</span>@endif
+            @if (!empty($facet))<span class="pill pill-dark">{{ $facet['icon'] ?? '' }} Groeifase: {{ $facet['label'] ?? '' }}</span>@endif
+        </div>
         <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">{{ $channel['title'] }}</h1>
         @if (!empty($channel['intro']))
             <p class="mt-3 text-[color:var(--color-on-dark-soft)] max-w-[60ch]">{{ $channel['intro'] }}</p>

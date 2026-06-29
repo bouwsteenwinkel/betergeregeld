@@ -14,7 +14,7 @@ class WebsiteLead extends Model
     protected $fillable = [
         'company', 'contact_name', 'email', 'phone',
         'postcode', 'city', 'address', 'distance_km', 'within_radius',
-        'branche', 'channel',
+        'branche', 'facet', 'channel',
         'current_website', 'message', 'source',
         'answers', 'features',
         'preview_url', 'preview_status',
@@ -56,6 +56,31 @@ class WebsiteLead extends Model
     public static function intakeAllQuestions(?string $branche): array
     {
         return array_merge(self::intakeCommonQuestions(), self::intakeQuestionsFor($branche));
+    }
+
+    // ── Groeidiamant-facetten (uit config/groeidiamant.php) ──────────────
+
+    /** Alle facetten (key => definitie). */
+    public static function facets(): array
+    {
+        return (array) config('groeidiamant.facets', []);
+    }
+
+    /** facet-key => label, voor selects/filters in de admin. */
+    public static function facetOptions(): array
+    {
+        $out = [];
+        foreach (self::facets() as $key => $def) {
+            $out[$key] = ($def['label'] ?? $key);
+        }
+        return $out;
+    }
+
+    /** Geldig facet of de default. */
+    public static function normalizeFacet(?string $facet): string
+    {
+        $facet = (string) $facet;
+        return array_key_exists($facet, self::facets()) ? $facet : (string) config('groeidiamant.default', 'website');
     }
 
     /** Pijplijn-statussen (label per key) voor de admin. */

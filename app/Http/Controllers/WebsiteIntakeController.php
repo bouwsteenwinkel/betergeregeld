@@ -45,6 +45,7 @@ class WebsiteIntakeController extends Controller
 
         return $this->persist($request, $locale, [
             'branche'   => $branche,
+            'facet'     => WebsiteLead::normalizeFacet(null),
             'channel'   => 'intake',
             'validQ'    => array_column(WebsiteLead::intakeAllQuestions($branche), 'key'),
             'validF'    => array_keys(WebsiteLead::intakeFeaturesFor($branche)),
@@ -54,21 +55,24 @@ class WebsiteIntakeController extends Controller
 
     // ── Per kanaal ──────────────────────────────────────────────────────
 
-    public function showChannel(Request $request, string $locale, string $channel): View
+    public function showChannel(Request $request, string $locale, string $channel, ?string $facet = null): View
     {
         $cfg = config('promo.channels.' . $channel);
         abort_unless(is_array($cfg), 404);
+        $facet = WebsiteLead::normalizeFacet($facet);
 
         return view('pages.promo', [
             'channel'    => $cfg,
             'channelKey' => $channel,
+            'facetKey'   => $facet,
+            'facet'      => WebsiteLead::facets()[$facet] ?? [],
             'demoUrl'    => $this->demoUrl($cfg),
             'slotDays'   => AppointmentSlots::upcoming(2),
             'radiusKm'   => GeoBussum::RADIUS_KM,
         ]);
     }
 
-    public function storeChannel(Request $request, string $locale, string $channel): RedirectResponse
+    public function storeChannel(Request $request, string $locale, string $channel, ?string $facet = null): RedirectResponse
     {
         $cfg = config('promo.channels.' . $channel);
         abort_unless(is_array($cfg), 404);
@@ -77,6 +81,7 @@ class WebsiteIntakeController extends Controller
 
         return $this->persist($request, $locale, [
             'branche'    => (string) ($cfg['branche'] ?? 'overig'),
+            'facet'      => WebsiteLead::normalizeFacet($facet),
             'channel'    => $channel,
             'validQ'     => array_column($questions, 'key'),
             'validF'     => array_keys($cfg['features'] ?? []),
@@ -156,6 +161,7 @@ class WebsiteIntakeController extends Controller
         $lead = WebsiteLead::create([
             'company'            => $data['company'],
             'branche'            => $ctx['branche'],
+            'facet'              => $ctx['facet'] ?? 'website',
             'contact_name'       => $data['contact_name'],
             'email'              => $data['email'],
             'phone'              => $data['phone'],

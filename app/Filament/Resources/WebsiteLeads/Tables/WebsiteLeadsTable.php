@@ -42,6 +42,9 @@ class WebsiteLeadsTable
                 TextColumn::make('channel')->label('Kanaal')->badge()->color('gray')
                     ->formatStateUsing(fn ($state) => $channelOptions[$state] ?? ($state ?: '—')),
 
+                TextColumn::make('facet')->label('Groeifase')->badge()->color('warning')
+                    ->formatStateUsing(fn ($state) => WebsiteLead::facetOptions()[$state] ?? ($state ?: '—')),
+
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn ($state) => WebsiteLead::STATUSES[$state] ?? $state)
                     ->color(fn ($state) => $statusColors[$state] ?? 'gray'),
@@ -64,6 +67,7 @@ class WebsiteLeadsTable
             ->filters([
                 SelectFilter::make('status')->label('Status')->options(WebsiteLead::STATUSES),
                 SelectFilter::make('channel')->label('Kanaal')->options($channelOptions),
+                SelectFilter::make('facet')->label('Groeifase')->options(WebsiteLead::facetOptions()),
                 SelectFilter::make('branche')->label('Branche')->options(WebsiteLead::BRANCHES),
                 SelectFilter::make('appointment_type')->label('Afspraak-type')->options(WebsiteLead::APPOINTMENT_TYPES),
                 TernaryFilter::make('appointment_at')->label('Heeft afspraak')
