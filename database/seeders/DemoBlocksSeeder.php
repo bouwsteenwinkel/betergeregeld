@@ -23,6 +23,7 @@ class DemoBlocksSeeder extends Seeder
 
             $site->update([
                 'header'      => $demo['header'],
+                'theme'       => array_merge((array) $site->theme, $demo['theme'] ?? []),
                 'legacy_view' => null,   // voortaan blok-gedreven
             ]);
 
@@ -113,6 +114,85 @@ class DemoBlocksSeeder extends Seeder
                             ['day' => 'Donderdag', 'time' => '09:00 – 21:00'],
                             ['day' => 'Vrijdag', 'time' => '09:00 – 18:00'],
                             ['day' => 'Zaterdag', 'time' => '08:30 – 16:00'],
+                            ['day' => 'Zondag', 'time' => 'Gesloten'],
+                        ],
+                    ]],
+                    ['type' => 'wizard'],
+                ],
+            ],
+
+            'herenkapper' => [
+                // Donker thema: layout gebruikt --c-ink als tekstkleur → licht maken,
+                // en de footer-achtergrond apart donker houden.
+                'theme' => ['ink' => '#ece7df', 'footer_bg' => '#0e0c08'],
+                'header' => [
+                    'menu' => [
+                        ['label' => 'Diensten', 'href' => '#diensten'],
+                        ['label' => 'Galerij', 'href' => '#galerij'],
+                        ['label' => 'Over', 'href' => '#over'],
+                        ['label' => 'Contact', 'href' => '#contact'],
+                    ],
+                    'cta' => ['label' => 'Afspraak', 'href' => '#gratis-voorbeeld'],
+                ],
+                'blocks' => [
+                    ['type' => 'hero', 'content' => [
+                        'eyebrow'    => 'Barbershop · Bussum',
+                        'title'      => 'Scherp geknipt, strak in de baard',
+                        'sub'        => 'Klassiek vakmanschap, moderne coupes en scheren met het mes. Boek je stoel zo online — of loop binnen.',
+                        'cta_label'  => 'Online afspraak',
+                        'cta2_label' => 'Bekijk diensten',
+                        'cta2_href'  => '#diensten',
+                    ]],
+                    ['type' => 'pricelist', 'content' => [
+                        'eyebrow' => 'Diensten',
+                        'heading' => 'Wat we voor je doen',
+                        'sub'     => 'Vakwerk voor knippen, baard en scheren. Twijfel je? We adviseren je in de stoel.',
+                        'items'   => [
+                            ['name' => 'Knippen', 'desc' => 'Wassen, knippen en stylen', 'price' => '€ 27'],
+                            ['name' => 'Knippen + baard', 'desc' => 'De complete beurt', 'price' => '€ 39'],
+                            ['name' => 'Baard trimmen', 'desc' => 'Strak in model', 'price' => '€ 18'],
+                            ['name' => 'Scheren met het mes', 'desc' => 'Klassiek, met hete handdoek', 'price' => '€ 30'],
+                            ['name' => 'Contouren / snor', 'desc' => 'Even bijwerken', 'price' => '€ 12'],
+                            ['name' => 'Knippen tot 12 jaar', 'desc' => 'Voor de jonge mannen', 'price' => '€ 20'],
+                        ],
+                    ]],
+                    ['type' => 'gallery', 'content' => [
+                        'eyebrow' => 'Galerij',
+                        'heading' => 'Ons werk',
+                        'sub'     => "Hier komen straks jouw eigen foto's — fades, baarden en classics.",
+                        'tiles'   => [
+                            ['label' => 'Fade'], ['label' => 'Baard'], ['label' => 'Classic'],
+                            ['label' => 'Scheren'], ['label' => 'Crop'], ['label' => 'Pompadour'],
+                        ],
+                    ]],
+                    ['type' => 'about', 'content' => [
+                        'eyebrow' => 'Over Brink Barbers',
+                        'heading' => 'Een barbershop met karakter',
+                        'body'    => "Bij Brink Barbers draait alles om vakmanschap en een goeie sfeer. Of je nu komt voor een strakke fade, een nette baard of een klassieke scheerbeurt met het mes — we nemen de tijd en zorgen dat je er scherp uitloopt.\n\nOnze barbers zijn opgeleid in zowel klassieke als moderne technieken.",
+                        'stats'   => [
+                            ['value' => '10+', 'label' => 'jaar ervaring'],
+                            ['value' => '4,9', 'label' => 'review'],
+                            ['value' => '3', 'label' => 'barbers'],
+                        ],
+                    ]],
+                    ['type' => 'reviews', 'content' => [
+                        'heading' => 'Wat klanten zeggen',
+                        'items'   => [
+                            ['stars' => 5, 'text' => 'Strakke fade en een scheerbeurt met het mes. Echt vakwerk.', 'author' => 'Dave'],
+                            ['stars' => 5, 'text' => 'Vaste zaak geworden. Goeie sfeer en je zit zo binnen via de app.', 'author' => 'Rachid'],
+                            ['stars' => 5, 'text' => 'Mijn baard is nog nooit zo netjes geweest. Top.', 'author' => 'Mark'],
+                        ],
+                    ]],
+                    ['type' => 'location', 'content' => [
+                        'heading' => 'Boek je stoel',
+                        'sub'     => 'Online boeken of even bellen — je bent welkom bij Brink Barbers.',
+                        'hours'   => [
+                            ['day' => 'Maandag', 'time' => 'Gesloten'],
+                            ['day' => 'Dinsdag', 'time' => '09:00 – 18:00'],
+                            ['day' => 'Woensdag', 'time' => '09:00 – 18:00'],
+                            ['day' => 'Donderdag', 'time' => '09:00 – 21:00'],
+                            ['day' => 'Vrijdag', 'time' => '09:00 – 18:00'],
+                            ['day' => 'Zaterdag', 'time' => '08:00 – 16:00'],
                             ['day' => 'Zondag', 'time' => 'Gesloten'],
                         ],
                     ]],

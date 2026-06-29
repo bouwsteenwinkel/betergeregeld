@@ -133,14 +133,17 @@ class ChannelSite
     {
         $t = $this->theme();
         $map = [
-            '--c-primary' => $t['primary'],
-            '--c-accent'  => $t['accent'],
-            '--c-ink'     => $t['ink'],
-            '--c-muted'   => $t['muted'],
-            '--c-bg'      => $t['bg'],
-            '--c-surface' => $t['surface'],
-            '--font'      => $t['font'],
-            '--radius'    => $t['radius'],
+            '--c-primary'   => $t['primary'],
+            '--c-accent'    => $t['accent'],
+            '--c-ink'       => $t['ink'],
+            '--c-muted'     => $t['muted'],
+            '--c-bg'        => $t['bg'],
+            '--c-surface'   => $t['surface'],
+            // Footer-achtergrond apart, zodat donkere thema's (ink = lichte tekst)
+            // geen lichte footer krijgen. Default = ink (ongewijzigd licht thema).
+            '--c-footer-bg' => $t['footer_bg'] ?? $t['ink'],
+            '--font'        => $t['font'],
+            '--radius'      => $t['radius'],
         ];
         return implode(';', array_map(fn ($k, $v) => "$k:$v", array_keys($map), $map));
     }
