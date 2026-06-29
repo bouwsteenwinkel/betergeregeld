@@ -11,7 +11,7 @@
         <h2>Jouw groeipad — stap voor stap</h2>
         <p class="muted" style="max-width:62ch;margin:.4rem auto 2rem">
             Je begint waar jij nu staat. Groeit je bedrijf, dan groeit je website gewoon mee —
-            je hoeft nooit opnieuw te beginnen.
+            je hoeft nooit opnieuw te beginnen. <strong>Klik op een fase</strong> om te zien wat die voor jou betekent.
         </p>
 
         <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;align-items:stretch">
@@ -20,7 +20,7 @@
                     $nr = (int) ($f['nr'] ?? 0);
                     $state = $nr < $curNr ? 'done' : ($key === $current ? 'now' : 'next');
                 @endphp
-                <div style="flex:1;min-width:150px;max-width:200px;border-radius:var(--radius);padding:1.1rem .9rem;text-align:left;
+                <a href="{{ $site->url('groeifase/' . $key) }}" style="display:block;flex:1;min-width:150px;max-width:200px;border-radius:var(--radius);padding:1.1rem .9rem;text-align:left;text-decoration:none;color:inherit;
                     @if($state==='now') background:var(--c-primary);color:#fff;box-shadow:0 10px 30px color-mix(in srgb,var(--c-primary) 35%,transparent);
                     @elseif($state==='done') background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-accent) 45%,transparent);
                     @else background:var(--c-surface);border:1px dashed color-mix(in srgb,var(--c-muted) 40%,transparent);opacity:.7; @endif">
@@ -33,7 +33,7 @@
                     </div>
                     <div style="font-weight:700;font-size:1.02rem;@if($state!=='now')color:var(--c-ink)@endif">{{ $nr }}. {{ $f['label'] ?? $key }}</div>
                     <div style="font-size:.82rem;margin-top:.2rem;@if($state==='now')color:rgba(255,255,255,.85)@else color:var(--c-muted)@endif">{{ $f['tagline'] ?? '' }}</div>
-                </div>
+                </a>
             @endforeach
         </div>
     </div>
