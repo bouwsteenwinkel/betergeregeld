@@ -10,16 +10,65 @@ use Illuminate\Support\Str;
  */
 class ChannelSite
 {
-    /** @param array<string,mixed> $cfg */
+    /**
+     * @param array<string,mixed> $cfg
+     * @param iterable<\App\Models\Channel\Block>|null $blocks DB-blokken (null = config-site)
+     */
     public function __construct(
         public readonly string $key,
         public readonly array $cfg,
+        public readonly ?iterable $blocks = null,
     ) {
     }
 
     public function get(string $path, mixed $default = null): mixed
     {
         return data_get($this->cfg, $path, $default);
+    }
+
+    /** Channel-branche-key (bv. 'kapper') voor branche-brede blok-overrides. */
+    public function brancheKey(): ?string
+    {
+        return $this->cfg['branche_key'] ?? null;
+    }
+
+    /** @return iterable<\App\Models\Channel\Block> */
+    public function blocks(): iterable
+    {
+        return $this->blocks ?? [];
+    }
+
+    public function hasBlocks(): bool
+    {
+        return $this->blocks !== null && count($this->blocks) > 0;
+    }
+
+    /**
+     * Resolveert de view voor een blok, in volgorde van specifiek → generiek:
+     *   1. channels._blocks.{site}.{block_key}    (bespoke per blok)
+     *   2. channels._blocks.{site}.{type}         (bespoke per type, deze site)
+     *   3. channels._blocks.branche-{branche}.{type} (branche-breed)
+     *   4. channels.blocks.{type}                 (generieke bibliotheek)
+     *   5. channels.blocks._generic               (universele placeholder)
+     */
+    public function blockView(string $type, string $blockKey): string
+    {
+        $candidates = [
+            "channels._blocks.{$this->key}.{$blockKey}",
+            "channels._blocks.{$this->key}.{$type}",
+        ];
+        if ($bk = $this->brancheKey()) {
+            $candidates[] = "channels._blocks.branche-{$bk}.{$type}";
+        }
+        $candidates[] = "channels.blocks.{$type}";
+        $candidates[] = 'channels.blocks._generic';
+
+        foreach ($candidates as $view) {
+            if (view()->exists($view)) {
+                return $view;
+            }
+        }
+        return 'channels.blocks._generic';
     }
 
     public function name(): string
@@ -133,11 +182,17 @@ class ChannelSite
         return (string) ($this->cfg['meta']['home_description'] ?? '');
     }
 
-    /** Optionele bespoke homepage-view, of de generieke. */
+    /** Bespoke blade > blok-gedreven (DB) > generieke config-home. */
     public function homeView(): string
     {
         $view = $this->cfg['view'] ?? null;
-        return ($view && view()->exists($view)) ? $view : 'channels.home';
+        if ($view && view()->exists($view)) {
+            return $view;                 // tijdelijke bespoke pagina (transitie)
+        }
+        if ($this->hasBlocks()) {
+            return 'channels.home-blocks'; // blok-gedreven render
+        }
+        return 'channels.home';            // legacy config-home (facet-zone + wizard)
     }
 
     public static function slug(string $place): string
