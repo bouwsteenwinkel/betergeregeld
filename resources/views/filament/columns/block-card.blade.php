@@ -13,18 +13,18 @@
     $url        = url('/blok-voorbeeld/' . $type) . ($siteKey ? '?site=' . $siteKey : '');
     $hasFields  = in_array($type, ['groeipad', 'wizard'], true) === false;
 @endphp
-<div style="position:relative;overflow:hidden;border-radius:10px;border:1px solid rgba(0,0,0,.08);min-height:122px;background:#fff;{{ $enabled ? '' : 'opacity:.5' }}">
-    {{-- zachte template-achtergrond --}}
+<div style="position:relative;overflow:hidden;border-radius:10px;border:1px solid rgba(0,0,0,.08);min-height:180px;background:#fff;{{ $enabled ? '' : 'opacity:.5' }}">
+    {{-- template-achtergrond --}}
     @if ($hasFields)
-        <div style="position:absolute;inset:0;opacity:.20;pointer-events:none">
+        <div style="position:absolute;inset:0;opacity:.38;pointer-events:none">
             <iframe src="{{ $url }}" loading="lazy" tabindex="-1"
-                    style="width:1100px;height:560px;border:0;transform:scale(.92);transform-origin:top left"></iframe>
+                    style="width:1100px;height:620px;border:0;transform:scale(.92);transform-origin:top left"></iframe>
         </div>
     @endif
-    {{-- witte sluier voor leesbaarheid van de tekst erover --}}
-    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.93),rgba(255,255,255,.74) 55%,rgba(255,255,255,.55));pointer-events:none"></div>
+    {{-- witte sluier: links sterk (leesbare tekst), naar rechts lichter (template zichtbaar) --}}
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.92),rgba(255,255,255,.5) 48%,rgba(255,255,255,.22));pointer-events:none"></div>
     {{-- voorgrond: de instellingen --}}
-    <div style="position:relative;padding:16px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:122px">
+    <div style="position:relative;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;min-height:180px">
         <span style="font-weight:700;font-size:15px;color:#0f172a">{{ $typeLabel }}</span>
         <span style="font-size:11px;font-weight:600;color:#fff;background:{{ $statusCol }};padding:2px 9px;border-radius:999px">{{ $statusLbl }}</span>
         @if ($r->locked)
