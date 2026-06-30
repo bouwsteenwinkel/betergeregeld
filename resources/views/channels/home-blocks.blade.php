@@ -34,7 +34,8 @@
             if (!a || !zone.contains(a)) return;
             e.preventDefault();
             var url = a.getAttribute('href');
-            var facet = (url.match(/groeifase\/([^\/?#]+)/) || [])[1] || 'website';
+            // Schone fase-URL's (/webshop): de fase staat op de link zelf.
+            var facet = a.getAttribute('data-facet') || (url.replace(/[?#].*$/, '').replace(/\/$/, '').split('/').pop()) || 'website';
             zone.style.transition = 'opacity .15s'; zone.style.opacity = '.45';
 
             fetch(url.replace(/\/$/, '') + '/fragment', { headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })

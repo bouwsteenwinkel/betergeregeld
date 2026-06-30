@@ -8,6 +8,8 @@
     $statusCol  = match ($statusKey) { 'klaar' => '#16a34a', 'bewerking' => '#d97706', default => '#94a3b8' };
     $blockKey   = $r->block_key ?? null;
     $enabled    = $r->enabled ?? true;
+    $facetKey   = $r->facet ?? null;
+    $facetLbl   = $facetKey ? (config('groeidiamant.facets.' . $facetKey . '.label') ?? $facetKey) : 'Basis';
     // Site-blokken → preview in de huisstijl van die site; blueprint-blokken neutraal.
     $siteKey    = $r->channel_site_id ? optional($r->site)->key : null;
     $url        = url('/blok-voorbeeld/' . $type) . ($siteKey ? '?site=' . $siteKey : '');
@@ -26,6 +28,7 @@
     {{-- voorgrond: de instellingen --}}
     <div style="position:relative;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;min-height:200px">
         <span style="font-weight:700;font-size:15px;color:#0f172a">{{ $typeLabel }}</span>
+        <span style="font-size:11px;font-weight:600;color:{{ $facetKey ? '#fff' : '#475569' }};background:{{ $facetKey ? '#6366f1' : '#e2e8f0' }};padding:2px 9px;border-radius:999px">{{ $facetLbl }}</span>
         <span style="font-size:11px;font-weight:600;color:#fff;background:{{ $statusCol }};padding:2px 9px;border-radius:999px">{{ $statusLbl }}</span>
         @if ($r->locked)
             <span title="Funnel — niet verwijderbaar" style="font-size:12px;font-weight:600;color:#b45309">🔒 funnel</span>

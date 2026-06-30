@@ -26,6 +26,14 @@ class BlocksRelationManager extends RelationManager
 
     protected static string|\BackedEnum|null $icon = 'heroicon-m-squares-2x2';
 
+    /** Fase-key => label, voor de Fase-select en het filter. */
+    public static function facetOptions(): array
+    {
+        return collect(config('groeidiamant.facets', []))
+            ->mapWithKeys(fn ($d, $k) => [$k => trim(($d['nr'] ?? '') . '. ' . ($d['label'] ?? $k), '. ')])
+            ->all();
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -36,6 +44,10 @@ class BlocksRelationManager extends RelationManager
                         ->options(Block::TYPES)->required()->live()
                         ->disabled(fn (?Block $record) => $record?->locked)
                         ->afterStateUpdated(fn ($state, $set, ?Block $record) => $record ? null : $set('block_key', $state)),
+                    Select::make('facet')->label('Fase')
+                        ->options(self::facetOptions())
+                        ->placeholder('Basis — in elke fase')
+                        ->helperText('Leeg = basis (zichtbaar in elke fase). Anders: alleen in deze fase.'),
                     TextInput::make('block_key')->label('Sleutel')->required()
                         ->alphaDash()
                         ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule, $livewire) => $rule->where('channel_site_id', $livewire->getOwnerRecord()->getKey()))
@@ -114,6 +126,13 @@ class BlocksRelationManager extends RelationManager
             ->columns([
                 \Filament\Tables\Columns\ViewColumn::make('card')->label('Blok')
                     ->view('filament.columns.block-card'),
+            ])
+            ->filters([
+                \Filament\Tables\Filters\SelectFilter::make('facet')->label('Bekijk fase')
+                    ->options(self::facetOptions())
+                    ->query(fn ($query, array $data) => filled($data['value'] ?? null)
+                        ? $query->where(fn ($q) => $q->whereNull('facet')->orWhere('facet', $data['value']))
+                        : $query),
             ])
             ->headerActions([
                 CreateAction::make()->label('Blok toevoegen')

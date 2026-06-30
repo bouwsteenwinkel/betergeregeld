@@ -14,7 +14,7 @@ class Block extends Model
     protected $table = 'channel_blocks';
 
     protected $fillable = [
-        'channel_site_id', 'type', 'block_key', 'sort',
+        'channel_site_id', 'type', 'facet', 'block_key', 'sort',
         'enabled', 'locked', 'status', 'content', 'style', 'design_notes',
     ];
 

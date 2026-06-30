@@ -44,6 +44,18 @@ class ChannelSite
     }
 
     /**
+     * Blokken voor een fase-presentatie: basis-blokken (facet leeg = alle fases)
+     * + de blokken van deze fase, in sort-volgorde.
+     * @return \Illuminate\Support\Collection<int,\App\Models\Channel\Block>
+     */
+    public function blocksForFacet(string $facet): \Illuminate\Support\Collection
+    {
+        return collect($this->blocks())
+            ->filter(fn ($b) => blank($b->facet) || $b->facet === $facet)
+            ->values();
+    }
+
+    /**
      * Resolveert de view voor een blok, in volgorde van specifiek → generiek:
      *   1. channels._blocks.{site}.{block_key}    (bespoke per blok)
      *   2. channels._blocks.{site}.{type}         (bespoke per type, deze site)
