@@ -121,6 +121,7 @@ class BlocksRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('block_key')
+            ->description('Elk blok hoort bij een fase. “Basis” = zichtbaar in élke fase. Kies hieronder een fase om alléén die blokken (+ basis) te zien; een nieuw blok dat je dan toevoegt komt automatisch in die fase. Sleep om de volgorde te bepalen.')
             ->reorderable('sort')
             ->defaultSort('sort')
             ->columns([
@@ -128,15 +129,24 @@ class BlocksRelationManager extends RelationManager
                     ->view('filament.columns.block-card'),
             ])
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('facet')->label('Bekijk fase')
+                \Filament\Tables\Filters\SelectFilter::make('facet')->label('Toon fase')
+                    ->placeholder('Alles (basis + alle fases)')
                     ->options(self::facetOptions())
                     ->query(fn ($query, array $data) => filled($data['value'] ?? null)
                         ? $query->where(fn ($q) => $q->whereNull('facet')->orWhere('facet', $data['value']))
                         : $query),
             ])
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->headerActions([
                 CreateAction::make()->label('Blok toevoegen')
-                    ->mutateFormDataUsing(function (array $data): array {
+                    ->mutateFormDataUsing(function (array $data, $livewire): array {
+                        // Geen fase gekozen in het formulier? Pak de actief gefilterde fase.
+                        if (blank($data['facet'] ?? null)) {
+                            $active = data_get($livewire, 'tableFilters.facet.value');
+                            if (filled($active)) {
+                                $data['facet'] = $active;
+                            }
+                        }
                         $data['locked'] = in_array($data['type'] ?? '', Block::FUNNEL_TYPES, true);
                         return self::pruneFacets($data);
                     }),
