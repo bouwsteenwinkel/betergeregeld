@@ -110,7 +110,8 @@ class Site extends Model
             'locale'      => $this->locale,
             'domain'  => $this->domain,
             'status'  => $this->status,
-            'theme'   => (array) $this->theme,
+            // Cascade: branche-thema als basis, site-thema overschrijft per token.
+            'theme'   => array_merge((array) ($this->branche?->theme ?? []), (array) $this->theme),
             'brand'   => (array) $this->brand,
             'meta'    => (array) $this->meta,
             'header'  => (array) $this->header,
