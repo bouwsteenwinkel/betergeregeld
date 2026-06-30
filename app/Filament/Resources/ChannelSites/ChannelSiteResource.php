@@ -119,8 +119,8 @@ class ChannelSiteResource extends Resource
                 TextColumn::make('domain')->label('Domein')->placeholder('— concept —')
                     ->url(fn (Site $r) => $r->domain ? 'https://' . $r->domain : null, true),
                 TextColumn::make('status')->label('Status')->badge()
-                    ->formatStateUsing(fn (string $s) => $s === 'live' ? 'Live' : 'Concept')
-                    ->color(fn (string $s) => $s === 'live' ? 'success' : 'gray'),
+                    ->formatStateUsing(fn (string $state) => $state === 'live' ? 'Live' : 'Concept')
+                    ->color(fn (string $state) => $state === 'live' ? 'success' : 'gray'),
                 TextColumn::make('blocks_count')->label('Blokken')->counts('blocks')->badge(),
                 TextColumn::make('updated_at')->label('Gewijzigd')->since()->sortable(),
             ])

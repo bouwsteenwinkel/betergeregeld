@@ -77,7 +77,7 @@ class ChannelBrancheResource extends Resource
                 TextColumn::make('name')->label('Branche')->weight('bold')
                     ->description(fn (Branche $r) => $r->key),
                 TextColumn::make('lead_branche')->label('Lead-branche')
-                    ->formatStateUsing(fn (?string $s) => WebsiteLead::BRANCHES[$s] ?? $s)->badge(),
+                    ->formatStateUsing(fn (?string $state) => WebsiteLead::BRANCHES[$state] ?? $state)->badge(),
                 TextColumn::make('blueprint')->label('Blokken')
                     ->formatStateUsing(fn ($state) => is_array($state) ? count($state) : 0),
                 TextColumn::make('sites_count')->label('Sites')->counts('sites')->badge(),
