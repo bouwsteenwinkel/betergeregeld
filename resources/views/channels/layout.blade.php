@@ -290,7 +290,7 @@
 		.hm-svc .sel{background:var(--c-primary);color:#fff}
 		.hm-btn{width:100%;background:var(--c-primary);color:#fff;font-weight:800;border:0;border-radius:10px;padding:.8rem;font-size:.95rem;cursor:pointer}
 		/* footer */
-		footer{background:var(--c-ink);color:#fff;padding:48px 0 28px;margin-top:24px}
+		footer{background:var(--c-footer-bg,var(--c-ink));color:#fff;padding:48px 0 28px;margin-top:24px}
 		footer a{color:rgba(255,255,255,.8)}footer a:hover{color:#fff}
 		.foot-grid{display:grid;gap:1.6rem;margin-bottom:1.8rem}
 		@media(min-width:760px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}

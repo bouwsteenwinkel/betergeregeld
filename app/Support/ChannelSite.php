@@ -10,16 +10,77 @@ use Illuminate\Support\Str;
  */
 class ChannelSite
 {
-    /** @param array<string,mixed> $cfg */
+    /**
+     * @param array<string,mixed> $cfg
+     * @param iterable<\App\Models\Channel\Block>|null $blocks DB-blokken (null = config-site)
+     */
     public function __construct(
         public readonly string $key,
         public readonly array $cfg,
+        public readonly ?iterable $blocks = null,
     ) {
     }
 
     public function get(string $path, mixed $default = null): mixed
     {
         return data_get($this->cfg, $path, $default);
+    }
+
+    /** Channel-branche-key (bv. 'kapper') voor branche-brede blok-overrides. */
+    public function brancheKey(): ?string
+    {
+        return $this->cfg['branche_key'] ?? null;
+    }
+
+    /** @return iterable<\App\Models\Channel\Block> */
+    public function blocks(): iterable
+    {
+        return $this->blocks ?? [];
+    }
+
+    public function hasBlocks(): bool
+    {
+        return $this->blocks !== null && count($this->blocks) > 0;
+    }
+
+    /**
+     * Blokken voor een fase-presentatie: basis-blokken (facet leeg = alle fases)
+     * + de blokken van deze fase, in sort-volgorde.
+     * @return \Illuminate\Support\Collection<int,\App\Models\Channel\Block>
+     */
+    public function blocksForFacet(string $facet): \Illuminate\Support\Collection
+    {
+        return collect($this->blocks())
+            ->filter(fn ($b) => blank($b->facet) || $b->facet === $facet)
+            ->values();
+    }
+
+    /**
+     * Resolveert de view voor een blok, in volgorde van specifiek → generiek:
+     *   1. channels._blocks.{site}.{block_key}    (bespoke per blok)
+     *   2. channels._blocks.{site}.{type}         (bespoke per type, deze site)
+     *   3. channels._blocks.branche-{branche}.{type} (branche-breed)
+     *   4. channels.blocks.{type}                 (generieke bibliotheek)
+     *   5. channels.blocks._generic               (universele placeholder)
+     */
+    public function blockView(string $type, string $blockKey): string
+    {
+        $candidates = [
+            "channels._blocks.{$this->key}.{$blockKey}",
+            "channels._blocks.{$this->key}.{$type}",
+        ];
+        if ($bk = $this->brancheKey()) {
+            $candidates[] = "channels._blocks.branche-{$bk}.{$type}";
+        }
+        $candidates[] = "channels.blocks.{$type}";
+        $candidates[] = 'channels.blocks._generic';
+
+        foreach ($candidates as $view) {
+            if (view()->exists($view)) {
+                return $view;
+            }
+        }
+        return 'channels.blocks._generic';
     }
 
     public function name(): string
@@ -92,20 +153,70 @@ class ChannelSite
     {
         $t = $this->theme();
         $map = [
-            '--c-primary' => $t['primary'],
-            '--c-accent'  => $t['accent'],
+            '--c-primary'   => $t['primary'],
+            '--c-accent'    => $t['accent'],
             '--c-on-accent' => $t['on_accent'] ?? $t['ink'],
-            '--c-cta'     => $t['cta'] ?? $t['accent'],
-            '--c-on-cta'  => $t['on_cta'] ?? ($t['cta'] ? '#ffffff' : ($t['on_accent'] ?? $t['ink'])),
-            '--c-ink'     => $t['ink'],
-            '--c-muted'   => $t['muted'],
-            '--c-bg'      => $t['bg'],
-            '--c-surface' => $t['surface'],
+            '--c-cta'       => $t['cta'] ?? $t['accent'],
+            '--c-on-cta'    => $t['on_cta'] ?? ($t['cta'] ? '#ffffff' : ($t['on_accent'] ?? $t['ink'])),
+            '--c-ink'       => $t['ink'],
+            '--c-muted'     => $t['muted'],
+            '--c-bg'        => $t['bg'],
+            '--c-surface'   => $t['surface'],
+            // Footer-achtergrond apart, zodat donkere thema's (ink = lichte tekst)
+            // geen lichte footer krijgen. Default = ink (ongewijzigd licht thema).
+            '--c-footer-bg' => $t['footer_bg'] ?? $t['ink'],
             '--font'         => $t['font'],
             '--font-display' => $t['font_display'] ?: $t['font'],
-            '--radius'    => $t['radius'],
+            '--radius'      => $t['radius'],
         ];
         return implode(';', array_map(fn ($k, $v) => "$k:$v", array_keys($map), $map));
+    }
+
+    /** @return array<string,mixed> site-specifieke header-config */
+    public function header(): array
+    {
+        return (array) ($this->cfg['header'] ?? []);
+    }
+
+    /** Menu-items voor de nav (site-specifiek), met een nette fallback. */
+    public function navMenu(): array
+    {
+        $menu = $this->header()['menu'] ?? null;
+        if (is_array($menu) && $menu) {
+            return $menu;
+        }
+        return [
+            ['label' => 'Home', 'href' => ''],
+            ['label' => 'Plaatsen', 'href' => 'plaatsen'],
+            ['label' => 'Blog', 'href' => 'blog'],
+            ['label' => 'Over ons', 'href' => 'over-ons'],
+        ];
+    }
+
+    /** Header-CTA-knop (label + bestemming), default naar de funnel. */
+    public function navCta(): array
+    {
+        $cta = (array) ($this->header()['cta'] ?? []);
+        return [
+            'label' => $cta['label'] ?? 'Gratis voorbeeld',
+            'href'  => $cta['href'] ?? '#gratis-voorbeeld',
+        ];
+    }
+
+    /** Lost een menu-href op: '' = home, '#anker' = anker op home, pad of absolute. */
+    public function navHref(string $href): string
+    {
+        $href = trim($href);
+        if ($href === '') {
+            return $this->url();
+        }
+        if (str_starts_with($href, '#')) {
+            return $this->url() . $href;
+        }
+        if (preg_match('#^(https?://|tel:|mailto:)#', $href)) {
+            return $href;
+        }
+        return $this->url($href);
     }
 
     public function brand(string $key, mixed $default = null): mixed
@@ -269,11 +380,17 @@ class ChannelSite
         return (string) ($this->cfg['meta']['home_description'] ?? '');
     }
 
-    /** Optionele bespoke homepage-view, of de generieke. */
+    /** Bespoke blade > blok-gedreven (DB) > generieke config-home. */
     public function homeView(): string
     {
         $view = $this->cfg['view'] ?? null;
-        return ($view && view()->exists($view)) ? $view : 'channels.home';
+        if ($view && view()->exists($view)) {
+            return $view;                 // tijdelijke bespoke pagina (transitie)
+        }
+        if ($this->hasBlocks()) {
+            return 'channels.home-blocks'; // blok-gedreven render
+        }
+        return 'channels.home';            // legacy config-home (facet-zone + wizard)
     }
 
     public static function slug(string $place): string

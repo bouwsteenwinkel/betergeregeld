@@ -18,13 +18,11 @@ use App\Http\Middleware\ResolveChannelSite;
 use App\Services\ChannelSiteResolver;
 use Illuminate\Support\Facades\Route;
 
-$channelRoutes = function () {
+// Geldige Groeidiamant-fase-keys, voor de schone fase-URL's (/webshop e.d.).
+$facetKeys = implode('|', array_keys((array) config('groeidiamant.facets', [])));
+
+$channelRoutes = function () use ($facetKeys) {
     Route::get('/', [ChannelSiteController::class, 'home']);
-    // SEO-instap op een Groeidiamant-fase: dezelfde homepage, maar toegesneden
-    // op de fase waar de bezoeker al is (bv. /groeifase/webshop).
-    Route::get('/groeifase/{facet}', [ChannelSiteController::class, 'home']);
-    // Alleen het facet-blok (AJAX) — live fase-switch zonder page-load.
-    Route::get('/groeifase/{facet}/fragment', [ChannelSiteController::class, 'homeFragment']);
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
 
     Route::get('/plaatsen', [ChannelSiteController::class, 'places']);
@@ -39,6 +37,14 @@ $channelRoutes = function () {
 
     Route::post('/contact', [ChannelSiteController::class, 'leadStore'])->middleware('throttle:10,1');
     Route::get('/bedankt', [ChannelSiteController::class, 'leadSent']);
+
+    // SEO-instap op een Groeidiamant-fase als schone URL (bv. /webshop). Staat
+    // bewust onderaan + is begrensd op geldige fase-keys, zodat het de statische
+    // routes hierboven niet afvangt. /{facet}/fragment = de live AJAX-switch.
+    if ($facetKeys !== '') {
+        Route::get('/{facet}', [ChannelSiteController::class, 'home'])->where('facet', $facetKeys);
+        Route::get('/{facet}/fragment', [ChannelSiteController::class, 'homeFragment'])->where('facet', $facetKeys);
+    }
 };
 
 // 1) Live kanalen op hun eigen domein.

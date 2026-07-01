@@ -44,14 +44,16 @@ class ChannelSiteController extends Controller
     {
         $site  = $this->site();
         $facet = WebsiteLead::normalizeFacet($request->route('facet'));
-        $home  = array_replace((array) $site->get('home', []), (array) $site->get('facets.' . $facet, []));
+        $facets = (array) config('groeidiamant.facets', []);
 
-        return view('channels.partials.facet-zone', [
-            'site'   => $site,
-            'facet'  => $facet,
-            'home'   => $home,
-            'facets' => (array) config('groeidiamant.facets', []),
-        ]);
+        // Blok-gedreven site → de DB-blokken (zonder wizard); anders de config-zone.
+        if ($site->hasBlocks()) {
+            return view('channels.partials.blocks-fragment', compact('site', 'facet', 'facets'));
+        }
+
+        $home = array_replace((array) $site->get('home', []), (array) $site->get('facets.' . $facet, []));
+
+        return view('channels.partials.facet-zone', compact('site', 'facet', 'home', 'facets'));
     }
 
     public function about(): View

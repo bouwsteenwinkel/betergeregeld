@@ -19,7 +19,7 @@
                     $nr = (int) ($f['nr'] ?? 0);
                     $state = $nr < $curNr ? 'done' : ($key === $current ? 'now' : 'next');
                 @endphp
-                <a href="{{ $site->url('groeifase/' . $key) }}" data-facet-link data-facet="{{ $key }}" style="display:block;flex:1;min-width:150px;max-width:200px;border-radius:var(--radius);padding:1.1rem .9rem;text-align:left;text-decoration:none;color:inherit;
+                <a href="{{ $site->url($key) }}" data-facet-link data-facet="{{ $key }}" style="display:block;flex:1;min-width:150px;max-width:200px;border-radius:var(--radius);padding:1.1rem .9rem;text-align:left;text-decoration:none;color:inherit;
                     @if($state==='now') background:var(--c-primary);color:#fff;box-shadow:0 10px 30px color-mix(in srgb,var(--c-primary) 35%,transparent);
                     @elseif($state==='done') background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-accent) 45%,transparent);
                     @else background:var(--c-surface);border:1px dashed color-mix(in srgb,var(--c-muted) 40%,transparent);opacity:.7; @endif">
