@@ -112,6 +112,10 @@ class WebsiteLead extends Model
         'zorg'          => 'Zorg / praktijk',
         'automotive'    => 'Automotive / garage',
         'vastgoed'      => 'Makelaar / vastgoed',
+        'onderwijs_opvang'    => 'Onderwijs / opvang',
+        'recreatie_vrije_tijd' => 'Recreatie / vrije tijd',
+        'transport_logistiek'  => 'Transport / logistiek',
+        'agrarisch_dieren'     => 'Agrarisch / dieren',
         'overig'        => 'Overig',
     ];
 
