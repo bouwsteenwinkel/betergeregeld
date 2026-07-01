@@ -52,6 +52,16 @@
                 <rect x="17.5" y="22.5" width="13" height="14" rx="3.5" fill="var(--c-cta)"/>
                 <rect x="20" y="25.5" width="3" height="7" rx="1.5" fill="#ffffff" opacity=".28"/>
             </svg>
+        @elseif ($mark === 'plumber')
+            {{-- Loodgieter-badge: themakleuren-badge met een witte waterdruppel + moersleutel-hint. --}}
+            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="23" fill="var(--c-primary)"/>
+                <circle cx="24" cy="24" r="22.25" fill="none" stroke="var(--c-accent)" stroke-width="1.5"/>
+                <circle cx="24" cy="24" r="18.5" fill="none" stroke="var(--c-accent)" stroke-width="1" stroke-opacity=".35"/>
+                <path d="M24 11c0 0 8.5 9.6 8.5 16a8.5 8.5 0 0 1-17 0c0-6.4 8.5-16 8.5-16Z" fill="#ffffff"/>
+                <path d="M20.5 27.5a3.5 3.5 0 0 0 3.5 3.5" fill="none" stroke="var(--c-primary)" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>
+                <circle cx="24" cy="24.5" r="2.4" fill="var(--c-accent)"/>
+            </svg>
         @else
             {{-- Auto-monogram-badge: initialen uit de naam, in de themakleuren. --}}
             <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
