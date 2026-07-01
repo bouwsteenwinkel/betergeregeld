@@ -86,6 +86,34 @@ return [
             ],
         ],
 
+        'nagelsalon' => [
+            'title'   => 'Een website voor je nagelsalon, klanten boeken zelf online',
+            'pill'    => 'Voor nagelsalons & nagelstylisten',
+            'intro'   => 'Minder appjes, een vollere agenda: klanten boeken zelf 24/7 hun manicure of gellak en zien meteen je werk en prijzen. We zetten vóór ons gesprek al een voorbeeld van jouw salon-site klaar.',
+            'branche' => 'kapper_beauty',
+            'features' => [
+                'online_booking' => 'Online afspraken maken (24/7)',
+                'price_list'     => 'Prijslijst / behandelingen',
+                'gallery'        => 'Foto-galerij (nail-art / voor-na)',
+                'reviews'        => 'Reviews',
+                'opening_hours'  => 'Openingstijden + route',
+                'products'       => 'Verkoop van nagelproducten',
+            ],
+            'questions' => [
+                'general' => [
+                    ['key' => 'goal',  'label' => 'Wat wil je vooral bereiken (meer afspraken, nieuwe klanten, minder appjes)?', 'type' => 'textarea'],
+                    ['key' => 'style', 'label' => 'Welke uitstraling past bij je salon?', 'type' => 'select',
+                        'options' => ['elegant' => 'Elegant & verzorgd', 'modern' => 'Strak & modern', 'luxe' => 'Luxe / premium', 'speels' => 'Speels & kleurrijk']],
+                    ['key' => 'has_logo', 'label' => 'Heb je al een logo / huisstijl?', 'type' => 'boolean'],
+                ],
+                'specific' => [
+                    ['key' => 'services',  'label' => 'Welke behandelingen bied je aan (gellak, acryl, manicure, nail-art)?', 'type' => 'textarea'],
+                    ['key' => 'team_size', 'label' => 'Met hoeveel stylisten werk je?', 'type' => 'text'],
+                    ['key' => 'booking_tool', 'label' => 'Gebruik je al een afsprakensysteem? Zo ja, welk (bv. Salonized, Treatwell)?', 'type' => 'text'],
+                ],
+            ],
+        ],
+
         'dameskapper' => [
             'title'   => 'Een website voor je dameskapsalon — vol geboekt, online',
             'pill'    => 'Voor dameskappers',

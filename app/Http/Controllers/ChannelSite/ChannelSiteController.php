@@ -111,6 +111,47 @@ class ChannelSiteController extends Controller
         return view('channels.blog.show', ['site' => $site, 'post' => $post]);
     }
 
+    /* ─────────────────────────────── SEO ─────────────────────────────────── */
+
+    /** Per-kanaal sitemap met home, over-ons, plaatsen, plaats-pagina's en blog. */
+    public function sitemap(): \Illuminate\Http\Response
+    {
+        $site = $this->site();
+
+        $urls = [$site->url(''), $site->url('over-ons'), $site->url('plaatsen'), $site->url('blog')];
+        foreach (array_keys(app(\App\Services\ChannelSiteResolver::class)->places()) as $slug) {
+            $urls[] = $site->url('plaatsen/' . $slug);
+        }
+        try {
+            foreach (BlogPost::query()->forChannel($site->key)->published()->pluck('slug') as $slug) {
+                $urls[] = $site->url('blog/' . $slug);
+            }
+        } catch (\Throwable $e) {
+            // Blog (nog) niet beschikbaar — sitemap blijft geldig zonder blogposts.
+        }
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach ($urls as $u) {
+            $xml .= '  <url><loc>' . htmlspecialchars($u, ENT_XML1) . '</loc></url>' . "\n";
+        }
+        $xml .= '</urlset>';
+
+        return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+    }
+
+    /** Per-kanaal robots.txt. Concept = niet indexeren; live = indexeren + sitemap. */
+    public function robots(): \Illuminate\Http\Response
+    {
+        $site = $this->site();
+
+        $lines = $site->isLive()
+            ? ['User-agent: *', 'Allow: /', '', 'Sitemap: ' . $site->url('sitemap.xml')]
+            : ['User-agent: *', 'Disallow: /'];
+
+        return response(implode("\n", $lines) . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+    }
+
     /* ─────────────────────────────── Lead ────────────────────────────────── */
 
     public function leadStore(Request $request): RedirectResponse

@@ -33,6 +33,10 @@ $channelRoutes = function () {
     Route::get('/blog', [ChannelSiteController::class, 'blogIndex']);
     Route::get('/blog/{slug}', [ChannelSiteController::class, 'blogShow']);
 
+    // SEO: per-kanaal sitemap + robots (zodat Google elke site apart indexeert).
+    Route::get('/sitemap.xml', [ChannelSiteController::class, 'sitemap']);
+    Route::get('/robots.txt', [ChannelSiteController::class, 'robots']);
+
     Route::post('/contact', [ChannelSiteController::class, 'leadStore'])->middleware('throttle:10,1');
     Route::get('/bedankt', [ChannelSiteController::class, 'leadSent']);
 };

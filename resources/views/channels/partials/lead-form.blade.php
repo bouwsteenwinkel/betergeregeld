@@ -2,9 +2,9 @@
 <section id="contact" style="background:color-mix(in srgb,var(--c-accent) 8%,transparent)">
 	<div class="wrap" style="display:grid;gap:2rem">
 		<div style="max-width:48ch">
-			<span class="eyebrow">Gratis & vrijblijvend</span>
+			<span class="kicker"><span class="kicker-line"></span> Gratis &amp; vrijblijvend</span>
 			<h2>Vraag een gratis voorbeeld aan</h2>
-			<p class="muted">Laat je gegevens achter. We zetten een voorbeeld voor je klaar en nemen binnen 2 werkdagen contact op — zonder verplichtingen.</p>
+			<p class="muted">Laat je gegevens achter. We zetten een voorbeeld voor je klaar en nemen binnen 2 werkdagen contact op, zonder verplichtingen.</p>
 		</div>
 
 		<div class="card" style="max-width:640px">

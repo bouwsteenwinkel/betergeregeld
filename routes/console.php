@@ -232,3 +232,11 @@ Schedule::command('radar:scan-web --all-active --queue')
     ->dailyAt('05:45')
     ->onOneServer()
     ->withoutOverlapping(90);
+
+// Channel-sites: dagelijks per kanaal een branche-specifiek blog-CONCEPT (Claude).
+// Komt binnen als published_at = NULL + ai_generated = true; mens controleert en
+// publiceert handmatig in de admin (geen auto-publish).
+Schedule::command('channels:blog --all --write')
+    ->dailyAt('07:30')
+    ->onOneServer()
+    ->withoutOverlapping();

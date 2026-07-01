@@ -17,7 +17,7 @@
 	<section>
 		<div class="wrap">
 			<h2>Kies je plaats</h2>
-			<p class="muted" style="margin-bottom:1.6rem">Staat jouw plaats er niet bij? Geen probleem — we werken in heel Nederland. Vraag gewoon een voorbeeld aan.</p>
+			<p class="muted" style="margin-bottom:1.6rem">Staat jouw plaats er niet bij? Geen probleem, we werken in heel Nederland. Vraag gewoon een voorbeeld aan.</p>
 			<style>.places-cols{columns:2;column-gap:1.5rem;line-height:2.1}@media(min-width:760px){.places-cols{columns:4}}</style>
 			<div class="places-cols">
 				@foreach ($placesList as $slug => $name)

@@ -3,11 +3,7 @@
 	<div class="wrap">
 		<div class="foot-grid">
 			<div>
-				@if ($site->logoImage())
-					<img src="{{ $site->logoImage() }}" alt="{{ $site->name() }}" style="height:42px;margin-bottom:.6rem">
-				@else
-					<div class="logo" style="color:#fff;margin-bottom:.6rem">{!! $site->brand('logo_text', $site->name()) !!}</div>
-				@endif
+				<div class="logo" style="color:#fff;margin-bottom:.6rem">@include('channels.partials.logo')</div>
 				<p style="color:rgba(255,255,255,.75);max-width:42ch">
 					{{ $site->homeDescription() }}
 				</p>
@@ -28,7 +24,19 @@
 		</div>
 		<div class="foot-bottom">
 			<span>© {{ now()->year }} {{ $site->name() }}</span>
-			@if ($site->endorsement())
+			@if ($site->endorsementLogo())
+				{{-- Moedermerk-keurmerk als logo-badge (witte chip op de donkere footer). --}}
+				<span class="endorsement">
+					<span class="endorse-label">Onderdeel van</span>
+					@if ($site->endorsementUrl())
+						<a class="endorse-badge" href="{{ $site->endorsementUrl() }}" target="_blank" rel="noopener" aria-label="{{ $site->endorsement() ?: 'Groeidiamant' }}">
+							<img src="{{ $site->endorsementLogo() }}" alt="{{ $site->endorsement() ?: 'Groeidiamant by Betergeregeld' }}">
+						</a>
+					@else
+						<span class="endorse-badge"><img src="{{ $site->endorsementLogo() }}" alt="{{ $site->endorsement() ?: 'Groeidiamant by Betergeregeld' }}"></span>
+					@endif
+				</span>
+			@elseif ($site->endorsement())
 				<span class="endorsement">
 					<span class="diamond" aria-hidden="true">◆</span>
 					@if ($site->endorsementUrl())

@@ -5,13 +5,12 @@
     $curNr   = (int) ($facets[$current]['nr'] ?? 1);
 @endphp
 @if (!empty($facets))
-<section id="groeipad">
+<section id="groeipad" data-section="groeipad" style="padding:48px 0">
     <div class="wrap" style="text-align:center">
-        <span class="eyebrow">De Groeidiamant</span>
-        <h2>Jouw groeipad — stap voor stap</h2>
-        <p class="muted" style="max-width:62ch;margin:.4rem auto 2rem">
-            Je begint waar jij nu staat. Groeit je bedrijf, dan groeit je website gewoon mee —
-            je hoeft nooit opnieuw te beginnen. <strong>Klik op een fase</strong> om te zien wat die voor jou betekent.
+        <span class="kicker" style="justify-content:center"><span class="kicker-line"></span> De Groeidiamant</span>
+        <h2>Je site groeit met je mee</h2>
+        <p class="muted" style="max-width:54ch;margin:.4rem auto 1.6rem">
+            Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. <strong>Klik op een fase</strong> om te zien wat die voor jou betekent.
         </p>
 
         <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;align-items:stretch">
@@ -25,7 +24,7 @@
                     @elseif($state==='done') background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-accent) 45%,transparent);
                     @else background:var(--c-surface);border:1px dashed color-mix(in srgb,var(--c-muted) 40%,transparent);opacity:.7; @endif">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
-                        <span style="font-size:1.5rem">{{ $f['icon'] ?? '' }}</span>
+                        <span style="display:inline-flex;@if($state==='now') color:#fff @else color:var(--c-primary) @endif">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</span>
                         <span style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
                             @if($state==='now') color:rgba(255,255,255,.85) @elseif($state==='done') color:var(--c-accent) @else color:var(--c-muted) @endif">
                             @if($state==='done') ✓ heb je @elseif($state==='now') jouw stap @else later @endif

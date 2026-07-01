@@ -10,6 +10,9 @@
 		@include('channels.partials.facet-zone')
 	</div>
 
+	{{-- Anker zodat de gedeelde #contact-CTA's (nav, hero) op de home bij het
+	     formulier landen; de wizard zelf houdt id="gratis-voorbeeld" (bespoke channels). --}}
+	<div id="contact" class="scroll-anchor" aria-hidden="true"></div>
 	@include('channels.partials.lead-wizard')
 
 	<script>

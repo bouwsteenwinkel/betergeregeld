@@ -15,7 +15,7 @@
 		<div class="wrap">
 			<span class="eyebrow">{{ $placeName }}</span>
 			<h1>{{ $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)) }}</h1>
-			<p class="lead" style="max-width:56ch">{{ $repl($pl['city_intro'] ?? '') }}</p>
+			<p class="lead" style="max-width:56ch">{{ $site->placeIntro($placeSlug, $placeName) }}</p>
 			<a href="#contact" class="btn">Gratis voorbeeld in {{ $placeName }}</a>
 		</div>
 	</section>
