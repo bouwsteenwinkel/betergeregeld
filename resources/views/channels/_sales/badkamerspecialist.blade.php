@@ -101,24 +101,31 @@
         </div>
     </section>
 
-    {{-- ── Voorbeeld-showcase ─────────────────────────────────────────────── --}}
-    @if ($heroImg)
-        <section class="showcase showcase--compact" data-section="voorbeeld">
-            <div class="wrap">
-                <div class="showcase-inner">
-                    <a href="{{ $site->url('voorbeeld') }}" class="showcase-media" style="display:block">
-                        <img src="{{ $heroImg }}" @if ($heroSet) srcset="{{ $heroSet }}" sizes="(max-width:760px) 92vw, 40vw" @endif alt="Voorbeeld badkamerwebsite" loading="lazy" decoding="async">
-                    </a>
-                    <div class="showcase-text">
-                        <span class="kicker"><span class="kicker-line"></span> Zie het voor je</span>
-                        <h2>Zo zou jouw site eruit kunnen zien</h2>
-                        <p class="muted">We hebben een compleet voorbeeld klaargezet in de badkamerbranche — inclusief diensten, prijzen, reviews en een webshop-variant. Klik erdoorheen en stel je voor dat het jóuw bedrijf is.</p>
-                        <a href="{{ $site->url('voorbeeld') }}" class="btn" style="margin-top:1.2rem">Bekijk het voorbeeld →</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    @endif
+    {{-- ── "Zo kan het worden" — website (herbruikbaar blok, later per product) ─
+         Afgestemd op de niche: een badkamer is techniek én stijl. De mockup laat
+         beide zien — een vertrouwenwekkende hero (vakwerk) + een galerij van
+         afgewerkte badkamers (het mooie resultaat). --}}
+    @include('channels.partials.zo-kan-het-worden', [
+        'site'         => $site,
+        'facet'        => 'website',
+        'label'        => 'Website',
+        'title'        => 'Zo kan het worden: je vakwerk én je mooiste badkamers online',
+        'intro'        => 'Een badkamer is techniek én stijl. Je site laat allebei zien: de betrouwbare vakman achter het werk, en de afgewerkte badkamers waar klanten verliefd op worden. We hebben een compleet voorbeeld klaargezet — klik erdoorheen en stel je voor dat het jóuw bedrijf is.',
+        'brand'        => 'BadkamerBloem',
+        'heroTitle'    => 'Van oude badkamer naar afgewerkte ruimte in 10 werkdagen',
+        'urlLabel'     => 'jouw-badkamerbedrijf.nl',
+        'ctaLabel'     => 'Bekijk het volledige voorbeeld',
+        'galleryLabel' => 'Recent afgeleverde badkamers',
+        'gallery'      => array_values(array_filter([
+            $site->image('gallery1'), $site->image('gallery2'), $site->image('gallery3'),
+        ])),
+        'bullets'      => [
+            ['title' => 'Je mooiste badkamers in beeld', 'text' => 'Een galerij van afgewerkte projecten die klanten over de streep trekt.'],
+            ['title' => 'Vertrouwen door vakmanschap', 'text' => 'Garanties, vast team en heldere werkwijze — techniek waar men op durft te bouwen.'],
+            ['title' => 'Gevonden in je regio', 'text' => 'Vindbaar als iemand een badkamer zoekt bij jou in de buurt.'],
+            ['title' => '24/7 offerteaanvragen', 'text' => 'Een aanvraagknop die ook \'s avonds leads oplevert, mobiel en desktop.'],
+        ],
+    ])
 
     {{-- ── Aanpak ─────────────────────────────────────────────────────────── --}}
     <section data-section="aanpak">
