@@ -127,6 +127,34 @@
         ],
     ])
 
+    {{-- "Zo kan het worden": webshop. Zelfde blok, andere params. De mockup leest
+         als webshop (winkelmand-knop + producttegels met prijs). --}}
+    @include('channels.partials.zo-kan-het-worden', [
+        'site'         => $site,
+        'facet'        => 'webshop',
+        'label'        => 'Webshop',
+        'title'        => 'Zo kan het worden: je showroom 24/7 online',
+        'intro'        => 'Naast klussen ook producten verkopen? Klanten bestellen zelf kranen, tegels en complete pakketten, betalen met iDEAL en kiezen bezorgen of afhalen. Bekijk het webshop-voorbeeld en zie hoe jouw assortiment online staat.',
+        'brand'        => 'BadkamerBloem',
+        'heroTitle'    => 'Bestel sanitair en tegels online, bezorgd of afgehaald',
+        'urlLabel'     => 'shop.jouw-badkamerbedrijf.nl',
+        'navCta'       => 'Winkelmand',
+        'heroBtn'      => 'In winkelmand',
+        'ctaLabel'     => 'Bekijk het webshop-voorbeeld',
+        'galleryLabel' => 'Populair in de shop',
+        'gallery'      => array_values(array_filter([
+            ['img' => $site->image('gallery4'), 'price' => '€ 179'],
+            ['img' => $site->image('gallery5'), 'price' => '€ 385'],
+            ['img' => $site->image('gallery6'), 'price' => '€ 349'],
+        ], fn ($g) => ! empty($g['img']))),
+        'bullets'      => [
+            ['title' => 'Verkoop dag en nacht door', 'text' => 'Klanten bestellen ook \'s avonds en in het weekend, zonder dat jij er iets voor hoeft te doen.'],
+            ['title' => 'Veilig betalen met iDEAL', 'text' => 'Direct afgerekend. Vaste klanten en aannemers kunnen op rekening bestellen.'],
+            ['title' => 'Bezorgen of afhalen', 'text' => 'Wat op voorraad ligt, is binnen twee werkdagen bezorgd of ligt klaar in je loods.'],
+            ['title' => 'Montage bij te boeken', 'text' => 'Klant koopt online en vinkt montage aan. Zo verdien je aan het product én de plaatsing.'],
+        ],
+    ])
+
     {{-- ── Aanpak ─────────────────────────────────────────────────────────── --}}
     <section data-section="aanpak">
         <div class="wrap">

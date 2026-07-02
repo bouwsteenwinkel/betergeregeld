@@ -11,10 +11,13 @@
     $brand     = $brand     ?? $site->name();
     $heroTitle = $heroTitle ?? $site->name();
     $urlLabel  = $urlLabel  ?? 'jouw-website.nl';
+    $navCta    = $navCta    ?? 'Offerte';     // knop in de mockup-nav (bv. "Winkelmand")
+    $heroBtn   = $heroBtn   ?? 'Gratis offerte'; // knop in de mockup-hero
     $bullets   = $bullets   ?? [];
     $ctaLabel  = $ctaLabel  ?? 'Bekijk het volledige voorbeeld';
     $galleryLabel = $galleryLabel ?? null;   // bv. "Recente badkamers", toont de esthetische kant
-    $gallery   = $gallery   ?? [];            // urls van sfeer-/portfolio-thumbnails
+    // Thumbnails: string (url) of ['img' => url, 'price' => '€ ...'] voor shop-tegels.
+    $gallery   = $gallery   ?? [];
     $href      = $site->url('voorbeeld/' . $facet);
     $img       = $site->image('hero');
 @endphp
@@ -49,7 +52,8 @@
     .zkhw-btn{display:inline-block;margin-top:.7rem;background:var(--c-cta);color:var(--c-on-cta);font-weight:700;font-size:.74rem;padding:.42rem .8rem;border-radius:6px}
     .zkhw-galrow{padding:.85rem 1rem 0;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-muted)}
     .zkhw-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;padding:.5rem 1rem 1.1rem}
-    .zkhw-cards span{height:58px;border-radius:8px;background:var(--c-surface) center/cover no-repeat;border:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);box-shadow:0 6px 16px -12px rgba(0,0,0,.4)}
+    .zkhw-cards span{position:relative;height:58px;border-radius:8px;background:var(--c-surface) center/cover no-repeat;border:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);box-shadow:0 6px 16px -12px rgba(0,0,0,.4);overflow:hidden}
+    .zkhw-cards span em{position:absolute;left:5px;bottom:5px;font-style:normal;font-weight:800;font-size:.62rem;background:#fff;color:var(--c-ink);padding:.12rem .38rem;border-radius:5px;box-shadow:0 3px 8px -3px rgba(0,0,0,.5)}
     .zkhw-open{display:block;text-align:center;padding:.8rem;font-weight:700;font-size:.9rem;color:var(--c-cta);background:var(--c-surface);border-top:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent)}
     /* tekstkolom */
     .zkhw-aside h3{font-size:1.15rem;margin-bottom:.3rem}
@@ -78,19 +82,20 @@
                     <div class="zkhw-nav">
                         <span class="zkhw-brand">{{ $brand }}</span>
                         <span class="zkhw-links"><i></i><i></i><i></i></span>
-                        <span class="zkhw-navcta">Offerte</span>
+                        <span class="zkhw-navcta">{{ $navCta }}</span>
                     </div>
                     <div class="zkhw-hero" @if ($img) style="background-image:url('{{ $img }}')" @endif>
                         <div class="zkhw-hero-copy">
                             <span class="zkhw-eyebrow-mini">{{ $label }}</span>
                             <strong>{{ $heroTitle }}</strong>
-                            <span class="zkhw-btn">Gratis offerte</span>
+                            <span class="zkhw-btn">{{ $heroBtn }}</span>
                         </div>
                     </div>
                     @if ($galleryLabel)<div class="zkhw-galrow">{{ $galleryLabel }}</div>@endif
                     <div class="zkhw-cards">
                         @forelse (array_slice($gallery, 0, 3) as $g)
-                            <span style="background-image:url('{{ $g }}')"></span>
+                            @php $gimg = is_array($g) ? ($g['img'] ?? '') : $g; $gprice = is_array($g) ? ($g['price'] ?? null) : null; @endphp
+                            <span style="background-image:url('{{ $gimg }}')">@if ($gprice)<em>{{ $gprice }}</em>@endif</span>
                         @empty
                             <span></span><span></span><span></span>
                         @endforelse
