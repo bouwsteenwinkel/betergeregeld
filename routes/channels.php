@@ -23,6 +23,11 @@ $facetKeys = implode('|', array_keys((array) config('groeidiamant.facets', [])))
 
 $channelRoutes = function () use ($facetKeys) {
     Route::get('/', [ChannelSiteController::class, 'home']);
+
+    // Voorbeeld-/demolaag: "zo zou jouw site eruitzien". Aparte pagina zodat de
+    // hoofd-URL de verkooppitch aan de ondernemer kan zijn (twee-lagen-model).
+    Route::get('/voorbeeld', [ChannelSiteController::class, 'demo']);
+
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
 
     Route::get('/plaatsen', [ChannelSiteController::class, 'places']);
@@ -42,6 +47,11 @@ $channelRoutes = function () use ($facetKeys) {
     // bewust onderaan + is begrensd op geldige fase-keys, zodat het de statische
     // routes hierboven niet afvangt. /{facet}/fragment = de live AJAX-switch.
     if ($facetKeys !== '') {
+        // Facet-instap op de demolaag (/voorbeeld/webshop) + de live AJAX-switch.
+        Route::get('/voorbeeld/{facet}', [ChannelSiteController::class, 'demo'])->where('facet', $facetKeys);
+        Route::get('/voorbeeld/{facet}/fragment', [ChannelSiteController::class, 'demoFragmentRoute'])->where('facet', $facetKeys);
+
+        // Legacy: sites zonder aparte verkooppagina hebben de demo op de hoofd-URL.
         Route::get('/{facet}', [ChannelSiteController::class, 'home'])->where('facet', $facetKeys);
         Route::get('/{facet}/fragment', [ChannelSiteController::class, 'homeFragment'])->where('facet', $facetKeys);
     }

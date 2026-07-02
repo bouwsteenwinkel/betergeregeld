@@ -5,6 +5,10 @@
 @section('description', $site->homeDescription())
 
 @section('content')
+    @if ($isDemo ?? false)
+        @include('channels.partials.demo-banner')
+    @endif
+
     {{-- Facet-afhankelijke blokken: bij een fase-keuze in de groeiselector worden
          deze live (AJAX) opnieuw gerenderd. De funnel-wizard staat er bewust BUITEN
          (zijn init-script zou na een innerHTML-swap niet opnieuw draaien). --}}
@@ -16,10 +20,11 @@
     @foreach ($site->blocks() as $block)
         @continue(! $block->enabled || $block->type !== 'wizard')
         @include($site->blockView($block->type, $block->block_key), [
-            'site'   => $site,
-            'block'  => $block,
-            'facet'  => $facet ?? 'website',
-            'facets' => $facets ?? [],
+            'site'      => $site,
+            'block'     => $block,
+            'facet'     => $facet ?? 'website',
+            'facets'    => $facets ?? [],
+            'facetBase' => $facetBase ?? '',
         ])
     @endforeach
 

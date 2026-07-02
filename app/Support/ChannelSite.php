@@ -386,6 +386,19 @@ class ChannelSite
         return (string) ($this->cfg['meta']['home_description'] ?? '');
     }
 
+    /**
+     * Bespoke betergeregeld-VERKOOPPAGINA voor deze site, of null.
+     * Als die bestaat wordt de hoofdpagina de sales-pitch (aan de ondernemer) en
+     * verhuist de blok-gedreven demo naar /voorbeeld. Opt-in per site via het
+     * bestaan van channels/_sales/{key}.blade.php.
+     */
+    public function salesHomeView(): ?string
+    {
+        $view = "channels._sales.{$this->key}";
+
+        return view()->exists($view) ? $view : null;
+    }
+
     /** Bespoke blade > blok-gedreven (DB) > generieke config-home. */
     public function homeView(): string
     {

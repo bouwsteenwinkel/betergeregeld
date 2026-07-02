@@ -26,21 +26,59 @@ class ChannelSiteController extends Controller
     public function home(Request $request): View
     {
         $site = $this->site();
-        // Groeidiamant-fase (SEO-instap). De homepage-content kan per fase worden
-        // overschreven via config: channels.<key>.facets.<facet>.
+
+        // Twee-lagen-model: als er een betergeregeld-verkooppagina voor deze site
+        // bestaat, is DÍE de hoofdpagina (pitch aan de ondernemer). De blok-gedreven
+        // demo ("zo zou jouw site eruitzien") verhuist dan naar /voorbeeld.
+        if ($salesView = $site->salesHomeView()) {
+            return view($salesView, [
+                'site'   => $site,
+                'facets' => (array) config('groeidiamant.facets', []),
+            ]);
+        }
+
+        // Anders: de site is zelf de triggersite (legacy) — demo op de hoofd-URL.
+        return $this->renderDemo($request, '');
+    }
+
+    /** De blok-/config-gedreven demo op /voorbeeld (framing-balk + facet-switcher). */
+    public function demo(Request $request): View
+    {
+        return $this->renderDemo($request, 'voorbeeld/');
+    }
+
+    /**
+     * Rendert de demo-pagina. $facetBase bepaalt onder welke URL de facet-links
+     * lopen ('' als de demo zélf de home is, 'voorbeeld/' als aparte pagina).
+     */
+    private function renderDemo(Request $request, string $facetBase): View
+    {
+        $site  = $this->site();
         $facet = WebsiteLead::normalizeFacet($request->route('facet'));
         $home  = array_replace((array) $site->get('home', []), (array) $site->get('facets.' . $facet, []));
 
         return view($site->homeView(), [
-            'site'   => $site,
-            'facet'  => $facet,
-            'home'   => $home,
-            'facets' => (array) config('groeidiamant.facets', []),
+            'site'      => $site,
+            'facet'     => $facet,
+            'home'      => $home,
+            'facets'    => (array) config('groeidiamant.facets', []),
+            'facetBase' => $facetBase,
+            'isDemo'    => $facetBase !== '',
         ]);
     }
 
     /** Alleen de facet-afhankelijke blokken — voor de live (AJAX) fase-switch. */
     public function homeFragment(Request $request): View
+    {
+        return $this->demoFragment($request, '');
+    }
+
+    public function demoFragmentRoute(Request $request): View
+    {
+        return $this->demoFragment($request, 'voorbeeld/');
+    }
+
+    private function demoFragment(Request $request, string $facetBase): View
     {
         $site  = $this->site();
         $facet = WebsiteLead::normalizeFacet($request->route('facet'));
@@ -48,12 +86,12 @@ class ChannelSiteController extends Controller
 
         // Blok-gedreven site → de DB-blokken (zonder wizard); anders de config-zone.
         if ($site->hasBlocks()) {
-            return view('channels.partials.blocks-fragment', compact('site', 'facet', 'facets'));
+            return view('channels.partials.blocks-fragment', compact('site', 'facet', 'facets', 'facetBase'));
         }
 
         $home = array_replace((array) $site->get('home', []), (array) $site->get('facets.' . $facet, []));
 
-        return view('channels.partials.facet-zone', compact('site', 'facet', 'home', 'facets'));
+        return view('channels.partials.facet-zone', compact('site', 'facet', 'home', 'facets', 'facetBase'));
     }
 
     public function about(): View

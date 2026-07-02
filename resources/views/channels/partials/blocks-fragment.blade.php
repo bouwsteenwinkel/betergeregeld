@@ -6,9 +6,10 @@
     @continue(! $block->enabled || $block->type === 'wizard')
     @php $block->setActiveFacet($f); @endphp
     @include($site->blockView($block->type, $block->block_key), [
-        'site'   => $site,
-        'block'  => $block,
-        'facet'  => $f,
-        'facets' => $facets ?? (array) config('groeidiamant.facets', []),
+        'site'      => $site,
+        'block'     => $block,
+        'facet'     => $f,
+        'facets'    => $facets ?? (array) config('groeidiamant.facets', []),
+        'facetBase' => $facetBase ?? '',
     ])
 @endforeach
