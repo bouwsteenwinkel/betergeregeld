@@ -209,6 +209,33 @@
         ],
     ])
 
+    {{-- "Zo kan het worden": AI-assistent. De tegels tonen wat de assistent afhandelt. --}}
+    @include('channels.partials.zo-kan-het-worden', [
+        'site'         => $site,
+        'facet'        => 'ai',
+        'label'        => 'AI',
+        'title'        => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
+        'intro'        => 'Bel je een keer niet op tijd terug, dan is de klus vaak al weg. Een slimme assistent neemt telefoon en chat aan, vraagt door en bereidt je offerte voor, dag en nacht. Bekijk hoe dat werkt op een badkamerbedrijf.',
+        'brand'        => 'BadkamerBloem',
+        'heroTitle'    => 'Altijd bereikbaar, ook als jij aan het werk bent',
+        'urlLabel'     => 'jouw-badkamerbedrijf.nl',
+        'navCta'       => 'Chat',
+        'heroBtn'      => 'Stel je vraag',
+        'ctaLabel'     => 'Bekijk het AI-voorbeeld',
+        'galleryLabel' => 'De assistent aan het werk',
+        'gallery'      => array_values(array_filter([
+            ['img' => $site->image('gallery1'), 'price' => 'Chat ✓'],
+            ['img' => $site->image('gallery2'), 'price' => 'Afspraak ✓'],
+            ['img' => $site->image('gallery3'), 'price' => 'Offerte ✓'],
+        ], fn ($g) => ! empty($g['img']))),
+        'bullets'      => [
+            ['title' => 'Neemt op als jij niet kan', 'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.'],
+            ['title' => 'Bereidt je offerte voor', 'text' => 'Uit een paar foto\'s een eerste inschatting van werk en materiaal.'],
+            ['title' => 'Filtert serieuze aanvragen', 'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke klussen terugbelt.'],
+            ['title' => 'Verzamelt reviews', 'text' => 'Vraagt na oplevering automatisch om een Google-review.'],
+        ],
+    ])
+
     {{-- ── Aanpak ─────────────────────────────────────────────────────────── --}}
     <section data-section="aanpak">
         <div class="wrap">
