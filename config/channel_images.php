@@ -92,6 +92,23 @@ return [
             'detail' => 'Handen aan het werk met het gereedschap of de laptop van het vak, focus op vakmanschap.',
         ],
 
+        'onderwijs_opvang' => [
+            'hero'   => 'Een lichte, vriendelijke Nederlandse leer- of opvangruimte met natuurlijk licht, opgeruimde tafels en materialen, rustige sfeer voordat de groep binnenkomt.',
+            'detail' => 'Handen die lesmateriaal of speelgoed klaarleggen, warme en verzorgde omgeving, geen herkenbare kindergezichten.',
+        ],
+        'recreatie_vrije_tijd' => [
+            'hero'   => 'Een uitnodigende Nederlandse vrijetijdslocatie met goed licht en ruimte, netjes ingericht en klaar voor gasten, ontspannen sfeer.',
+            'detail' => 'Detail van de beleving of het materiaal ter plaatse, echte texturen, natuurlijk licht.',
+        ],
+        'transport_logistiek' => [
+            'hero'   => 'Een opgeruimd Nederlands transport- of logistiekbedrijf met een nette bestelwagen of vrachtwagen op het terrein, ochtendlicht, echte werkomgeving.',
+            'detail' => 'Handen die iets inladen of vastzetten, dozen of materiaal, focus op zorgvuldig werk.',
+        ],
+        'agrarisch_dieren' => [
+            'hero'   => 'Een verzorgde Nederlandse agrarische locatie of dieren-omgeving met daglicht en ruimte, rustige en echte sfeer, geen geposeerde beelden.',
+            'detail' => 'Handen die met dieren, planten of gereedschap bezig zijn, aardse texturen en natuurlijk licht.',
+        ],
+
         // Fallback voor branches zonder eigen recept.
         '_default' => [
             'hero'   => 'Een Nederlandse vakman of ondernemer aan het werk in zijn eigen omgeving, documentaire stijl, handen en gereedschap centraal, daglicht.',
