@@ -78,19 +78,19 @@ class SeedBadkamerWebshopFacet extends Command
             // Hero — verkoopt de webshop i.p.v. de renovatie.
             'hero' => [
                 'eyebrow'    => 'Badkamer webshop',
-                'title'      => 'Je showroom 24/7 open — verkoop sanitair en tegels online',
+                'title'      => 'Je showroom is 24/7 open: verkoop sanitair en tegels online',
                 'sub'        => 'Laat klanten zelf kranen, tegels en complete pakketten bestellen. Veilig betalen met iDEAL, live voorraad en bezorgen of afhalen. Jij verkoopt door terwijl je op de bouw staat.',
                 'cta_label'  => 'Bekijk je webshop-voorbeeld',
                 'cta2_label' => 'Bekijk het assortiment',
                 'cta2_href'  => '#diensten',
-                'note'       => 'Gekoppeld aan je site en voorraad — geen dubbele administratie',
+                'note'       => 'Gekoppeld aan je site en voorraad, dus geen dubbele administratie',
             ],
 
             // USP-balk — e-commerce vertrouwenssignalen.
             'usps' => [
                 'items' => [
                     ['icon' => '💳', 'text' => 'Veilig afrekenen met iDEAL, creditcard of op rekening'],
-                    ['icon' => '📦', 'text' => 'Live voorraad — klanten zien direct wat leverbaar is'],
+                    ['icon' => '📦', 'text' => 'Klanten zien direct wat er op voorraad ligt'],
                     ['icon' => '🚚', 'text' => 'Bezorgen door heel Nederland of gratis afhalen'],
                     ['icon' => '↩️', 'text' => '14 dagen retour op ongebruikte artikelen'],
                 ],
@@ -115,7 +115,7 @@ class SeedBadkamerWebshopFacet extends Command
                 'eyebrow' => 'Pakketten',
                 'heading' => 'Complete badkamerpakketten',
                 'items'   => [
-                    ['name' => 'Basispakket compleet', 'desc' => 'Toilet, wastafel, thermostaatkraan en spiegel — op elkaar afgestemd.', 'price' => '€ 1.295'],
+                    ['name' => 'Basispakket compleet', 'desc' => 'Toilet, wastafel, thermostaatkraan en spiegel, op elkaar afgestemd.', 'price' => '€ 1.295'],
                     ['name' => 'Comfortpakket inloopdouche', 'desc' => 'Inloopdouche met glaswand, regendouche, wastafelmeubel en toilet.', 'price' => '€ 2.450'],
                     ['name' => 'Luxepakket met ligbad', 'desc' => 'Vrijstaand bad, dubbele wastafel, inbouwkranen en designradiator.', 'price' => '€ 4.890'],
                     ['name' => 'Stel je eigen pakket samen', 'desc' => 'Kies losse onderdelen in de configurator en zie direct de totaalprijs.', 'price' => 'op maat'],
@@ -181,7 +181,7 @@ class SeedBadkamerWebshopFacet extends Command
                 'heading' => 'Meer dan alleen een bestelknop',
                 'sub'     => 'De webshop verkoopt, adviseert en werkt samen met je vakmanschap.',
                 'items'   => [
-                    ['icon' => '🧑‍🔧', 'title' => 'Montage erbij te boeken', 'text' => 'Klant bestelt online en vinkt "inclusief montage" aan — jij plant het in.'],
+                    ['icon' => '🧑‍🔧', 'title' => 'Montage erbij te boeken', 'text' => 'Klant bestelt online en vinkt \'inclusief montage\' aan. Jij plant het in.'],
                     ['icon' => '💬', 'title' => 'Advies bij twijfel', 'text' => 'Chat- en belknop bij elk product, zodat een klant niet afhaakt bij een keuze.'],
                     ['icon' => '🏢', 'title' => 'Zakelijk op rekening', 'text' => 'Aannemers en collega\'s bestellen op factuur met hun eigen prijsafspraak.'],
                     ['icon' => '🔗', 'title' => 'Gekoppeld aan je voorraad', 'text' => 'Verkocht is verkocht: voorraad en webshop lopen gelijk, geen nee-verkoop.'],

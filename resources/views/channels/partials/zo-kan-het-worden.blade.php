@@ -13,7 +13,7 @@
     $urlLabel  = $urlLabel  ?? 'jouw-website.nl';
     $bullets   = $bullets   ?? [];
     $ctaLabel  = $ctaLabel  ?? 'Bekijk het volledige voorbeeld';
-    $galleryLabel = $galleryLabel ?? null;   // bv. "Recente badkamers" — toont de esthetische kant
+    $galleryLabel = $galleryLabel ?? null;   // bv. "Recente badkamers", toont de esthetische kant
     $gallery   = $gallery   ?? [];            // urls van sfeer-/portfolio-thumbnails
     $href      = $site->url('voorbeeld/' . $facet);
     $img       = $site->image('hero');

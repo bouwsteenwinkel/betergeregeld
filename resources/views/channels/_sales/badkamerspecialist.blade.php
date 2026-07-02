@@ -28,14 +28,14 @@
                 <div>
                     <span class="eyebrow">Voor badkamerspecialisten</span>
                     <h1>Meer badkamerklussen uit je eigen regio</h1>
-                    <p class="lead">Een strakke website, webshop of klantenportaal die klanten binnenhaalt terwijl jij op de bouw staat. Wij bouwen 'm — jij bepaalt hoe ver je gaat.</p>
+                    <p class="lead">Een strakke website, webshop of klantenportaal die klanten binnenhaalt terwijl jij op de bouw staat. Wij bouwen 'm, jij bepaalt hoe ver je gaat.</p>
                     <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
                     <a href="{{ $site->url('voorbeeld') }}" class="btn btn-ghost" style="margin-left:.6rem">Bekijk een voorbeeld →</a>
                     <p class="muted" style="margin-top:.8rem;font-size:.9rem">Gratis &middot; vrijblijvend &middot; voorbeeld van jóuw site, vaak binnen 1 à 2 dagen</p>
                     <ul class="hero-usps">
                         <li>Gevonden worden als iemand een badkamer zoekt in jouw regio</li>
                         <li>Offerteaanvragen rechtstreeks in je mailbox</li>
-                        <li>Begin klein, breid later uit — nooit opnieuw beginnen</li>
+                        <li>Begin klein en breid later uit, je hoeft nooit opnieuw te beginnen</li>
                     </ul>
                 </div>
                 @if ($heroImg)
@@ -85,7 +85,7 @@
     <section data-section="producten" style="background:color-mix(in srgb,var(--c-accent) 6%,transparent)">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Wat we voor je bouwen</span>
-            <h2>Kies waar je nu staat — de rest komt later</h2>
+            <h2>Kies waar je nu staat, de rest komt later</h2>
             <p class="section-lead muted">Van een eerste professionele site tot online verkopen en slimme automatisering. Bekijk van elk een echt voorbeeld in de badkamerbranche.</p>
             <div class="grid cols-3 feature-grid">
                 @foreach ($facets as $key => $f)
@@ -101,16 +101,16 @@
         </div>
     </section>
 
-    {{-- ── "Zo kan het worden" — website (herbruikbaar blok, later per product) ─
-         Afgestemd op de niche: een badkamer is techniek én stijl. De mockup laat
-         beide zien — een vertrouwenwekkende hero (vakwerk) + een galerij van
+    {{-- "Zo kan het worden": website (herbruikbaar blok, later per product).
+         Afgestemd op de niche: een badkamer is techniek en stijl. De mockup laat
+         beide zien: een vertrouwenwekkende hero (vakwerk) plus een galerij van
          afgewerkte badkamers (het mooie resultaat). --}}
     @include('channels.partials.zo-kan-het-worden', [
         'site'         => $site,
         'facet'        => 'website',
         'label'        => 'Website',
         'title'        => 'Zo kan het worden: je vakwerk én je mooiste badkamers online',
-        'intro'        => 'Een badkamer is techniek én stijl. Je site laat allebei zien: de betrouwbare vakman achter het werk, en de afgewerkte badkamers waar klanten verliefd op worden. We hebben een compleet voorbeeld klaargezet — klik erdoorheen en stel je voor dat het jóuw bedrijf is.',
+        'intro'        => 'Een badkamer is techniek én stijl. Je site laat allebei zien: de vakman achter het werk en de afgewerkte badkamers waar klanten blij van worden. We hebben een compleet voorbeeld klaargezet. Klik erdoorheen en stel je voor dat het je eigen bedrijf is.',
         'brand'        => 'BadkamerBloem',
         'heroTitle'    => 'Van oude badkamer naar afgewerkte ruimte in 10 werkdagen',
         'urlLabel'     => 'jouw-badkamerbedrijf.nl',
@@ -121,9 +121,9 @@
         ])),
         'bullets'      => [
             ['title' => 'Je mooiste badkamers in beeld', 'text' => 'Een galerij van afgewerkte projecten die klanten over de streep trekt.'],
-            ['title' => 'Vertrouwen door vakmanschap', 'text' => 'Garanties, vast team en heldere werkwijze — techniek waar men op durft te bouwen.'],
+            ['title' => 'Vertrouwen door vakmanschap', 'text' => 'Garanties, een vast team en een heldere werkwijze. Daar durven klanten op te bouwen.'],
             ['title' => 'Gevonden in je regio', 'text' => 'Vindbaar als iemand een badkamer zoekt bij jou in de buurt.'],
-            ['title' => '24/7 offerteaanvragen', 'text' => 'Een aanvraagknop die ook \'s avonds leads oplevert, mobiel en desktop.'],
+            ['title' => 'Dag en nacht aanvragen', 'text' => 'Een duidelijke knop die ook \'s avonds nieuwe aanvragen oplevert, op mobiel en desktop.'],
         ],
     ])
 
@@ -146,7 +146,7 @@
                 <div class="step">
                     <div class="step-num">3</div>
                     <h3>Live en groeit mee</h3>
-                    <p>We zetten 'm live. Later uitbreiden met een webshop, portaal of automatisering? Dat bouwen we erop voort — nooit opnieuw beginnen.</p>
+                    <p>We zetten 'm live. Later uitbreiden met een webshop, portaal of automatisering? Dat bouwen we er gewoon op voort. Je hoeft nooit opnieuw te beginnen.</p>
                 </div>
             </div>
         </div>
@@ -160,7 +160,7 @@
                 <div class="feature-card"><h3>Vaste prijs</h3><span class="feature-rule"></span><p>Duidelijke prijs vooraf, geen verrassingen achteraf.</p></div>
                 <div class="feature-card"><h3>Echt bereikbaar</h3><span class="feature-rule"></span><p>Een Nederlands team dat opneemt en meedenkt.</p></div>
                 <div class="feature-card"><h3>Groeit met je mee</h3><span class="feature-rule"></span><p>De Groeidiamant: begin klein, breid uit wanneer je eraan toe bent.</p></div>
-                <div class="feature-card"><h3>Bij jou langs</h3><span class="feature-rule"></span><p>Bezoek aan huis in de regio, of gewoon online — wat jou uitkomt.</p></div>
+                <div class="feature-card"><h3>Bij jou langs</h3><span class="feature-rule"></span><p>Bezoek aan huis in de regio, of gewoon online. Net wat jou uitkomt.</p></div>
             </div>
         </div>
     </section>

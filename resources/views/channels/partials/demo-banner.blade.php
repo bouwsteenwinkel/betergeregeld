@@ -7,7 +7,7 @@
         <div style="display:flex;align-items:center;gap:.6rem;min-width:0">
             <span aria-hidden="true" style="font-size:1.1rem">🔍</span>
             <span style="font-size:.92rem;line-height:1.35;color:var(--c-ink)">
-                <strong>Voorbeeld</strong> — zo zou de site van een {{ mb_strtolower($site->name()) }} eruit kunnen zien.
+                <strong>Voorbeeld:</strong> zo zou de site van een {{ mb_strtolower($site->name()) }} eruit kunnen zien.
                 <span class="muted">Dit is geen echt bedrijf.</span>
             </span>
         </div>

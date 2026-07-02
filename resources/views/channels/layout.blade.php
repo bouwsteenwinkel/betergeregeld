@@ -318,7 +318,7 @@
 	<a class="skip-link" href="#main">Naar inhoud</a>
 	@if (! $site->isLive())
 		<div style="background:#1c1917;color:#fbbf24;text-align:center;font-size:.8rem;padding:.4rem">
-			PREVIEW · concept "{{ $site->key }}" — nog niet live (geen domein gekoppeld)
+			PREVIEW · concept "{{ $site->key }}" · nog niet live (geen domein gekoppeld)
 		</div>
 	@endif
 
