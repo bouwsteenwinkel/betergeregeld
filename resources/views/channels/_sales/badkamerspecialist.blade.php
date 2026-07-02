@@ -181,6 +181,34 @@
         ],
     ])
 
+    {{-- "Zo kan het worden": automatisering (back-office). De tegels tonen wat er
+         automatisch loopt, zodat jij tijd overhoudt voor de bouw. --}}
+    @include('channels.partials.zo-kan-het-worden', [
+        'site'         => $site,
+        'facet'        => 'automatisering',
+        'label'        => 'Automatisering',
+        'title'        => 'Zo kan het worden: papierwerk dat zichzelf doet',
+        'intro'        => 'Offertes, planning en facturen kosten je nu uren. Laat de techniek dat overnemen: een aanvraag wordt een offerte, facturen en herinneringen gaan vanzelf, en alles staat gekoppeld. Bekijk hoe de back-office voor je werkt.',
+        'brand'        => 'BadkamerBloem',
+        'heroTitle'    => 'Minder tijd achter de laptop, meer tijd op de bouw',
+        'urlLabel'     => 'app.jouw-badkamerbedrijf.nl',
+        'navCta'       => 'Dashboard',
+        'heroBtn'      => 'Bekijk demo',
+        'ctaLabel'     => 'Bekijk het automatisering-voorbeeld',
+        'galleryLabel' => 'Loopt automatisch',
+        'gallery'      => array_values(array_filter([
+            ['img' => $site->image('gallery4'), 'price' => 'Offerte ✓'],
+            ['img' => $site->image('gallery5'), 'price' => 'Factuur ✓'],
+            ['img' => $site->image('gallery6'), 'price' => 'Review ✓'],
+        ], fn ($g) => ! empty($g['img']))),
+        'bullets'      => [
+            ['title' => 'Offertes in 10 minuten', 'text' => 'Standaardposten klaarzetten en versturen, geen uren typen.'],
+            ['title' => 'Facturen en herinneringen vanzelf', 'text' => 'Op het juiste moment verstuurd, jij hoeft niet achter je geld aan.'],
+            ['title' => 'Planning zonder appjes', 'text' => 'Je ploeg weet waar ze moeten zijn, direct vanuit de planning.'],
+            ['title' => 'Alles gekoppeld', 'text' => 'Website, agenda en boekhouding werken met elkaar mee, geen dubbel werk.'],
+        ],
+    ])
+
     {{-- ── Aanpak ─────────────────────────────────────────────────────────── --}}
     <section data-section="aanpak">
         <div class="wrap">
