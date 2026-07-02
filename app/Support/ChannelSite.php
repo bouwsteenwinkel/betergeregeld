@@ -261,16 +261,22 @@ class ChannelSite
         return preg_match('#^https?://#', $img) ? $img : asset(ltrim($img, '/'));
     }
 
-    /** Gegenereerd channel-beeld voor een slot (hero/detail), of null. */
+    /**
+     * Gegenereerd channel-beeld voor een slot (hero/detail), of null.
+     * Eigen site-beeld wint; anders het gedeelde sector-beeld (per lead-branche).
+     */
     public function image(string $slot): ?string
     {
-        return app(\App\Services\ChannelSites\ChannelImageGenerator::class)->url($this->key, $slot);
+        $gen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
+        return $gen->url($this->key, $slot) ?? $gen->url($this->branche(), $slot);
     }
 
-    /** Responsive srcset voor een channel-beeld, of leeg. */
+    /** Responsive srcset voor een channel-beeld (site-eigen, anders sector), of leeg. */
     public function imageSrcset(string $slot): string
     {
-        return app(\App\Services\ChannelSites\ChannelImageGenerator::class)->srcset($this->key, $slot);
+        $gen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
+        $own = $gen->srcset($this->key, $slot);
+        return $own !== '' ? $own : $gen->srcset($this->branche(), $slot);
     }
 
     /** Unieke (AI-)plaats-intro, met de sjabloon-tekst als fallback. */

@@ -31,3 +31,4 @@ Thumbs.db
 
 # Lokale toegangsgegevens (RDP e.d.) — nooit committen
 /private/
+/public/channel-media/**/*.png
