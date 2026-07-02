@@ -155,6 +155,32 @@
         ],
     ])
 
+    {{-- "Zo kan het worden": klantenportaal / afspraken. De mockup leest als een
+         persoonlijke omgeving (inlog-knop + projecttegels). --}}
+    @include('channels.partials.zo-kan-het-worden', [
+        'site'         => $site,
+        'facet'        => 'klantenportaal',
+        'label'        => 'Portaal & afspraken',
+        'title'        => 'Zo kan het worden: klanten regelen het zelf',
+        'intro'        => 'Klanten plannen zelf hun inmeting in, volgen de badkamer en vinden alle documenten in een eigen omgeving. Dat scheelt jou telefoontjes en heen-en-weer gemail. Bekijk het voorbeeld van zo\'n klantenportaal.',
+        'brand'        => 'BadkamerBloem',
+        'heroTitle'    => 'Plan je afspraak en volg je badkamer in je eigen omgeving',
+        'urlLabel'     => 'mijn.jouw-badkamerbedrijf.nl',
+        'navCta'       => 'Inloggen',
+        'heroBtn'      => 'Mijn omgeving',
+        'ctaLabel'     => 'Bekijk het portaal-voorbeeld',
+        'galleryLabel' => 'Je project in beeld',
+        'gallery'      => array_values(array_filter([
+            $site->image('gallery1'), $site->image('gallery2'), $site->image('gallery3'),
+        ])),
+        'bullets'      => [
+            ['title' => 'Afspraken 24/7 inplannen', 'text' => 'Klanten kiezen zelf een moment voor inmeting of oplevering, ook \'s avonds.'],
+            ['title' => 'Project volgen', 'text' => 'Planning, 3D-ontwerp en foto\'s van de voortgang, altijd bij de hand.'],
+            ['title' => 'Minder telefoontjes', 'text' => 'Klanten vinden hun antwoord zelf, jij houdt tijd over voor de bouw.'],
+            ['title' => 'Alles op één plek', 'text' => 'Offerte, facturen en garantiebewijs blijven ook na oplevering bewaard.'],
+        ],
+    ])
+
     {{-- ── Aanpak ─────────────────────────────────────────────────────────── --}}
     <section data-section="aanpak">
         <div class="wrap">
