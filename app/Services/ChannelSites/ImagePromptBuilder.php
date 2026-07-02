@@ -23,7 +23,10 @@ class ImagePromptBuilder
         // Per-kanaal override (config channel_sites.channels.<key>.images.<slot>)
         // wint van het branche-recept, zodat bv. een barbershop andere beelden
         // krijgt dan een dameskapper, ook al delen ze de branche kapper_beauty.
-        $subject  = $subjectOverride ?: ($recipe[$slot] ?? ($recipe['hero'] ?? 'Een Nederlandse vakman aan het werk in zijn eigen omgeving.'));
+        // Galerij-slots delen het 'detail'-onderwerp (werk-close-up); 6 generaties
+        // geven vanzelf 6 gevarieerde beelden. Anders per-slot recept, anders hero.
+        $slotKey  = str_starts_with($slot, 'gallery') ? 'gallery' : $slot;
+        $subject  = $subjectOverride ?: ($recipe[$slotKey] ?? ($recipe['detail'] ?? ($recipe['hero'] ?? 'Een Nederlandse vakman aan het werk in zijn eigen omgeving.')));
 
         $style    = (string) ($cfg['style'] ?? '');
         $negative = (string) ($cfg['negative'] ?? '');
@@ -34,10 +37,11 @@ class ImagePromptBuilder
 
         // Slot-specifieke kadrering. De hero is een breed, liggend full-width
         // beeld; detail is een liggende close-up. Voorkomt rare uitsnedes.
-        $framing = match ($slot) {
-            'hero'   => ' Brede, liggende compositie (landschap, 3:2): de hele scene met lucht en ruimte rondom het onderwerp, het onderwerp iets uit het midden zodat er plek is voor tekst, geschikt als breed hero-beeld over de volle paginabreedte.',
-            'detail' => ' Liggende, goed gevulde close-up.',
-            default  => '',
+        $framing = match (true) {
+            $slot === 'hero'   => ' Brede, liggende compositie (landschap, 3:2): de hele scene met lucht en ruimte rondom het onderwerp, het onderwerp iets uit het midden zodat er plek is voor tekst, geschikt als breed hero-beeld over de volle paginabreedte.',
+            $slot === 'detail' => ' Liggende, goed gevulde close-up.',
+            str_starts_with($slot, 'gallery') => ' Vierkante compositie (1:1). Een concreet werkmoment, materiaal of resultaat van dit vak, documentair en gevarieerd.',
+            default => '',
         };
 
         $prompt = trim($subject . ' ' . $style . $palette . $framing);

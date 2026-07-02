@@ -29,6 +29,13 @@ return [
     'slots' => [
         'hero'   => ['size' => '1536x1024', 'ratio' => '3/2'],  // liggend, full-width hero-beeld
         'detail' => ['size' => '1536x1024', 'ratio' => '3/2'],  // liggend, detail/sfeer
+        // Galerij: 6 vierkante werk-foto's per sector (gedeeld door alle niches).
+        'gallery1' => ['size' => '1024x1024', 'ratio' => '1/1'],
+        'gallery2' => ['size' => '1024x1024', 'ratio' => '1/1'],
+        'gallery3' => ['size' => '1024x1024', 'ratio' => '1/1'],
+        'gallery4' => ['size' => '1024x1024', 'ratio' => '1/1'],
+        'gallery5' => ['size' => '1024x1024', 'ratio' => '1/1'],
+        'gallery6' => ['size' => '1024x1024', 'ratio' => '1/1'],
     ],
 
     // ── DE ART-DIRECTIE (anti-AI-look) — geldt voor ELKE generatie ────────────
