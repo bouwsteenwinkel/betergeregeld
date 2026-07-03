@@ -169,6 +169,58 @@ class ChannelContentGenerator
         ];
     }
 
+    /**
+     * Blogconcept voor één topic uit de matrix (title + invalshoek + product),
+     * uniek per niche via Claude. Fake-mode (geen key) geeft een placeholder.
+     *
+     * @param array<string,mixed> $topic  slug/title/angle/product
+     * @param array<string,mixed> $tokens branche.places (trade/niche)
+     */
+    public function blogDraftForTopic(ChannelSite $site, array $topic, array $tokens = []): array
+    {
+        $map = [
+            ':trades' => (string) ($tokens['trades'] ?? 'bedrijven'),
+            ':trade'  => (string) ($tokens['trade'] ?? 'bedrijf'),
+            ':niches' => (string) ($tokens['niches'] ?? 'diensten'),
+            ':niche'  => (string) ($tokens['niche'] ?? 'vak'),
+        ];
+        $title = strtr((string) ($topic['title'] ?? ''), $map);
+        $angle = strtr((string) ($topic['angle'] ?? ''), $map);
+        $trade = $map[':trade'];
+
+        $system = 'Je schrijft korte, nuttige blogartikelen voor specialist-websites die websites, webshops, klantenportalen, automatisering en AI verkopen aan ondernemers. '
+            . 'Toon: helder, praktisch, vertrouwenwekkend, jij-vorm. Regels: Nederlands, GEEN em-dashes, geen holle marketingtaal (vermijd ontzorgen, naadloos, op-maat), concreet en specifiek voor de branche. '
+            . 'Geef ALLEEN geldige JSON terug met "title", "excerpt" (1 zin) en "body" (geldige HTML met <h2> en <p>, 250 tot 350 woorden). Eindig met een zin die uitnodigt tot een gratis voorbeeld.';
+        $user = "Branche: {$site->branche()} (een {$trade}). Onderwerp: \"{$title}\". Invalshoek: {$angle}. "
+            . 'Schrijf hierover een concreet, branche-specifiek artikel dat deze ondernemer helpt en subtiel het bijbehorende product laat zien. Geen verkooppraatje, wel praktische tips.';
+
+        $model = 'fake';
+        $json = null;
+        try {
+            $model = app(AnthropicClient::class)->writerModel();
+            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600, 'temperature' => 0.7]);
+            if ($raw) {
+                $json = json_decode($this->stripFences($raw), true);
+            }
+        } catch (\Throwable $e) {
+            $json = null;
+        }
+
+        $fake = ! (is_array($json) && ! empty($json['title']) && ! empty($json['body']));
+        if ($fake) {
+            $json = ['title' => $title, 'excerpt' => '', 'body' => "<h2>{$title}</h2><p>Concept nog te genereren (geen Anthropic-key in deze omgeving).</p>"];
+        }
+
+        return [
+            'slug'    => (string) ($topic['slug'] ?? \Illuminate\Support\Str::slug($title)),
+            'title'   => (string) $json['title'],
+            'excerpt' => (string) ($json['excerpt'] ?? ''),
+            'body'    => (string) $json['body'],
+            'model'   => $fake ? 'fake' : (string) $model,
+            'fake'    => $fake,
+        ];
+    }
+
     private function fakeBlog(ChannelSite $site): array
     {
         $b = $site->branche();
