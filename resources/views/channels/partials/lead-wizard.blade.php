@@ -87,7 +87,7 @@
                 <p class="lwz-q">Waar mogen we je voorbeeld naartoe sturen?</p>
                 <p class="lwz-help">We sturen je vrijblijvend een voorbeeld van jouw zaak, geen verplichtingen.</p>
                 <label class="lwz-label" for="lwz-name">Je naam</label>
-                <input id="lwz-name" class="lwz-input" type="text" name="contact_name" value="{{ old('contact_name') }}" placeholder="Je naam" autocomplete="name" data-required autofocus>
+                <input id="lwz-name" class="lwz-input" type="text" name="contact_name" value="{{ old('contact_name') }}" placeholder="Je naam" autocomplete="name" data-required>
                 <label class="lwz-label" for="lwz-email">E-mailadres</label>
                 <input id="lwz-email" class="lwz-input" type="email" name="email" value="{{ old('email') }}" placeholder="naam@voorbeeld.nl" autocomplete="email" data-required>
                 <label class="lwz-label" for="lwz-phone">Telefoonnummer</label>
