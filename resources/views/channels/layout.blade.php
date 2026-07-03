@@ -319,6 +319,8 @@
 		.foot-endorse-badge img{height:64px;width:auto;display:block;border-radius:4px}
 		.foot-legal{display:inline-flex;gap:1rem;flex-wrap:wrap}
 		.foot-legal a{color:rgba(255,255,255,.6);font-size:.82rem}.foot-legal a:hover{color:#fff}
+		.foot-links{display:flex;gap:.6rem 1.4rem;flex-wrap:wrap;padding:1.2rem 0;margin-bottom:.4rem;border-top:1px solid rgba(255,255,255,.12)}
+		.foot-links a{color:rgba(255,255,255,.8);font-size:.9rem;font-weight:600}.foot-links a:hover{color:#fff}
 		/* form */
 		.field{margin-bottom:.9rem}
 		.field label{display:block;font-weight:600;font-size:.9rem;margin-bottom:.3rem}

@@ -124,6 +124,21 @@ class ChannelSiteController extends Controller
         return view('channels.pricing', ['site' => $this->site()]);
     }
 
+    public function werkwijze(): View
+    {
+        return view('channels.werkwijze', ['site' => $this->site()]);
+    }
+
+    public function faq(): View
+    {
+        return view('channels.faq', ['site' => $this->site()]);
+    }
+
+    public function vergelijken(): View
+    {
+        return view('channels.vergelijken', ['site' => $this->site()]);
+    }
+
     public function privacy(): View
     {
         return view('channels.legal.privacy', ['site' => $this->site()]);

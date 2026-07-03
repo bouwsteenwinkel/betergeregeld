@@ -32,6 +32,12 @@
 				<p style="margin-top:.6rem"><a href="{{ $site->navHref('#gratis-voorbeeld') }}">Gratis voorbeeld aanvragen</a></p>
 			</div>
 		</div>
+		<div class="foot-links">
+			<a href="{{ $site->url('werkwijze') }}">Onze werkwijze</a>
+			<a href="{{ $site->url('veelgestelde-vragen') }}">Veelgestelde vragen</a>
+			<a href="{{ $site->url('vergelijken') }}">Zelf bouwen of laten maken</a>
+			<a href="{{ $site->url('groeidiamant') }}">De Groeidiamant</a>
+		</div>
 		<div class="foot-bottom">
 			<span>© {{ now()->year }} {{ $site->displayName() }}</span>
 			<span class="foot-legal">
