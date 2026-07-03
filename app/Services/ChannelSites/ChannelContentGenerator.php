@@ -56,7 +56,7 @@ class ChannelContentGenerator
         $text = null;
         try {
             $text = app(AnthropicClient::class)->chat([
-                'user' => $user, 'system' => $system, 'max_tokens' => 300, 'temperature' => 0.85,
+                'user' => $user, 'system' => $system, 'max_tokens' => 300,
             ]);
         } catch (\Throwable $e) {
             $text = null;
@@ -103,7 +103,7 @@ class ChannelContentGenerator
 
         $items = null;
         try {
-            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1200, 'temperature' => 0.6]);
+            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1200]);
             if ($raw) {
                 $json = json_decode($this->stripFences($raw), true);
                 if (is_array($json)) {
@@ -145,7 +145,7 @@ class ChannelContentGenerator
         $json = null;
         try {
             $model = app(AnthropicClient::class)->writerModel();
-            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600, 'temperature' => 0.7]);
+            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600]);
             if ($raw) {
                 $json = json_decode($this->stripFences($raw), true);
             }
@@ -198,7 +198,7 @@ class ChannelContentGenerator
         $json = null;
         try {
             $model = app(AnthropicClient::class)->writerModel();
-            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600, 'temperature' => 0.7]);
+            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600]);
             if ($raw) {
                 $json = json_decode($this->stripFences($raw), true);
             }
