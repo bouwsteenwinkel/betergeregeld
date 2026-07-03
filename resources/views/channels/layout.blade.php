@@ -293,7 +293,7 @@
 		footer{background:var(--c-footer-bg,var(--c-ink));color:#fff;padding:48px 0 28px;margin-top:24px}
 		footer a{color:rgba(255,255,255,.8)}footer a:hover{color:#fff}
 		.foot-grid{display:grid;gap:1.6rem;margin-bottom:1.8rem}
-		@media(min-width:760px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}
+		@media(min-width:760px){.foot-grid{grid-template-columns:2fr 1fr 1.6fr 1fr}}
 		.foot-bottom{border-top:1px solid rgba(255,255,255,.15);padding-top:1rem;font-size:.85rem;color:rgba(255,255,255,.6);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;align-items:center}
 		.endorsement{display:inline-flex;align-items:center;gap:.55rem}
 		.endorsement a{color:rgba(255,255,255,.75)}.endorsement a:hover{color:#fff}

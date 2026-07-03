@@ -118,22 +118,77 @@ class ChannelSiteController extends Controller
 
     public function places(): View
     {
-        return view('channels.places.index', ['site' => $this->site()]);
+        return view('channels.places.index', [
+            'site'      => $this->site(),
+            'provinces' => app(\App\Services\ChannelSiteResolver::class)->provinces(),
+        ]);
+    }
+
+    public function province(Request $request): View
+    {
+        $prov     = (string) $request->route('prov');
+        $resolver = app(\App\Services\ChannelSiteResolver::class);
+        $name     = $resolver->provinceName($prov);
+        abort_if($name === null, 404);
+
+        return view('channels.places.province', [
+            'site'       => $this->site(),
+            'provName'   => $name,
+            'provSlug'   => $prov,
+            'provPlaces' => $resolver->provincePlaces($prov),
+        ]);
     }
 
     public function place(Request $request): View
     {
         // By-name lezen i.p.v. method-injectie: de preview-route heeft een extra
         // {channelKey}-param vóór {place}, wat anders positioneel zou binden.
-        $place = (string) $request->route('place');
-        $site  = $this->site();
-        $name  = app(\App\Services\ChannelSiteResolver::class)->placeName($place);
-        abort_if($name === null, 404);
+        $slug     = (string) $request->route('place');
+        $site     = $this->site();
+        $resolver = app(\App\Services\ChannelSiteResolver::class);
+        $data     = $resolver->placeData($slug);
+        abort_if($data === null, 404);
+
+        // Unieke, branche-gerichte content (variatie-engine) voor deze plaats.
+        $tokens  = (array) $site->get('places', []);
+        $content = app(\App\Services\ChannelSites\ChannelPlaceContent::class)->assemble($tokens, $data);
+
+        // Branche-tokens (niet plaats) alvast in de bedrijven-config invullen.
+        $business = array_merge((array) config('channel_places.business', []), (array) ($tokens['business'] ?? []));
+        $brancheMap = [
+            ':trades'  => (string) ($tokens['trades'] ?? config('channel_places.defaults.trades')),
+            ':trade'   => (string) ($tokens['trade'] ?? config('channel_places.defaults.trade')),
+            ':niches'  => (string) ($tokens['niches'] ?? config('channel_places.defaults.niches')),
+            ':niche'   => (string) ($tokens['niche'] ?? config('channel_places.defaults.niche')),
+        ];
+        $business['query'] = strtr((string) ($business['query'] ?? ':niche :city'), $brancheMap);
+        $business['label'] = str_replace([':city', ':region'], [$data['naam'], $data['provincie']], strtr((string) ($business['label'] ?? ''), $brancheMap));
+        $business['intro'] = str_replace([':city', ':region'], [$data['naam'], $data['provincie']], strtr((string) ($business['intro'] ?? ''), $brancheMap));
+
+        // Echte lokale bedrijven (Google Places, cache-first). Faalt zacht → [].
+        $businesses = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)
+            ->forPlace((string) $site->brancheKey(), $data['slug'], $data['naam'], $data['provincie'], $business);
+
+        // Nabije plaatsen (zelfde provincie) — zoveel mogelijk interne links.
+        $names   = $resolver->places();
+        $nearby  = [];
+        foreach ($resolver->regions() as $pSlug => $prov) {
+            if ($pSlug === $data['slug'] || $prov !== $data['provincie']) {
+                continue;
+            }
+            $nearby[$pSlug] = $names[$pSlug] ?? $pSlug;
+        }
+        asort($nearby);
 
         return view('channels.places.show', [
-            'site'      => $site,
-            'placeName' => $name,
-            'placeSlug' => $place,
+            'site'       => $site,
+            'place'      => $data,
+            'placeName'  => $data['naam'],
+            'placeSlug'  => $data['slug'],
+            'content'    => $content,
+            'business'   => $business,
+            'businesses' => $businesses,
+            'nearby'     => $nearby,
         ]);
     }
 

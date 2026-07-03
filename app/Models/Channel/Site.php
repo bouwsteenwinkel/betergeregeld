@@ -116,6 +116,9 @@ class Site extends Model
             'meta'    => (array) $this->meta,
             'header'  => (array) $this->header,
             'view'    => $this->legacy_view,
+            // Plaatsen-teksten leven op de niche-branche (geldt voor alle sites
+            // van die branche); per-site override kan later via een site-veld.
+            'places'  => (array) ($this->branche?->places ?? []),
         ];
 
         return new ChannelSite($this->key, $cfg, $this->relationLoaded('blocks') ? $this->blocks : null);

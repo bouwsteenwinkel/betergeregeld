@@ -15,7 +15,7 @@ class Branche extends Model
 
     protected $fillable = [
         'key', 'name', 'lead_branche',
-        'theme', 'header', 'blueprint', 'intake', 'active',
+        'theme', 'header', 'blueprint', 'intake', 'places', 'active',
     ];
 
     protected $casts = [
@@ -23,6 +23,7 @@ class Branche extends Model
         'header'    => 'array',
         'blueprint' => 'array',
         'intake'    => 'array',
+        'places'    => 'array',
         'active'    => 'boolean',
     ];
 

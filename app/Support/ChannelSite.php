@@ -182,15 +182,29 @@ class ChannelSite
     public function navMenu(): array
     {
         $menu = $this->header()['menu'] ?? null;
-        if (is_array($menu) && $menu) {
-            return $menu;
+        if (! is_array($menu) || ! $menu) {
+            $menu = [
+                ['label' => 'Home', 'href' => ''],
+                ['label' => 'Plaatsen', 'href' => 'plaatsen'],
+                ['label' => 'Blog', 'href' => 'blog'],
+                ['label' => 'Over ons', 'href' => 'over-ons'],
+            ];
         }
-        return [
-            ['label' => 'Home', 'href' => ''],
-            ['label' => 'Plaatsen', 'href' => 'plaatsen'],
-            ['label' => 'Blog', 'href' => 'blog'],
-            ['label' => 'Over ons', 'href' => 'over-ons'],
-        ];
+
+        // Zorg dat elke site een 'Plaatsen'-link heeft (de /plaatsen-pagina's zijn
+        // er voor alle niche-sites). Injecteer vóór 'Contact' als 'ie ontbreekt.
+        $hasPlaatsen = collect($menu)->contains(fn ($m) => trim((string) ($m['href'] ?? ''), '/') === 'plaatsen');
+        if (! $hasPlaatsen) {
+            $pos = collect($menu)->search(fn ($m) => str_contains((string) ($m['href'] ?? ''), 'contact'));
+            $item = ['label' => 'Plaatsen', 'href' => 'plaatsen'];
+            if ($pos === false) {
+                $menu[] = $item;
+            } else {
+                array_splice($menu, $pos, 0, [$item]);
+            }
+        }
+
+        return $menu;
     }
 
     /** Header-CTA-knop (label + bestemming), default naar de funnel. */

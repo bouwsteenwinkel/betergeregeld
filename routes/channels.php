@@ -31,6 +31,7 @@ $channelRoutes = function () use ($facetKeys) {
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
 
     Route::get('/plaatsen', [ChannelSiteController::class, 'places']);
+    Route::get('/plaatsen/provincie/{prov}', [ChannelSiteController::class, 'province']);
     Route::get('/plaatsen/{place}', [ChannelSiteController::class, 'place']);
 
     Route::get('/blog', [ChannelSiteController::class, 'blogIndex']);

@@ -92,12 +92,35 @@ class ChannelSiteResolver
         return $out;
     }
 
-    /** @return array<string,string> slug => weergavenaam */
+    /**
+     * @return array<string,string> slug => weergavenaam
+     * Config-vorm: slug => ['naam','provincie','context'] (rijk) of een platte lijst.
+     */
     public function places(): array
     {
         $out = [];
-        foreach ((array) config('nl_places', []) as $place) {
-            $out[ChannelSite::slug($place)] = $place;
+        foreach ((array) config('nl_places', []) as $k => $v) {
+            if (is_int($k)) {                              // platte lijst 'Naam'
+                $out[ChannelSite::slug($v)] = $v;
+            } else {                                       // slug => [...] of slug => naam
+                $out[(string) $k] = is_array($v) ? ($v['naam'] ?? $k) : $v;
+            }
+        }
+        return $out;
+    }
+
+    /** @return array<string,string> slug => provincie ('Nederland' als onbekend) */
+    public function regions(): array
+    {
+        $out = [];
+        foreach ((array) config('nl_places', []) as $k => $v) {
+            if (is_int($k)) {
+                $out[ChannelSite::slug($v)] = 'Nederland';
+            } elseif (is_array($v)) {
+                $out[(string) $k] = $v['provincie'] ?? 'Nederland';
+            } else {
+                $out[(string) $k] = is_string($v) && $v !== '' ? $v : 'Nederland';
+            }
         }
         return $out;
     }
@@ -105,5 +128,64 @@ class ChannelSiteResolver
     public function placeName(string $slug): ?string
     {
         return $this->places()[$slug] ?? null;
+    }
+
+    public function placeRegion(string $slug): string
+    {
+        return $this->regions()[$slug] ?? 'Nederland';
+    }
+
+    /**
+     * Provincies (voor de /plaatsen-hub + footer).
+     * @return array<string,array{name:string,slug:string,count:int}> provincie-slug => info
+     */
+    public function provinces(): array
+    {
+        $out = [];
+        foreach ($this->regions() as $prov) {
+            $slug = ChannelSite::slug($prov);
+            if (! isset($out[$slug])) {
+                $out[$slug] = ['name' => $prov, 'slug' => $slug, 'count' => 0];
+            }
+            $out[$slug]['count']++;
+        }
+        unset($out[ChannelSite::slug('Nederland')]);   // restgroep niet als provincie tonen
+        ksort($out);
+        return $out;
+    }
+
+    /** @return array<string,string> slug => naam voor alle plaatsen in een provincie. */
+    public function provincePlaces(string $provSlug): array
+    {
+        $out   = [];
+        $names = $this->places();
+        foreach ($this->regions() as $slug => $prov) {
+            if (ChannelSite::slug($prov) === $provSlug) {
+                $out[$slug] = $names[$slug] ?? $slug;
+            }
+        }
+        asort($out);
+        return $out;
+    }
+
+    public function provinceName(string $provSlug): ?string
+    {
+        return $this->provinces()[$provSlug]['name'] ?? null;
+    }
+
+    /** Volledige plaats-data voor één slug, of null. */
+    public function placeData(string $slug): ?array
+    {
+        $name = $this->placeName($slug);
+        if ($name === null) {
+            return null;
+        }
+        $raw = (array) (config('nl_places')[$slug] ?? []);
+        return [
+            'slug'      => $slug,
+            'naam'      => $name,
+            'provincie' => $raw['provincie'] ?? 'Nederland',
+            'context'   => $raw['context'] ?? null,
+        ];
     }
 }

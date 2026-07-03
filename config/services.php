@@ -53,4 +53,11 @@ return [
         'key_path' => env('ANTHROPIC_KEY_PATH'),
     ],
 
+    // Google Places (new v1) — voedt de "bedrijven in de regio"-sectie op de
+    // channel-site /plaatsen-pagina's. Via config zodat de key na `config:cache`
+    // beschikbaar blijft. Zet GOOGLE_PLACES_KEY in .env (Places API + billing aan).
+    'google_places' => [
+        'key' => env('GOOGLE_PLACES_KEY'),
+    ],
+
 ];
