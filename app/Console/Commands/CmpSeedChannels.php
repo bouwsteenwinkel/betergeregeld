@@ -40,7 +40,32 @@ class CmpSeedChannels extends Command
         $this->clone('cmp_policy', $source, ['policy_version', 'config_hash']);
         $this->clone('cmp_categories', $source, ['key', 'is_required', 'is_enabled', 'sort_order']);
         $this->clone('cmp_texts', $source, ['lang', 'text_key', 'text_value']);
-        $this->clone('cmp_branding', $source, ['branding_json']);
+
+        // Neutraal Betergeregeld-palet (niet de merk-kleuren van de bron-tenant):
+        // donker slate met de amber-CTA die de trigger-sites ook gebruiken.
+        $branding = [
+            'logo_url'        => '',
+            'banner_position' => 'bottom',
+            'banner_layout'   => 'inline',
+            'colors'          => [
+                'banner_bg'         => '#1f2937',
+                'banner_text'       => '#f1f5f9',
+                'banner_border'     => 'rgba(255,255,255,.14)',
+                'btn_primary_bg'    => '#f59e0b',
+                'btn_primary_text'  => '#1f2937',
+                'btn_secondary_bg'  => 'transparent',
+                'btn_secondary_text' => '#cbd5e1',
+                'link'              => '#fbbf24',
+            ],
+            'corner_radius_px' => 12,
+            'animate'          => true,
+            'show_close_x'     => false,
+        ];
+        DB::table('cmp_branding')->insert([
+            'tenant_key'    => $this->target,
+            'branding_json' => json_encode($branding, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'updated_at'    => now(),
+        ]);
 
         // Leadgen-teksten (geen winkelmand/account op de trigger-sites).
         $this->setText('banner.body', 'We gebruiken functionele cookies zodat de website goed werkt en je aanvraag veilig verstuurd wordt. Analytische cookies plaatsen we alleen met jouw toestemming, om de site te verbeteren.');
