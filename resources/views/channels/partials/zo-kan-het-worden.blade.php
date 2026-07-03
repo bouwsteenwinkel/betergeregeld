@@ -94,7 +94,13 @@
                     @if ($galleryLabel)<div class="zkhw-galrow">{{ $galleryLabel }}</div>@endif
                     <div class="zkhw-cards">
                         @forelse (array_slice($gallery, 0, 3) as $g)
-                            @php $gimg = is_array($g) ? ($g['img'] ?? '') : $g; $gprice = is_array($g) ? ($g['price'] ?? null) : null; @endphp
+                            @php
+                                $gimg = is_array($g)
+                                    ? ($g['img'] ?? (! empty($g['slot']) ? $site->image($g['slot']) : ''))
+                                    : $g;
+                                $gprice = is_array($g) ? ($g['price'] ?? null) : null;
+                            @endphp
+                            @continue(! $gimg)
                             <span style="background-image:url('{{ $gimg }}')">@if ($gprice)<em>{{ $gprice }}</em>@endif</span>
                         @empty
                             <span></span><span></span><span></span>

@@ -31,6 +31,21 @@ class ChannelSiteController extends Controller
         // bestaat, is DÍE de hoofdpagina (pitch aan de ondernemer). De blok-gedreven
         // demo ("zo zou jouw site eruitzien") verhuist dan naar /voorbeeld.
         if ($salesView = $site->salesHomeView()) {
+            $facet   = WebsiteLead::normalizeFacet($request->route('facet'));
+            $landing = $request->route('facet') ? config('badkamer_landings.' . $facet) : null;
+
+            // /{facet} met een bestaande productlanding + landing-view → de
+            // toegespitste trigger-pagina voor dat product (waar ads/SEO op landen).
+            if ($landing && ($landingView = $site->landingView())) {
+                return view($landingView, [
+                    'site'    => $site,
+                    'facet'   => $facet,
+                    'landing' => $landing,
+                    'facets'  => (array) config('groeidiamant.facets', []),
+                ]);
+            }
+
+            // / (of onbekende facet) → de brede overzichts-home.
             return view($salesView, [
                 'site'   => $site,
                 'facets' => (array) config('groeidiamant.facets', []),

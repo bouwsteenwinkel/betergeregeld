@@ -399,6 +399,18 @@ class ChannelSite
         return view()->exists($view) ? $view : null;
     }
 
+    /**
+     * Bespoke PRODUCT-LANDINGSPAGINA voor deze site, of null. Rendert één product
+     * (facet) volledig op /{facet} (trigger, waar ads/SEO op landen). Opt-in per
+     * site via het bestaan van channels/_landing/{key}.blade.php.
+     */
+    public function landingView(): ?string
+    {
+        $view = "channels._landing.{$this->key}";
+
+        return view()->exists($view) ? $view : null;
+    }
+
     /** Bespoke blade > blok-gedreven (DB) > generieke config-home. */
     public function homeView(): string
     {

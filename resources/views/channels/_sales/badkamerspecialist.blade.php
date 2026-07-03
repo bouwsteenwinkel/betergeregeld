@@ -1,18 +1,9 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $facets   = $facets ?? (array) config('groeidiamant.facets', []);
+    $landings = (array) config('badkamer_landings', []);
     $heroImg  = $site->image('hero');
     $heroSet  = $site->imageSrcset('hero');
-
-    // Per product (Groeidiamant-facet) een badkamer-specifieke verkoopregel +
-    // de link naar het live voorbeeld van dát product op de demolaag.
-    $productCopy = [
-        'website'        => 'Een site die je vak laat zien en klussen binnenhaalt. Gevonden worden in je regio, offerteaanvragen in je mailbox.',
-        'webshop'        => 'Verkoop sanitair, tegels en pakketten online. Je showroom 24/7 open, met iDEAL en bezorgen of afhalen.',
-        'klantenportaal' => 'Laat klanten hun project volgen: 3D-ontwerp, planning en materiaalkeuzes op één plek.',
-        'automatisering' => 'Offertes, planning en facturen die zichzelf doen. Minder papierwerk, meer tijd op de bouw.',
-        'ai'             => 'Een assistent die de telefoon opneemt en offertes voorbereidt terwijl jij aan het werk bent.',
-    ];
 @endphp
 @extends('channels.layout')
 
@@ -21,7 +12,7 @@
 
 @section('content')
 
-    {{-- ── Hero: spreekt de ondernemer aan, niet z'n klanten ──────────────── --}}
+    {{-- Hero: spreekt de ondernemer aan, niet z'n klanten --}}
     <section class="hero" data-section="hero">
         <div class="wrap">
             <div @if ($heroImg) class="grid cols-2" style="align-items:center;gap:2.6rem" @endif>
@@ -51,7 +42,7 @@
         </div>
     </section>
 
-    {{-- ── Herkenning / pijn ──────────────────────────────────────────────── --}}
+    {{-- Herkenning / pijn --}}
     <section data-section="herkenning">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Herken je dit?</span>
@@ -81,213 +72,34 @@
         </div>
     </section>
 
-    {{-- ── Wat we voor je bouwen = de 5 producten, elk met live voorbeeld ──── --}}
+    {{-- Wat we voor je bouwen = de 5 producten, elk met een eigen landingspagina --}}
     <section data-section="producten" style="background:color-mix(in srgb,var(--c-accent) 6%,transparent)">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Wat we voor je bouwen</span>
             <h2>Kies waar je nu staat, de rest komt later</h2>
-            <p class="section-lead muted">Van een eerste professionele site tot online verkopen en slimme automatisering. Bekijk van elk een echt voorbeeld in de badkamerbranche.</p>
+            <p class="section-lead muted">Van een eerste professionele site tot online verkopen en slimme automatisering. Klik op een product voor het volledige verhaal en een echt voorbeeld.</p>
             <div class="grid cols-3 feature-grid">
                 @foreach ($facets as $key => $f)
-                    <a href="{{ $site->url('voorbeeld/' . $key) }}" class="feature-card" style="display:block;color:inherit">
+                    @php $lead = $landings[$key]['hero']['sub'] ?? ($f['tagline'] ?? ''); @endphp
+                    <a href="{{ isset($landings[$key]) ? $site->url($key) : $site->url('voorbeeld/' . $key) }}" class="feature-card" style="display:block;color:inherit">
                         <div class="feature-ico" style="font-size:1.4rem;line-height:1">{{ $f['icon'] ?? '•' }}</div>
                         <h3>{{ $f['nr'] ?? '' }}. {{ $f['label'] ?? $key }}</h3>
                         <span class="feature-rule"></span>
-                        <p>{{ $productCopy[$key] ?? ($f['tagline'] ?? '') }}</p>
-                        <p style="margin-top:1rem;font-weight:700;color:var(--c-cta)">Bekijk voorbeeld →</p>
+                        <p>{{ $lead }}</p>
+                        <p style="margin-top:1rem;font-weight:700;color:var(--c-cta)">Meer over dit product →</p>
                     </a>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{-- "Zo kan het worden": website (herbruikbaar blok, later per product).
-         Afgestemd op de niche: een badkamer is techniek en stijl. De mockup laat
-         beide zien: een vertrouwenwekkende hero (vakwerk) plus een galerij van
-         afgewerkte badkamers (het mooie resultaat). --}}
-    @include('channels.partials.zo-kan-het-worden', [
-        'site'         => $site,
-        'facet'        => 'website',
-        'label'        => 'Website',
-        'title'        => 'Zo kan het worden: je vakwerk én je mooiste badkamers online',
-        'intro'        => 'Een badkamer is techniek én stijl. Je site laat allebei zien: de vakman achter het werk en de afgewerkte badkamers waar klanten blij van worden. We hebben een compleet voorbeeld klaargezet. Klik erdoorheen en stel je voor dat het je eigen bedrijf is.',
-        'brand'        => 'BadkamerBloem',
-        'heroTitle'    => 'Van oude badkamer naar afgewerkte ruimte in 10 werkdagen',
-        'urlLabel'     => 'jouw-badkamerbedrijf.nl',
-        'ctaLabel'     => 'Bekijk het volledige voorbeeld',
-        'galleryLabel' => 'Recent afgeleverde badkamers',
-        'gallery'      => array_values(array_filter([
-            $site->image('gallery1'), $site->image('gallery2'), $site->image('gallery3'),
-        ])),
-        'bullets'      => [
-            ['title' => 'Je mooiste badkamers in beeld', 'text' => 'Een galerij van afgewerkte projecten die klanten over de streep trekt.'],
-            ['title' => 'Vertrouwen door vakmanschap', 'text' => 'Garanties, een vast team en een heldere werkwijze. Daar durven klanten op te bouwen.'],
-            ['title' => 'Gevonden in je regio', 'text' => 'Vindbaar als iemand een badkamer zoekt bij jou in de buurt.'],
-            ['title' => 'Dag en nacht aanvragen', 'text' => 'Een duidelijke knop die ook \'s avonds nieuwe aanvragen oplevert, op mobiel en desktop.'],
-        ],
-    ])
+    {{-- Géén "Zo kan het worden"-blokken op de home: één blok per groeistap staat
+         op de eigen landingspagina (/{facet}). De home funnelt via de kaarten hierboven. --}}
 
-    {{-- "Zo kan het worden": webshop. Zelfde blok, andere params. De mockup leest
-         als webshop (winkelmand-knop + producttegels met prijs). --}}
-    @include('channels.partials.zo-kan-het-worden', [
-        'site'         => $site,
-        'facet'        => 'webshop',
-        'label'        => 'Webshop',
-        'title'        => 'Zo kan het worden: je showroom 24/7 online',
-        'intro'        => 'Naast klussen ook producten verkopen? Klanten bestellen zelf kranen, tegels en complete pakketten, betalen met iDEAL en kiezen bezorgen of afhalen. Bekijk het webshop-voorbeeld en zie hoe jouw assortiment online staat.',
-        'brand'        => 'BadkamerBloem',
-        'heroTitle'    => 'Bestel sanitair en tegels online, bezorgd of afgehaald',
-        'urlLabel'     => 'shop.jouw-badkamerbedrijf.nl',
-        'navCta'       => 'Winkelmand',
-        'heroBtn'      => 'In winkelmand',
-        'ctaLabel'     => 'Bekijk het webshop-voorbeeld',
-        'galleryLabel' => 'Populair in de shop',
-        'gallery'      => array_values(array_filter([
-            ['img' => $site->image('gallery4'), 'price' => '€ 179'],
-            ['img' => $site->image('gallery5'), 'price' => '€ 385'],
-            ['img' => $site->image('gallery6'), 'price' => '€ 349'],
-        ], fn ($g) => ! empty($g['img']))),
-        'bullets'      => [
-            ['title' => 'Verkoop dag en nacht door', 'text' => 'Klanten bestellen ook \'s avonds en in het weekend, zonder dat jij er iets voor hoeft te doen.'],
-            ['title' => 'Veilig betalen met iDEAL', 'text' => 'Direct afgerekend. Vaste klanten en aannemers kunnen op rekening bestellen.'],
-            ['title' => 'Bezorgen of afhalen', 'text' => 'Wat op voorraad ligt, is binnen twee werkdagen bezorgd of ligt klaar in je loods.'],
-            ['title' => 'Montage bij te boeken', 'text' => 'Klant koopt online en vinkt montage aan. Zo verdien je aan het product én de plaatsing.'],
-        ],
-    ])
+    {{-- Gedeelde aanpak / waarom / CTA --}}
+    @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe jouw site eruit zou zien?'])
 
-    {{-- "Zo kan het worden": klantenportaal / afspraken. De mockup leest als een
-         persoonlijke omgeving (inlog-knop + projecttegels). --}}
-    @include('channels.partials.zo-kan-het-worden', [
-        'site'         => $site,
-        'facet'        => 'klantenportaal',
-        'label'        => 'Portaal & afspraken',
-        'title'        => 'Zo kan het worden: klanten regelen het zelf',
-        'intro'        => 'Klanten plannen zelf hun inmeting in, volgen de badkamer en vinden alle documenten in een eigen omgeving. Dat scheelt jou telefoontjes en heen-en-weer gemail. Bekijk het voorbeeld van zo\'n klantenportaal.',
-        'brand'        => 'BadkamerBloem',
-        'heroTitle'    => 'Plan je afspraak en volg je badkamer in je eigen omgeving',
-        'urlLabel'     => 'mijn.jouw-badkamerbedrijf.nl',
-        'navCta'       => 'Inloggen',
-        'heroBtn'      => 'Mijn omgeving',
-        'ctaLabel'     => 'Bekijk het portaal-voorbeeld',
-        'galleryLabel' => 'Je project in beeld',
-        'gallery'      => array_values(array_filter([
-            $site->image('gallery1'), $site->image('gallery2'), $site->image('gallery3'),
-        ])),
-        'bullets'      => [
-            ['title' => 'Afspraken 24/7 inplannen', 'text' => 'Klanten kiezen zelf een moment voor inmeting of oplevering, ook \'s avonds.'],
-            ['title' => 'Project volgen', 'text' => 'Planning, 3D-ontwerp en foto\'s van de voortgang, altijd bij de hand.'],
-            ['title' => 'Minder telefoontjes', 'text' => 'Klanten vinden hun antwoord zelf, jij houdt tijd over voor de bouw.'],
-            ['title' => 'Alles op één plek', 'text' => 'Offerte, facturen en garantiebewijs blijven ook na oplevering bewaard.'],
-        ],
-    ])
-
-    {{-- "Zo kan het worden": automatisering (back-office). De tegels tonen wat er
-         automatisch loopt, zodat jij tijd overhoudt voor de bouw. --}}
-    @include('channels.partials.zo-kan-het-worden', [
-        'site'         => $site,
-        'facet'        => 'automatisering',
-        'label'        => 'Automatisering',
-        'title'        => 'Zo kan het worden: papierwerk dat zichzelf doet',
-        'intro'        => 'Offertes, planning en facturen kosten je nu uren. Laat de techniek dat overnemen: een aanvraag wordt een offerte, facturen en herinneringen gaan vanzelf, en alles staat gekoppeld. Bekijk hoe de back-office voor je werkt.',
-        'brand'        => 'BadkamerBloem',
-        'heroTitle'    => 'Minder tijd achter de laptop, meer tijd op de bouw',
-        'urlLabel'     => 'app.jouw-badkamerbedrijf.nl',
-        'navCta'       => 'Dashboard',
-        'heroBtn'      => 'Bekijk demo',
-        'ctaLabel'     => 'Bekijk het automatisering-voorbeeld',
-        'galleryLabel' => 'Loopt automatisch',
-        'gallery'      => array_values(array_filter([
-            ['img' => $site->image('gallery4'), 'price' => 'Offerte ✓'],
-            ['img' => $site->image('gallery5'), 'price' => 'Factuur ✓'],
-            ['img' => $site->image('gallery6'), 'price' => 'Review ✓'],
-        ], fn ($g) => ! empty($g['img']))),
-        'bullets'      => [
-            ['title' => 'Offertes in 10 minuten', 'text' => 'Standaardposten klaarzetten en versturen, geen uren typen.'],
-            ['title' => 'Facturen en herinneringen vanzelf', 'text' => 'Op het juiste moment verstuurd, jij hoeft niet achter je geld aan.'],
-            ['title' => 'Planning zonder appjes', 'text' => 'Je ploeg weet waar ze moeten zijn, direct vanuit de planning.'],
-            ['title' => 'Alles gekoppeld', 'text' => 'Website, agenda en boekhouding werken met elkaar mee, geen dubbel werk.'],
-        ],
-    ])
-
-    {{-- "Zo kan het worden": AI-assistent. De tegels tonen wat de assistent afhandelt. --}}
-    @include('channels.partials.zo-kan-het-worden', [
-        'site'         => $site,
-        'facet'        => 'ai',
-        'label'        => 'AI',
-        'title'        => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-        'intro'        => 'Bel je een keer niet op tijd terug, dan is de klus vaak al weg. Een slimme assistent neemt telefoon en chat aan, vraagt door en bereidt je offerte voor, dag en nacht. Bekijk hoe dat werkt op een badkamerbedrijf.',
-        'brand'        => 'BadkamerBloem',
-        'heroTitle'    => 'Altijd bereikbaar, ook als jij aan het werk bent',
-        'urlLabel'     => 'jouw-badkamerbedrijf.nl',
-        'navCta'       => 'Chat',
-        'heroBtn'      => 'Stel je vraag',
-        'ctaLabel'     => 'Bekijk het AI-voorbeeld',
-        'galleryLabel' => 'De assistent aan het werk',
-        'gallery'      => array_values(array_filter([
-            ['img' => $site->image('gallery1'), 'price' => 'Chat ✓'],
-            ['img' => $site->image('gallery2'), 'price' => 'Afspraak ✓'],
-            ['img' => $site->image('gallery3'), 'price' => 'Offerte ✓'],
-        ], fn ($g) => ! empty($g['img']))),
-        'bullets'      => [
-            ['title' => 'Neemt op als jij niet kan', 'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.'],
-            ['title' => 'Bereidt je offerte voor', 'text' => 'Uit een paar foto\'s een eerste inschatting van werk en materiaal.'],
-            ['title' => 'Filtert serieuze aanvragen', 'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke klussen terugbelt.'],
-            ['title' => 'Verzamelt reviews', 'text' => 'Vraagt na oplevering automatisch om een Google-review.'],
-        ],
-    ])
-
-    {{-- ── Aanpak ─────────────────────────────────────────────────────────── --}}
-    <section data-section="aanpak">
-        <div class="wrap">
-            <span class="kicker"><span class="kicker-line"></span> Zo werkt het</span>
-            <h2>Van aanvraag naar een site die voor je werkt</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-num">1</div>
-                    <h3>Gratis voorbeeld</h3>
-                    <p>Beantwoord een paar korte vragen. Wij zetten een voorbeeld van jóuw site klaar, vaak al binnen 1 à 2 dagen. Gratis en vrijblijvend.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">2</div>
-                    <h3>Samen scherpstellen</h3>
-                    <p>We bespreken het voorbeeld bij jou op locatie of online. Jij bepaalt wat er wel en niet in moet, tot het klopt.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">3</div>
-                    <h3>Live en groeit mee</h3>
-                    <p>We zetten 'm live. Later uitbreiden met een webshop, portaal of automatisering? Dat bouwen we er gewoon op voort. Je hoeft nooit opnieuw te beginnen.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ── Waarom betergeregeld ───────────────────────────────────────────── --}}
-    <section data-section="waarom" style="background:color-mix(in srgb,var(--c-accent) 6%,transparent)">
-        <div class="wrap">
-            <span class="kicker"><span class="kicker-line"></span> Waarom betergeregeld</span>
-            <div class="grid cols-4 feature-grid" style="margin-top:1.4rem">
-                <div class="feature-card"><h3>Vaste prijs</h3><span class="feature-rule"></span><p>Duidelijke prijs vooraf, geen verrassingen achteraf.</p></div>
-                <div class="feature-card"><h3>Echt bereikbaar</h3><span class="feature-rule"></span><p>Een Nederlands team dat opneemt en meedenkt.</p></div>
-                <div class="feature-card"><h3>Groeit met je mee</h3><span class="feature-rule"></span><p>De Groeidiamant: begin klein, breid uit wanneer je eraan toe bent.</p></div>
-                <div class="feature-card"><h3>Bij jou langs</h3><span class="feature-rule"></span><p>Bezoek aan huis in de regio, of gewoon online. Net wat jou uitkomt.</p></div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ── CTA-band ───────────────────────────────────────────────────────── --}}
-    <section class="cta-band" data-section="cta">
-        <div class="wrap">
-            <div class="cta-band-inner">
-                <div>
-                    <h2>Benieuwd hoe jouw site eruit zou zien?</h2>
-                    <p>Vraag gratis en vrijblijvend een voorbeeld aan. Je zit nergens aan vast.</p>
-                </div>
-                <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
-            </div>
-        </div>
-    </section>
-
-    {{-- ── Funnel: gratis-voorbeeld-wizard (hergebruikt bouwblok) ─────────── --}}
+    {{-- Funnel: gratis-voorbeeld-wizard --}}
     @include('channels.partials.lead-wizard', ['site' => $site, 'facet' => 'website'])
 
 @endsection
