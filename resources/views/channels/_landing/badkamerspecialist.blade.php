@@ -71,9 +71,16 @@
         @include('channels.partials.zo-kan-het-worden', array_merge(['site' => $site, 'facet' => $facet], $zkhw))
     @endif
 
-    {{-- Groeidiamant: alle fasen, deze fase gemarkeerd als "jouw stap", de andere
-         linken door naar hun eigen triggerpagina. --}}
-    @include('channels.partials.groeipad', ['site' => $site, 'facet' => $facet, 'facets' => $facets])
+    {{-- Groeidiamant: compacte facetstrip, deze fase gemarkeerd, de andere linken
+         door naar hun eigen triggerpagina. --}}
+    @include('channels.partials.facet-strip', [
+        'site'    => $site,
+        'facets'  => $facets,
+        'current' => $facet,
+        'kicker'  => 'De Groeidiamant',
+        'title'   => 'Je site groeit met je mee',
+        'lead'    => 'Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. Elke stap bouwt voort op de vorige, in je eigen tempo.',
+    ])
 
     {{-- Gedeelde aanpak / waarom / CTA --}}
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe dit voor jou zou werken?'])

@@ -101,22 +101,14 @@
 	@endif
 
 	{{-- Groeidiamant: waar we een bedrijf in deze plaats mee helpen (links naar triggers). --}}
-	@if ($facets)
-		<section style="background:var(--c-surface)">
-			<div class="wrap" style="text-align:center">
-				<span class="kicker" style="justify-content:center"><span class="kicker-line"></span> Wat we voor je doen in {{ $placeName }}</span>
-				<h2>Van website tot slimme groei</h2>
-				<div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-top:1.4rem">
-					@foreach ($facets as $key => $f)
-						<a href="{{ $site->url($key) }}" class="btn btn-ghost" style="gap:.5rem">
-							<span style="display:inline-flex;color:var(--c-primary)">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</span>
-							{{ $f['label'] ?? $key }}
-						</a>
-					@endforeach
-				</div>
-			</div>
-		</section>
-	@endif
+	@include('channels.partials.facet-strip', [
+		'site'   => $site,
+		'facets' => $facets,
+		'kicker' => 'Wat we voor je doen in ' . $placeName,
+		'title'  => 'Van website tot slimme groei',
+		'lead'   => 'Begin met een sterke website en breid later uit met een webshop, klantenportaal, automatisering of AI. Je groeit stap voor stap, in je eigen tempo.',
+		'bg'     => 'var(--c-surface)',
+	])
 
 	@if (!empty($c['trust']))
 		<section>
