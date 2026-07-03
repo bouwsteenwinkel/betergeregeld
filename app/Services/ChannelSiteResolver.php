@@ -149,7 +149,12 @@ class ChannelSiteResolver
             }
             $out[$slug]['count']++;
         }
-        unset($out[ChannelSite::slug('Nederland')]);   // restgroep niet als provincie tonen
+        // Restgroep 'Nederland' alleen weglaten als er ook echte provincies zijn —
+        // anders zou provinces() leeg raken (bv. bij een plaatslijst zonder provincie).
+        $nl = ChannelSite::slug('Nederland');
+        if (isset($out[$nl]) && count($out) > 1) {
+            unset($out[$nl]);
+        }
         ksort($out);
         return $out;
     }
