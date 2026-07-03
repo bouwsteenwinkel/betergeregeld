@@ -57,7 +57,11 @@ return [
     // channel-site /plaatsen-pagina's. Via config zodat de key na `config:cache`
     // beschikbaar blijft. Zet GOOGLE_PLACES_KEY in .env (Places API + billing aan).
     'google_places' => [
-        'key' => env('GOOGLE_PLACES_KEY'),
+        'key'       => env('GOOGLE_PLACES_KEY'),
+        'enabled'   => (bool) env('GOOGLE_PLACES_ENABLED', true),
+        // Kosten-/quota-plafond: max. aantal live Places-calls per dag (warm-command
+        // én lazy web-fetches samen). 0 = geen limiet. Reset elke dag automatisch.
+        'daily_cap' => (int) env('GOOGLE_PLACES_DAILY_CAP', 500),
     ],
 
 ];

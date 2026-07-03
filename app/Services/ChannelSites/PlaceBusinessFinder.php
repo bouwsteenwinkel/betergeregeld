@@ -4,6 +4,7 @@ namespace App\Services\ChannelSites;
 
 use Composer\CaBundle\CaBundle;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -62,6 +63,45 @@ class PlaceBusinessFinder
             ->exists();
     }
 
+    /* ─────────────────────── Kosten-/quota-plafond ──────────────────────── */
+
+    /** Feature aan én key aanwezig? */
+    public function enabled(): bool
+    {
+        return (bool) config('services.google_places.enabled', true) && (bool) config('services.google_places.key');
+    }
+
+    /** Max. live calls per dag (0 = ongelimiteerd). */
+    public function dailyCap(): int
+    {
+        return (int) config('services.google_places.daily_cap', 0);
+    }
+
+    /** Live calls die vandaag al gedaan zijn. */
+    public function todayCalls(): int
+    {
+        return (int) Cache::get($this->counterKey(), 0);
+    }
+
+    /** Is het dagplafond bereikt? */
+    public function capReached(): bool
+    {
+        $cap = $this->dailyCap();
+        return $cap > 0 && $this->todayCalls() >= $cap;
+    }
+
+    private function counterKey(): string
+    {
+        return 'places_api_calls:' . now()->format('Y-m-d');
+    }
+
+    /** Telt één call bij de dag-teller (reset automatisch morgen). */
+    private function countCall(): void
+    {
+        $key = $this->counterKey();
+        Cache::put($key, $this->todayCalls() + 1, now()->endOfDay());
+    }
+
     /**
      * Live Places-call. null = fout (cache niet overschrijven); array = resultaat
      * (mag leeg zijn = "geen bedrijven gevonden", wél cachen).
@@ -70,14 +110,21 @@ class PlaceBusinessFinder
      */
     private function fetch(string $city, string $region, array $search): ?array
     {
-        $key = config('services.google_places.key');
-        if (! $key) {
+        if (! $this->enabled()) {
+            return null;
+        }
+        // Kosten-/quota-plafond: niet meer live ophalen als de dag-cap bereikt is.
+        if ($this->capReached()) {
+            Log::info('Places dagplafond bereikt — live fetch overgeslagen', ['calls' => $this->todayCalls(), 'cap' => $this->dailyCap()]);
             return null;
         }
 
+        $key        = config('services.google_places.key');
         $query      = str_replace([':city', ':region'], [$city, $region], (string) ($search['query'] ?? ':city'));
         $limit      = (int) ($search['limit'] ?? 8);
         $minReviews = (int) ($search['min_reviews'] ?? 0);
+
+        $this->countCall();   // tel de poging (ook bij fout — beschermt tegen error-loops)
 
         try {
             $resp = Http::timeout(12)
