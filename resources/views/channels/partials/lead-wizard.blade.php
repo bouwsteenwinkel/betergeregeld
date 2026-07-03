@@ -220,14 +220,16 @@
     var total = steps.length;
     var idx   = 0;
 
-    function show(i) {
+    function show(i, scroll) {
         idx = Math.max(0, Math.min(i, total - 1));
         steps.forEach(function (s, n) { s.classList.toggle('is-active', n === idx); });
         if (bar) bar.style.width = ((idx + 1) / total * 100) + '%';
         if (window.bgTrack) window.bgTrack('wizard_step', { step: idx + 1, total: total });
         var f = steps[idx].querySelector('input:not([type=hidden]),textarea');
         if (f) { try { f.focus({ preventScroll: true }); } catch (e) {} }
-        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Alleen naar het formulier scrollen bij een door de gebruiker gewisselde
+        // stap, NIET bij init (anders scrolt elke pagina meteen naar het formulier).
+        if (scroll) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     // Verplichte velden in de huidige stap valideren.
@@ -259,23 +261,23 @@
                 if (btn.dataset.facet) {
                     var fc = form.querySelector('input[name="facet"]'); if (fc) fc.value = btn.dataset.facet;
                 }
-                if (group.hasAttribute('data-advance')) setTimeout(function () { show(idx + 1); }, 180);
+                if (group.hasAttribute('data-advance')) setTimeout(function () { show(idx + 1, true); }, 180);
             });
         });
     });
 
     form.querySelectorAll('.lwz-next').forEach(function (b) {
-        b.addEventListener('click', function () { if (valid(steps[idx])) show(idx + 1); });
+        b.addEventListener('click', function () { if (valid(steps[idx])) show(idx + 1, true); });
     });
     form.querySelectorAll('.lwz-back').forEach(function (b) {
-        b.addEventListener('click', function () { show(idx - 1); });
+        b.addEventListener('click', function () { show(idx - 1, true); });
     });
 
     // Enter in een tekstveld = volgende (niet submitten), behalve op de laatste stap.
     form.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && e.target.matches('.lwz-input:not(textarea)')) {
             e.preventDefault();
-            if (valid(steps[idx])) show(idx + 1);
+            if (valid(steps[idx])) show(idx + 1, true);
         }
     });
 
