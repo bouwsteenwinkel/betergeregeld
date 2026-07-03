@@ -37,7 +37,7 @@
 
             <h2>Je toestemming beheren</h2>
             <p>Bij je eerste bezoek vragen we via een cookiemelding om je keuze. Je kunt die keuze op elk moment aanpassen of intrekken via de knop hieronder. Daarnaast kun je cookies altijd verwijderen of blokkeren via de instellingen van je browser.</p>
-            <p><button type="button" class="btn btn-ghost" data-cmp-open>Cookievoorkeuren aanpassen</button></p>
+            <p><button type="button" class="btn btn-ghost" data-cmp-open-prefs>Cookievoorkeuren aanpassen</button></p>
 
             <h2>Vragen?</h2>
             <p>Neem gerust contact op via de gegevens in ons <a href="{{ $site->url('privacybeleid') }}">privacybeleid</a>.</p>

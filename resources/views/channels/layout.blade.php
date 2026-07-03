@@ -52,6 +52,12 @@
 	})();
 	</script>
 
+	{{-- Betergeregeld CMP (cookie-consent). Toont de banner, logt consent en gate't
+	     scripts uit categorie 'analytics'/'marketing'. LET OP: analytics/heatmap/GA4
+	     NOOIT los in de layout laden — voeg ze toe als CMP-script (admin, categorie
+	     analytics), anders draaien ze buiten de consent om. --}}
+	<script src="{{ url('/cmp/loader.js') }}?tenant=channels&lang={{ $site->locale() }}" async></script>
+
 	@if ($site->theme()['font_url'])
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
