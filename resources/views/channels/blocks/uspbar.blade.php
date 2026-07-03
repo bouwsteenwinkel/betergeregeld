@@ -4,7 +4,7 @@
     <div class="wrap" style="display:flex;justify-content:center;gap:2.4rem;flex-wrap:wrap">
         @foreach ($items as $it)
             <div style="display:flex;align-items:center;gap:.6rem;font-weight:600">
-                <span style="font-size:1.2rem">{{ is_array($it) ? ($it['icon'] ?? '✓') : '✓' }}</span>
+                <span style="display:inline-flex;color:var(--c-accent)">@include('channels.partials.icon', ['name' => is_array($it) ? ($it['icon'] ?? 'check') : 'check'])</span>
                 {{ is_array($it) ? ($it['text'] ?? '') : $it }}
             </div>
         @endforeach

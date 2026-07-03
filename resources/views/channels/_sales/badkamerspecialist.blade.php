@@ -82,7 +82,7 @@
                 @foreach ($facets as $key => $f)
                     @php $lead = $landings[$key]['hero']['sub'] ?? ($f['tagline'] ?? ''); @endphp
                     <a href="{{ isset($landings[$key]) ? $site->url($key) : $site->url('voorbeeld/' . $key) }}" class="feature-card" style="display:block;color:inherit">
-                        <div class="feature-ico" style="font-size:1.4rem;line-height:1">{{ $f['icon'] ?? '•' }}</div>
+                        <div class="feature-ico">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
                         <h3>{{ $f['nr'] ?? '' }}. {{ $f['label'] ?? $key }}</h3>
                         <span class="feature-rule"></span>
                         <p>{{ $lead }}</p>

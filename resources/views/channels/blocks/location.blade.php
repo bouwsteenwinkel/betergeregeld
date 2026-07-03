@@ -9,10 +9,10 @@
     <div class="wrap" style="display:grid;gap:2rem;grid-template-columns:1fr;@media(min-width:760px){grid-template-columns:1fr 1fr}">
         <div>
             @if ($block->c('heading'))<h2>{{ $block->c('heading') }}</h2>@endif
-            <div class="muted" style="margin-top:1rem;display:grid;gap:.5rem">
-                @if ($address)<div>📍 {{ $address }}</div>@endif
-                @if ($phone)<div>📞 <a href="tel:{{ preg_replace('/\s+/', '', $phone) }}">{{ $phone }}</a></div>@endif
-                @if ($email)<div>✉ <a href="mailto:{{ $email }}">{{ $email }}</a></div>@endif
+            <div class="muted" style="margin-top:1rem;display:grid;gap:.6rem">
+                @if ($address)<div style="display:flex;align-items:center;gap:.55rem"><span style="display:inline-flex;color:var(--c-accent);flex:0 0 auto">@include('channels.partials.icon', ['name' => 'location'])</span>{{ $address }}</div>@endif
+                @if ($phone)<div style="display:flex;align-items:center;gap:.55rem"><span style="display:inline-flex;color:var(--c-accent);flex:0 0 auto">@include('channels.partials.icon', ['name' => 'phone'])</span><a href="tel:{{ preg_replace('/\s+/', '', $phone) }}">{{ $phone }}</a></div>@endif
+                @if ($email)<div style="display:flex;align-items:center;gap:.55rem"><span style="display:inline-flex;color:var(--c-accent);flex:0 0 auto">@include('channels.partials.icon', ['name' => 'mail'])</span><a href="mailto:{{ $email }}">{{ $email }}</a></div>@endif
             </div>
         </div>
         @if ($hours)

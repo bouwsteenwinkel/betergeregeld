@@ -6,7 +6,7 @@
         <div class="grid cols-4">
             @foreach ($items as $f)
                 <div class="card">
-                    <div style="font-size:2rem;margin-bottom:.5rem">{{ $f['icon'] ?? '•' }}</div>
+                    <div class="feature-ico">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
                     <h3>{{ $f['title'] ?? '' }}</h3>
                     <p class="muted" style="font-size:.95rem">{{ $f['text'] ?? '' }}</p>
                 </div>

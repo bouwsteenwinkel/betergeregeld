@@ -27,7 +27,7 @@
 				<div class="grid cols-4" style="margin-top:1.4rem">
 					@foreach ($h['features'] as $f)
 						<div class="card">
-							<div style="font-size:1.8rem;margin-bottom:.4rem">{{ $f['icon'] ?? '•' }}</div>
+							<div class="feature-ico">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
 							<h3>{{ $f['title'] }}</h3>
 							<p class="muted" style="font-size:.95rem">{{ $f['text'] }}</p>
 						</div>
