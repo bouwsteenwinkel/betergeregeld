@@ -137,6 +137,19 @@ foreach ($__legacyTools as $__t) {
 	Route::redirect("/{$__t}", "/nl/tools/{$__t}", 301);
 	Route::redirect("/tools/{$__t}", "/nl/tools/{$__t}", 301);
 }
+// Hernoemde content-pagina's → dichtstbijzijnde huidige equivalent. Alleen waar
+// een écht relevant target bestaat; pers/cases/terms/etc. hebben er geen en
+// blijven bewust 404 (redirect naar een generieke pagina = soft-404, slecht).
+foreach (['nl', 'en'] as $__loc) {
+	Route::redirect("/{$__loc}/over-ons", "/{$__loc}/over", 301);
+	Route::redirect("/{$__loc}/over-betergeregeld", "/{$__loc}/over", 301);
+	Route::redirect("/{$__loc}/support", "/{$__loc}/contact", 301);
+	foreach (['business', 'teams', 'freelancers'] as $__seg) {
+		Route::redirect("/{$__loc}/solutions/{$__seg}", "/{$__loc}/prijzen", 301);
+	}
+}
+Route::redirect('/nl/servicios', '/nl/diensten', 301);   // oude es-slug onder /nl
+Route::redirect('/nl/sobre-nosotros', '/nl/over', 301);
 
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)

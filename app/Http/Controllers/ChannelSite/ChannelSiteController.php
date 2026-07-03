@@ -119,6 +119,26 @@ class ChannelSiteController extends Controller
         return view('channels.groeidiamant', ['site' => $this->site()]);
     }
 
+    public function pricing(): View
+    {
+        return view('channels.pricing', ['site' => $this->site()]);
+    }
+
+    public function privacy(): View
+    {
+        return view('channels.legal.privacy', ['site' => $this->site()]);
+    }
+
+    public function cookies(): View
+    {
+        return view('channels.legal.cookies', ['site' => $this->site()]);
+    }
+
+    public function terms(): View
+    {
+        return view('channels.legal.terms', ['site' => $this->site()]);
+    }
+
     /* ───────────────────────────── Plaatsen ──────────────────────────────── */
 
     public function places(): View

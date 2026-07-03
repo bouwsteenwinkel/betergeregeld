@@ -34,6 +34,11 @@
 		</div>
 		<div class="foot-bottom">
 			<span>© {{ now()->year }} {{ $site->displayName() }}</span>
+			<span class="foot-legal">
+				<a href="{{ $site->url('privacybeleid') }}">Privacy</a>
+				<a href="{{ $site->url('cookiebeleid') }}">Cookies</a>
+				<a href="{{ $site->url('algemene-voorwaarden') }}">Voorwaarden</a>
+			</span>
 			{{-- Groeidiamant-keurmerk: mooie logo-badge → interne uitlegpagina. --}}
 			<a href="{{ $site->url('groeidiamant') }}" class="foot-endorse" aria-label="Meer over de Groeidiamant by Betergeregeld ICT">
 				<span class="foot-endorse-label">Werkt volgens de</span>

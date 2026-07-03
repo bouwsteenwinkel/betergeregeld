@@ -30,6 +30,10 @@ $channelRoutes = function () use ($facetKeys) {
 
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
     Route::get('/groeidiamant', [ChannelSiteController::class, 'groeidiamant']);
+    Route::get('/prijzen', [ChannelSiteController::class, 'pricing']);
+    Route::get('/privacybeleid', [ChannelSiteController::class, 'privacy']);
+    Route::get('/cookiebeleid', [ChannelSiteController::class, 'cookies']);
+    Route::get('/algemene-voorwaarden', [ChannelSiteController::class, 'terms']);
 
     Route::get('/plaatsen', [ChannelSiteController::class, 'places']);
     Route::get('/plaatsen/provincie/{prov}', [ChannelSiteController::class, 'province']);
