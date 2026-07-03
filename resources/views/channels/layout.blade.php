@@ -310,9 +310,9 @@
 		.endorse-badge img{height:34px;width:auto;display:block}
 		.foot-endorse{display:inline-flex;align-items:center;gap:.65rem;text-decoration:none}
 		.foot-endorse-label{color:rgba(255,255,255,.6);font-size:.82rem}
-		.foot-endorse-badge{display:inline-flex;background:#fff;border-radius:12px;padding:.5rem .8rem;box-shadow:0 8px 22px -10px rgba(0,0,0,.7);transition:transform .15s ease,box-shadow .2s ease}
+		.foot-endorse-badge{display:inline-flex;background:#fff;border-radius:12px;padding:.3rem .45rem;box-shadow:0 8px 22px -10px rgba(0,0,0,.7);transition:transform .15s ease,box-shadow .2s ease}
 		.foot-endorse:hover .foot-endorse-badge{transform:translateY(-2px);box-shadow:0 13px 30px -10px rgba(0,0,0,.85)}
-		.foot-endorse-badge img{height:42px;width:auto;display:block;border-radius:4px}
+		.foot-endorse-badge img{height:64px;width:auto;display:block;border-radius:4px}
 		.foot-legal{display:inline-flex;gap:1rem;flex-wrap:wrap}
 		.foot-legal a{color:rgba(255,255,255,.6);font-size:.82rem}.foot-legal a:hover{color:#fff}
 		/* form */
