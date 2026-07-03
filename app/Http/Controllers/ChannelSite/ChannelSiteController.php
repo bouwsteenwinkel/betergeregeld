@@ -129,6 +129,11 @@ class ChannelSiteController extends Controller
         return view('channels.werkwijze', ['site' => $this->site()]);
     }
 
+    public function cases(): View
+    {
+        return view('channels.cases', ['site' => $this->site()]);
+    }
+
     public function faq(): View
     {
         return view('channels.faq', ['site' => $this->site()]);

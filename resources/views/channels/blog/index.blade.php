@@ -35,7 +35,7 @@
 						</a>
 					@endforeach
 				</div>
-				<div style="margin-top:2.4rem">{{ $posts->links() }}</div>
+				<div style="margin-top:2.4rem">{{ $posts->links('channels.partials.pagination') }}</div>
 			@endif
 		</div>
 	</section>

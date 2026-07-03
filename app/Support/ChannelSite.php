@@ -223,6 +223,17 @@ class ChannelSite
             ];
         }
 
+        // Ankers waarvoor nu een eigen pagina bestaat → naar die pagina i.p.v. een
+        // (vaak niet-bestaand) home-anker.
+        $pageForAnchor = ['#werkwijze' => 'werkwijze', '#reviews' => 'cases'];
+        $menu = array_map(function ($m) use ($pageForAnchor) {
+            $h = trim((string) ($m['href'] ?? ''));
+            if (isset($pageForAnchor[$h])) {
+                $m['href'] = $pageForAnchor[$h];
+            }
+            return $m;
+        }, $menu);
+
         // Zorg dat elke site 'Prijzen'-, 'Plaatsen'- en 'Blog'-links heeft (deze
         // pagina's bestaan voor alle niche-sites). Injecteer vóór 'Contact' als ze
         // ontbreken.
@@ -260,6 +271,11 @@ class ChannelSite
             return $this->url();
         }
         if (str_starts_with($href, '#')) {
+            // Het aanvraagformulier staat op ELKE pagina → same-page anker.
+            if (in_array($href, ['#contact', '#gratis-voorbeeld'], true)) {
+                return $href;
+            }
+            // Overige ankers verwijzen naar een home-sectie → absoluut naar home.
             return $this->url() . $href;
         }
         if (preg_match('#^(https?://|tel:|mailto:)#', $href)) {

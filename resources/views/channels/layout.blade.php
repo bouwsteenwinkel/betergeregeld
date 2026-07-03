@@ -182,6 +182,11 @@
 		.blog-card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
 		.blog-card:hover .blog-card-img img{transform:scale(1.04)}
 		.article-cover{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:var(--radius);box-shadow:0 24px 60px -30px rgba(0,0,0,.4)}
+		.pager{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+		.pager-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.1rem;border-radius:8px;font-weight:600;font-size:.95rem;border:1px solid color-mix(in srgb,var(--c-ink) 14%,transparent);background:var(--c-surface);color:var(--c-ink);text-decoration:none;transition:border-color .15s,color .15s}
+		.pager-btn:hover{border-color:var(--c-primary);color:var(--c-primary)}
+		.pager-btn.is-disabled{opacity:.4;pointer-events:none}
+		.pager-info{color:var(--c-muted);font-size:.9rem;font-weight:600}
 		.empty-state{text-align:center;max-width:540px;margin:1rem auto;padding:2.6rem 1.6rem;background:var(--c-surface);border:1px dashed color-mix(in srgb,var(--c-ink) 18%,transparent);border-radius:calc(var(--radius) + 2px)}
 		.empty-state h3{font-size:1.3rem;margin-bottom:.5rem}
 		.empty-state p{margin:0 auto 1.5rem;max-width:42ch}

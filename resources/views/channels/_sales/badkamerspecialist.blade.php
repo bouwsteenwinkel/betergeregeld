@@ -74,6 +74,7 @@
 
     {{-- Wat we voor je bouwen = de Groeidiamant-facetstrip (zelfde compacte blok als
          op de trigger- en plaatsen-pagina's). Elk facet linkt naar z'n landingspagina. --}}
+    <div id="diensten" class="scroll-anchor" aria-hidden="true"></div>
     @include('channels.partials.facet-strip', [
         'site'   => $site,
         'facets' => $facets,
@@ -90,6 +91,7 @@
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe jouw site eruit zou zien?'])
 
     {{-- Funnel: gratis-voorbeeld-wizard --}}
+    <div id="contact" class="scroll-anchor" aria-hidden="true"></div>
     @include('channels.partials.lead-wizard', ['site' => $site, 'facet' => 'website'])
 
 @endsection

@@ -33,6 +33,7 @@
 			</div>
 		</div>
 		<div class="foot-links">
+			<a href="{{ $site->url('cases') }}">Cases</a>
 			<a href="{{ $site->url('werkwijze') }}">Onze werkwijze</a>
 			<a href="{{ $site->url('veelgestelde-vragen') }}">Veelgestelde vragen</a>
 			<a href="{{ $site->url('vergelijken') }}">Zelf bouwen of laten maken</a>
