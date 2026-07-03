@@ -25,5 +25,6 @@
 		</section>
 	</article>
 
-	@include('channels.partials.lead-form')
+	<div id="contact" class="scroll-anchor" aria-hidden="true"></div>
+	@include('channels.partials.lead-wizard', ['site' => $site, 'facet' => 'website'])
 @endsection
