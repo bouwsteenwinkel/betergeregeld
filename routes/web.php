@@ -108,6 +108,13 @@ Route::post('/monitor/socketlabs/webhook', \App\Http\Controllers\Monitor\SocketL
 Route::match(['get', 'post'], '/cron/ping/{token}/{signal?}', \App\Http\Controllers\Monitor\CronPingController::class)
 	->name('cron.ping');
 
+// Uitgefaseerde locales de/fr/es (waren onvertaalde NL-duplicaten) → 301 naar /nl.
+// Behoudt link-equity voor reeds geïndexeerde URL's i.p.v. kale 404's. MOET vóór
+// de {locale}-groep staan. Slugs waren toch al Nederlands, dus /nl/{rest} resolvet.
+Route::get('/{oldloc}/{rest?}', function (string $oldloc, ?string $rest = null) {
+	return redirect('/nl' . ($rest !== null && $rest !== '' ? '/' . $rest : ''), 301);
+})->where('oldloc', 'de|fr|es')->where('rest', '.*');
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)

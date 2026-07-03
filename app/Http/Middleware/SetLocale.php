@@ -10,7 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-	public const SUPPORTED = ['nl', 'en', 'de', 'fr', 'es'];
+	// de/fr/es uitgefaseerd 2026-07-03: die serveerden onvertaalde NL-content
+	// (duplicate content, verkeerd lang-attribuut). Alleen nl + en worden nog
+	// bediend/geïndexeerd; oude de/fr/es-URL's 301'en naar /nl via routes/web.php.
+	public const SUPPORTED = ['nl', 'en'];
 
 	public function handle(Request $request, Closure $next): Response
 	{

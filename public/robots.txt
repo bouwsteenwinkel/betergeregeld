@@ -21,5 +21,8 @@ Disallow: /*/tools/boekhouden
 # AccessGuard token-flows
 Disallow: /*/accessguard/notifications/unsubscribe/
 
+# Cloudflare e-mail-protection artefact (geen echte pagina)
+Disallow: /cdn-cgi/
+
 # Stale www.-variant (zorg dat de canonical-host serveert)
 Sitemap: https://betergeregeld.com/sitemap.xml

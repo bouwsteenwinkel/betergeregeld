@@ -92,7 +92,7 @@ class SitemapController extends Controller
 		// dailyAt 09:00 'blog:generate-daily' command schrijft direct
 		// een NL- en EN-versie; oudere posts hebben alleen NL en zijn
 		// daarom alleen onder /nl/ vindbaar.
-		foreach (BlogPost::query()->published()->get(['slug', 'locale', 'updated_at', 'is_pillar']) as $post) {
+		foreach (BlogPost::query()->published()->whereIn('locale', $locales)->get(['slug', 'locale', 'updated_at', 'is_pillar']) as $post) {
 			$xml .= $this->url(
 				url("/{$post->locale}/blog/{$post->slug}"),
 				$post->is_pillar ? '0.8' : '0.6',
