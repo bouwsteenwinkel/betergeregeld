@@ -115,6 +115,29 @@ Route::get('/{oldloc}/{rest?}', function (string $oldloc, ?string $rest = null) 
 	return redirect('/nl' . ($rest !== null && $rest !== '' ? '/' . $rest : ''), 301);
 })->where('oldloc', 'de|fr|es')->where('rest', '.*');
 
+// ── Legacy landings-URL's → 301 naar huidige gelokaliseerde structuur ─────────
+// Oude korte-URL's (pre-locale-prefix root `/seo-check`, of `/nl/seo-check`)
+// wezen uit GSC naar 404. Slug-gestuurd uit de catalogus zodat het meegroeit.
+// MOET vóór de {locale}-groep staan zodat deze eerst matchen.
+$__legacyServices = array_keys(config('services_catalog', []));
+$__legacyTools = [
+	'iban-check', 'vat-check', 'postcode-check', 'shipping-rates', 'ip-lookup',
+	'lego-lookup', 'json-formatter', 'diff', 'favicon-generator', 'pdf-merge',
+	'dns-inspector', 'mail-auth-check', 'ssl-check', 'security-headers', 'whois-lookup',
+];
+Route::redirect('/diensten', '/nl/diensten', 301);
+Route::redirect('/tools', '/nl/tools', 301);
+foreach ($__legacyServices as $__s) {
+	Route::redirect("/{$__s}", "/nl/diensten/{$__s}", 301);           // root → nl/diensten
+	Route::redirect("/diensten/{$__s}", "/nl/diensten/{$__s}", 301);  // zonder locale
+	Route::redirect("/nl/{$__s}", "/nl/diensten/{$__s}", 301);        // oude /nl korte vorm
+	Route::redirect("/en/{$__s}", "/en/diensten/{$__s}", 301);
+}
+foreach ($__legacyTools as $__t) {
+	Route::redirect("/{$__t}", "/nl/tools/{$__t}", 301);
+	Route::redirect("/tools/{$__t}", "/nl/tools/{$__t}", 301);
+}
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)
