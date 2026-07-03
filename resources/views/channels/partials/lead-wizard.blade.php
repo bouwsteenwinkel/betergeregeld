@@ -64,6 +64,8 @@
             <input type="hidden" name="style"            value="{{ old('style') }}">
             <input type="hidden" name="timing"           value="{{ old('timing') }}">
             <input type="hidden" name="appointment_type" value="{{ old('appointment_type') }}">
+            {{-- Plaats-prefill (bv. vanaf een /plaatsen-pagina), zodat de lead getagd wordt. --}}
+            <input type="hidden" name="city"             value="{{ old('city', $placePrefill ?? '') }}">
 
             <div class="lwz-progress"><span class="lwz-bar"></span></div>
 
