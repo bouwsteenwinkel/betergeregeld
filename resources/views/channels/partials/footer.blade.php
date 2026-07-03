@@ -34,28 +34,11 @@
 		</div>
 		<div class="foot-bottom">
 			<span>© {{ now()->year }} {{ $site->displayName() }}</span>
-			@if ($site->endorsementLogo())
-				{{-- Moedermerk-keurmerk als logo-badge (witte chip op de donkere footer). --}}
-				<span class="endorsement">
-					<span class="endorse-label">Onderdeel van</span>
-					@if ($site->endorsementUrl())
-						<a class="endorse-badge" href="{{ $site->endorsementUrl() }}" target="_blank" rel="noopener" aria-label="{{ $site->endorsement() ?: 'Groeidiamant' }}">
-							<img src="{{ $site->endorsementLogo() }}" alt="{{ $site->endorsement() ?: 'Groeidiamant by Betergeregeld' }}">
-						</a>
-					@else
-						<span class="endorse-badge"><img src="{{ $site->endorsementLogo() }}" alt="{{ $site->endorsement() ?: 'Groeidiamant by Betergeregeld' }}"></span>
-					@endif
-				</span>
-			@elseif ($site->endorsement())
-				<span class="endorsement">
-					<span class="diamond" aria-hidden="true">◆</span>
-					@if ($site->endorsementUrl())
-						<a href="{{ $site->endorsementUrl() }}" target="_blank" rel="noopener">{{ $site->endorsement() }}</a>
-					@else
-						{{ $site->endorsement() }}
-					@endif
-				</span>
-			@endif
+			{{-- Groeidiamant-keurmerk: mooie logo-badge → interne uitlegpagina. --}}
+			<a href="{{ $site->url('groeidiamant') }}" class="foot-endorse" aria-label="Meer over de Groeidiamant by Betergeregeld ICT">
+				<span class="foot-endorse-label">Werkt volgens de</span>
+				<span class="foot-endorse-badge"><img src="{{ asset('channel-media/_brand/groeidiamant.jpg') }}" alt="Groeidiamant by Betergeregeld ICT"></span>
+			</a>
 		</div>
 	</div>
 </footer>

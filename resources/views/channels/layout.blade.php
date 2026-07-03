@@ -302,6 +302,11 @@
 		.endorse-badge{display:inline-flex;align-items:center;background:#fff;border-radius:10px;padding:.45rem .7rem;box-shadow:0 6px 18px -10px rgba(0,0,0,.6);transition:transform .15s}
 		.endorse-badge:hover{transform:translateY(-1px)}
 		.endorse-badge img{height:34px;width:auto;display:block}
+		.foot-endorse{display:inline-flex;align-items:center;gap:.65rem;text-decoration:none}
+		.foot-endorse-label{color:rgba(255,255,255,.6);font-size:.82rem}
+		.foot-endorse-badge{display:inline-flex;background:#fff;border-radius:12px;padding:.5rem .8rem;box-shadow:0 8px 22px -10px rgba(0,0,0,.7);transition:transform .15s ease,box-shadow .2s ease}
+		.foot-endorse:hover .foot-endorse-badge{transform:translateY(-2px);box-shadow:0 13px 30px -10px rgba(0,0,0,.85)}
+		.foot-endorse-badge img{height:42px;width:auto;display:block;border-radius:4px}
 		/* form */
 		.field{margin-bottom:.9rem}
 		.field label{display:block;font-weight:600;font-size:.9rem;margin-bottom:.3rem}

@@ -114,6 +114,11 @@ class ChannelSiteController extends Controller
         return view('channels.about', ['site' => $this->site()]);
     }
 
+    public function groeidiamant(): View
+    {
+        return view('channels.groeidiamant', ['site' => $this->site()]);
+    }
+
     /* ───────────────────────────── Plaatsen ──────────────────────────────── */
 
     public function places(): View
