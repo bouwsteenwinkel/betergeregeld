@@ -72,26 +72,16 @@
         </div>
     </section>
 
-    {{-- Wat we voor je bouwen = de 5 producten, elk met een eigen landingspagina --}}
-    <section data-section="producten" style="background:color-mix(in srgb,var(--c-accent) 6%,transparent)">
-        <div class="wrap">
-            <span class="kicker"><span class="kicker-line"></span> Wat we voor je bouwen</span>
-            <h2>Kies waar je nu staat, de rest komt later</h2>
-            <p class="section-lead muted">Van een eerste professionele site tot online verkopen en slimme automatisering. Klik op een product voor het volledige verhaal en een echt voorbeeld.</p>
-            <div class="grid cols-3 feature-grid">
-                @foreach ($facets as $key => $f)
-                    @php $lead = $landings[$key]['hero']['sub'] ?? ($f['tagline'] ?? ''); @endphp
-                    <a href="{{ isset($landings[$key]) ? $site->url($key) : $site->url('voorbeeld/' . $key) }}" class="feature-card" style="display:block;color:inherit">
-                        <div class="feature-ico">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
-                        <h3>{{ $f['nr'] ?? '' }}. {{ $f['label'] ?? $key }}</h3>
-                        <span class="feature-rule"></span>
-                        <p>{{ $lead }}</p>
-                        <p style="margin-top:1rem;font-weight:700;color:var(--c-cta)">Meer over dit product →</p>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
+    {{-- Wat we voor je bouwen = de Groeidiamant-facetstrip (zelfde compacte blok als
+         op de trigger- en plaatsen-pagina's). Elk facet linkt naar z'n landingspagina. --}}
+    @include('channels.partials.facet-strip', [
+        'site'   => $site,
+        'facets' => $facets,
+        'kicker' => 'Wat we voor je bouwen',
+        'title'  => 'Kies waar je nu staat, de rest komt later',
+        'lead'   => 'Van een eerste professionele site tot online verkopen en slimme automatisering. Klik op een product voor het volledige verhaal en een echt voorbeeld.',
+        'bg'     => 'color-mix(in srgb,var(--c-accent) 6%,transparent)',
+    ])
 
     {{-- Géén "Zo kan het worden"-blokken op de home: één blok per groeistap staat
          op de eigen landingspagina (/{facet}). De home funnelt via de kaarten hierboven. --}}
