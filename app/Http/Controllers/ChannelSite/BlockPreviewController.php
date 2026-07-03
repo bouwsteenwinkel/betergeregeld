@@ -52,7 +52,7 @@ class BlockPreviewController extends Controller
                 'primary' => '#4f46e5', 'accent' => '#06b6d4', 'ink' => '#0f172a',
                 'muted' => '#64748b', 'bg' => '#ffffff', 'surface' => '#f8fafc', 'radius' => '14px',
             ],
-            'brand' => ['phone' => '085 1303 600', 'email' => 'hallo@betergeregeld.nl', 'address' => 'Bussum'],
+            'brand' => ['phone' => '085 1303 600', 'email' => 'info@betergeregeld.com', 'address' => 'Bussum'],
             'meta'  => [],
         ]);
     }

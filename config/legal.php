@@ -15,7 +15,7 @@ return [
     'kvk'        => '',                              // VUL IN (KvK-nummer)
     'btw'        => '',                              // VUL IN (BTW-nummer, optioneel)
     'address'    => '',                             // VUL IN (vestigingsadres)
-    'email'      => 'hallo@betergeregeld.nl',
+    'email'      => 'info@betergeregeld.com',
     'phone'      => '085 1303 600',
     'website'    => 'https://betergeregeld.nl',
     'ap_url'     => 'https://www.autoriteitpersoonsgegevens.nl',

@@ -46,7 +46,7 @@ return [
     // brand.endorsement_url.
     'defaults' => [
         'phone' => '085 1303 600',
-        'email' => 'hallo@betergeregeld.nl',
+        'email' => 'info@betergeregeld.com',
         'kvk'   => '',
         'trustline'       => 'Gratis voorbeeld, geen verplichtingen',
         'endorsement'     => 'Volgens de Groeidiamant van Betergeregeld ICT',
