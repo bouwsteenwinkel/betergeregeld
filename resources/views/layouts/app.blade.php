@@ -294,9 +294,9 @@
 			<div class="pt-6 border-t border-[color:var(--color-on-dark-line)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[color:var(--color-on-dark-soft)]">
 				<div>&copy; {{ date('Y') }} Beter Geregeld ICT. {{ __('Alle rechten voorbehouden.') }}</div>
 				<div class="flex gap-5">
-					<span class="hover:text-white cursor-pointer">{{ __('Privacy') }}</span>
-					<span class="hover:text-white cursor-pointer">{{ __('Voorwaarden') }}</span>
-					<span class="hover:text-white cursor-pointer">{{ __('Cookiebeleid') }}</span>
+					<a href="{{ route('legal.privacy') }}" class="hover:text-white">{{ __('Privacy') }}</a>
+					<a href="{{ route('legal.terms') }}" class="hover:text-white">{{ __('Voorwaarden') }}</a>
+					<a href="{{ route('legal.cookies') }}" class="hover:text-white">{{ __('Cookiebeleid') }}</a>
 				</div>
 			</div>
 		</div>

@@ -150,6 +150,14 @@ foreach (['nl', 'en'] as $__loc) {
 }
 Route::redirect('/nl/servicios', '/nl/diensten', 301);   // oude es-slug onder /nl
 Route::redirect('/nl/sobre-nosotros', '/nl/over', 301);
+// Oude legal-URL's → de nieuwe juridische pagina's op de hoofdsite.
+foreach (['nl', 'en'] as $__loc) {
+	Route::redirect("/{$__loc}/privacy", "/{$__loc}/privacybeleid", 301);
+	Route::redirect("/{$__loc}/cookies", "/{$__loc}/cookiebeleid", 301);
+	Route::redirect("/{$__loc}/terms", "/{$__loc}/algemene-voorwaarden", 301);
+	Route::redirect("/{$__loc}/voorwaarden", "/{$__loc}/algemene-voorwaarden", 301);
+	Route::redirect("/{$__loc}/disclaimer", "/{$__loc}/algemene-voorwaarden", 301);
+}
 
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
@@ -157,6 +165,11 @@ Route::prefix('{locale}')
 	->group(function () {
 		Route::get('/', fn () => view('welcome'))->name('home');
 		Route::get('/over', fn () => view('pages.about'))->name('about');
+
+		// Juridische pagina's (generiek uit config/legal.php). noindex,follow.
+		Route::get('/privacybeleid', fn () => view('pages.legal.privacy'))->name('legal.privacy');
+		Route::get('/cookiebeleid', fn () => view('pages.legal.cookies'))->name('legal.cookies');
+		Route::get('/algemene-voorwaarden', fn () => view('pages.legal.terms'))->name('legal.terms');
 		Route::get('/accessguard', [AccessGuardLandingController::class, 'show'])->name('accessguard.landing');
 		Route::get('/accessguard/demo', [AccessGuardDemoController::class, 'show'])->name('accessguard.demo');
 
