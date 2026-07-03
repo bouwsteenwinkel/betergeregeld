@@ -7,8 +7,13 @@
     // Daarnaast: wordmark in de display-font + optionele brand.logo_tagline.
     $mark    = $site->brand('logo_mark');
     $tagline = $site->brand('logo_tagline');
+    // Trigger-identiteit (niet-demo): toon de eigen naam als wordmark i.p.v. het
+    // demo-bedrijfslogo/monogram.
+    $triggerName = ! $site->isDemoContext() ? $site->brand('footer_name') : null;
 @endphp
-@if ($site->logoImage())
+@if ($triggerName)
+    <span class="logo-text"><span class="logo-word">{{ $triggerName }}</span></span>
+@elseif ($site->logoImage())
     <img src="{{ $site->logoImage() }}" alt="{{ $site->name() }}" style="height:40px;display:block">
 @else
     <span class="logo-mark" aria-hidden="true">

@@ -30,7 +30,9 @@
 <header class="nav">
 	<div class="wrap nav-inner">
 		<a href="{{ $site->url() }}" class="logo">
-			@if ($site->logoImage())
+			@if (! $site->isDemoContext() && $site->brand('footer_name'))
+				{{ $site->brand('footer_name') }}
+			@elseif ($site->logoImage())
 				<img src="{{ $site->logoImage() }}" alt="{{ $site->name() }}" style="height:34px;display:block">
 			@else
 				{!! $site->brand('logo_text', $site->name()) !!}

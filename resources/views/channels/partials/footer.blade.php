@@ -1,30 +1,14 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 <footer>
-	@php
-		// Op de demo-pagina's (/voorbeeld) is de footer onderdeel van de mockup en
-		// hoort de klant-identiteit erin. Op de trigger-/plaatsen-pagina's gaat de
-		// footer over óns (het aanbod) — dan winnen brand.footer_name/footer_about.
-		$isDemo      = \Illuminate\Support\Str::contains(request()->path(), 'voorbeeld');
-		$footerName  = $site->brand('footer_name');
-		$footerAbout = $site->brand('footer_about');
-		$aboutUs     = ! $isDemo && ($footerName || $footerAbout);
-	@endphp
+	{{-- Identiteit is context-afhankelijk: op /voorbeeld de demo-mockup (klant),
+	     elders óns aanbod. Logo-partial + metaDescription() regelen dat zelf. --}}
 	<div class="wrap">
 		<div class="foot-grid">
 			<div>
-				@if ($aboutUs)
-					<div class="logo" style="color:#fff;margin-bottom:.6rem">
-						<span class="logo-text"><span class="logo-word">{{ $footerName ?: $site->name() }}</span></span>
-					</div>
-					<p style="color:rgba(255,255,255,.75);max-width:44ch">
-						{{ $footerAbout ?: $site->homeDescription() }}
-					</p>
-				@else
-					<div class="logo" style="color:#fff;margin-bottom:.6rem">@include('channels.partials.logo')</div>
-					<p style="color:rgba(255,255,255,.75);max-width:42ch">
-						{{ $site->homeDescription() }}
-					</p>
-				@endif
+				<div class="logo" style="color:#fff;margin-bottom:.6rem">@include('channels.partials.logo')</div>
+				<p style="color:rgba(255,255,255,.75);max-width:44ch">
+					{{ $site->metaDescription() }}
+				</p>
 			</div>
 			<div>
 				<h3 style="font-size:1rem;margin-bottom:.6rem">Menu</h3>
@@ -49,7 +33,7 @@
 			</div>
 		</div>
 		<div class="foot-bottom">
-			<span>© {{ now()->year }} {{ $site->name() }}</span>
+			<span>© {{ now()->year }} {{ $site->displayName() }}</span>
 			@if ($site->endorsementLogo())
 				{{-- Moedermerk-keurmerk als logo-badge (witte chip op de donkere footer). --}}
 				<span class="endorsement">

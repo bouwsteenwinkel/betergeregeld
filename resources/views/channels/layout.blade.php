@@ -7,23 +7,23 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<meta name="robots" content="@yield('robots', $site->isLive() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow')">
 
-	<title>@yield('title', $site->homeTitle()) · {{ $site->name() }}</title>
-	<meta name="description" content="@yield('description', $site->homeDescription())">
+	<title>@yield('title', $site->homeTitle()) · {{ $site->displayName() }}</title>
+	<meta name="description" content="@yield('description', $site->metaDescription())">
 	<link rel="canonical" href="@yield('canonical', $site->url(request()->path() === '/' ? '' : ltrim(str_replace('_site/'.$site->key, '', request()->path()), '/')))">
 
 	<meta property="og:type" content="website">
-	<meta property="og:site_name" content="{{ $site->name() }}">
+	<meta property="og:site_name" content="{{ $site->displayName() }}">
 	<meta property="og:title" content="@yield('title', $site->homeTitle())">
-	<meta property="og:description" content="@yield('description', $site->homeDescription())">
+	<meta property="og:description" content="@yield('description', $site->metaDescription())">
 	@php $ogImage = $site->image('hero'); @endphp
 	@if ($ogImage)
 		<meta property="og:image" content="{{ $ogImage }}">
-		<meta property="og:image:alt" content="{{ $site->name() }}">
+		<meta property="og:image:alt" content="{{ $site->displayName() }}">
 		<meta name="twitter:image" content="{{ $ogImage }}">
 	@endif
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="@yield('title', $site->homeTitle())">
-	<meta name="twitter:description" content="@yield('description', $site->homeDescription())">
+	<meta name="twitter:description" content="@yield('description', $site->metaDescription())">
 
 	{{-- Themed favicon (data-URI): primary-badge met de eerste monogram-letter in het accent. --}}
 	@php

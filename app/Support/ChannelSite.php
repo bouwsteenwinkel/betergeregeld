@@ -88,6 +88,38 @@ class ChannelSite
         return (string) ($this->cfg['name'] ?? $this->key);
     }
 
+    /**
+     * Zit de bezoeker op een demo-pagina (/voorbeeld)? Daar is de site een mockup
+     * van de klant (demo-identiteit); elders (trigger/sales/plaatsen) gaat 't over
+     * óns aanbod (trigger-identiteit).
+     */
+    public function isDemoContext(): bool
+    {
+        try {
+            return \Illuminate\Support\Str::contains(request()->path(), 'voorbeeld');
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /** Weergavenaam: demo → sitenaam (mockup); trigger → brand.footer_name als gezet. */
+    public function displayName(): string
+    {
+        if (! $this->isDemoContext() && ($n = $this->brand('footer_name'))) {
+            return (string) $n;
+        }
+        return $this->name();
+    }
+
+    /** Meta-/og-beschrijving: demo → home_description; trigger → brand.footer_about als gezet. */
+    public function metaDescription(): string
+    {
+        if (! $this->isDemoContext() && ($d = $this->brand('footer_about'))) {
+            return (string) $d;
+        }
+        return $this->homeDescription();
+    }
+
     public function branche(): string
     {
         return (string) ($this->cfg['branche'] ?? 'overig');
