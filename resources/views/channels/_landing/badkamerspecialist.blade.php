@@ -71,22 +71,9 @@
         @include('channels.partials.zo-kan-het-worden', array_merge(['site' => $site, 'facet' => $facet], $zkhw))
     @endif
 
-    {{-- Andere mogelijkheden: interne links naar de andere product-landingspagina's --}}
-    <section data-section="andere-producten">
-        <div class="wrap" style="text-align:center">
-            <span class="kicker" style="justify-content:center"><span class="kicker-line"></span> Ook mogelijk</span>
-            <h2>Groeit met je mee</h2>
-            <p class="section-lead muted" style="margin-left:auto;margin-right:auto">Begin met {{ mb_strtolower($fLabel) }} en breid later uit. Of bekijk direct een ander product.</p>
-            <div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap">
-                @foreach ($facets as $key => $f)
-                    @continue($key === $facet || ! in_array($key, $landingKeys, true))
-                    <a href="{{ $site->url($key) }}" class="btn btn-ghost" style="gap:.5rem">
-                        <span>{{ $f['icon'] ?? '' }}</span> {{ $f['label'] ?? $key }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
+    {{-- Groeidiamant: alle fasen, deze fase gemarkeerd als "jouw stap", de andere
+         linken door naar hun eigen triggerpagina. --}}
+    @include('channels.partials.groeipad', ['site' => $site, 'facet' => $facet, 'facets' => $facets])
 
     {{-- Gedeelde aanpak / waarom / CTA --}}
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe dit voor jou zou werken?'])
