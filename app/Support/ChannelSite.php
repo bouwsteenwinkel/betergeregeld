@@ -223,9 +223,10 @@ class ChannelSite
             ];
         }
 
-        // Zorg dat elke site 'Prijzen'- en 'Plaatsen'-links heeft (deze pagina's
-        // bestaan voor alle niche-sites). Injecteer vóór 'Contact' als ze ontbreken.
-        foreach ([['label' => 'Prijzen', 'href' => 'prijzen'], ['label' => 'Plaatsen', 'href' => 'plaatsen']] as $inject) {
+        // Zorg dat elke site 'Prijzen'-, 'Plaatsen'- en 'Blog'-links heeft (deze
+        // pagina's bestaan voor alle niche-sites). Injecteer vóór 'Contact' als ze
+        // ontbreken.
+        foreach ([['label' => 'Prijzen', 'href' => 'prijzen'], ['label' => 'Plaatsen', 'href' => 'plaatsen'], ['label' => 'Blog', 'href' => 'blog']] as $inject) {
             $has = collect($menu)->contains(fn ($m) => trim((string) ($m['href'] ?? ''), '/') === $inject['href']);
             if ($has) {
                 continue;
