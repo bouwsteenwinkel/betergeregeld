@@ -16,6 +16,11 @@
 				<h1 style="margin-top:.8rem">{{ $post->title }}</h1>
 				<p class="muted" style="margin-top:.7rem">{{ optional($post->published_at)->translatedFormat('j F Y') }} · {{ $post->reading_time_min }} min lezen</p>
 			</div>
+			@if ($post->image)
+				<div class="wrap" style="max-width:900px;margin-top:1.4rem">
+					<img src="{{ $post->image }}" alt="{{ $post->title }}" class="article-cover" loading="eager" decoding="async">
+				</div>
+			@endif
 		</section>
 
 		<section style="padding-top:0">

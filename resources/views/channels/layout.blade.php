@@ -178,6 +178,10 @@
 		.blog-more{margin-top:auto;display:inline-flex;align-items:center;gap:.4rem;font-weight:600;font-size:.95rem;color:var(--c-cta)}
 		.blog-more svg{width:16px;height:16px;transition:transform .2s ease}
 		.blog-card:hover .blog-more svg{transform:translateX(3px)}
+		.blog-card-img{display:block;margin:-1.6rem -1.6rem 1.1rem;border-radius:calc(var(--radius) + 2px) calc(var(--radius) + 2px) 0 0;overflow:hidden;aspect-ratio:16/10;background:color-mix(in srgb,var(--c-ink) 6%,transparent)}
+		.blog-card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
+		.blog-card:hover .blog-card-img img{transform:scale(1.04)}
+		.article-cover{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:var(--radius);box-shadow:0 24px 60px -30px rgba(0,0,0,.4)}
 		.empty-state{text-align:center;max-width:540px;margin:1rem auto;padding:2.6rem 1.6rem;background:var(--c-surface);border:1px dashed color-mix(in srgb,var(--c-ink) 18%,transparent);border-radius:calc(var(--radius) + 2px)}
 		.empty-state h3{font-size:1.3rem;margin-bottom:.5rem}
 		.empty-state p{margin:0 auto 1.5rem;max-width:42ch}

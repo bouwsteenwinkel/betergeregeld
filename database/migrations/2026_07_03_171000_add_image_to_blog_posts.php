@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/** Coverbeeld-URL per blogpost (o.a. gegenereerd via channel:blog:images). */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('blog_posts', function (Blueprint $table) {
+            $table->string('image')->nullable()->after('body');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('blog_posts', function (Blueprint $table) {
+            $table->dropColumn('image');
+        });
+    }
+};

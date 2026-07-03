@@ -25,6 +25,7 @@
 				<div class="grid cols-3 blog-grid">
 					@foreach ($posts as $post)
 						<a href="{{ $site->url('blog/' . $post->slug) }}" class="blog-card">
+							@if ($post->image)<span class="blog-card-img"><img src="{{ $post->image }}" alt="{{ $post->title }}" loading="lazy" decoding="async"></span>@endif
 							<span class="blog-meta">{{ optional($post->published_at)->translatedFormat('j F Y') }} · {{ $post->reading_time_min }} min</span>
 							<h3>{{ $post->title }}</h3>
 							<p class="muted">{{ $post->excerpt }}</p>

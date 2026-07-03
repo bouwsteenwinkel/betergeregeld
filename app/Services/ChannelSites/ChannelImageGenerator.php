@@ -111,6 +111,53 @@ class ChannelImageGenerator
     }
 
     /**
+     * Genereert een beeld voor een vrij slot met een MEEGEGEVEN prompt (bv. een
+     * blog-afbeelding: slot 'blog-{slug}'). Zelfde opslag/optimalisatie als de
+     * vaste slots. Faalt zacht; fake-mode geeft een SVG-placeholder.
+     *
+     * @return array{slot:string,status:string,file:?string,fake:bool}
+     */
+    public function generateRaw(string $channelKey, string $slot, string $prompt, string $size = '1536x1024', bool $force = false): array
+    {
+        if (! $force && $this->url($channelKey, $slot) !== null) {
+            return ['slot' => $slot, 'status' => 'bestaat-al', 'file' => $this->url($channelKey, $slot), 'fake' => $this->isFake()];
+        }
+
+        $dir = public_path($this->relativeDir($channelKey));
+        File::ensureDirectoryExists($dir);
+        File::put("{$dir}/{$slot}.prompt.txt", $prompt);
+
+        if ($this->isFake()) {
+            File::put("{$dir}/{$slot}.svg", $this->placeholderSvg('', $slot, $prompt, null));
+            return ['slot' => $slot, 'status' => 'fake-preview', 'file' => $this->url($channelKey, $slot), 'fake' => true];
+        }
+
+        $resp = Http::withToken((string) config('accessguard.ai.api_key'))
+            ->withOptions(['verify' => $this->verify()])
+            ->timeout(120)
+            ->post('https://api.openai.com/v1/images/generations', [
+                'model'   => (string) config('channel_images.model', 'gpt-image-1'),
+                'prompt'  => $prompt,
+                'size'    => $size,
+                'quality' => (string) config('channel_images.quality', 'high'),
+                'n'       => 1,
+            ]);
+
+        if (! $resp->successful()) {
+            return ['slot' => $slot, 'status' => 'fout: ' . $resp->status(), 'file' => null, 'fake' => false];
+        }
+        $b64 = data_get($resp->json(), 'data.0.b64_json');
+        if (! $b64) {
+            return ['slot' => $slot, 'status' => 'geen-beeld-terug', 'file' => null, 'fake' => false];
+        }
+
+        File::put("{$dir}/{$slot}.png", base64_decode($b64));
+        $this->optimize($channelKey, $slot);
+
+        return ['slot' => $slot, 'status' => 'gegenereerd', 'file' => $this->url($channelKey, $slot), 'fake' => false];
+    }
+
+    /**
      * Maakt WebP-varianten (meerdere breedtes) van de bron-PNG voor snelle
      * paginalaadtijd (Core Web Vitals). Geeft de gemaakte breedtes terug.
      *

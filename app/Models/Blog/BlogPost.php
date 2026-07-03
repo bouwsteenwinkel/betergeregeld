@@ -13,7 +13,7 @@ class BlogPost extends Model
 
 	protected $fillable = [
 		'category_id', 'locale', 'translation_of_post_id', 'channel',
-		'slug', 'title', 'meta_title', 'excerpt', 'body',
+		'slug', 'title', 'meta_title', 'excerpt', 'body', 'image',
 		'reading_time_min', 'is_pillar', 'featured', 'published_at',
 		'ai_generated', 'ai_model', 'ai_prompt_meta',
 	];
