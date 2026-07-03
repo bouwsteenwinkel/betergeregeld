@@ -3,6 +3,12 @@
     $facets  = $facets ?? (array) config('groeidiamant.facets', []);
     $current = $facet ?? (string) config('groeidiamant.default', 'website');
     $curNr   = (int) ($facets[$current]['nr'] ?? 1);
+
+    // Two-lagen-model (bv. badkamerspecialist): heeft de site een landing-laag, dan
+    // stuurt een fase-klik naar de triggerpagina /{facet} (waar de ondernemer koopt/
+    // aanvraagt) i.p.v. de live demo-switch. Oude sites houden de AJAX-switch.
+    $hasLanding = method_exists($site, 'landingView') && $site->landingView();
+    $linkBase   = $hasLanding ? '' : ($facetBase ?? '');
 @endphp
 @if (!empty($facets))
 <section id="groeipad" data-section="groeipad" style="padding:48px 0">
@@ -19,7 +25,7 @@
                     $nr = (int) ($f['nr'] ?? 0);
                     $state = $nr < $curNr ? 'done' : ($key === $current ? 'now' : 'next');
                 @endphp
-                <a href="{{ $site->url(($facetBase ?? '') . $key) }}" data-facet-link data-facet="{{ $key }}" style="display:block;flex:1;min-width:150px;max-width:200px;border-radius:var(--radius);padding:1.1rem .9rem;text-align:left;text-decoration:none;color:inherit;
+                <a href="{{ $site->url($linkBase . $key) }}" @unless($hasLanding) data-facet-link data-facet="{{ $key }}" @endunless style="display:block;flex:1;min-width:150px;max-width:200px;border-radius:var(--radius);padding:1.1rem .9rem;text-align:left;text-decoration:none;color:inherit;
                     @if($state==='now') background:var(--c-primary);color:#fff;box-shadow:0 10px 30px color-mix(in srgb,var(--c-primary) 35%,transparent);
                     @elseif($state==='done') background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-accent) 45%,transparent);
                     @else background:var(--c-surface);border:1px dashed color-mix(in srgb,var(--c-muted) 40%,transparent);opacity:.7; @endif">
