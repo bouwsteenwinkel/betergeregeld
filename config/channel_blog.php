@@ -48,4 +48,31 @@ return [
         // Groei
         ['slug' => 'groeien-van-website-tot-ai',           'product' => 'groei',          'title' => 'Groeien met je :trade: van website tot AI',        'angle' => 'de Groeidiamant, stap voor stap uitbreiden, nooit opnieuw beginnen'],
     ],
+
+    // ── Beeld-scène per onderwerp ─────────────────────────────────────────
+    // Zorgt dat het blog-coverbeeld ÉCHT bij de tekst past (i.p.v. een generieke
+    // branche-foto). Tokenized (:trade/:niche) zodat het per niche klopt.
+    'topic_images' => [
+        'online-gevonden-worden-in-je-regio'    => 'een hand met een smartphone die een lokaal :trade zoekt, kaart en zoekresultaten vaag zichtbaar, moderne lichte omgeving',
+        'wat-kost-een-website'                  => 'een opgeruimd, licht bureau met een laptop, rekenmachine en notitieblok, iemand die een website-investering doorrekent',
+        'website-of-social-media'               => 'een laptop en een smartphone naast elkaar op een licht bureau, keuze tussen een eigen website en social media',
+        'reviews-goud-waard'                    => 'een hand die een smartphone vasthoudt met een positieve vijf-sterren-beoordeling, tevreden en modern',
+        'meer-aanvragen-binnenhalen'            => 'een ondernemer die tevreden op een laptop een binnengekomen offerteaanvraag bekijkt, licht kantoor aan huis',
+        'wat-klanten-zoeken-op-je-website'      => 'iemand die op een laptop een moderne, strakke bedrijfswebsite bekijkt, over de schouder gezien, daglicht',
+        'vakwerk-in-beeld-fotos'                => 'een vakman die met een smartphone een foto maakt van net afgerond :niche-werk, helder en modern',
+        'verouderde-website-kost-klussen'       => 'iemand die op een laptop een website beoordeelt aan een modern, licht bureau, kritische blik',
+        'loont-een-webshop'                     => 'een verzendklaar pakket naast een laptop die een webshop toont, opgeruimd en licht',
+        'online-verkopen-naast-je-werk'         => 'nette producten uitgestald met een tablet die een webshop toont, modern en verzorgd',
+        'montage-bijverkopen'                   => 'een product met verzorgd gereedschap ernaast, klaar voor montage, modern en helder',
+        'klanten-project-laten-volgen'          => 'een klant die thuis op een tablet de voortgang van een project bekijkt, licht en ontspannen',
+        'minder-gebel-over-planning'            => 'een ontspannen ondernemer aan een bureau met een planning op het scherm, rustige moderne sfeer',
+        'afspraken-zelf-laten-inplannen'        => 'een hand die op een smartphone een moment kiest in een online afsprakenplanner, modern en licht',
+        'offertes-sneller-maken'                => 'een ondernemer die vlot op een laptop een offerte opstelt, opgeruimd bureau, daglicht',
+        'facturen-en-herinneringen-automatisch' => 'een laptop met nette administratie/facturen op een opgeruimd, licht bureau',
+        'koppel-agenda-boekhouding-website'     => 'een laptop en smartphone die samenwerken op een bureau, verbonden en overzichtelijk, modern',
+        'nooit-meer-een-aanvraag-missen'        => 'een smartphone die in de avond oplicht met een binnenkomend bericht, warme moderne setting',
+        'ai-bereidt-je-offerte-voor'            => 'een ondernemer met een laptop op een moderne lichte werkplek, slimme technologie die meehelpt',
+        'automatisch-reviews-verzamelen'        => 'een tevreden klant die op een smartphone een beoordeling met sterren achterlaat, modern en positief',
+        'groeien-van-website-tot-ai'            => 'een ondernemer die tevreden naar oplopende resultaten op een laptop kijkt, licht en eigentijds kantoor aan huis',
+    ],
 ];

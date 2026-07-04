@@ -43,6 +43,8 @@ class ChannelBlogImages extends Command
         $tokens = (array) $site->get('places', []);
         $niche  = (string) ($tokens['niche'] ?? 'vak');
         $trade  = (string) ($tokens['trade'] ?? 'bedrijf');
+        $map    = [':trades' => (string) ($tokens['trades'] ?? 'bedrijven'), ':trade' => $trade, ':niches' => (string) ($tokens['niches'] ?? 'diensten'), ':niche' => $niche];
+        $scenesBySlug = (array) config('channel_blog.topic_images', []);
 
         $posts = BlogPost::where('channel', $key)->orderBy('id')->get();
         $limit = (int) $this->option('limit');
@@ -58,10 +60,13 @@ class ChannelBlogImages extends Command
                 break;
             }
 
-            $scene = $this->scenes[abs(crc32($post->slug)) % count($this->scenes)];
-            $prompt = "Professionele, fotorealistische redactionele foto voor de blog van een {$trade}. "
-                . "Onderwerp: {$scene} rond {$niche}. Helder, modern, natuurlijk daglicht, strak en stijlvol, "
-                . 'hoge kwaliteit. Geen tekst, geen logo, geen watermerk, geen herkenbare gezichten.';
+            // Beeld dat past bij DIT artikel: scène per onderwerp (slug), anders fallback.
+            $sceneTpl = $scenesBySlug[$post->slug]
+                ?? ($this->scenes[abs(crc32($post->slug)) % count($this->scenes)] . ' rond :niche');
+            $scene = strtr($sceneTpl, $map);
+            $prompt = "Moderne, heldere fotorealistische redactionele blogfoto die past bij het onderwerp. "
+                . "Onderwerp: {$scene}. Natuurlijk daglicht, frisse eigentijdse sfeer, schone compositie, hoge kwaliteit. "
+                . 'Geen tekst, geen letters, geen logo, geen watermerk, geen schermvullende interface, geen frontale herkenbare gezichten.';
 
             $res = $img->generateRaw($key, 'blog-' . $post->slug, $prompt, '1536x1024', (bool) $this->option('force'));
             if (! empty($res['file'])) {
