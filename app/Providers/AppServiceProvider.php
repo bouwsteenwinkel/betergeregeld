@@ -31,12 +31,14 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\QualityScan\ClaudeAnalyzer::class,
         );
 
-        // Afsprakenplanner: agenda-provider. Fase 1a = stub (geen Google), fase 1b
-        // wisselt dit naar de echte Google Calendar-gateway.
-        $this->app->bind(
-            \App\Services\Scheduling\Contracts\CalendarGateway::class,
-            \App\Services\Scheduling\StubCalendarGateway::class,
-        );
+        // Afsprakenplanner: agenda-provider. Echte Google Calendar-gateway zodra die
+        // gekoppeld is (refresh-token aanwezig), anders de stub (geen Meet-link).
+        $this->app->bind(\App\Services\Scheduling\Contracts\CalendarGateway::class, function ($app) {
+            $google = $app->make(\App\Services\Scheduling\GoogleCalendarGateway::class);
+            return (config('scheduling.google.enabled') && $google->isConnected())
+                ? $google
+                : $app->make(\App\Services\Scheduling\StubCalendarGateway::class);
+        });
     }
 
     public function boot(): void

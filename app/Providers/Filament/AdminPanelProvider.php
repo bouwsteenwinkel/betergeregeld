@@ -49,6 +49,13 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make('Google-agenda koppelen')
+                    ->url(fn () => url('/admin/google-agenda'))
+                    ->icon('heroicon-o-calendar-days')
+                    ->group('Afspraken')
+                    ->sort(40),
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -72,6 +72,14 @@ Route::prefix('afspraak')->group(function () {
     Route::post('/boeken', [\App\Http\Controllers\AppointmentController::class, 'book'])->middleware('throttle:20,1');
 });
 
+// Google-agenda koppelen (afsprakenplanner, fase 1b). Alleen ingelogde admin.
+Route::middleware(['web', 'auth'])->prefix('admin/google-agenda')->group(function () {
+    Route::get('/', [\App\Http\Controllers\GoogleAgendaController::class, 'status'])->name('google-agenda.status');
+    Route::get('/connect', [\App\Http\Controllers\GoogleAgendaController::class, 'connect'])->name('google-agenda.connect');
+    Route::get('/callback', [\App\Http\Controllers\GoogleAgendaController::class, 'callback'])->name('google-agenda.callback');
+    Route::post('/disconnect', [\App\Http\Controllers\GoogleAgendaController::class, 'disconnect'])->name('google-agenda.disconnect');
+});
+
 Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
 
 // Blok-template preview (thumbnail in de admin). Buiten de locale-prefix.
