@@ -1,11 +1,37 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 <footer>
+	<style>
+		/* Mobiel: i.p.v. de naam-tekst twee logo's naast elkaar (eigen logo links,
+		   Groeidiamant rechts) als witte kaarten met gelijke hoogte. */
+		.foot-brand-mobile{display:none}
+		@media(max-width:760px){
+			.foot-brand-desktop{display:none}
+			.foot-brand-mobile{display:flex;gap:.7rem;align-items:stretch;margin-bottom:.9rem}
+			.foot-brand-mobile .fb-card{flex:1 1 50%;min-width:0;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;padding:.85rem .9rem;min-height:66px}
+			.foot-brand-mobile .fb-card img{max-width:100%;max-height:46px;width:auto;height:auto;display:block}
+			.foot-brand-mobile .fb-name{color:var(--c-ink);font-weight:800;font-size:1rem;text-align:center;line-height:1.2}
+		}
+	</style>
 	{{-- Identiteit is context-afhankelijk: op /voorbeeld de demo-mockup (klant),
 	     elders óns aanbod. Logo-partial + metaDescription() regelen dat zelf. --}}
 	<div class="wrap">
 		<div class="foot-grid">
 			<div>
-				<div class="logo" style="color:#fff;margin-bottom:.6rem">@include('channels.partials.logo')</div>
+				<div class="logo foot-brand-desktop" style="color:#fff;margin-bottom:.6rem">@include('channels.partials.logo')</div>
+				<div class="foot-brand-mobile">
+					<a href="{{ $site->url() }}" class="fb-card">
+						@if (! $site->isDemoContext() && $site->brand('footer_logo'))
+							<img src="{{ $site->brand('footer_logo') }}" alt="{{ $site->displayName() }}">
+						@elseif ($site->logoImage())
+							<img src="{{ $site->logoImage() }}" alt="{{ $site->name() }}">
+						@else
+							<span class="fb-name">{{ $site->displayName() }}</span>
+						@endif
+					</a>
+					<a href="{{ $site->url('groeidiamant') }}" class="fb-card fb-gd" aria-label="De Groeidiamant by Betergeregeld">
+						<img src="{{ asset('channel-media/_brand/groeidiamant.jpg') }}" alt="Groeidiamant by Betergeregeld">
+					</a>
+				</div>
 				<p style="color:rgba(255,255,255,.75);max-width:44ch">
 					{{ $site->metaDescription() }}
 				</p>
