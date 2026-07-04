@@ -257,7 +257,11 @@
 		.logo{display:inline-flex;align-items:center;gap:.6rem;color:var(--c-ink);line-height:1}
 		.logo-mark{display:inline-flex;flex:0 0 auto}
 		.logo-img{height:44px;width:auto;display:block}
-		@media(max-width:560px){.logo-img{height:36px}}
+		/* Mobiel (burger zichtbaar): logo gecentreerd in de balk, burger rechts vast. */
+		@media(max-width:859px){
+			.nav-inner{position:relative;justify-content:center}
+			.nav-actions{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+		}
 		.logo-text{display:inline-flex;flex-direction:column;gap:.16rem;min-width:0}
 		.logo-word{font-family:var(--font-display);font-weight:700;font-size:1.34rem;letter-spacing:.01em}
 		.logo-word span{color:var(--c-accent)}
