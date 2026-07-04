@@ -15,7 +15,7 @@
             </div>
             <form class="bkg-form" hidden>
                 <p class="bkg-chosen"></p>
-                <input type="text" name="company" class="bkg-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <input type="text" name="website" class="bkg-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
                 <div class="bkg-fields">
                     <label>Je naam<input type="text" name="name" required autocomplete="name"></label>
                     <label>E-mailadres<input type="email" name="email" required autocomplete="email"></label>
@@ -137,7 +137,7 @@
         btn.disabled = true; btn.textContent = 'Bezig…';
         var body = {
             name: elForm.name.value, email: elForm.email.value, phone: elForm.phone.value,
-            company: elForm.company.value, starts_at: picked, source_site: site
+            website: elForm.website.value, starts_at: picked, source_site: site
         };
         fetch('/afspraak/boeken', {
             method: 'POST',

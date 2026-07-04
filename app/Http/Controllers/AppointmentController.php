@@ -32,7 +32,7 @@ class AppointmentController extends Controller
             'starts_at'   => 'required|date',
             'note'        => 'nullable|string|max:1000',
             'source_site' => 'nullable|string|max:80',
-            'company'     => 'nullable|max:0', // honeypot: moet leeg zijn
+            'website'     => 'nullable|max:0', // honeypot: moet leeg zijn (geen autofill)
         ]);
 
         try {
