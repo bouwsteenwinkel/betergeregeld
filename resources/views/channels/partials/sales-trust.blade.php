@@ -48,7 +48,7 @@
                 <h2>{{ $ctaTitle ?? 'Benieuwd hoe het voor jou zou werken?' }}</h2>
                 <p>Vraag gratis en vrijblijvend een voorbeeld aan. Je zit nergens aan vast.</p>
             </div>
-            <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
+            <a href="{{ $ctaHref ?? '#gratis-voorbeeld' }}" class="btn">Gratis voorbeeld aanvragen</a>
         </div>
     </div>
 </section>

@@ -225,7 +225,7 @@ class ChannelSite
 
         // Ankers waarvoor nu een eigen pagina bestaat → naar die pagina i.p.v. een
         // (vaak niet-bestaand) home-anker.
-        $pageForAnchor = ['#werkwijze' => 'werkwijze', '#reviews' => 'cases'];
+        $pageForAnchor = ['#werkwijze' => 'werkwijze', '#reviews' => 'cases', '#contact' => 'contact'];
         $menu = array_map(function ($m) use ($pageForAnchor) {
             $h = trim((string) ($m['href'] ?? ''));
             if (isset($pageForAnchor[$h])) {
@@ -248,6 +248,12 @@ class ChannelSite
             } else {
                 array_splice($menu, $pos, 0, [$inject]);
             }
+        }
+
+        // Zorg dat er altijd een 'Contact'-link is (eigen pagina, geen formulier).
+        $hasContact = collect($menu)->contains(fn ($m) => trim((string) ($m['href'] ?? ''), '/#') === 'contact');
+        if (! $hasContact) {
+            $menu[] = ['label' => 'Contact', 'href' => 'contact'];
         }
 
         return $menu;

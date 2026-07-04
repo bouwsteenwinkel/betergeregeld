@@ -279,6 +279,8 @@
 		@media(max-width:560px){.logo-tag{display:none}.logo-word{font-size:1.16rem}.nav-actions .btn{padding:.7rem 1.05rem;font-size:.92rem}.nav-inner{gap:.8rem;height:64px}}
 		/* hero */
 		.hero{padding:72px 0 56px;background:linear-gradient(180deg,color-mix(in srgb,var(--c-accent) 10%,transparent),transparent)}
+		/* Slanke hero voor eenvoudige content-pagina's (minder top-ruimte op desktop). */
+		@media(min-width:641px){.hero--slim{padding-top:44px}}
 		.hero p.lead{font-size:1.2rem;max-width:38ch;margin:1rem 0 1.6rem}
 		.hero-usps{list-style:none;margin:1.4rem 0 0;display:grid;gap:.5rem}
 		.hero-usps li{padding-left:1.7rem;position:relative;font-weight:600}

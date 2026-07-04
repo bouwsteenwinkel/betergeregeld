@@ -50,7 +50,7 @@
 				<p style="margin-top:.5rem"><a href="{{ $site->url('plaatsen') }}" style="font-size:.9rem;font-weight:600">Alle plaatsen →</a></p>
 			</div>
 			<div>
-				<h3 style="font-size:1rem;margin-bottom:.6rem">Contact</h3>
+				<h3 style="font-size:1rem;margin-bottom:.6rem"><a href="{{ $site->url('contact') }}" style="color:inherit">Contact</a></h3>
 				@if ($site->brand('phone'))<p><a href="tel:{{ preg_replace('/\s+/', '', $site->brand('phone')) }}">{{ $site->brand('phone') }}</a></p>@endif
 				@if ($site->brand('email'))<p><a href="mailto:{{ $site->brand('email') }}">{{ $site->brand('email') }}</a></p>@endif
 				<p style="margin-top:.6rem"><a href="{{ $site->navHref('#gratis-voorbeeld') }}">Gratis voorbeeld aanvragen</a></p>
@@ -62,6 +62,7 @@
 			<a href="{{ $site->url('veelgestelde-vragen') }}">Veelgestelde vragen</a>
 			<a href="{{ $site->url('vergelijken') }}">Zelf bouwen of laten maken</a>
 			<a href="{{ $site->url('groeidiamant') }}">De Groeidiamant</a>
+			<a href="{{ $site->url('contact') }}">Contact</a>
 		</div>
 		<div class="foot-bottom">
 			<span>© {{ now()->year }} {{ $site->displayName() }}</span>

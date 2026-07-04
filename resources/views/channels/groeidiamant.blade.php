@@ -32,7 +32,10 @@
                 .gd-hero-logo::before{content:"";position:absolute;inset:-25% -18% -25% -18%;z-index:-1;
                     background:radial-gradient(circle,color-mix(in srgb,var(--c-primary) 28%,transparent),transparent 70%);filter:blur(30px)}
                 .gd-hero-logo img{display:block;width:300px;max-width:44vw;height:auto;border-radius:14px}
-                @media(max-width:760px){.gd-hero{gap:1.8rem}.gd-hero-logo img{width:240px;max-width:70vw}}
+                @media(max-width:760px){.gd-hero{gap:1.8rem}
+                    /* Logo-kaart over de volle breedte, logo gecentreerd. */
+                    .gd-hero-logo{flex:1 1 100%;width:100%;text-align:center;padding:1.6rem}
+                    .gd-hero-logo img{width:300px;max-width:78vw;margin:0 auto}}
             </style>
             <div class="gd-hero">
                 <div class="gd-hero-txt">

@@ -20,7 +20,12 @@
 @endpush
 
 @section('content')
-    <section class="hero">
+    <style>
+        /* Geanimeerde accordion, altijd max. 1 open. Antwoord-hoogte via JS. */
+        .faq-acc details > .faq-a{display:block;overflow:hidden;height:0;transition:height .3s ease}
+        .faq-acc details p{margin:0}
+    </style>
+    <section class="hero hero--slim">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Vragen</span>
             <h1>Veelgestelde vragen</h1>
@@ -30,16 +35,48 @@
 
     <section style="padding-top:1rem">
         <div class="wrap">
-            <div class="faq" style="max-width:820px">
+            <div class="faq faq-acc" style="max-width:820px">
                 @foreach ($items as $i => $qa)
                     <details @if($i === 0) open @endif>
                         <summary>{{ $qa['q'] }}</summary>
-                        <p>{{ $qa['a'] }}</p>
+                        <div class="faq-a"><p>{{ $qa['a'] }}</p></div>
                     </details>
                 @endforeach
             </div>
         </div>
     </section>
+
+    <script>
+    (function () {
+        var acc = document.querySelector('.faq-acc');
+        if (!acc) return;
+        var items = [].slice.call(acc.querySelectorAll('details'));
+        function expand(d) {
+            var a = d.querySelector('.faq-a');
+            d.open = true;
+            a.style.height = a.scrollHeight + 'px';
+            a.addEventListener('transitionend', function te(ev) {
+                if (ev.propertyName === 'height') { a.style.height = 'auto'; a.removeEventListener('transitionend', te); }
+            });
+        }
+        function collapse(d) {
+            var a = d.querySelector('.faq-a');
+            a.style.height = a.scrollHeight + 'px';
+            requestAnimationFrame(function () { a.style.height = '0px'; });
+            d.open = false;
+        }
+        items.forEach(function (d) {
+            var a = d.querySelector('.faq-a');
+            if (d.open) { a.style.height = 'auto'; }
+            d.querySelector('summary').addEventListener('click', function (e) {
+                e.preventDefault();
+                var willOpen = !d.open;
+                items.forEach(function (o) { if (o !== d && o.open) collapse(o); });
+                willOpen ? expand(d) : collapse(d);
+            });
+        });
+    })();
+    </script>
 
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Nog een vraag? Vraag gerust een gratis voorbeeld aan.'])
 
