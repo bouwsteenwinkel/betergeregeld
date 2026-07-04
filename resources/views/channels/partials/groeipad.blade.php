@@ -51,10 +51,26 @@
         #groeipad .gd-step:not(.is-now) .gd-label{color:var(--c-ink)}
         #groeipad .gd-step:not(.is-now) .gd-tag{color:var(--c-muted)}
         @media(max-width:900px){#groeipad .gd-steps{grid-template-columns:repeat(3,1fr)}}
-        @media(max-width:760px){#groeipad .gd-head{flex-direction:column;align-items:flex-start;gap:1.4rem}
-            #groeipad .gd-logo img{width:210px;max-width:62vw}}
-        @media(max-width:560px){#groeipad .gd-steps{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:380px){#groeipad .gd-steps{grid-template-columns:1fr}}
+        @media(max-width:760px){#groeipad .gd-head{flex-direction:column;align-items:stretch;gap:1.4rem}
+            /* Logo-kaart vol breedte, gecentreerd (zoals op badkamerspecialist). */
+            #groeipad .gd-logo{align-self:stretch;text-align:center;padding:1.4rem}
+            #groeipad .gd-logo img{width:220px;max-width:60vw;margin:0 auto}}
+        /* Mobiel: compacte facet-strip-look (zoals badkamerspecialist) — gestapelde
+           rijen met icoon + label, zonder badge/omschrijving; huidige stap in de
+           site-kleur (--c-primary). */
+        @media(max-width:640px){
+            #groeipad .gd-steps{grid-template-columns:1fr;gap:.55rem}
+            #groeipad .gd-step{flex-direction:row;align-items:center;gap:.65rem;padding:.95rem 1.1rem;
+                border:1px solid color-mix(in srgb,var(--c-ink) 14%,transparent);background:var(--c-surface)}
+            #groeipad .gd-step:hover{transform:none}
+            #groeipad .gd-top{margin:0;flex:0 0 auto}
+            #groeipad .gd-badge,#groeipad .gd-tag{display:none}
+            #groeipad .gd-label{font-size:1rem}
+            #groeipad .gd-step.is-next{opacity:1}
+            #groeipad .gd-step.is-done{border-color:color-mix(in srgb,var(--c-accent) 45%,transparent)}
+            #groeipad .gd-step.is-now{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+            #groeipad .gd-step.is-now .gd-label,#groeipad .gd-step.is-now .gd-icon{color:#fff}
+        }
     </style>
     <div class="wrap">
         <div class="gd-head">

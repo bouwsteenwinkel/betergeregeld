@@ -263,6 +263,7 @@
 		.logo{display:inline-flex;align-items:center;gap:.6rem;color:var(--c-ink);line-height:1}
 		.logo-mark{display:inline-flex;flex:0 0 auto}
 		.logo-img{height:44px;width:auto;display:block}
+		@media(min-width:860px){.logo-img{height:50px}}
 		/* Mobiel (burger zichtbaar): logo gecentreerd in de balk, burger rechts vast. */
 		@media(max-width:859px){
 			.nav-inner{position:relative;justify-content:center}
