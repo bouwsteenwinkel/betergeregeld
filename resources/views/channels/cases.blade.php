@@ -3,7 +3,8 @@
     $cases = (array) config('cases_' . $site->key . '.cases', []);
     $imgGen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
     $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
-    $trade = $t['trade'] ?? 'bedrijf';
+    $trade  = $t['trade'] ?? 'bedrijf';
+    $trades = $t['trades'] ?? 'bedrijven';
 @endphp
 @extends('channels.layout')
 
@@ -36,8 +37,15 @@
         @media(max-width:820px){.case{grid-template-columns:1fr;gap:1.4rem}.case:nth-child(even) .case-media{order:0}}
     </style>
 
+    @if ($cases)
     <section>
-        <div class="wrap" style="display:grid;gap:3.4rem">
+        <div class="wrap">
+            <div style="text-align:center;max-width:660px;margin:0 auto 3rem">
+                <span class="kicker" style="justify-content:center"><span class="kicker-line"></span> Praktijkvoorbeelden</span>
+                <h2>Van eerste website tot compleet platform</h2>
+                <p class="muted">Zo groeiden andere {{ $trades }} stap voor stap met de Groeidiamant: van een eerste sterke website naar online verkopen en slimme tools. Elk voorbeeld laat zien wat het oplevert, zodat je je eigen groei voor je ziet.</p>
+            </div>
+        <div style="display:grid;gap:3.4rem">
             @foreach ($cases as $case)
                 @php $img = $imgGen->url($site->key, 'case-' . ($case['slug'] ?? '')); @endphp
                 <div class="case">
@@ -60,9 +68,11 @@
                     </div>
                 </div>
             @endforeach
-            <p class="muted" style="font-size:.82rem;text-align:center;max-width:70ch;margin:0 auto">Dit zijn illustratieve voorbeeldcases die laten zien wat mogelijk is. Benieuwd wat we voor jouw bedrijf kunnen betekenen? Vraag een gratis voorbeeld aan.</p>
+            <p class="muted" style="font-size:.82rem;text-align:center;max-width:70ch;margin:0 auto">Dit zijn illustratieve voorbeeldcases die laten zien wat mogelijk is. Benieuwd wat we voor jouw {{ $trade }} kunnen betekenen? Vraag een gratis voorbeeld aan.</p>
+        </div>
         </div>
     </section>
+    @endif
 
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Ook zulke resultaten voor jouw bedrijf?'])
 
