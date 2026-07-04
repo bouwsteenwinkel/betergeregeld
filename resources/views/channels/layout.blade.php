@@ -280,8 +280,10 @@
 		@media(max-width:640px){
 			section{padding:38px 0}
 			.hero{padding:34px 0 40px}
-			.hero .btn{display:flex;width:100%;margin-left:0!important}
-			.hero .btn+.btn{margin-top:.7rem}
+			/* Alle CTA-knoppen in content-secties vol breedte, gestapeld met ruimte
+			   ertussen; inline horizontale marges (bv. de 2e knop) resetten. */
+			section .btn{display:flex;width:100%;margin-left:0!important;margin-right:0!important}
+			section .btn+.btn{margin-top:.7rem}
 		}
 		/* Full-width hero-beeld: edge-to-edge foto met leesbare overlay, tekst eroverheen. */
 		.hero--shot{position:relative;isolation:isolate;padding:0;min-height:clamp(460px,74vh,660px);display:flex;align-items:center;overflow:hidden;background:var(--c-ink)}
