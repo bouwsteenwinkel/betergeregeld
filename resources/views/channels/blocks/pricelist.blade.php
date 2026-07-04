@@ -12,7 +12,16 @@
                 <div class="pl-card">
                     <div class="pl-name">{{ $it['name'] ?? '' }}</div>
                     @if (!empty($it['desc']))<p class="pl-desc">{{ $it['desc'] }}</p>@endif
-                    @if (!empty($it['price']))<div class="pl-price">{{ $it['price'] }}</div>@endif
+                    @if (!empty($it['price']))
+                        @php
+                            // €-teken vóór het bedrag (alleen als er een getal in staat en nog geen €).
+                            $price = (string) $it['price'];
+                            if (! str_contains($price, '€') && preg_match('/\d/', $price)) {
+                                $price = preg_replace('/(\d[\d.,]*)/', '€ $1', $price, 1);
+                            }
+                        @endphp
+                        <div class="pl-price">{{ $price }}</div>
+                    @endif
                 </div>
             @endforeach
         </div>
@@ -36,6 +45,6 @@
     .pricelist .pl-name{font-size:1.15rem;font-weight:800;line-height:1.25;color:var(--c-ink)}
     .pricelist .pl-desc{color:var(--c-muted);font-size:.95rem;line-height:1.5;margin:.55rem 0 1.3rem;flex:1}
     .pricelist .pl-price{margin-top:auto;padding-top:1rem;border-top:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);
-        color:var(--c-primary);font-weight:800;font-size:1.4rem;letter-spacing:-.01em}
+        color:var(--c-primary);font-weight:800;font-size:1.4rem;letter-spacing:-.01em;text-align:right}
     @media(max-width:560px){.pricelist .pl-card{padding:1.3rem 1.25rem}.pricelist .pl-price{font-size:1.3rem}}
 </style>
