@@ -172,7 +172,9 @@
 		@media(max-width:859px){.sticky-cta{display:flex}
 			/* Ruimte reserveren voor de vaste CTA-balk IN de footer (donker), zodat
 			   er geen lichte body-strook tussen footer en CTA ontstaat. */
-			footer{padding-bottom:84px}}
+			footer{padding-bottom:84px}
+			/* Kleine footer-CTA-link overbodig naast de sticky-CTA. */
+			.foot-cta-link{display:none}}
 		/* blog-overzicht */
 		.blog-grid{gap:1.4rem;margin-top:1rem}
 		.blog-card{display:flex;flex-direction:column;background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent);border-radius:calc(var(--radius) + 2px);padding:1.6rem;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}

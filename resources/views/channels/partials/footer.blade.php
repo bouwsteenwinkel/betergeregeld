@@ -53,7 +53,8 @@
 				<h3 style="font-size:1rem;margin-bottom:.6rem"><a href="{{ $site->url('contact') }}" style="color:inherit">Contact</a></h3>
 				@if ($site->brand('phone'))<p><a href="tel:{{ preg_replace('/\s+/', '', $site->brand('phone')) }}">{{ $site->brand('phone') }}</a></p>@endif
 				@if ($site->brand('email'))<p><a href="mailto:{{ $site->brand('email') }}">{{ $site->brand('email') }}</a></p>@endif
-				<p style="margin-top:.6rem"><a href="{{ $site->navHref('#gratis-voorbeeld') }}">Gratis voorbeeld aanvragen</a></p>
+				{{-- Op mobiel verborgen: de sticky-CTA onderaan dekt dit al. --}}
+				<p class="foot-cta-link" style="margin-top:.6rem"><a href="{{ $site->navHref('#gratis-voorbeeld') }}">Gratis voorbeeld aanvragen</a></p>
 			</div>
 		</div>
 		<div class="foot-links">

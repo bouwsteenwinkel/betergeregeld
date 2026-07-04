@@ -381,16 +381,21 @@ class ChannelSite
      */
     public function jsonLd(): string
     {
+        $logo = $this->brand('footer_logo')
+            ? rtrim($this->baseUrl(), '/') . '/' . ltrim((string) $this->brand('footer_logo'), '/')
+            : null;
+
         $service = array_filter([
             '@type'       => 'ProfessionalService',
             '@id'         => $this->baseUrl() . '#org',
-            'name'        => $this->name(),
+            'name'        => $this->displayName(),
             'url'         => $this->baseUrl(),
+            'logo'        => $logo,
             'telephone'   => $this->brand('phone'),
             'email'       => $this->brand('email'),
-            'image'       => $this->image('hero'),
+            'image'       => $this->image('hero') ?: $logo,
             'areaServed'  => ['@type' => 'Country', 'name' => 'Nederland'],
-            'description' => $this->homeDescription() ?: null,
+            'description' => $this->metaDescription() ?: null,
             'sameAs'      => $this->brand('sameas') ?: null,   // array van socials/GBP, indien geconfigureerd
         ]);
 
