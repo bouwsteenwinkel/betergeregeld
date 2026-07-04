@@ -83,10 +83,77 @@ class PlaceBusinessFinder
 
     /* ─────────────────────── Kosten-/quota-plafond ──────────────────────── */
 
-    /** Feature aan én key aanwezig? */
+    /** Feature aan én een credential aanwezig (service-account of API-key)? */
     public function enabled(): bool
     {
-        return (bool) config('services.google_places.enabled', true) && (bool) config('services.google_places.key');
+        return (bool) config('services.google_places.enabled', true) && $this->hasCredentials();
+    }
+
+    private function hasCredentials(): bool
+    {
+        return is_file(storage_path('app/google-api.json')) || (bool) config('services.google_places.key');
+    }
+
+    /**
+     * Auth-headers voor Places (New): bij voorkeur OAuth via het service-account
+     * (google-api.json), anders een API-key. Null = geen credential.
+     *
+     * @return array<string,string>|null
+     */
+    private function authHeaders(): ?array
+    {
+        $saPath = storage_path('app/google-api.json');
+        if (is_file($saPath) && ($token = $this->serviceAccountToken($saPath))) {
+            $sa = (array) json_decode((string) file_get_contents($saPath), true);
+            return ['Authorization' => 'Bearer ' . $token, 'X-Goog-User-Project' => (string) ($sa['project_id'] ?? '')];
+        }
+        if ($key = config('services.google_places.key')) {
+            return ['X-Goog-Api-Key' => (string) $key];
+        }
+        return null;
+    }
+
+    /** OAuth-token uit het service-account (JWT-grant), ~50 min gecachet. */
+    private function serviceAccountToken(string $path): ?string
+    {
+        if ($cached = Cache::get('google_places_sa_token')) {
+            return $cached;
+        }
+        $sa = (array) json_decode((string) file_get_contents($path), true);
+        if (empty($sa['client_email']) || empty($sa['private_key']) || empty($sa['token_uri'])) {
+            return null;
+        }
+        $b64 = fn ($d) => rtrim(strtr(base64_encode($d), '+/', '-_'), '=');
+        $now = time();
+        $jwt = $b64(json_encode(['alg' => 'RS256', 'typ' => 'JWT']))
+            . '.' . $b64(json_encode([
+                'iss'   => $sa['client_email'],
+                'scope' => 'https://www.googleapis.com/auth/cloud-platform',
+                'aud'   => $sa['token_uri'],
+                'iat'   => $now,
+                'exp'   => $now + 3600,
+            ]));
+        if (! openssl_sign($jwt, $sig, $sa['private_key'], 'sha256WithRSAEncryption')) {
+            return null;
+        }
+        $jwt .= '.' . $b64($sig);
+
+        try {
+            $resp = Http::asForm()->timeout(12)
+                ->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
+                ->post($sa['token_uri'], [
+                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    'assertion'  => $jwt,
+                ]);
+            $token = $resp->json('access_token');
+        } catch (\Throwable $e) {
+            Log::warning('Places service-account-token fout: ' . $e->getMessage());
+            return null;
+        }
+        if ($token) {
+            Cache::put('google_places_sa_token', $token, now()->addMinutes(50));
+        }
+        return $token ?: null;
     }
 
     /** Max. live calls per dag (0 = ongelimiteerd). */
@@ -137,7 +204,10 @@ class PlaceBusinessFinder
             return null;
         }
 
-        $key        = config('services.google_places.key');
+        $auth = $this->authHeaders();
+        if ($auth === null) {
+            return null;
+        }
         $query      = str_replace([':city', ':region'], [$city, $region], (string) ($search['query'] ?? ':city'));
         $limit      = (int) ($search['limit'] ?? 8);
         $minReviews = (int) ($search['min_reviews'] ?? 0);
@@ -147,9 +217,8 @@ class PlaceBusinessFinder
         try {
             $resp = Http::timeout(12)
                 ->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
-                ->withHeaders([
+                ->withHeaders($auth + [
                     'Content-Type'     => 'application/json',
-                    'X-Goog-Api-Key'   => $key,
                     'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.websiteUri,places.googleMapsUri,places.primaryTypeDisplayName',
                 ])
                 ->post('https://places.googleapis.com/v1/places:searchText', [
