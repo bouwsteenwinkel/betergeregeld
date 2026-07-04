@@ -5,17 +5,19 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
-	<meta name="robots" content="@yield('robots', $site->isLive() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow')">
+	{{-- Demo-/mockup-pagina's (/voorbeeld) nooit indexeren: het zijn voorbeelden,
+	     geen echte content, en anders concurreren ze met de trigger-pagina's. --}}
+	<meta name="robots" content="@yield('robots', $site->isLive() && ! $site->isDemoContext() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow')">
 
 	<title>@yield('title', $site->homeTitle()) · {{ $site->displayName() }}</title>
 	<meta name="description" content="@yield('description', $site->metaDescription())">
 	<link rel="canonical" href="@yield('canonical', $site->url(request()->path() === '/' ? '' : ltrim(str_replace('_site/'.$site->key, '', request()->path()), '/')))">
 
-	<meta property="og:type" content="website">
+	<meta property="og:type" content="@yield('og_type', 'website')">
 	<meta property="og:site_name" content="{{ $site->displayName() }}">
 	<meta property="og:title" content="@yield('title', $site->homeTitle())">
 	<meta property="og:description" content="@yield('description', $site->metaDescription())">
-	@php $ogImage = $site->image('hero'); @endphp
+	@php $ogImage = trim($__env->yieldContent('og_image')) ?: $site->image('hero'); @endphp
 	@if ($ogImage)
 		<meta property="og:image" content="{{ $ogImage }}">
 		<meta property="og:image:alt" content="{{ $site->displayName() }}">

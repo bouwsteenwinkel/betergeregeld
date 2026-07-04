@@ -278,13 +278,32 @@ class ChannelSiteController extends Controller
     {
         $site = $this->site();
 
-        $urls = [$site->url(''), $site->url('over-ons'), $site->url('plaatsen'), $site->url('blog')];
-        foreach (array_keys(app(\App\Services\ChannelSiteResolver::class)->places()) as $slug) {
-            $urls[] = $site->url('plaatsen/' . $slug);
+        $resolver = app(\App\Services\ChannelSiteResolver::class);
+
+        // Vaste content-pagina's: home, de Groeidiamant-facetlandingen (belangrijkste
+        // SEO-pagina's), en alle informatieve pagina's.
+        $paths = ['', 'over-ons', 'contact', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
+            'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog'];
+        foreach (array_keys((array) config('groeidiamant.facets', [])) as $facet) {
+            $paths[] = $facet;
         }
+        $urls = array_map(fn ($p) => ['loc' => $site->url($p)], $paths);
+
+        // Provincie-overzichten + alle plaatsen.
+        foreach ($resolver->provinces() as $prov) {
+            $urls[] = ['loc' => $site->url('plaatsen/provincie/' . $prov['slug'])];
+        }
+        foreach (array_keys($resolver->places()) as $slug) {
+            $urls[] = ['loc' => $site->url('plaatsen/' . $slug)];
+        }
+
+        // Blogposts met lastmod (helpt Google verse content sneller oppikken).
         try {
-            foreach (BlogPost::query()->forChannel($site->key)->published()->pluck('slug') as $slug) {
-                $urls[] = $site->url('blog/' . $slug);
+            foreach (BlogPost::query()->forChannel($site->key)->published()->get(['slug', 'updated_at', 'published_at']) as $post) {
+                $urls[] = [
+                    'loc'     => $site->url('blog/' . $post->slug),
+                    'lastmod' => optional($post->updated_at ?? $post->published_at)->toDateString(),
+                ];
             }
         } catch (\Throwable $e) {
             // Blog (nog) niet beschikbaar — sitemap blijft geldig zonder blogposts.
@@ -293,7 +312,9 @@ class ChannelSiteController extends Controller
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
             . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         foreach ($urls as $u) {
-            $xml .= '  <url><loc>' . htmlspecialchars($u, ENT_XML1) . '</loc></url>' . "\n";
+            $xml .= '  <url><loc>' . htmlspecialchars($u['loc'], ENT_XML1) . '</loc>'
+                . (! empty($u['lastmod']) ? '<lastmod>' . $u['lastmod'] . '</lastmod>' : '')
+                . '</url>' . "\n";
         }
         $xml .= '</urlset>';
 

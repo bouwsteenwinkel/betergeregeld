@@ -1,7 +1,7 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 @extends('channels.layout')
 
-@section('title', 'Bedankt | ' . $site->name())
+@section('title', 'Bedankt')
 @section('robots', 'noindex,nofollow')
 
 @section('content')

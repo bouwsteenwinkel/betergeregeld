@@ -1,9 +1,30 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 @extends('channels.layout')
 
-@section('title', ($post->meta_title ?: $post->title) . ' | ' . $site->name())
+@section('title', $post->meta_title ?: $post->title)
 @section('description', $post->excerpt)
 @section('canonical', $site->url('blog/' . $post->slug))
+@section('og_type', 'article')
+@if ($post->image)@section('og_image', $post->image)@endif
+
+@push('head')
+    @php
+        $articleLd = array_filter([
+            '@context'      => 'https://schema.org',
+            '@type'         => 'BlogPosting',
+            'headline'      => $post->title,
+            'description'   => $post->excerpt,
+            'image'         => $post->image ?: null,
+            'datePublished' => optional($post->published_at)->toIso8601String(),
+            'dateModified'  => optional($post->updated_at ?? $post->published_at)->toIso8601String(),
+            'inLanguage'    => $site->locale(),
+            'mainEntityOfPage' => $site->url('blog/' . $post->slug),
+            'author'        => ['@type' => 'Organization', 'name' => $site->displayName()],
+            'publisher'     => ['@type' => 'Organization', 'name' => $site->displayName()],
+        ]);
+    @endphp
+    <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
 
 @section('content')
 	<article>
