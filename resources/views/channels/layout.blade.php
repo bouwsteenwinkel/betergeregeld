@@ -165,7 +165,7 @@
 		.cta-band p{color:rgba(255,255,255,.82);max-width:46ch;margin:0}
 		.cta-band .btn{white-space:nowrap}
 		/* sticky mobiele CTA */
-		.sticky-cta{position:fixed;left:14px;right:14px;bottom:14px;z-index:60;display:none;align-items:center;justify-content:center;text-align:center;background:var(--c-cta);color:var(--c-on-cta);font-weight:700;padding:.95rem 1rem;border-radius:8px;box-shadow:0 12px 30px -8px color-mix(in srgb,var(--c-cta) 60%,transparent);transform:translateY(140%);transition:transform .3s ease}
+		.sticky-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;align-items:center;justify-content:center;text-align:center;background:var(--c-cta);color:var(--c-on-cta);font-weight:700;padding:1.05rem 1rem;border-radius:0;box-shadow:0 -6px 24px -8px rgba(0,0,0,.35);transform:translateY(140%);transition:transform .3s ease}
 		.sticky-cta.show{transform:translateY(0)}
 		@media(max-width:859px){.sticky-cta{display:flex}}
 		/* blog-overzicht */
