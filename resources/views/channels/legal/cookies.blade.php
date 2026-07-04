@@ -30,7 +30,7 @@
             <p>Deze zijn nodig om de website goed te laten werken en om formulieren veilig te versturen (bijvoorbeeld een sessie- en beveiligingscookie). Hiervoor is geen toestemming nodig; zonder deze cookies werkt de site niet goed.</p>
 
             <h3>Analytische cookies</h3>
-            <p>Met deze cookies meten we — alleen met jouw toestemming — hoe bezoekers de site gebruiken, zodat we hem kunnen verbeteren. Deze cookies worden pas geplaatst nadat je ze in de cookiemelding hebt geaccepteerd.</p>
+            <p>Met deze cookies meten we, alleen met jouw toestemming, hoe bezoekers de site gebruiken, zodat we hem kunnen verbeteren. Deze cookies worden pas geplaatst nadat je ze in de cookiemelding hebt geaccepteerd.</p>
 
             <h3>Marketingcookies</h3>
             <p>Als we in de toekomst marketing- of trackingcookies inzetten, gebeurt dat uitsluitend nadat je daar in de cookiemelding toestemming voor hebt gegeven.</p>

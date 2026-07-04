@@ -65,7 +65,7 @@
         'facets' => (array) config('groeidiamant.facets', []),
         'kicker' => 'De Groeidiamant',
         'title'  => 'Groei stap voor stap',
-        'lead'   => 'Elk pakket sluit aan op een fase van de Groeidiamant. Je begint klein en breidt uit wanneer je eraan toe bent — je gooit nooit iets weg.',
+        'lead'   => 'Elk pakket sluit aan op een fase van de Groeidiamant. Je begint klein en breidt uit wanneer je eraan toe bent. Je gooit nooit iets weg.',
         'bg'     => 'var(--c-surface)',
     ])
 

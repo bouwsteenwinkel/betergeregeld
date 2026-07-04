@@ -35,7 +35,7 @@
             <p>Na het voorbeeld ontvang je een duidelijke offerte met een vaste prijs. De overeenkomst komt tot stand zodra je de offerte (schriftelijk of digitaal) akkoord geeft.</p>
 
             <h2>5. Prijzen en betaling</h2>
-            <p>Prijzen zijn exclusief btw, tenzij anders vermeld. De op de offerte genoemde prijs is de prijs die je betaalt — geen verrassingen achteraf. Facturen voldoe je binnen de op de factuur genoemde termijn. Bij een abonnement (per maand) blijft de dienst actief zolang het abonnement loopt.</p>
+            <p>Prijzen zijn exclusief btw, tenzij anders vermeld. De op de offerte genoemde prijs is de prijs die je betaalt, geen verrassingen achteraf. Facturen voldoe je binnen de op de factuur genoemde termijn. Bij een abonnement (per maand) blijft de dienst actief zolang het abonnement loopt.</p>
 
             <h2>6. Uitvoering en oplevering</h2>
             <p>We voeren de opdracht naar beste inzicht en vermogen uit. Opgegeven termijnen zijn indicatief en geen fatale termijnen. We stemmen het resultaat met je af voordat het live gaat.</p>

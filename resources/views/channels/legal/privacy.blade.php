@@ -44,9 +44,9 @@
 
             <h2>3. Waarvoor en op welke grondslag?</h2>
             <ul>
-                <li><strong>Contact opnemen en een voorbeeld/offerte maken</strong> — om je aanvraag te beantwoorden en onze dienst te leveren. Grondslag: uitvoering van (de aanloop naar) een overeenkomst.</li>
-                <li><strong>Verbeteren en beveiligen van de website</strong> — om de site goed te laten werken en misbruik te voorkomen. Grondslag: gerechtvaardigd belang.</li>
-                <li><strong>Analyse (indien geplaatst)</strong> — om te begrijpen hoe de site gebruikt wordt. Grondslag: jouw toestemming (via de cookiemelding).</li>
+                <li><strong>Contact opnemen en een voorbeeld/offerte maken</strong>: om je aanvraag te beantwoorden en onze dienst te leveren. Grondslag: uitvoering van (de aanloop naar) een overeenkomst.</li>
+                <li><strong>Verbeteren en beveiligen van de website</strong>: om de site goed te laten werken en misbruik te voorkomen. Grondslag: gerechtvaardigd belang.</li>
+                <li><strong>Analyse (indien geplaatst)</strong>: om te begrijpen hoe de site gebruikt wordt. Grondslag: jouw toestemming (via de cookiemelding).</li>
             </ul>
 
             <h2>4. Hoe lang bewaren we je gegevens?</h2>

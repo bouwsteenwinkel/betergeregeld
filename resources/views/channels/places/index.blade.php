@@ -43,7 +43,7 @@
 				</div>
 			@elseif ($placesList)
 				<h2>Kies je plaats</h2>
-				<p class="muted" style="margin-bottom:1.6rem;max-width:66ch">{{ $r('pick_note', 'Staat jouw plaats er niet bij? We werken door heel Nederland — vraag gewoon een gratis voorbeeld aan.') }}</p>
+				<p class="muted" style="margin-bottom:1.6rem;max-width:66ch">{{ $r('pick_note', 'Staat jouw plaats er niet bij? We werken door heel Nederland. Vraag gerust een gratis voorbeeld aan.') }}</p>
 				<style>.places-cols{columns:2;column-gap:1.5rem;line-height:2}@media(min-width:560px){.places-cols{columns:3}}@media(min-width:900px){.places-cols{columns:5}}.places-cols a{display:block;font-weight:600;break-inside:avoid;text-decoration:none;color:inherit;font-size:.95rem}.places-cols a:hover{color:var(--c-primary)}</style>
 				<div class="places-cols">
 					@foreach ($placesList as $slug => $name)

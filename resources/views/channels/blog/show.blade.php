@@ -1,7 +1,7 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 @extends('channels.layout')
 
-@section('title', ($post->meta_title ?: $post->title) . ' — ' . $site->name())
+@section('title', ($post->meta_title ?: $post->title) . ' | ' . $site->name())
 @section('description', $post->excerpt)
 @section('canonical', $site->url('blog/' . $post->slug))
 

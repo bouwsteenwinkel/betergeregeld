@@ -15,8 +15,8 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'De Groeidiamant — groeien zonder opnieuw te beginnen')
-@section('description', 'De Groeidiamant van Betergeregeld ICT: een groeimodel in vijf fasen — van website tot slimme AI. Begin waar je nu staat en breid uit wanneer je eraan toe bent.')
+@section('title', 'De Groeidiamant: groeien zonder opnieuw te beginnen')
+@section('description', 'De Groeidiamant van Betergeregeld ICT: een groeimodel in vijf fasen, van website tot slimme AI. Begin waar je nu staat en breid uit wanneer je eraan toe bent.')
 
 @section('content')
 
@@ -38,7 +38,7 @@
                 <div class="gd-hero-txt">
                     <span class="eyebrow">Groeidiamant by Betergeregeld ICT</span>
                     <h1>Groei zonder ooit opnieuw te beginnen</h1>
-                    <p class="lead" style="max-width:52ch">De Groeidiamant is ons groeimodel in vijf fasen. Je begint waar je nu staat — meestal met een sterke website — en breidt uit wanneer je eraan toe bent. Elke fase bouwt voort op de vorige, dus je gooit nooit iets weg.</p>
+                    <p class="lead" style="max-width:52ch">De Groeidiamant is ons groeimodel in vijf fasen. Je begint waar je nu staat, meestal met een sterke website, en breidt uit wanneer je eraan toe bent. Elke fase bouwt voort op de vorige, dus je gooit nooit iets weg.</p>
                     <a href="{{ $site->navHref('#gratis-voorbeeld') }}" class="btn">Gratis voorbeeld aanvragen</a>
                 </div>
                 <div class="gd-hero-logo">

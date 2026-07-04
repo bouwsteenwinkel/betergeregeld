@@ -1,7 +1,7 @@
 @php /** @var \App\Support\ChannelSite $site */ $a = $site->get('about', []); @endphp
 @extends('channels.layout')
 
-@section('title', ($a['title'] ?? 'Over ons') . ' — ' . $site->name())
+@section('title', ($a['title'] ?? 'Over ons') . ' | ' . $site->name())
 @section('description', $a['lead'] ?? $site->homeDescription())
 
 @section('content')

@@ -1,7 +1,7 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 @extends('channels.layout')
 
-@section('title', 'Blog — ' . $site->name())
+@section('title', 'Blog | ' . $site->name())
 @section('description', 'Tips en inzichten over ' . ($site->get('places.service') ?: 'websites') . ' voor ' . $site->branche() . '.')
 
 @section('content')

@@ -12,8 +12,8 @@
 return [
     'eyebrow' => 'Prijzen',
     'h1'      => 'Duidelijke prijzen, geen verrassingen',
-    'intro'   => 'Je begint waar je nu staat en breidt uit wanneer je eraan toe bent — precies de Groeidiamant. Hieronder de richtprijzen per pakket. Je krijgt altijd vooraf een vaste prijs op maat, en een gratis voorbeeld van jouw bedrijf om te zien wat je krijgt.',
-    'note'    => 'Alle prijzen zijn indicatief en exclusief btw. Geen lange contracten — maandelijks opzegbaar. De exacte prijs krijg je vooraf, zonder verrassingen achteraf.',
+    'intro'   => 'Je begint waar je nu staat en breidt uit wanneer je eraan toe bent, precies zoals de Groeidiamant werkt. Hieronder de richtprijzen per pakket. Je krijgt altijd vooraf een vaste prijs op maat, en een gratis voorbeeld van jouw bedrijf om te zien wat je krijgt.',
+    'note'    => 'Alle prijzen zijn indicatief en exclusief btw. Geen lange contracten, maandelijks opzegbaar. De exacte prijs krijg je vooraf, zonder verrassingen achteraf.',
 
     'packages' => [
         [
@@ -42,7 +42,7 @@ return [
                 'Alles uit Start',
                 'Webshop met iDEAL, of een klantenportaal',
                 'Online betalen of afspraken laten plannen',
-                'Gekoppeld aan je site — geen dubbel werk',
+                'Gekoppeld aan je site, geen dubbel werk',
                 'Uitbreidbaar wanneer je bedrijf groeit',
             ],
         ],
