@@ -8,8 +8,11 @@
     $zkhw    = (array) ($landing['zkhw'] ?? []);
     $fLabel  = $facets[$facet]['label'] ?? ($zkhw['label'] ?? 'product');
     $landingKeys = array_keys((array) config('badkamer_landings', []));
-    $heroImg = $site->image('hero');
-    $heroSet = $site->imageSrcset('hero');
+    // Facet-specifiek hero-beeld (bv. 'facet-automatisering' = automatisering-thema)
+    // met terugval op het algemene hero zolang dat er nog niet is.
+    $facetSlot = 'facet-' . $facet;
+    $heroImg = $site->image($facetSlot) ?: $site->image('hero');
+    $heroSet = $site->image($facetSlot) ? $site->imageSrcset($facetSlot) : $site->imageSrcset('hero');
 @endphp
 @extends('channels.layout')
 
