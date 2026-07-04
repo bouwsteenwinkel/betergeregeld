@@ -120,6 +120,15 @@ class ChannelSite
         return $this->homeDescription();
     }
 
+    /** OG-/social-afbeelding: het site-logo (absoluut), anders het hero-beeld. */
+    public function ogImage(): ?string
+    {
+        if ($logo = $this->brand('footer_logo')) {
+            return rtrim($this->baseUrl(), '/') . '/' . ltrim((string) $logo, '/');
+        }
+        return $this->image('hero');
+    }
+
     public function branche(): string
     {
         return (string) ($this->cfg['branche'] ?? 'overig');

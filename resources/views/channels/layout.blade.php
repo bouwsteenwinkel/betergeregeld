@@ -18,7 +18,7 @@
 	<meta property="og:site_name" content="{{ $site->displayName() }}">
 	<meta property="og:title" content="@yield('title', $site->homeTitle())">
 	<meta property="og:description" content="@yield('description', $site->metaDescription())">
-	@php $ogImage = trim($__env->yieldContent('og_image')) ?: $site->image('hero'); @endphp
+	@php $ogImage = trim($__env->yieldContent('og_image')) ?: $site->ogImage(); @endphp
 	@if ($ogImage)
 		<meta property="og:image" content="{{ $ogImage }}">
 		<meta property="og:image:alt" content="{{ $site->displayName() }}">
