@@ -170,9 +170,9 @@
 		.sticky-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;align-items:center;justify-content:center;text-align:center;background:var(--c-cta);color:var(--c-on-cta);font-weight:700;padding:1.05rem 1rem;border-radius:0;box-shadow:0 -6px 24px -8px rgba(0,0,0,.35);transform:translateY(140%);transition:transform .3s ease}
 		.sticky-cta.show{transform:translateY(0)}
 		@media(max-width:859px){.sticky-cta{display:flex}
-			/* Ruimte onderaan de pagina zodat de vaste CTA-balk niet over de
-			   footer-content valt. */
-			body{padding-bottom:72px}}
+			/* Ruimte reserveren voor de vaste CTA-balk IN de footer (donker), zodat
+			   er geen lichte body-strook tussen footer en CTA ontstaat. */
+			footer{padding-bottom:84px}}
 		/* blog-overzicht */
 		.blog-grid{gap:1.4rem;margin-top:1rem}
 		.blog-card{display:flex;flex-direction:column;background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent);border-radius:calc(var(--radius) + 2px);padding:1.6rem;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
