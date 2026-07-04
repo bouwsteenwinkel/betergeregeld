@@ -114,10 +114,10 @@ class ChannelSiteResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->label('Site')->weight('bold')
-                    ->description(fn (Site $r) => '/_site/' . $r->key)->searchable(),
-                TextColumn::make('branche.name')->label('Branche')->badge(),
+                    ->description(fn (Site $r) => '/_site/' . $r->key)->searchable(['name', 'key']),
+                TextColumn::make('branche.name')->label('Branche')->badge()->searchable(),
                 TextColumn::make('domain')->label('Domein')->placeholder('— concept —')
-                    ->url(fn (Site $r) => $r->domain ? 'https://' . $r->domain : null, true),
+                    ->url(fn (Site $r) => $r->domain ? 'https://' . $r->domain : null, true)->searchable(),
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn (string $state) => $state === 'live' ? 'Live' : 'Concept')
                     ->color(fn (string $state) => $state === 'live' ? 'success' : 'gray'),
