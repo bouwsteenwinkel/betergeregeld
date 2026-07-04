@@ -39,10 +39,14 @@
             box-shadow:0 12px 28px -12px color-mix(in srgb,var(--c-primary) 60%,transparent)}
         .facetstrip .fs-item.is-current .fs-ic{color:#fff}
         @media(max-width:820px){.facetstrip .fs-grid{grid-template-columns:repeat(3,1fr)}}
-        @media(max-width:760px){.facetstrip .fs-head{flex-direction:column;align-items:flex-start;gap:1.3rem}
-            .facetstrip .fs-logo img{width:180px;max-width:56vw}}
-        @media(max-width:520px){.facetstrip .fs-grid{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:360px){.facetstrip .fs-grid{grid-template-columns:1fr}}
+        @media(max-width:760px){.facetstrip .fs-head{flex-direction:column;align-items:stretch;gap:1.3rem}
+            /* Logo-kaart over de volle breedte, logo netjes gecentreerd. */
+            .facetstrip .fs-logo{align-self:stretch;text-align:center;padding:1.4rem}
+            .facetstrip .fs-logo img{width:200px;max-width:56vw;margin:0 auto}}
+        @media(max-width:640px){.facetstrip .fs-grid{grid-template-columns:repeat(2,1fr)}}
+        /* Mobiel: elke facet-knop op een eigen rij. */
+        @media(max-width:560px){.facetstrip .fs-grid{grid-template-columns:1fr}
+            .facetstrip .fs-item{justify-content:flex-start;padding:1rem 1.1rem;font-size:1rem}}
     </style>
     <div class="wrap">
         <div class="fs-head">
