@@ -229,13 +229,19 @@
 		.grid{display:grid;gap:1.2rem}
 		@media(min-width:760px){.cols-3{grid-template-columns:repeat(3,1fr)}.cols-4{grid-template-columns:repeat(4,1fr)}.cols-2{grid-template-columns:1fr 1fr}}
 		/* FAQ (accordeon) */
-		.faq{display:grid;gap:.7rem;max-width:760px}
-		.faq details{background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-ink) 10%,transparent);border-radius:var(--radius);overflow:hidden}
-		.faq summary{list-style:none;cursor:pointer;padding:1rem 1.2rem;font-weight:700;display:flex;justify-content:space-between;gap:1rem;align-items:center}
+		.faq{display:grid;gap:.8rem;max-width:820px;margin:0 auto}
+		.faq details{background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-ink) 10%,transparent);border-radius:calc(var(--radius) + 4px);box-shadow:0 10px 30px -26px rgba(0,0,0,.4);transition:border-color .2s ease,box-shadow .2s ease}
+		.faq details[open]{border-color:color-mix(in srgb,var(--c-primary) 40%,transparent);box-shadow:0 18px 42px -28px color-mix(in srgb,var(--c-primary) 55%,rgba(0,0,0,.5))}
+		.faq summary{list-style:none;cursor:pointer;padding:1.15rem 1.35rem;font-weight:700;font-size:1.02rem;display:flex;justify-content:space-between;gap:1rem;align-items:center;color:var(--c-ink)}
 		.faq summary::-webkit-details-marker{display:none}
-		.faq summary::after{content:"+";color:var(--c-cta);font-size:1.4rem;line-height:1;transition:transform .2s}
-		.faq details[open] summary::after{transform:rotate(45deg)}
-		.faq details p{padding:0 1.2rem 1.1rem;color:var(--c-muted)}
+		.faq summary::after{content:"+";flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c-primary) 12%,transparent);color:var(--c-primary);font-size:1.3rem;line-height:1;transition:transform .3s ease,background .2s ease}
+		.faq details[open] summary{color:var(--c-primary)}
+		.faq details[open] summary::after{transform:rotate(135deg);background:color-mix(in srgb,var(--c-primary) 20%,transparent)}
+		/* Vloeiende open/dicht via grid-rows (werkt ook zonder JS). */
+		.faq-acc details > .faq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1)}
+		.faq-acc details[open] > .faq-a{grid-template-rows:1fr}
+		.faq-acc .faq-a-inner{overflow:hidden;min-height:0}
+		.faq .faq-a p,.faq details > p{margin:0;padding:0 1.35rem 1.2rem;color:var(--c-muted);line-height:1.6}
 		/* trust-balk boven de nav */
 		.topbar{background:var(--c-ink);color:rgba(255,255,255,.78);font-size:.82rem;letter-spacing:.01em}
 		.topbar-inner{display:flex;align-items:center;justify-content:space-between;min-height:42px;gap:1rem}
