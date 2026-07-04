@@ -22,6 +22,7 @@
 @section('description', 'Van gratis voorbeeld tot een website die voor je werkt. Zo pakken we het aan voor je ' . $trade . ', zonder technisch gedoe.')
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Onze werkwijze']]])
     <section class="hero">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Zo werkt het</span>

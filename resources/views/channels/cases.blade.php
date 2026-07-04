@@ -9,6 +9,7 @@
 @section('description', 'Zo ziet groei met de Groeidiamant eruit: voorbeeldcases van een website, webshop en slimme tools voor badkamerbedrijven.')
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Cases']]])
     <section class="hero">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Cases</span>

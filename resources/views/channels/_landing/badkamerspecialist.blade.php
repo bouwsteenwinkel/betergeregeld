@@ -18,6 +18,12 @@
 
 @section('content')
 
+    @include('channels.partials.breadcrumb', ['items' => [
+        ['label' => 'Home', 'url' => $site->url('')],
+        ['label' => 'Diensten', 'url' => $site->url('diensten')],
+        ['label' => $fLabel],
+    ]])
+
     {{-- Product-hero: spreekt de ondernemer aan die juist DIT product zoekt --}}
     <section class="hero" data-section="hero">
         <div class="wrap">

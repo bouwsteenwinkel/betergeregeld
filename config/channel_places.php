@@ -20,6 +20,11 @@
 
 return [
 
+    // SEO-gating: een plaats-pagina wordt pas geïndexeerd (en in de sitemap gezet)
+    // als er minstens zoveel echte lokale bedrijven in cache staan. Dunne plaatsen
+    // krijgen noindex, zodat er geen doorway-/thin-content-pagina's ontstaan.
+    'index_min_businesses' => 3,
+
     // Fallback-tokens als een branche (nog) geen eigen waarden heeft.
     'defaults' => [
         'trade'   => 'bedrijf',

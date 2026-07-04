@@ -51,6 +51,24 @@
 		</section>
 	</article>
 
+	{{-- Interne links naar de diensten (helpt SEO en houdt lezers op de site). --}}
+	<section style="background:var(--c-surface)">
+		<div class="wrap" style="max-width:760px">
+			<span class="kicker"><span class="kicker-line"></span> Lees ook</span>
+			<h2 style="margin:.3rem 0 1rem">Wat we voor je kunnen bouwen</h2>
+			<div class="grid cols-3" style="gap:.7rem">
+				@foreach ((array) config('groeidiamant.facets', []) as $fk => $fv)
+					<a href="{{ $site->url($fk) }}" class="feature-card" style="display:block;text-decoration:none;color:inherit">
+						<h3 style="font-size:1.02rem">{{ $fv['label'] ?? $fk }}</h3>
+						<span class="feature-rule"></span>
+						<p style="font-size:.92rem">{{ $fv['tagline'] ?? '' }}</p>
+					</a>
+				@endforeach
+			</div>
+			<p style="margin-top:1rem"><a href="{{ $site->url('diensten') }}" style="font-weight:600">Bekijk alle diensten →</a></p>
+		</div>
+	</section>
+
 	<div id="contact" class="scroll-anchor" aria-hidden="true"></div>
 	@include('channels.partials.lead-wizard', ['site' => $site, 'facet' => 'website'])
 @endsection

@@ -39,6 +39,10 @@
 
 @section('title', $c['meta_title'] ?? ('Website in ' . $placeName))
 @section('description', $c['meta_description'] ?? $site->homeDescription())
+{{-- Dunne plaatsen (te weinig echte bedrijven) niet indexeren: voorkomt doorway-content. --}}
+@unless ($indexable ?? true)
+    @section('robots', 'noindex,follow')
+@endunless
 
 @push('head')
 	@foreach ($ld as $block)

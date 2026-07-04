@@ -20,6 +20,7 @@
 @section('description', 'Zelf bouwen met een website-bouwer of je website laten maken? Een eerlijke vergelijking voor je ' . $trade . '.')
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Zelf bouwen of laten maken']]])
     <section class="hero">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Vergelijken</span>

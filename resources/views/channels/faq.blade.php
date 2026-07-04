@@ -20,6 +20,7 @@
 @endpush
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Veelgestelde vragen']]])
     <style>
         /* Geanimeerde accordion, altijd max. 1 open. Antwoord-hoogte via JS. */
         .faq-acc details > .faq-a{display:block;overflow:hidden;height:0;transition:height .3s ease}

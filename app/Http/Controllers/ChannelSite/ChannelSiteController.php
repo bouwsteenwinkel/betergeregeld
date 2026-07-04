@@ -235,6 +235,9 @@ class ChannelSiteController extends Controller
         }
         asort($nearby);
 
+        // SEO-gating: alleen plaatsen met genoeg echte bedrijven indexeren.
+        $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3);
+
         return view('channels.places.show', [
             'site'       => $site,
             'place'      => $data,
@@ -244,6 +247,7 @@ class ChannelSiteController extends Controller
             'business'   => $business,
             'businesses' => $businesses,
             'nearby'     => $nearby,
+            'indexable'  => $indexable,
         ]);
     }
 
@@ -294,11 +298,17 @@ class ChannelSiteController extends Controller
         }
         $urls = array_map(fn ($p) => ['loc' => $site->url($p)], $paths);
 
-        // Provincie-overzichten + alle plaatsen.
+        // Provincie-overzichten + alleen "sterke" plaatsen (genoeg echte bedrijven);
+        // dunne plaatsen staan op noindex en horen dus niet in de sitemap.
         foreach ($resolver->provinces() as $prov) {
             $urls[] = ['loc' => $site->url('plaatsen/provincie/' . $prov['slug'])];
         }
-        foreach (array_keys($resolver->places()) as $slug) {
+        $min = (int) config('channel_places.index_min_businesses', 3);
+        $strong = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->indexableSlugs($site->brancheKey(), $min);
+        // Geen cache-data (nog niet gewarmd)? Val terug op alle plaatsen zodat de
+        // sitemap niet leeg is; anders alleen de sterke plaatsen.
+        $placeSlugs = $strong ?: array_keys($resolver->places());
+        foreach ($placeSlugs as $slug) {
             $urls[] = ['loc' => $site->url('plaatsen/' . $slug)];
         }
 

@@ -9,6 +9,7 @@
 @section('description', $p['intro'] ?? 'Duidelijke richtprijzen en pakketten. Vooraf een vaste prijs en een gratis voorbeeld van jouw bedrijf.')
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Prijzen']]])
 
     <section class="hero">
         <div class="wrap">

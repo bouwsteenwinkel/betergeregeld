@@ -14,6 +14,7 @@
 @section('description', $r($cfg['intro'] ?? 'Alles wat we voor je bouwen, van een professionele website tot slimme automatisering en AI.'))
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Diensten']]])
     <style>
         .svc{padding:56px 0}
         .svc:nth-child(even){background:var(--c-surface)}

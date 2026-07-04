@@ -4,6 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="{{ $site->theme()['primary'] }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	{{-- Demo-/mockup-pagina's (/voorbeeld) nooit indexeren: het zijn voorbeelden,
 	     geen echte content, en anders concurreren ze met de trigger-pagina's. --}}
@@ -282,6 +283,10 @@
 		/* compacter logo/CTA op kleine schermen zodat de balk niet propt */
 		@media(max-width:560px){.logo-tag{display:none}.logo-word{font-size:1.16rem}.nav-actions .btn{padding:.7rem 1.05rem;font-size:.92rem}.nav-inner{gap:.8rem;height:64px}}
 		/* hero */
+		.breadcrumb{font-size:.84rem;color:var(--c-muted);padding:.9rem 0 0}
+		.breadcrumb a{color:var(--c-muted)}.breadcrumb a:hover{color:var(--c-cta)}
+		.breadcrumb .bc-sep{margin:0 .5rem;opacity:.6}
+		.breadcrumb [aria-current=page]{color:var(--c-ink);font-weight:600}
 		.hero{padding:72px 0 56px;background:linear-gradient(180deg,color-mix(in srgb,var(--c-accent) 10%,transparent),transparent)}
 		/* Slanke hero voor eenvoudige content-pagina's (minder top-ruimte op desktop). */
 		@media(min-width:641px){.hero--slim{padding-top:44px}}

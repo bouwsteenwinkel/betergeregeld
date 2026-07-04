@@ -11,6 +11,7 @@
 @section('description', 'Neem rechtstreeks contact op: bel of mail ons over een website, webshop of slimme tools voor je bedrijf. Een gratis voorbeeld vraag je zo aan.')
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Contact']]])
     <section class="hero hero--slim">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Contact</span>

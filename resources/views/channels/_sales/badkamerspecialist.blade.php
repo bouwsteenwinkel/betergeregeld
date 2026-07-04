@@ -10,6 +10,13 @@
 @section('title', 'Website of webshop voor je badkamerbedrijf laten maken')
 @section('description', 'Meer badkamerklussen uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
 
+{{-- LCP: hero-afbeelding vroeg laden zodat de grootste afbeelding sneller in beeld staat. --}}
+@if ($heroImg)
+    @push('head')
+        <link rel="preload" as="image" href="{{ $heroImg }}" @if ($heroSet) imagesrcset="{{ $heroSet }}" imagesizes="(max-width:760px) 92vw, 46vw" @endif fetchpriority="high">
+    @endpush
+@endif
+
 @section('content')
 
     {{-- Hero: spreekt de ondernemer aan, niet z'n klanten --}}

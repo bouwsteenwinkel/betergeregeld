@@ -19,6 +19,7 @@
 @section('description', 'De Groeidiamant van Betergeregeld ICT: een groeimodel in vijf fasen, van website tot slimme AI. Begin waar je nu staat en breid uit wanneer je eraan toe bent.')
 
 @section('content')
+    @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'De Groeidiamant']]])
 
     {{-- Hero met logo-presentatie --}}
     <section class="hero">

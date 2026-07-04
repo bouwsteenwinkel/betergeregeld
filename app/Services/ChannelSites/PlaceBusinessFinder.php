@@ -63,6 +63,24 @@ class PlaceBusinessFinder
             ->exists();
     }
 
+    /**
+     * Slugs van plaatsen met minstens $min echte bedrijven in cache (één query,
+     * géén API). Voor SEO-gating: alleen "sterke" plaatsen indexeren + in sitemap,
+     * dunne (0-2 bedrijven) op noindex zodat er geen doorway-pagina's ontstaan.
+     *
+     * @return array<int,string>
+     */
+    public function indexableSlugs(string $brancheKey, int $min): array
+    {
+        $out = [];
+        foreach (DB::table('channel_place_listings')->where('branche_key', $brancheKey)->get(['place_slug', 'listings']) as $row) {
+            if (count((array) json_decode($row->listings ?? '[]', true)) >= $min) {
+                $out[] = $row->place_slug;
+            }
+        }
+        return $out;
+    }
+
     /* ─────────────────────── Kosten-/quota-plafond ──────────────────────── */
 
     /** Feature aan én key aanwezig? */

@@ -3,6 +3,8 @@
 
 @section('title', 'Blog')
 @section('description', 'Tips en inzichten over ' . ($site->get('places.service') ?: 'websites') . ' voor ' . $site->branche() . '.')
+{{-- Paginatie: elke pagina verwijst naar zichzelf (geen canonical naar pagina 1). --}}
+@section('canonical', $site->url('blog') . ($posts->currentPage() > 1 ? '?page=' . $posts->currentPage() : ''))
 
 @section('content')
 	<section class="hero">
