@@ -2,7 +2,7 @@
 {{-- Zelfstandige afspraken-widget: haalt vrije sloten op en boekt (same-origin
      /afspraak/*). Platform-breed, dezelfde gedeelde agenda op elke trigger-site. --}}
 <section class="bkg" data-section="afspraak" id="afspraak">
-    <div class="wrap" style="max-width:820px">
+    <div class="wrap">
         <span class="kicker"><span class="kicker-line"></span> Direct plannen</span>
         <h2>Plan zelf een online kennismaking</h2>
         <p class="muted" style="max-width:56ch;margin-top:.3rem">Kies een moment dat jou uitkomt. Je krijgt een korte videoafspraak via Google Meet, gratis en vrijblijvend.</p>
