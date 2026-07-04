@@ -39,7 +39,7 @@
     <style>
         .svc{padding:56px 0}
         .svc:nth-child(even){background:var(--c-surface)}
-        .svc-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:2.6rem;align-items:center;max-width:1040px;margin:0 auto}
+        .svc-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:2.6rem;align-items:center}
         .svc:nth-child(even) .svc-inner{grid-template-columns:.9fr 1.1fr}
         .svc:nth-child(even) .svc-text{order:2}
         .svc-ic{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;

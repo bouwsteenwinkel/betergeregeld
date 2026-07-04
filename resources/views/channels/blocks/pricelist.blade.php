@@ -34,8 +34,7 @@
     .pricelist .pl-head{text-align:center;max-width:640px;margin:0 auto 2rem}
     .pricelist .pl-head h2{margin:.3rem 0 0}
     .pricelist .pl-sub{margin-top:.6rem}
-    .pricelist .pl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.1rem;
-        max-width:980px;margin:0 auto;align-items:stretch}
+    .pricelist .pl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.1rem;align-items:stretch}
     .pricelist .pl-card{display:flex;flex-direction:column;background:var(--c-surface);
         border:1px solid color-mix(in srgb,var(--c-ink) 10%,transparent);border-radius:calc(var(--radius) + 6px);
         padding:1.5rem 1.45rem;box-shadow:0 14px 34px -26px rgba(0,0,0,.4);

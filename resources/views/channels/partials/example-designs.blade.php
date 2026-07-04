@@ -47,7 +47,7 @@
 <style>
     .exd-head{text-align:center;max-width:660px;margin:0 auto 2.2rem}
     .exd-head h2{margin:.3rem 0 .5rem}
-    .exd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.6rem;max-width:1080px;margin:0 auto}
+    .exd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.6rem}
     .exd-card{display:flex;flex-direction:column}
     .exd-browser{border-radius:14px;overflow:hidden;background:var(--c-surface);
         border:1px solid color-mix(in srgb,var(--c-ink) 12%,transparent);
