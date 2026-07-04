@@ -167,7 +167,10 @@
 		/* sticky mobiele CTA */
 		.sticky-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;align-items:center;justify-content:center;text-align:center;background:var(--c-cta);color:var(--c-on-cta);font-weight:700;padding:1.05rem 1rem;border-radius:0;box-shadow:0 -6px 24px -8px rgba(0,0,0,.35);transform:translateY(140%);transition:transform .3s ease}
 		.sticky-cta.show{transform:translateY(0)}
-		@media(max-width:859px){.sticky-cta{display:flex}}
+		@media(max-width:859px){.sticky-cta{display:flex}
+			/* Ruimte onderaan de pagina zodat de vaste CTA-balk niet over de
+			   footer-content valt. */
+			body{padding-bottom:72px}}
 		/* blog-overzicht */
 		.blog-grid{gap:1.4rem;margin-top:1rem}
 		.blog-card{display:flex;flex-direction:column;background:var(--c-surface);border:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent);border-radius:calc(var(--radius) + 2px);padding:1.6rem;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
@@ -267,6 +270,11 @@
 		.nav-drawer-contact a:hover{color:var(--c-cta)}
 		.nav-drawer-contact .ic{width:16px;height:16px;color:var(--c-cta);flex:0 0 auto}
 		.nav-drawer-cta{margin:.8rem 22px 0;text-align:center}
+		.nav-drawer-cookies{display:flex;align-items:center;gap:.55rem;margin:.9rem 22px .1rem;padding:.5rem 0;background:none;border:0;cursor:pointer;font:inherit;font-weight:600;color:var(--c-muted)}
+		.nav-drawer-cookies .ic{width:16px;height:16px;flex:0 0 auto}
+		.nav-drawer-cookies:hover{color:var(--c-cta)}
+		/* Zwevende cookie-knop alleen op desktop; op mobiel staat 'ie in het menu. */
+		@media(max-width:859px){#cmp-reopen,.cmp-reopen{display:none!important}}
 		/* compacter logo/CTA op kleine schermen zodat de balk niet propt */
 		@media(max-width:560px){.logo-tag{display:none}.logo-word{font-size:1.16rem}.nav-actions .btn{padding:.7rem 1.05rem;font-size:.92rem}.nav-inner{gap:.8rem;height:64px}}
 		/* hero */

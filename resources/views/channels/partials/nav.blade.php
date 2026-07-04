@@ -67,6 +67,12 @@
 			@endif
 		</div>
 		<div class="nav-drawer-cta"><a href="{{ $site->navHref($cta['href']) }}" class="btn" style="width:100%">{{ $cta['label'] }}</a></div>
+		{{-- Cookievoorkeuren onderaan het mobiele menu (opent CMP-venster via
+		     data-cmp-open-prefs); de zwevende cookie-knop is op mobiel verborgen. --}}
+		<button type="button" class="nav-drawer-cookies" data-cmp-open-prefs>
+			<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5Z"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
+			Cookievoorkeuren
+		</button>
 	</div>
 </header>
 
@@ -82,7 +88,7 @@
         toggle.setAttribute('aria-label', open ? 'Menu sluiten' : 'Menu openen');
     }
     toggle.addEventListener('click', function () { setOpen(!nav.classList.contains('open')); });
-    nav.querySelectorAll('.nav-drawer a').forEach(function (a) {
+    nav.querySelectorAll('.nav-drawer a, .nav-drawer button').forEach(function (a) {
         a.addEventListener('click', function () { setOpen(false); });
     });
     window.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
