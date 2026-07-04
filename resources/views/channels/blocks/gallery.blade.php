@@ -1,14 +1,9 @@
 @php
     /** @var \App\Models\Channel\Block $block */
+    // Alleen ÉCHTE, expliciet ingevulde tegels (bv. referentie-/klantsites). Geen
+    // fallback naar sector-galerijbeelden: die zijn geen echt "werk", dus het blok
+    // blijft verborgen tot er echte voorbeelden zijn (referentie-sites/reviews).
     $tiles = (array) $block->c('tiles', []);
-    // Geen expliciete tiles? Val terug op de gedeelde sector-galerijbeelden.
-    if (! $tiles) {
-        for ($i = 1; $i <= 6; $i++) {
-            if ($u = $site->image('gallery' . $i)) {
-                $tiles[] = ['image' => $u, 'srcset' => $site->imageSrcset('gallery' . $i)];
-            }
-        }
-    }
 @endphp
 @if ($tiles)
 <section data-block="gallery" style="background:var(--c-surface)">
