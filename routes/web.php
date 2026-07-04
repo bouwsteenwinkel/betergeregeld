@@ -66,6 +66,12 @@ use Illuminate\Support\Facades\Route;
 // loze routes hieronder, anders vangt '/' het channel-domein af.
 require __DIR__ . '/channels.php';
 
+// Afsprakenplanner (platform-breed; werkt op elk trigger-domein, same-origin).
+Route::prefix('afspraak')->group(function () {
+    Route::get('/beschikbaarheid', [\App\Http\Controllers\AppointmentController::class, 'availability']);
+    Route::post('/boeken', [\App\Http\Controllers\AppointmentController::class, 'book'])->middleware('throttle:20,1');
+});
+
 Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
 
 // Blok-template preview (thumbnail in de admin). Buiten de locale-prefix.

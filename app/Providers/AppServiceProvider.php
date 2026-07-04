@@ -30,6 +30,13 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\QualityScan\Contracts\ClaudeAnalyzerInterface::class,
             \App\Services\QualityScan\ClaudeAnalyzer::class,
         );
+
+        // Afsprakenplanner: agenda-provider. Fase 1a = stub (geen Google), fase 1b
+        // wisselt dit naar de echte Google Calendar-gateway.
+        $this->app->bind(
+            \App\Services\Scheduling\Contracts\CalendarGateway::class,
+            \App\Services\Scheduling\StubCalendarGateway::class,
+        );
     }
 
     public function boot(): void

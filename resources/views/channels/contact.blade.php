@@ -55,6 +55,8 @@
         </div>
     </section>
 
+    @include('channels.partials.booking', ['site' => $site])
+
     @if (! empty(array_filter([$legal['legal_name'] ?? '', $legal['address'] ?? '', $legal['kvk'] ?? '', $legal['btw'] ?? ''])))
         <section style="background:var(--c-surface)">
             <div class="wrap" style="max-width:760px">
