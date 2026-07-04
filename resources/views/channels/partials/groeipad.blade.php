@@ -11,6 +11,10 @@
     $hasLanding = method_exists($site, 'landingView') && $site->landingView();
     $linkBase   = $hasLanding ? '' : ($facetBase ?? '');
     $gdLogo     = asset('channel-media/_brand/groeidiamant.jpg');
+    // Optionele koptekst-overrides (bv. de home van badkamerspecialist).
+    $kicker = $kicker ?? 'De Groeidiamant';
+    $title  = $title ?? 'Je site groeit met je mee';
+    $lead   = $lead ?? 'Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. Klik op een fase om te zien wat die voor jou betekent.';
 @endphp
 @if (!empty($facets))
 <section id="groeipad" data-section="groeipad" style="padding:56px 0">
@@ -75,9 +79,9 @@
     <div class="wrap">
         <div class="gd-head">
             <div class="gd-intro">
-                <span class="kicker"><span class="kicker-line"></span> De Groeidiamant</span>
-                <h2>Je site groeit met je mee</h2>
-                <p class="muted">Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. <strong>Klik op een fase</strong> om te zien wat die voor jou betekent.</p>
+                <span class="kicker"><span class="kicker-line"></span> {{ $kicker }}</span>
+                <h2>{{ $title }}</h2>
+                <p class="muted">{{ $lead }}</p>
             </div>
             <div class="gd-logo">
                 <img src="{{ $gdLogo }}" alt="Groeidiamant by Betergeregeld" width="240" loading="lazy" decoding="async">

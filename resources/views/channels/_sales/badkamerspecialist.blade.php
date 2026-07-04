@@ -82,13 +82,12 @@
     {{-- Wat we voor je bouwen = de Groeidiamant-facetstrip (zelfde compacte blok als
          op de trigger- en plaatsen-pagina's). Elk facet linkt naar z'n landingspagina. --}}
     <div id="diensten" class="scroll-anchor" aria-hidden="true"></div>
-    @include('channels.partials.facet-strip', [
+    @include('channels.partials.groeipad', [
         'site'   => $site,
         'facets' => $facets,
         'kicker' => 'Wat we voor je bouwen',
         'title'  => 'Kies waar je nu staat, de rest komt later',
-        'lead'   => 'Van een eerste professionele site tot online verkopen en slimme automatisering. Klik op een product voor het volledige verhaal en een echt voorbeeld.',
-        'bg'     => 'color-mix(in srgb,var(--c-accent) 6%,transparent)',
+        'lead'   => 'Van een eerste professionele site tot online verkopen en slimme automatisering. Klik op een fase voor het volledige verhaal en een echt voorbeeld.',
     ])
 
     {{-- Géén "Zo kan het worden"-blokken op de home: één blok per groeistap staat
