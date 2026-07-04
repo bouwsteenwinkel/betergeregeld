@@ -267,7 +267,8 @@
 		/* Mobiel (burger zichtbaar): logo gecentreerd in de balk, burger rechts vast. */
 		@media(max-width:859px){
 			.nav-inner{position:relative;justify-content:center}
-			.nav-actions{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+			/* right = de wrap-padding (22px), anders plakt de burger tegen de schermrand. */
+			.nav-actions{position:absolute;right:22px;top:50%;transform:translateY(-50%)}
 		}
 		.logo-text{display:inline-flex;flex-direction:column;gap:.16rem;min-width:0}
 		.logo-word{font-family:var(--font-display);font-weight:700;font-size:1.34rem;letter-spacing:.01em}
