@@ -116,6 +116,18 @@ return [
             'gallery5' => 'Handen die een lesplanning of theorie op een tablet doornemen in een licht, modern auto-interieur.',
             'gallery6' => 'Een blije geslaagde leerling bij de lesauto, natuurlijk moment, helder daglicht, moderne uitstraling.',
         ],
+
+        // Badkamerspecialist: moderne, lichte badkamers (het afgeleverde vakwerk).
+        'badkamerspecialist' => [
+            'hero'     => 'Een moderne, lichte badkamer, net opgeleverd: strakke tegels, een ruime inloopdouche met glazen wand en natuurlijke materialen, veel daglicht, rustige eigentijdse sfeer met ruimte rondom.',
+            'detail'   => 'Een strak detail van vakwerk in een moderne badkamer: een nette tegelnaad of een designkraan, schoon en verzorgd, helder daglicht.',
+            'gallery1' => 'Een moderne inloopdouche met grote tegels en een glazen wand, licht en strak.',
+            'gallery2' => 'Een vrijstaand bad bij een raam met daglicht in een rustige, moderne badkamer.',
+            'gallery3' => 'Een strak badmeubel met waskom en spiegel, verzorgd en eigentijds, helder licht.',
+            'gallery4' => 'Een detail van net gelegd tegelwerk met perfecte voegen in een moderne badkamer.',
+            'gallery5' => 'Een badkamerspecialist die geconcentreerd aan het tegelen of monteren is, van opzij, modern en licht.',
+            'gallery6' => 'Een compleet afgeleverde moderne badkamer in totaalbeeld, strak en licht, klaar voor gebruik.',
+        ],
         'recreatie_vrije_tijd' => [
             'hero'   => 'Een uitnodigende Nederlandse vrijetijdslocatie met goed licht en ruimte, netjes ingericht en klaar voor gasten, ontspannen sfeer.',
             'detail' => 'Detail van de beleving of het materiaal ter plaatse, echte texturen, natuurlijk licht.',

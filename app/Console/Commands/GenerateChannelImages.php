@@ -44,17 +44,18 @@ class GenerateChannelImages extends Command
         }
 
         foreach ($targets as $k) {
-            $cfg = $channels[$k] ?? null;
-            if (! $cfg) {
+            $cfg  = $channels[$k] ?? null;
+            // Naast de config-channels ook de DB-niche-sites (badkamerspecialist, rijschool, ...).
+            $site = $cfg ? null : app(\App\Services\ChannelSiteResolver::class)->byKey($k);
+            if (! $cfg && ! $site) {
                 $this->error("Onbekend kanaal: {$k}");
                 continue;
             }
+            $sector = $cfg ? ($cfg['branche'] ?? 'overig') : $site->branche();
             // Site-specifiek beeldrecept gaat vóór het sector-recept: bestaat er een
             // recept met de naam van de channel-key (bv. 'rijschool'), gebruik dat.
-            $branche = config('channel_images.branches.' . $k)
-                ? $k
-                : (string) ($cfg['branche'] ?? 'overig');
-            $accent  = data_get($cfg, 'theme.accent');
+            $branche = config('channel_images.branches.' . $k) ? $k : (string) $sector;
+            $accent  = $cfg ? data_get($cfg, 'theme.accent') : ($site->theme()['accent'] ?? null);
 
             $this->line("<info>{$k}</info> (branche: {$branche})");
 
