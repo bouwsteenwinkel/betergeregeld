@@ -2,21 +2,25 @@
     /** @var \App\Support\ChannelSite $site */
     $cases = (array) config('cases_' . $site->key . '.cases', []);
     $imgGen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
+    $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
+    $trade = $t['trade'] ?? 'bedrijf';
 @endphp
 @extends('channels.layout')
 
-@section('title', 'Voorbeeldcases')
-@section('description', 'Zo ziet groei met de Groeidiamant eruit: voorbeeldcases van een website, webshop en slimme tools voor badkamerbedrijven.')
+@section('title', 'Voorbeelden en cases')
+@section('description', 'Zo ziet groei met de Groeidiamant eruit: voorbeeld-website-designs en cases van een website, webshop en slimme tools voor een ' . $trade . '.')
 
 @section('content')
     @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Cases']]])
     <section class="hero">
         <div class="wrap">
-            <span class="kicker"><span class="kicker-line"></span> Cases</span>
+            <span class="kicker"><span class="kicker-line"></span> Voorbeelden</span>
             <h1>Zo ziet groei eruit</h1>
-            <p class="lead" style="max-width:60ch">Voorbeelden van wat een sterke online aanpak oplevert voor een badkamerbedrijf, van een eerste website tot webshop en slimme tools. Zo zou het ook voor jou kunnen werken.</p>
+            <p class="lead" style="max-width:60ch">Voorbeelden van wat een sterke online aanpak oplevert voor een {{ $trade }}, van een eerste website tot webshop en slimme tools. Zo zou het ook voor jou kunnen werken.</p>
         </div>
     </section>
+
+    @include('channels.partials.example-designs', ['site' => $site])
 
     <style>
         .case{display:grid;grid-template-columns:1fr 1fr;gap:2.6rem;align-items:center;margin:0 0 1rem}
