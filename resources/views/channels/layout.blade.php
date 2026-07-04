@@ -232,6 +232,8 @@
 		.nav-actions{display:flex;align-items:center;gap:1rem;flex:0 0 auto}
 		.logo{display:inline-flex;align-items:center;gap:.6rem;color:var(--c-ink);line-height:1}
 		.logo-mark{display:inline-flex;flex:0 0 auto}
+		.logo-img{height:44px;width:auto;display:block}
+		@media(max-width:560px){.logo-img{height:36px}}
 		.logo-text{display:inline-flex;flex-direction:column;gap:.16rem;min-width:0}
 		.logo-word{font-family:var(--font-display);font-weight:700;font-size:1.34rem;letter-spacing:.01em}
 		.logo-word span{color:var(--c-accent)}
