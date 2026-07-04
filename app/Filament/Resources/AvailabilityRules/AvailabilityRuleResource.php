@@ -18,7 +18,13 @@ class AvailabilityRuleResource extends Resource
 {
     protected static ?string $model = AvailabilityRule::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Afspraken';
+
+    protected static ?string $navigationLabel = 'Werktijden';
+
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {
