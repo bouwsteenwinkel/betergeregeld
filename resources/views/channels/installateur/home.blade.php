@@ -212,7 +212,7 @@ footer{background:var(--primary-2);color:rgba(255,255,255,.74);padding-block:46p
 <body>
 
 @if(!$site->isLive())
-<div class="ribbon">Voorbeeld, nog niet live — placeholder-foto's en keurmerken vervang je door je eigen materiaal</div>
+<div class="ribbon">Voorbeeld, nog niet live. Placeholder-foto's en keurmerken vervang je door je eigen materiaal</div>
 @endif
 
 @php

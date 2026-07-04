@@ -21,7 +21,7 @@
     ];
     $reviews = [
         ['Sinds jaren mijn vaste salon. Altijd een prachtige kleur en echt de tijd voor je.', 'Marloes'],
-        ['De balayage is precies wat ik wilde — natuurlijk en stijlvol. Aanrader!', 'Yvonne'],
+        ['De balayage is precies wat ik wilde, natuurlijk en stijlvol. Aanrader!', 'Yvonne'],
         ['Fijne sfeer, vakwerk en je kunt zó online een afspraak maken.', 'Sanne'],
     ];
 @endphp
@@ -137,7 +137,7 @@
 <header class="hero"><div class="wrap">
     <span class="eyebrow">Dameskapper · Bussum</span>
     <h1>Jouw haar, met aandacht en oog voor detail</h1>
-    <p class="lead">Knippen, kleuren en balayage in een warme, persoonlijke salon. Maak in een paar tikken zelf online een afspraak — wanneer het jou uitkomt.</p>
+    <p class="lead">Knippen, kleuren en balayage in een warme, persoonlijke salon. Maak in een paar tikken zelf online een afspraak, wanneer het jou uitkomt.</p>
     <div class="cta">
         <a href="#afspraak" class="btn">Online afspraak maken</a>
         <a href="#behandelingen" class="btn btn-ghost">Bekijk behandelingen</a>
@@ -160,7 +160,7 @@
 </div></section>
 
 <section class="block" id="galerij" style="background:var(--surface)"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">Galerij</span><h2>Een indruk van ons werk</h2><p>Hier komen straks jouw eigen foto's — coupes, kleuren en opgestoken kapsels.</p></div>
+    <div class="sec-head"><span class="eyebrow">Galerij</span><h2>Een indruk van ons werk</h2><p>Hier komen straks jouw eigen foto's: coupes, kleuren en opgestoken kapsels.</p></div>
     <div class="gallery">
         @foreach ($gallery as $g)<div class="tile"><span>{{ $g }}</span></div>@endforeach
     </div>
@@ -170,7 +170,7 @@
     <div>
         <span class="eyebrow">Over Salon Lumière</span>
         <h2 style="font-size:clamp(30px,4vw,44px);margin-bottom:16px">Een salon waar je tot rust komt</h2>
-        <p style="color:var(--muted);margin-bottom:14px">Bij Salon Lumière nemen we de tijd voor je. We luisteren naar wat je wilt, denken mee en zorgen dat je met een goed gevoel de deur uitloopt — of het nu om een frisse coupe of een complete kleurmetamorfose gaat.</p>
+        <p style="color:var(--muted);margin-bottom:14px">Bij Salon Lumière nemen we de tijd voor je. We luisteren naar wat je wilt, denken mee en zorgen dat je met een goed gevoel de deur uitloopt, of het nu om een frisse coupe of een complete kleurmetamorfose gaat.</p>
         <p style="color:var(--muted)">Onze kapsters zijn gespecialiseerd in kleurtechnieken zoals balayage, en in stijlvolle opgestoken kapsels voor bruiloften en feesten.</p>
         <div class="stats">
             <div><div class="v">15+</div><div class="l">jaar ervaring</div></div>
@@ -213,7 +213,7 @@
 
 @include('channels.partials.lead-wizard')
 
-<footer><div class="wrap">{{ $name }} · {{ $address }} · {{ $phone }} — © {{ date('Y') }}</div></footer>
+<footer><div class="wrap">{{ $name }} · {{ $address }} · {{ $phone }} · © {{ date('Y') }}</div></footer>
 
 <a href="#gratis-voorbeeld" class="demo-flag">Voorbeeld door Beter Geregeld · vraag je eigen voorbeeld aan →</a>
 </body>

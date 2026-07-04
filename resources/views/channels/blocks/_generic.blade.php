@@ -11,7 +11,7 @@
     <div class="wrap">
         @unless ($site->isLive())
             <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--c-muted);margin-bottom:.6rem">
-                Blok “{{ $block->type }}” — nog te stylen
+                Blok “{{ $block->type }}” (nog te stylen)
                 @if ($block->design_notes)· <em>{{ $block->design_notes }}</em>@endif
             </div>
         @endunless

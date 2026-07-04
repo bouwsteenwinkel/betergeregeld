@@ -84,14 +84,14 @@ return [
             ],
 
             'meta' => [
-                'home_title'       => 'Horecawebsite laten maken — meer reserveringen & gasten',
+                'home_title'       => 'Horecawebsite laten maken voor meer reserveringen & gasten',
                 'home_description' => 'Strakke websites voor restaurants, cafés en lunchrooms. Online menu, reserveren en topvindbaarheid. Vooraf een gratis voorbeeld.',
             ],
 
             'home' => [
                 'hero_eyebrow' => 'Speciaal voor de horeca',
                 'hero_title'   => 'Een website die je tafels vult',
-                'hero_sub'     => 'Menu, online reserveren en goede vindbaarheid in Google — in één strakke site die past bij de sfeer van je zaak.',
+                'hero_sub'     => 'Menu, online reserveren en goede vindbaarheid in Google, in één strakke site die past bij de sfeer van je zaak.',
                 'hero_cta'     => 'Gratis voorbeeld aanvragen',
                 'hero_note'    => 'Binnen 2 werkdagen een voorbeeld van jóuw zaak. Geen verplichtingen.',
 
@@ -103,7 +103,7 @@ return [
 
                 'features' => [
                     ['icon' => '🍽️', 'title' => 'Menu online',        'text' => 'Altijd actueel, leesbaar op elke telefoon.'],
-                    ['icon' => '📅', 'title' => 'Online reserveren',   'text' => 'Gasten boeken zelf — eventueel met aanbetaling.'],
+                    ['icon' => '📅', 'title' => 'Online reserveren',   'text' => 'Gasten boeken zelf, eventueel met aanbetaling.'],
                     ['icon' => '⭐', 'title' => 'Reviews & sfeer',     'text' => 'Toon je beste foto\'s en beoordelingen.'],
                     ['icon' => '📍', 'title' => 'Lokaal vindbaar',     'text' => 'Geoptimaliseerd voor "restaurant in [jouw stad]".'],
                 ],
@@ -114,7 +114,7 @@ return [
                     ['title' => 'Live binnen 2 weken', 'text' => 'Wij regelen techniek, hosting en vindbaarheid.'],
                 ],
 
-                'proof' => '“Sinds de nieuwe site lopen de online reserveringen storm.” — restaurant in Utrecht',
+                'proof' => '“Sinds de nieuwe site lopen de online reserveringen storm.” Restaurant in Utrecht',
             ],
 
             'about' => [
@@ -133,9 +133,9 @@ return [
 
             'places' => [
                 'h1'         => 'Dé partner voor horecawebsites in heel Nederland',
-                'intro'      => 'Waar je zaak ook zit — wij maken horecawebsites in elke plaats van Nederland. Kies je stad of vraag direct een gratis voorbeeld aan.',
+                'intro'      => 'Waar je zaak ook zit, wij maken horecawebsites in elke plaats van Nederland. Kies je stad of vraag direct een gratis voorbeeld aan.',
                 'city_h1'    => 'Horecawebsite laten maken in :city',
-                'city_intro' => 'Run je een restaurant, café of lunchroom in :city? Wij maken een strakke website die nieuwe gasten naar je toe trekt — met online menu en reserveren. Vooraf een gratis voorbeeld van jóuw zaak in :city.',
+                'city_intro' => 'Run je een restaurant, café of lunchroom in :city? Wij maken een strakke website die nieuwe gasten naar je toe trekt, met online menu en reserveren. Vooraf een gratis voorbeeld van jóuw zaak in :city.',
                 'service'    => 'horecawebsite',
             ],
 
@@ -175,7 +175,7 @@ return [
             ],
 
             'meta' => [
-                'home_title'       => 'Website voor je installatiebedrijf — meer klussen, ook bij spoed',
+                'home_title'       => 'Website voor je installatiebedrijf: meer klussen, ook bij spoed',
                 'home_description' => 'Word gevonden in Google als mensen een loodgieter of elektricien zoeken, ook \'s avonds en in het weekend. Een nette website voor je installatiebedrijf, met vooraf een gratis voorbeeld.',
             ],
 
@@ -205,7 +205,7 @@ return [
                     ['title' => 'Live binnen 2 weken', 'text' => 'Wij regelen techniek, hosting en vindbaarheid in Google.'],
                 ],
 
-                'proof' => '“Eerste week al drie spoedklussen via de site, voorheen liep dat allemaal langs me heen.” — installateur in Amersfoort',
+                'proof' => '“Eerste week al drie spoedklussen via de site, voorheen liep dat allemaal langs me heen.” Installateur in Amersfoort',
             ],
 
             'about' => [
@@ -287,7 +287,7 @@ return [
             ],
 
             'meta' => [
-                'home_title'       => 'Website voor je barbershop laten maken — vollere agenda, minder gebel',
+                'home_title'       => 'Website voor je barbershop laten maken: vollere agenda, minder gebel',
                 'home_description' => 'Online afspraken, je prijslijst en je beste werk in beeld. Strakke barbershop-websites die nieuwe klanten naar je stoel trekken, met vooraf een gratis voorbeeld.',
             ],
 
@@ -649,14 +649,14 @@ return [
                     ['title' => 'Live binnen 2 weken', 'text' => 'Wij regelen alles van techniek tot vindbaarheid.'],
                 ],
 
-                'proof' => '“Klanten boeken nu zelf online — scheelt me uren bellen.” — kapsalon in Amersfoort',
+                'proof' => '“Klanten boeken nu zelf online, scheelt me uren bellen.” Kapsalon in Amersfoort',
             ],
 
             'about' => [
                 'title' => 'Salonwebsites die bij jouw stijl passen',
                 'lead'  => 'We maken websites voor kappers, nagelstudio\'s en beautyzaken door heel Nederland.',
                 'body'  => [
-                    'Een strakke site, online afsprakensysteem en een galerij van je werk — zonder gedoe en zonder lange contracten.',
+                    'Een strakke site, online afsprakensysteem en een galerij van je werk, zonder gedoe en zonder lange contracten.',
                     'We starten met een gratis voorbeeld van jóuw salon, zodat je precies ziet wat je krijgt.',
                 ],
                 'stats' => [
@@ -670,7 +670,7 @@ return [
                 'h1'         => 'Dé partner voor salonwebsites in heel Nederland',
                 'intro'      => 'In elke plaats van Nederland maken wij stijlvolle websites voor kappers en beautyzaken. Kies je stad of vraag een gratis voorbeeld aan.',
                 'city_h1'    => 'Salonwebsite laten maken in :city',
-                'city_intro' => 'Heb je een kapsalon of beautyzaak in :city? Wij bouwen een stijlvolle website met online boeken — en zetten vooraf een gratis voorbeeld van jóuw salon in :city klaar.',
+                'city_intro' => 'Heb je een kapsalon of beautyzaak in :city? Wij bouwen een stijlvolle website met online boeken, en zetten vooraf een gratis voorbeeld van jóuw salon in :city klaar.',
                 'service'    => 'salonwebsite',
             ],
 
@@ -679,10 +679,10 @@ return [
             'facets' => [
                 'webshop' => [
                     'hero_eyebrow' => 'Voor kappers die al een website hebben',
-                    'hero_title'   => 'Verkoop je producten online — naast je salon',
+                    'hero_title'   => 'Verkoop je producten online, naast je salon',
                     'hero_sub'     => 'Je hebt al een site; tijd voor de volgende stap. Een webshop voor je haarproducten en cadeaubonnen, netjes gekoppeld aan je bestaande site.',
                     'hero_cta'     => 'Gratis voorbeeld van je webshop',
-                    'hero_note'    => 'Je huidige website blijft — we bouwen de webshop eraan vast.',
+                    'hero_note'    => 'Je huidige website blijft, we bouwen de webshop eraan vast.',
                     'usps' => [
                         'Haarproducten & cadeaubonnen online',
                         'Veilig betalen met iDEAL',
@@ -694,7 +694,7 @@ return [
                         ['icon' => '💳', 'title' => 'Veilig betalen', 'text' => 'iDEAL en kaart, zonder gedoe.'],
                         ['icon' => '🔗', 'title' => 'Gekoppeld',     'text' => 'Eén geheel met je huidige website.'],
                     ],
-                    'proof' => '“De cadeaubonnen lopen online storm — vooral rond de feestdagen.” — kapsalon in Bussum',
+                    'proof' => '“De cadeaubonnen lopen online storm, vooral rond de feestdagen.” Kapsalon in Bussum',
                 ],
             ],
 
@@ -786,7 +786,7 @@ return [
             ],
 
             'meta' => [
-                'home_title'       => 'Salon Lumière — dameskapper in Bussum',
+                'home_title'       => 'Salon Lumière, dameskapper in Bussum',
                 'home_description' => 'Knippen, kleuren, balayage en opsteken bij Salon Lumière in Bussum. Maak eenvoudig online een afspraak.',
             ],
 
@@ -823,7 +823,7 @@ return [
             ],
 
             'meta' => [
-                'home_title'       => 'Brink Barbers — herenkapper & barbershop in Bussum',
+                'home_title'       => 'Brink Barbers, herenkapper & barbershop in Bussum',
                 'home_description' => 'Knippen, baard trimmen en scheren met het mes bij Brink Barbers in Bussum. Boek eenvoudig online je afspraak.',
             ],
 

@@ -124,7 +124,7 @@
 <header class="hero"><div class="wrap">
     <span class="eyebrow">Barbershop · Bussum</span>
     <h1>Scherp geknipt, strak in de baard</h1>
-    <p class="lead">Klassiek vakmanschap, moderne coupes en scheren met het mes. Boek je stoel zo online — of loop binnen.</p>
+    <p class="lead">Klassiek vakmanschap, moderne coupes en scheren met het mes. Boek je stoel zo online, of loop gewoon binnen.</p>
     <div class="cta">
         <a href="#afspraak" class="btn">Online afspraak</a>
         <a href="#diensten" class="btn btn-ghost">Bekijk diensten</a>
@@ -145,7 +145,7 @@
 </div></section>
 
 <section class="block" id="galerij" style="background:var(--surface)"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">Galerij</span><h2>Ons werk</h2><p>Hier komen straks jouw eigen foto's — fades, baarden en classics.</p></div>
+    <div class="sec-head"><span class="eyebrow">Galerij</span><h2>Ons werk</h2><p>Hier komen straks jouw eigen foto's: fades, baarden en classics.</p></div>
     <div class="gallery">@foreach ($gallery as $g)<div class="tile"><span>{{ $g }}</span></div>@endforeach</div>
 </div></section>
 
@@ -153,7 +153,7 @@
     <div>
         <span class="eyebrow">Over Brink Barbers</span>
         <h2 style="font-size:clamp(30px,4.5vw,48px);margin-bottom:16px">Een barbershop met karakter</h2>
-        <p style="color:var(--muted);margin-bottom:14px">Bij Brink Barbers draait alles om vakmanschap en een goeie sfeer. Of je nu komt voor een strakke fade, een nette baard of een klassieke scheerbeurt met het mes — we nemen de tijd en zorgen dat je er scherp uitloopt.</p>
+        <p style="color:var(--muted);margin-bottom:14px">Bij Brink Barbers draait alles om vakmanschap en een goeie sfeer. Of je nu komt voor een strakke fade, een nette baard of een klassieke scheerbeurt met het mes, we nemen de tijd en zorgen dat je er scherp uitloopt.</p>
         <p style="color:var(--muted)">Onze barbers zijn opgeleid in zowel klassieke als moderne technieken.</p>
         <div class="stats">
             <div><div class="v">10+</div><div class="l">jaar ervaring</div></div>
@@ -174,7 +174,7 @@
         <div>
             <span class="eyebrow">Afspraak & contact</span>
             <h2>Boek je stoel</h2>
-            <p style="color:#c5bdb0;margin:14px 0 22px;max-width:38ch">Online boeken of even bellen — je bent welkom bij Brink Barbers.</p>
+            <p style="color:#c5bdb0;margin:14px 0 22px;max-width:38ch">Online boeken of even bellen, je bent welkom bij Brink Barbers.</p>
             <a href="tel:{{ preg_replace('/\s+/', '', $phone) }}" class="btn">Bel {{ $phone }}</a>
             <div class="info" style="margin-top:24px">
                 <p>📍 {{ $address }}</p>
@@ -190,7 +190,7 @@
 
 @include('channels.partials.lead-wizard')
 
-<footer><div class="wrap">{{ $name }} · {{ $address }} · {{ $phone }} — © {{ date('Y') }}</div></footer>
+<footer><div class="wrap">{{ $name }} · {{ $address }} · {{ $phone }} · © {{ date('Y') }}</div></footer>
 
 <a href="#gratis-voorbeeld" class="demo-flag">Voorbeeld door Beter Geregeld · vraag je eigen voorbeeld aan →</a>
 </body>
