@@ -230,6 +230,9 @@
 		.nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--c-bg) 92%,transparent);backdrop-filter:blur(12px) saturate(1.2);border-bottom:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);box-shadow:0 6px 24px -22px rgba(0,0,0,.7)}
 		.nav-inner{display:flex;align-items:center;justify-content:space-between;height:74px;gap:1.5rem}
 		.nav-actions{display:flex;align-items:center;gap:1rem;flex:0 0 auto}
+		/* Op mobiel (burger zichtbaar) de header-CTA verbergen zodat de burger nooit
+		   van het scherm geduwd wordt; de sticky-CTA onderaan dekt de conversie. */
+		@media(max-width:859px){.nav-actions .btn{display:none}}
 		.logo{display:inline-flex;align-items:center;gap:.6rem;color:var(--c-ink);line-height:1}
 		.logo-mark{display:inline-flex;flex:0 0 auto}
 		.logo-img{height:44px;width:auto;display:block}
@@ -272,6 +275,13 @@
 		.hero-usps{list-style:none;margin:1.4rem 0 0;display:grid;gap:.5rem}
 		.hero-usps li{padding-left:1.7rem;position:relative;font-weight:600}
 		.hero-usps li:before{content:"✓";position:absolute;left:0;color:var(--c-primary);font-weight:800}
+		/* Mobiel: minder top-ruimte onder de sticky header + hero-CTA's vol breedte,
+		   gestapeld met ruimte ertussen (inline margin-left van de 2e knop overriden). */
+		@media(max-width:640px){
+			.hero{padding:34px 0 40px}
+			.hero .btn{display:flex;width:100%;margin-left:0!important}
+			.hero .btn+.btn{margin-top:.7rem}
+		}
 		/* Full-width hero-beeld: edge-to-edge foto met leesbare overlay, tekst eroverheen. */
 		.hero--shot{position:relative;isolation:isolate;padding:0;min-height:clamp(460px,74vh,660px);display:flex;align-items:center;overflow:hidden;background:var(--c-ink)}
 		.hero--shot .hero-bg{position:absolute;inset:0;z-index:-2}
