@@ -13,6 +13,27 @@
 @section('title', 'Diensten: website, webshop, portaal, automatisering en AI')
 @section('description', $r($cfg['intro'] ?? 'Alles wat we voor je bouwen, van een professionele website tot slimme automatisering en AI.'))
 
+@push('head')
+    @php
+        $svcLd = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Service',
+            'serviceType' => $r($cfg['h1'] ?? 'Diensten'),
+            'provider'    => ['@id' => rtrim($site->baseUrl(), '/') . '#org'],
+            'areaServed'  => ['@type' => 'Country', 'name' => 'Nederland'],
+            'hasOfferCatalog' => [
+                '@type' => 'OfferCatalog',
+                'name'  => 'Diensten',
+                'itemListElement' => array_values(array_map(fn ($s) => [
+                    '@type'       => 'Offer',
+                    'itemOffered' => ['@type' => 'Service', 'name' => $s['label'] ?? '', 'description' => $r($s['tagline'] ?? '')],
+                ], $services)),
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($svcLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
+
 @section('content')
     @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Diensten']]])
     <style>

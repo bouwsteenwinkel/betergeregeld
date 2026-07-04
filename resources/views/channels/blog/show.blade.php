@@ -24,6 +24,10 @@
         ]);
     @endphp
     <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @if ($post->published_at)<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">@endif
+    <meta property="article:modified_time" content="{{ optional($post->updated_at ?? $post->published_at)->toIso8601String() }}">
+    <meta property="article:section" content="{{ $site->branche() }}">
+    <meta property="article:author" content="{{ $site->displayName() }}">
 @endpush
 
 @section('content')

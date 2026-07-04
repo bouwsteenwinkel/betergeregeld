@@ -14,15 +14,28 @@
 	<meta name="description" content="@yield('description', $site->metaDescription())">
 	<link rel="canonical" href="@yield('canonical', $site->url(request()->path() === '/' ? '' : ltrim(str_replace('_site/'.$site->key, '', request()->path()), '/')))">
 
+	@php
+		$ogOverride = trim($__env->yieldContent('og_image'));
+		$ogImage = $ogOverride ?: $site->ogImage();
+		$ogIsCard = $ogImage && ! $ogOverride && $site->hasSocialCard();   // 1200x630 PNG met bekende afmetingen
+		$ogLocale = ['nl' => 'nl_NL', 'en' => 'en_US', 'de' => 'de_DE', 'fr' => 'fr_FR', 'es' => 'es_ES'][$site->locale()] ?? 'nl_NL';
+	@endphp
 	<meta property="og:type" content="@yield('og_type', 'website')">
 	<meta property="og:site_name" content="{{ $site->displayName() }}">
 	<meta property="og:title" content="@yield('title', $site->homeTitle())">
 	<meta property="og:description" content="@yield('description', $site->metaDescription())">
-	@php $ogImage = trim($__env->yieldContent('og_image')) ?: $site->ogImage(); @endphp
+	<meta property="og:url" content="@yield('canonical', $site->url(request()->path() === '/' ? '' : ltrim(str_replace('_site/'.$site->key, '', request()->path()), '/')))">
+	<meta property="og:locale" content="{{ $ogLocale }}">
 	@if ($ogImage)
 		<meta property="og:image" content="{{ $ogImage }}">
+		@if ($ogIsCard)
+			<meta property="og:image:width" content="1200">
+			<meta property="og:image:height" content="630">
+			<meta property="og:image:type" content="image/png">
+		@endif
 		<meta property="og:image:alt" content="{{ $site->displayName() }}">
 		<meta name="twitter:image" content="{{ $ogImage }}">
+		<meta name="twitter:image:alt" content="{{ $site->displayName() }}">
 	@endif
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="@yield('title', $site->homeTitle())">

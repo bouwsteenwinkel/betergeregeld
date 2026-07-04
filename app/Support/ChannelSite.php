@@ -120,11 +120,24 @@ class ChannelSite
         return $this->homeDescription();
     }
 
-    /** OG-/social-afbeelding: het site-logo (absoluut), anders het hero-beeld. */
+    /** Bestaat er een dedicated 1200x630 social-kaart (channel:og) voor deze site? */
+    public function hasSocialCard(): bool
+    {
+        return is_file(public_path('channel-media/' . $this->key . '/og.png'));
+    }
+
+    /**
+     * OG-/social-afbeelding, in volgorde van voorkeur:
+     * 1) dedicated 1200x630 social-kaart (og.png), 2) site-logo, 3) hero-beeld.
+     */
     public function ogImage(): ?string
     {
+        $base = rtrim($this->baseUrl(), '/');
+        if ($this->hasSocialCard()) {
+            return $base . '/channel-media/' . $this->key . '/og.png';
+        }
         if ($logo = $this->brand('footer_logo')) {
-            return rtrim($this->baseUrl(), '/') . '/' . ltrim((string) $logo, '/');
+            return $base . '/' . ltrim((string) $logo, '/');
         }
         return $this->image('hero');
     }
@@ -390,9 +403,17 @@ class ChannelSite
      */
     public function jsonLd(): string
     {
-        $logo = $this->brand('footer_logo')
-            ? rtrim($this->baseUrl(), '/') . '/' . ltrim((string) $this->brand('footer_logo'), '/')
-            : null;
+        // Logo als ImageObject met afmetingen (beter voor knowledge panel/logo-resultaat).
+        $logo = null;
+        $logoUrl = null;
+        if ($rel = $this->brand('footer_logo')) {
+            $logoUrl = rtrim($this->baseUrl(), '/') . '/' . ltrim((string) $rel, '/');
+            $path = public_path(ltrim((string) $rel, '/'));
+            $dim  = is_file($path) ? @getimagesize($path) : null;
+            $logo = $dim
+                ? ['@type' => 'ImageObject', 'url' => $logoUrl, 'width' => $dim[0], 'height' => $dim[1]]
+                : $logoUrl;
+        }
 
         $service = array_filter([
             '@type'       => 'ProfessionalService',
@@ -402,7 +423,7 @@ class ChannelSite
             'logo'        => $logo,
             'telephone'   => $this->brand('phone'),
             'email'       => $this->brand('email'),
-            'image'       => $this->image('hero') ?: $logo,
+            'image'       => $this->image('hero') ?: $logoUrl,
             'areaServed'  => ['@type' => 'Country', 'name' => 'Nederland'],
             'description' => $this->metaDescription() ?: null,
             'sameAs'      => $this->brand('sameas') ?: null,   // array van socials/GBP, indien geconfigureerd

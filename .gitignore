@@ -32,3 +32,5 @@ Thumbs.db
 # Lokale toegangsgegevens (RDP e.d.) — nooit committen
 /private/
 /public/channel-media/**/*.png
+# ... behalve de deterministische OG-/social-kaarten (klein, via channel:og herbouwbaar)
+!/public/channel-media/**/og.png
