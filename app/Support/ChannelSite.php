@@ -256,10 +256,8 @@ class ChannelSite
             return $m;
         }, $menu);
 
-        // Zorg dat elke site 'Prijzen'-, 'Plaatsen'- en 'Blog'-links heeft (deze
-        // pagina's bestaan voor alle niche-sites). Injecteer vóór 'Contact' als ze
-        // ontbreken.
-        foreach ([['label' => 'Prijzen', 'href' => 'prijzen'], ['label' => 'Plaatsen', 'href' => 'plaatsen'], ['label' => 'Blog', 'href' => 'blog']] as $inject) {
+        // Zorg dat elke site een 'Prijzen'-link heeft. Injecteer vóór 'Contact' als 'ie ontbreekt.
+        foreach ([['label' => 'Prijzen', 'href' => 'prijzen']] as $inject) {
             $has = collect($menu)->contains(fn ($m) => trim((string) ($m['href'] ?? ''), '/') === $inject['href']);
             if ($has) {
                 continue;
@@ -277,6 +275,13 @@ class ChannelSite
         if (! $hasContact) {
             $menu[] = ['label' => 'Contact', 'href' => 'contact'];
         }
+
+        // Reviews, Plaatsen en Blog niet in het hoofdmenu (top + mobiel); die staan
+        // wel in de footer. Geldt voor alle channel-sites.
+        $menu = array_values(array_filter($menu, function ($m) {
+            $h = strtolower(trim((string) ($m['href'] ?? ''), '/#'));
+            return ! in_array($h, ['cases', 'reviews', 'plaatsen', 'blog'], true);
+        }));
 
         return $menu;
     }
