@@ -57,10 +57,10 @@
     .loc .loc-contact a:hover{color:var(--c-accent)}
     .loc .loc-contact .ic{display:inline-flex;color:var(--c-accent);flex:0 0 auto}
     .loc .loc-contact .ic svg{width:18px;height:18px}
-    .loc .loc-hours{border-top:1px solid rgba(255,255,255,.15);padding-top:1.3rem}
+    .loc .loc-hours{border-top:1px solid rgba(255,255,255,.15);padding-top:1.1rem;max-width:420px;margin:0 auto}
     .loc .loc-hours h3{text-align:center;text-transform:uppercase;letter-spacing:.1em;font-size:.76rem;font-weight:700;
-        color:rgba(255,255,255,.6);margin-bottom:.9rem}
-    .loc .loc-hours-row{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .2rem;border-bottom:1px solid rgba(255,255,255,.09)}
+        color:rgba(255,255,255,.6);margin-bottom:.6rem}
+    .loc .loc-hours-row{display:flex;justify-content:space-between;gap:1rem;padding:.38rem .2rem;font-size:.95rem;border-bottom:1px solid rgba(255,255,255,.09)}
     .loc .loc-hours-row:last-child{border-bottom:0}
     .loc .loc-hours-row span:first-child{color:#fff}
     .loc .loc-hours-row span:last-child{color:rgba(255,255,255,.72);font-variant-numeric:tabular-nums;white-space:nowrap}
