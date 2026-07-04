@@ -376,6 +376,7 @@ class ChannelSiteController extends Controller
             'features.*'       => ['string', 'max:60'],
             'appointment_type' => ['nullable', 'in:onsite,meet'],
             'appointment_note' => ['nullable', 'string', 'max:500'],
+            'appointment_at'   => ['nullable', 'date'],
         ], [], [
             'contact_name' => 'naam', 'email' => 'e-mail', 'phone' => 'telefoon',
         ]);
@@ -415,6 +416,26 @@ class ChannelSiteController extends Controller
             'status'             => 'new',
             'preview_status'     => 'todo',
         ]);
+
+        // Online-via-Meet + een gekozen moment → meteen een echte afspraak boeken
+        // (agenda-event + Google Meet-link + bevestigingsmail via BookingService).
+        if ($appointmentType === 'meet' && filled($data['appointment_at'] ?? null)) {
+            try {
+                app(\App\Services\Scheduling\BookingService::class)->book([
+                    'name'        => $data['contact_name'],
+                    'email'       => $data['email'],
+                    'phone'       => $data['phone'],
+                    'starts_at'   => $data['appointment_at'],
+                    'source_site' => $site->key,
+                    'note'        => 'Via gratis-voorbeeld-aanvraag' . (! empty($data['company']) ? ' — ' . $data['company'] : ''),
+                ]);
+                $lead->update(['appointment_status' => 'booked']);
+            } catch (\App\Services\Scheduling\SlotTakenException $e) {
+                // Slot net bezet: lead blijft 'requested', we plannen handmatig na.
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         $this->notifyInternal($lead, $site);
 
