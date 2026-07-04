@@ -41,20 +41,21 @@ return [
     // ── DE ART-DIRECTIE (anti-AI-look) — geldt voor ELKE generatie ────────────
     // Dit is de kern: het dwingt documentaire echtheid af i.p.v. stock/AI-gevoel.
     'style' => implode(' ', [
-        'Documentaire reportagefotografie, eerlijk en ongeposeerd.',
-        'Natuurlijk daglicht, echte Nederlandse context en locatie.',
-        'Echte texturen, materialen en kleine imperfecties; niets gladgestreken.',
-        'Realistische, ingetogen kleuren; geen oververzadiging, geen zware vignet of nep-bokeh.',
-        'Focus op handen, gereedschap, materiaal en de werkomgeving in plaats van frontale gezichten,',
-        'om het kunstmatige gezichts-effect te vermijden; mensen mogen, maar van opzij of bezig met het werk.',
-        '35mm-look, natuurlijke scherptediepte, alsof gemaakt door een vakfotograaf op locatie.',
+        'Moderne, heldere editorial-merkfotografie met veel natuurlijk daglicht; frisse, eigentijdse uitstraling.',
+        'Echte Nederlandse context, authentiek en geloofwaardig, maar helder en verzorgd (geen sombere of rommelige sfeer).',
+        'Schone, rustige compositie met ruimte rondom het onderwerp; scherpe details en natuurlijke, levendige kleuren.',
+        'Hedendaags, recent materiaal en apparatuur, verzorgd en up-to-date; nadrukkelijk geen gedateerde of jaren-90-uitstraling.',
+        'Mensen mogen in beeld, natuurlijk bezig met het werk (vaak van opzij), zonder geposeerde stockglimlach of frontaal poseren.',
+        'Full-frame camera-look, professioneel en licht belicht, alsof gemaakt door een hedendaagse merkfotograaf.',
     ]),
 
     // Wat NOOIT in beeld mag (negative prompt).
     'negative' => implode(', ', [
+        'donker of somber', 'ouderwets, gedateerd, vintage, jaren-90-uitstraling', 'grauw, mat of vergeeld',
+        'zware schaduwen of onderbelichting', 'rommelige of vieze omgeving',
         'stockfoto-uitstraling', 'geposeerde lachende-diverse-team-foto', 'plastic of wasachtige huid',
         'vervormde handen of vingers', '3D-render', 'illustratie of cartoon', 'tekst, letters, logo of watermerk',
-        'oversaturated', 'HDR-look', 'kunstmatige lens flare', 'AI-gloed',
+        'oversaturated', 'overdreven HDR', 'kunstmatige lens flare', 'AI-gloed',
     ]),
 
     // ── PER-BRANCHE RECEPTEN ──────────────────────────────────────────────────
@@ -102,6 +103,18 @@ return [
         'onderwijs_opvang' => [
             'hero'   => 'Een lichte, vriendelijke Nederlandse leer- of opvangruimte met natuurlijk licht, opgeruimde tafels en materialen, rustige sfeer voordat de groep binnenkomt.',
             'detail' => 'Handen die lesmateriaal of speelgoed klaarleggen, warme en verzorgde omgeving, geen herkenbare kindergezichten.',
+        ],
+
+        // Autorijschool: moderne, heldere beelden die écht over rijles gaan.
+        'rijschool' => [
+            'hero'     => 'Een moderne Nederlandse lesauto (recente compacte hatchback met dubbele bediening) op een rustige straat of oefenterrein bij helder daglicht; een rij-instructeur naast een leerling, ontspannen bezig met de rijles, frisse en eigentijdse sfeer, veel ruimte en lucht rondom.',
+            'detail'   => 'Close-up van handen op het stuur en de versnellingspook in een schoon, modern auto-interieur met daglicht door de voorruit; instructeur wijst rustig mee.',
+            'gallery1' => 'Een leerling geconcentreerd achter het stuur van een moderne lesauto, van opzij gezien, helder daglicht.',
+            'gallery2' => 'Rij-instructeur en leerling in gesprek naast de lesauto op een oefenterrein, ontspannen en modern.',
+            'gallery3' => 'Dashboard, stuur en pedalen met dubbele bediening in een recente, schone lesauto bij daglicht.',
+            'gallery4' => 'Een moderne lesauto rijdend op een rustige Nederlandse straat bij mooi helder weer.',
+            'gallery5' => 'Handen die een lesplanning of theorie op een tablet doornemen in een licht, modern auto-interieur.',
+            'gallery6' => 'Een blije geslaagde leerling bij de lesauto, natuurlijk moment, helder daglicht, moderne uitstraling.',
         ],
         'recreatie_vrije_tijd' => [
             'hero'   => 'Een uitnodigende Nederlandse vrijetijdslocatie met goed licht en ruimte, netjes ingericht en klaar voor gasten, ontspannen sfeer.',
