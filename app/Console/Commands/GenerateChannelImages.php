@@ -49,7 +49,11 @@ class GenerateChannelImages extends Command
                 $this->error("Onbekend kanaal: {$k}");
                 continue;
             }
-            $branche = (string) ($cfg['branche'] ?? 'overig');
+            // Site-specifiek beeldrecept gaat vóór het sector-recept: bestaat er een
+            // recept met de naam van de channel-key (bv. 'rijschool'), gebruik dat.
+            $branche = config('channel_images.branches.' . $k)
+                ? $k
+                : (string) ($cfg['branche'] ?? 'overig');
             $accent  = data_get($cfg, 'theme.accent');
 
             $this->line("<info>{$k}</info> (branche: {$branche})");
