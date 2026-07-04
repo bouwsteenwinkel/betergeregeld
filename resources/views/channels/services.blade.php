@@ -76,7 +76,7 @@
     </section>
 
     {{-- Snelnavigatie naar de facet-landingspagina's --}}
-    @include('channels.partials.facet-strip', [
+    @include('channels.partials.groeipad', [
         'site'   => $site,
         'facets' => (array) config('groeidiamant.facets', []),
         'kicker' => 'In het kort',

@@ -61,7 +61,7 @@
     </section>
 
     {{-- Koppeling met de Groeidiamant --}}
-    @include('channels.partials.facet-strip', [
+    @include('channels.partials.groeipad', [
         'site'   => $site,
         'facets' => (array) config('groeidiamant.facets', []),
         'kicker' => 'De Groeidiamant',

@@ -79,10 +79,10 @@
 
     {{-- Groeidiamant: compacte facetstrip, deze fase gemarkeerd, de andere linken
          door naar hun eigen triggerpagina. --}}
-    @include('channels.partials.facet-strip', [
+    @include('channels.partials.groeipad', [
         'site'    => $site,
         'facets'  => $facets,
-        'current' => $facet,
+        'facet'   => $facet,
         'kicker'  => 'De Groeidiamant',
         'title'   => 'Je site groeit met je mee',
         'lead'    => 'Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. Elke stap bouwt voort op de vorige, in je eigen tempo.',

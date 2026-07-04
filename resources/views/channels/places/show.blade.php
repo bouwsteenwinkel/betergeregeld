@@ -105,13 +105,12 @@
 	@endif
 
 	{{-- Groeidiamant: waar we een bedrijf in deze plaats mee helpen (links naar triggers). --}}
-	@include('channels.partials.facet-strip', [
+	@include('channels.partials.groeipad', [
 		'site'   => $site,
 		'facets' => $facets,
 		'kicker' => 'Wat we voor je doen in ' . $placeName,
 		'title'  => 'Van website tot slimme groei',
 		'lead'   => 'Begin met een sterke website en breid later uit met een webshop, klantenportaal, automatisering of AI. Je groeit stap voor stap, in je eigen tempo.',
-		'bg'     => 'var(--c-surface)',
 	])
 
 	@if (!empty($c['trust']))
