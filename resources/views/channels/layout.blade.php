@@ -278,6 +278,7 @@
 		/* Mobiel: minder top-ruimte onder de sticky header + hero-CTA's vol breedte,
 		   gestapeld met ruimte ertussen (inline margin-left van de 2e knop overriden). */
 		@media(max-width:640px){
+			section{padding:38px 0}
 			.hero{padding:34px 0 40px}
 			.hero .btn{display:flex;width:100%;margin-left:0!important}
 			.hero .btn+.btn{margin-top:.7rem}
