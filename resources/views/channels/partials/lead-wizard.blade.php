@@ -207,6 +207,19 @@
 
     .lwz-errors{max-width:840px;margin:0 auto 18px;padding:14px 18px;border-radius:var(--radius,14px);
         background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.4);color:#b91c1c;font-size:14px}
+
+    /* Mobiel: compacter zodat je na het klikken op de CTA niet in veel witruimte
+       landt en het formulier meteen in beeld staat. */
+    @media(max-width:640px){
+        .lwz-band{padding:30px 0}
+        .lwz-head{margin-bottom:18px}
+        .lwz-title{font-size:25px;margin-bottom:8px}
+        .lwz-sub{font-size:14px}
+        .lwz-reassure{margin-top:8px}
+        .lwz{padding:20px 16px 18px}
+        .lwz-progress{margin-bottom:18px}
+        .lwz-nav{margin-top:18px}
+    }
 </style>
 
 <script>
