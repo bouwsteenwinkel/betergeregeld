@@ -119,6 +119,11 @@ class ChannelSiteController extends Controller
         return view('channels.contact', ['site' => $this->site()]);
     }
 
+    public function services(): View
+    {
+        return view('channels.services', ['site' => $this->site()]);
+    }
+
     public function groeidiamant(): View
     {
         return view('channels.groeidiamant', ['site' => $this->site()]);
@@ -282,7 +287,7 @@ class ChannelSiteController extends Controller
 
         // Vaste content-pagina's: home, de Groeidiamant-facetlandingen (belangrijkste
         // SEO-pagina's), en alle informatieve pagina's.
-        $paths = ['', 'over-ons', 'contact', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
+        $paths = ['', 'over-ons', 'contact', 'diensten', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
             'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog'];
         foreach (array_keys((array) config('groeidiamant.facets', [])) as $facet) {
             $paths[] = $facet;

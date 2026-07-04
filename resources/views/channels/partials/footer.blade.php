@@ -36,9 +36,11 @@
 			</div>
 			<div>
 				<h3 style="font-size:1rem;margin-bottom:.6rem">Menu</h3>
-				@foreach ($site->navMenu() as $item)
-					<p><a href="{{ $site->navHref($item['href'] ?? '') }}">{{ $item['label'] ?? '' }}</a></p>
-				@endforeach
+				<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 1.2rem">
+					@foreach ($site->navMenu() as $item)
+						<p style="margin:.15rem 0"><a href="{{ $site->navHref($item['href'] ?? '') }}">{{ $item['label'] ?? '' }}</a></p>
+					@endforeach
+				</div>
 			</div>
 			<div>
 				<h3 style="font-size:1rem;margin-bottom:.6rem">Plaatsen per provincie</h3>

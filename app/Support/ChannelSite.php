@@ -225,7 +225,7 @@ class ChannelSite
 
         // Ankers waarvoor nu een eigen pagina bestaat → naar die pagina i.p.v. een
         // (vaak niet-bestaand) home-anker.
-        $pageForAnchor = ['#werkwijze' => 'werkwijze', '#reviews' => 'cases', '#contact' => 'contact'];
+        $pageForAnchor = ['#diensten' => 'diensten', '#werkwijze' => 'werkwijze', '#reviews' => 'cases', '#contact' => 'contact'];
         $menu = array_map(function ($m) use ($pageForAnchor) {
             $h = trim((string) ($m['href'] ?? ''));
             if (isset($pageForAnchor[$h])) {
