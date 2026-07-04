@@ -311,7 +311,9 @@
 		.breadcrumb a{color:var(--c-muted)}.breadcrumb a:hover{color:var(--c-cta)}
 		.breadcrumb .bc-sep{margin:0 .5rem;opacity:.6}
 		.breadcrumb [aria-current=page]{color:var(--c-ink);font-weight:600}
-		.hero{padding:72px 0 56px;background:linear-gradient(180deg,color-mix(in srgb,var(--c-accent) 10%,transparent),transparent)}
+		{{-- Uniforme hero-ruimte: 44px boven (zoals /diensten) op elke pagina/site,
+		     zodat de content overal op dezelfde hoogte begint. --}}
+		.hero{padding:44px 0 56px;background:linear-gradient(180deg,color-mix(in srgb,var(--c-accent) 10%,transparent),transparent)}
 		/* Slanke hero voor eenvoudige content-pagina's (minder top-ruimte op desktop). */
 		@media(min-width:641px){.hero--slim{padding-top:44px}}
 		.hero p.lead{font-size:1.2rem;max-width:38ch;margin:1rem 0 1.6rem}
