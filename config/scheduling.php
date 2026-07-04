@@ -11,8 +11,8 @@
 
 return [
     'timezone'         => 'Europe/Amsterdam',
-    'slot_minutes'     => 30,     // rasterstap tussen sloten
-    'meeting_minutes'  => 30,     // duur van een afspraak
+    'slot_minutes'     => 60,     // rasterstap tussen sloten (hele uren)
+    'meeting_minutes'  => 60,     // duur van een afspraak (1 uur)
     'min_notice_hours' => 4,      // niet boekbaar binnen zoveel uur
     'horizon_days'     => 21,     // hoever vooruit boekbaar
     'buffer_minutes'   => 0,      // buffer voor/na een afspraak
