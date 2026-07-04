@@ -28,6 +28,7 @@
             <p>Er is nog geen <code>GOOGLE_CLIENT_ID</code>/<code>GOOGLE_CLIENT_SECRET</code> ingesteld in de omgeving.</p>
         @elseif ($connected)
             <div class="status on">● Gekoppeld</div>
+            @if (! empty($account))<p><strong>Gekoppeld account:</strong> {{ $account }}<br><span style="color:#5b6b78">De afspraken komen in de <strong>primary (hoofd)agenda</strong> van dit account.</span></p>@endif
             <p>De centrale Google-agenda is gekoppeld. Elke geboekte afspraak maakt automatisch een agenda-event met Google Meet-link, en je eigen agenda-afspraken blokkeren de beschikbare tijden.</p>
             <form method="POST" action="{{ route('google-agenda.disconnect') }}">@csrf<button class="btn ghost">Ontkoppelen</button></form>
         @else

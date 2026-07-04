@@ -18,9 +18,11 @@ class GoogleAgendaController extends Controller
 
     public function status(): View
     {
+        $connected = $this->gateway->isConnected();
         return view('admin.google-agenda', [
-            'connected'  => $this->gateway->isConnected(),
+            'connected'  => $connected,
             'configured' => (bool) config('scheduling.google.client_id'),
+            'account'    => $connected ? $this->gateway->connectedEmail() : null,
         ]);
     }
 

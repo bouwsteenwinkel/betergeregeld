@@ -84,6 +84,22 @@ class GoogleCalendarGateway implements CalendarGateway
         Cache::forget('google_agenda_access_token');
     }
 
+    /** E-mailadres van het gekoppelde account (= id van de primary agenda). */
+    public function connectedEmail(): ?string
+    {
+        $token = $this->accessToken();
+        if (! $token) {
+            return null;
+        }
+        try {
+            $resp = Http::withToken($token)->withOptions(['verify' => $this->ca()])->timeout(10)
+                ->get('https://www.googleapis.com/calendar/v3/calendars/primary');
+            return $resp->json('id');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
     private function accessToken(): ?string
     {
         if ($t = Cache::get('google_agenda_access_token')) {
