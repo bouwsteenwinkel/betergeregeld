@@ -1,24 +1,22 @@
 @php /** @var \App\Support\ChannelSite $site */ @endphp
 <footer>
 	<style>
-		/* Mobiel: i.p.v. de naam-tekst twee logo's naast elkaar (eigen logo links,
-		   Groeidiamant rechts) als witte kaarten met gelijke hoogte. */
-		.foot-brand-mobile{display:none}
-		@media(max-width:760px){
-			.foot-brand-desktop{display:none}
-			.foot-brand-mobile{display:flex;gap:.7rem;align-items:stretch;margin-bottom:.9rem}
-			.foot-brand-mobile .fb-card{flex:1 1 50%;min-width:0;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;padding:.85rem .9rem;min-height:66px}
-			.foot-brand-mobile .fb-card img{max-width:100%;max-height:46px;width:auto;height:auto;display:block}
-			.foot-brand-mobile .fb-name{color:var(--c-ink);font-weight:800;font-size:1rem;text-align:center;line-height:1.2}
-		}
+		/* Merk-rij: eigen logo links + Groeidiamant rechts als witte kaarten met
+		   gelijke hoogte. Desktop compact links, mobiel vol over 2 kolommen. */
+		.foot-brand{display:flex;gap:.7rem;align-items:stretch;margin-bottom:1rem;max-width:340px}
+		.foot-brand .fb-card{flex:1 1 50%;min-width:0;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;min-height:60px;padding:.55rem .65rem}
+		.foot-brand .fb-card img{max-width:100%;max-height:42px;width:auto;height:auto;display:block}
+		.foot-brand .fb-card.fb-gd{padding:.25rem .35rem}
+		.foot-brand .fb-card.fb-gd img{max-height:56px}
+		.foot-brand .fb-name{color:var(--c-ink);font-weight:800;font-size:1rem;text-align:center;line-height:1.2}
+		@media(max-width:760px){.foot-brand{max-width:none;margin-bottom:.9rem}}
 	</style>
 	{{-- Identiteit is context-afhankelijk: op /voorbeeld de demo-mockup (klant),
 	     elders óns aanbod. Logo-partial + metaDescription() regelen dat zelf. --}}
 	<div class="wrap">
 		<div class="foot-grid">
 			<div>
-				<div class="logo foot-brand-desktop" style="color:#fff;margin-bottom:.6rem">@include('channels.partials.logo')</div>
-				<div class="foot-brand-mobile">
+				<div class="foot-brand">
 					<a href="{{ $site->url() }}" class="fb-card">
 						@if (! $site->isDemoContext() && $site->brand('footer_logo'))
 							<img src="{{ $site->brand('footer_logo') }}" alt="{{ $site->displayName() }}">
@@ -72,11 +70,6 @@
 				<a href="{{ $site->url('cookiebeleid') }}">Cookies</a>
 				<a href="{{ $site->url('algemene-voorwaarden') }}">Voorwaarden</a>
 			</span>
-			{{-- Groeidiamant-keurmerk: mooie logo-badge → interne uitlegpagina. --}}
-			<a href="{{ $site->url('groeidiamant') }}" class="foot-endorse" aria-label="Meer over de Groeidiamant by Betergeregeld ICT">
-				<span class="foot-endorse-label">Werkt volgens de</span>
-				<span class="foot-endorse-badge"><img src="{{ asset('channel-media/_brand/groeidiamant.jpg') }}" alt="Groeidiamant by Betergeregeld ICT"></span>
-			</a>
 		</div>
 	</div>
 </footer>
