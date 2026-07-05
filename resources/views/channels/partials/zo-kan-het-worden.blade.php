@@ -30,7 +30,7 @@
 @once
 @push('head')
 <style>
-    .zkhw-grid{display:grid;gap:2rem;align-items:center;margin-top:1.6rem}
+    .zkhw-grid{display:grid;gap:2rem;align-items:start;margin-top:1.6rem}
     @media(min-width:900px){.zkhw-grid{grid-template-columns:1.15fr .85fr;gap:3rem}}
     /* browser-venster */
     .zkhw-window{display:block;color:inherit;border-radius:calc(var(--radius) + 6px);overflow:hidden;background:#fff;
@@ -61,7 +61,7 @@
     .zkhw-cards span em{position:absolute;left:5px;bottom:5px;font-style:normal;font-weight:800;font-size:.62rem;background:#fff;color:var(--c-ink);padding:.12rem .38rem;border-radius:5px;box-shadow:0 3px 8px -3px rgba(0,0,0,.5)}
     .zkhw-open{display:block;text-align:center;padding:.8rem;font-weight:700;font-size:.9rem;color:var(--c-cta);background:var(--c-surface);border-top:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent)}
     /* tekstkolom */
-    .zkhw-aside h3{font-size:1.15rem;margin-bottom:.3rem}
+    .zkhw-aside h3{font-size:1.15rem;margin-top:0;margin-bottom:.3rem}
     .zkhw-list{list-style:none;margin:1rem 0 1.4rem;display:grid;gap:.7rem}
     .zkhw-list li{padding-left:1.8rem;position:relative;font-weight:600;color:var(--c-ink)}
     .zkhw-list li::before{content:"✓";position:absolute;left:0;top:-1px;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--c-accent) 20%,transparent);color:var(--c-primary);font-size:.72rem;font-weight:800}
