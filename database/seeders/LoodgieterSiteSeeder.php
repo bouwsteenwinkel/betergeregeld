@@ -34,7 +34,7 @@ class LoodgieterSiteSeeder extends Seeder
                 'logo_text'    => 'Waterwerk',
                 'logo_tagline' => 'Loodgieter & installatie',
                 'trustline'    => 'Erkend & verzekerd · 4,9 ★',
-                'phone'        => '085 800 12 34',
+                'phone'        => '088-2545101',
                 'email'        => 'info@waterwerk.nl',
                 'address'      => 'Bussum',
             ],

@@ -45,7 +45,7 @@ return [
     // Betergeregeld ICT". Override per kanaal kan via brand.endorsement /
     // brand.endorsement_url.
     'defaults' => [
-        'phone' => '085 1303 600',
+        'phone' => '088-2545101',
         'email' => 'info@betergeregeld.com',
         'kvk'   => '',
         'trustline'       => 'Gratis voorbeeld, geen verplichtingen',
@@ -98,7 +98,7 @@ return [
             'brand' => [
                 'logo_text' => 'Horeca<span>Sites</span>',
                 // 'logo_image' => 'channel-logos/horeca.svg', // eigen logo in public/ → vervangt de wordmark
-                'phone'     => '085 1303 600',
+                'phone'     => '088-2545101',
                 'email'     => 'horeca@betergeregeld.nl',
                 // 'endorsement' => '...', // override van het standaard Groeidiamant-keurmerk
             ],
@@ -190,7 +190,7 @@ return [
             'brand' => [
                 'logo_text' => 'Installatie<span>Website</span>',
                 // 'logo_image' => 'channel-logos/installateur.svg',
-                'phone'     => '085 1303 600',
+                'phone'     => '088-2545101',
                 'email'     => 'installatie@betergeregeld.nl',
             ],
 
@@ -299,7 +299,7 @@ return [
                 'logo_text' => 'Barber<span>Site</span>',
                 'logo_mark'    => 'barber',                       // gegenereerd SVG-embleem (barber-pole-badge)
                 'logo_tagline' => 'Websites voor barbers',         // kicker onder de wordmark
-                'phone'     => '085 1303 600',
+                'phone'     => '088-2545101',
                 'email'     => 'barber@betergeregeld.nl',
                 'trustline' => 'Gratis voorbeeld binnen 2 werkdagen, geen verplichtingen',
                 // Groeidiamant-keurmerk onderaan (moedermerk), als logo-badge.
@@ -487,7 +487,7 @@ return [
                 'logo_text'    => 'Nagel<span>Site</span>',
                 'logo_mark'    => 'nails',                        // gegenereerd SVG-embleem (nagellak-fles)
                 'logo_tagline' => 'Websites voor nagelsalons',
-                'phone'        => '085 1303 600',
+                'phone'        => '088-2545101',
                 'email'        => 'nagel@betergeregeld.nl',
                 'trustline'    => 'Gratis voorbeeld binnen 2 werkdagen, geen verplichtingen',
                 'endorsement_logo' => 'channel-media/_brand/groeidiamant.jpg',
@@ -634,7 +634,7 @@ return [
 
             'brand' => [
                 'logo_text' => 'Salon<span>Sites</span>',
-                'phone'     => '085 1303 600',
+                'phone'     => '088-2545101',
                 'email'     => 'salon@betergeregeld.nl',
             ],
 
@@ -753,7 +753,7 @@ return [
             ],
 
             'brand' => [
-                'phone'       => '035 123 45 67',
+                'phone'       => '088-2545101',
                 'email'       => 'hallo@bellepeau.nl',
                 'address'     => 'Brinklaan 24, Bussum',
                 'booking_url' => '',             // vul de boekingstool-URL in (Salonized/Treatwell); leeg = telefonisch
@@ -800,7 +800,7 @@ return [
 
             'brand' => [
                 'logo_text' => 'Salon Lumière',
-                'phone'     => '035 123 45 67',
+                'phone'     => '088-2545101',
                 'email'     => 'hallo@salon-lumiere.nl',
                 'address'   => 'Brinklaan 12, Bussum',
             ],
@@ -837,7 +837,7 @@ return [
 
             'brand' => [
                 'logo_text' => 'Brink Barbers',
-                'phone'     => '035 765 43 21',
+                'phone'     => '088-2545101',
                 'email'     => 'info@brinkbarbers.nl',
                 'address'   => 'Brinklaan 48, Bussum',
             ],
