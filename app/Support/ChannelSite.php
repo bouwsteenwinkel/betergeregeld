@@ -195,19 +195,23 @@ class ChannelSite
     {
         $custom = $this->header()['pitch_strip'] ?? null;
         if (is_array($custom) && $custom) {
-            return array_values(array_filter(array_map(
-                fn ($i) => is_array($i)
-                    ? ['icon' => (string) ($i['icon'] ?? ''), 'text' => (string) ($i['text'] ?? '')]
-                    : null,
-                $custom
-            )));
+            return array_values(array_filter(array_map(function ($i) {
+                if (! is_array($i)) {
+                    return null;
+                }
+                return [
+                    'icon'  => (string) ($i['icon'] ?? 'check'),
+                    'title' => (string) ($i['title'] ?? ($i['text'] ?? '')),
+                    'sub'   => (string) ($i['sub'] ?? ''),
+                ];
+            }, $custom)));
         }
 
         return [
-            ['icon' => '🛡️', 'text' => 'Speciaal ontwikkeld voor ' . $this->pitchAudience()],
-            ['icon' => '🌐', 'text' => 'Eigen domeinnaam'],
-            ['icon' => '📱', 'text' => 'Volledig mobiel'],
-            ['icon' => '🚀', 'text' => 'Snel online'],
+            ['icon' => 'shield', 'title' => 'Speciaal ontwikkeld voor jou', 'sub' => 'Afgestemd op ' . $this->pitchAudience()],
+            ['icon' => 'globe',  'title' => 'Eigen domeinnaam',  'sub' => 'Jouw eigen naam online'],
+            ['icon' => 'mobile', 'title' => 'Volledig mobiel',   'sub' => 'Perfect op elke telefoon'],
+            ['icon' => 'rocket', 'title' => 'Snel online',       'sub' => 'Live binnen enkele dagen'],
         ];
     }
 

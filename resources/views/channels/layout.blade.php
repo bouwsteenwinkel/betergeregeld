@@ -242,15 +242,24 @@
 		.faq-acc details[open] > .faq-a{grid-template-rows:1fr}
 		.faq-acc .faq-a-inner{overflow:hidden;min-height:0}
 		.faq .faq-a p,.faq details > p{margin:0;padding:0 1.35rem 1.2rem;color:var(--c-muted);line-height:1.6}
-		/* pitch-strip: waarom deze niche-website (geënt op de branche), boven de trust-balk */
-		.pitch-strip{background:linear-gradient(90deg,var(--c-primary),color-mix(in srgb,var(--c-primary) 78%,var(--c-cta)));color:#fff}
-		.pitch-strip-inner{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.35rem 1.9rem;min-height:44px;padding:.5rem 0;font-size:.86rem;font-weight:600;line-height:1.25}
-		.pitch-item{display:inline-flex;align-items:center;gap:.45rem;white-space:nowrap;position:relative}
-		.pitch-emoji{font-size:1.02rem;line-height:1}
-		@media(min-width:681px){.pitch-item:not(:last-child)::after{content:"•";position:absolute;right:-1.05rem;color:rgba(255,255,255,.5)}}
+		/* pitch-strip: waarom deze niche-website (geënt op de branche), bovenaan de header.
+		   Desktop: alle USP's naast elkaar met scheidingslijnen. Mobiel: één per keer,
+		   automatisch wisselend (geen horizontaal scrollen). */
+		.pitch-strip{background:linear-gradient(100deg,var(--c-primary),color-mix(in srgb,var(--c-primary) 66%,var(--c-cta)));color:#fff}
+		.pitch-strip-inner{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap;gap:0}
+		.pitch-item{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:.72rem 1.7rem;position:relative}
+		.pitch-item:not(:last-child)::after{content:"";position:absolute;right:0;top:22%;bottom:22%;width:1px;background:rgba(255,255,255,.2)}
+		.pitch-ic{flex:0 0 auto;display:inline-flex;color:#fff}
+		.pitch-ic svg{width:26px;height:26px;display:block}
+		.pitch-ic-emoji{font-size:1.4rem;line-height:1}
+		.pitch-txt{display:flex;flex-direction:column;min-width:0}
+		.pitch-title{font-weight:700;font-size:.9rem;line-height:1.2;letter-spacing:.01em}
+		.pitch-sub{font-size:.775rem;line-height:1.2;color:rgba(255,255,255,.8);margin-top:1px}
 		@media(max-width:680px){
-			.pitch-strip-inner{flex-wrap:nowrap;justify-content:flex-start;gap:1.4rem;padding:.55rem 16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-			.pitch-strip-inner::-webkit-scrollbar{display:none}
+			.pitch-strip-inner{display:block;position:relative;min-height:54px}
+			.pitch-item{position:absolute;inset:0;opacity:0;transition:opacity .45s ease;pointer-events:none;padding:.5rem 16px}
+			.pitch-item.is-active{opacity:1}
+			.pitch-item::after{display:none}
 		}
 		/* trust-balk boven de nav */
 		.topbar{background:var(--c-ink);color:rgba(255,255,255,.78);font-size:.82rem;letter-spacing:.01em}
