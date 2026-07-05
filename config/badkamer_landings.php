@@ -195,6 +195,8 @@ return [
             'navCta'       => 'Chat',
             'heroBtn'      => 'Stel je vraag',
             'ctaLabel'     => 'Bekijk het AI-voorbeeld',
+            // Kant-en-klare AI-mockup (eigen browser-frame) i.p.v. de CSS-mockup.
+            'imageSlot'    => 'ai-preview',
             'galleryLabel' => 'De assistent aan het werk',
             'gallery'      => [['slot' => 'gallery1', 'price' => 'Chat ✓'], ['slot' => 'gallery2', 'price' => 'Afspraak ✓'], ['slot' => 'gallery3', 'price' => 'Offerte ✓']],
             'bullets'      => [
