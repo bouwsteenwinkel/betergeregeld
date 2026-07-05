@@ -30,7 +30,7 @@
     {{-- Product-hero: spreekt de ondernemer aan die juist DIT product zoekt --}}
     <section class="hero" data-section="hero">
         <div class="wrap">
-            <div @if ($heroImg) class="grid cols-2" style="align-items:center;gap:2.6rem" @endif>
+            <div @if ($heroImg) class="grid cols-2" style="align-items:start;gap:2.6rem" @endif>
                 <div>
                     @if (! empty($hero['eyebrow']))<span class="eyebrow">{{ $hero['eyebrow'] }}</span>@endif
                     <h1>{{ $hero['title'] ?? $fLabel }}</h1>

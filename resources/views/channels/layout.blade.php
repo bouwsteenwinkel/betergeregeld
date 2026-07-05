@@ -118,7 +118,7 @@
 		.btn-secondary{background:var(--c-primary);color:#fff}
 		.btn-ghost{background:transparent;color:var(--c-primary);border:2px solid var(--c-primary)}
 		.eyebrow{display:inline-block;background:color-mix(in srgb,var(--c-accent) 18%,transparent);color:var(--c-primary);font-weight:700;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;padding:.35rem .8rem;border-radius:999px;margin-bottom:1rem}
-		h1{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;font-weight:700;letter-spacing:-.005em}
+		h1{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;font-weight:700;letter-spacing:-.005em;text-wrap:balance}
 		h2{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:700;letter-spacing:0;margin-bottom:.4rem}
 		h3{font-size:1.2rem;font-weight:700}
 		section{padding:64px 0}

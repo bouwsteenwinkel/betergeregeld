@@ -22,7 +22,7 @@
     {{-- Hero: spreekt de ondernemer aan, niet z'n klanten --}}
     <section class="hero" data-section="hero">
         <div class="wrap">
-            <div @if ($heroImg) class="grid cols-2" style="align-items:center;gap:2.6rem" @endif>
+            <div @if ($heroImg) class="grid cols-2" style="align-items:start;gap:2.6rem" @endif>
                 <div>
                     <span class="eyebrow">Voor badkamerspecialisten</span>
                     <h1>Meer badkamerklussen uit je eigen regio</h1>
