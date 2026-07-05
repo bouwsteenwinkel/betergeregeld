@@ -117,9 +117,12 @@ return [
             'gallery6' => 'Een blije geslaagde leerling bij de lesauto, natuurlijk moment, helder daglicht, moderne uitstraling.',
         ],
 
-        // Badkamerspecialist: moderne, lichte badkamers (het afgeleverde vakwerk).
+        // Badkamerspecialist: de hero toont de VAKMAN (de doelgroep), niet een
+        // badkamer als product — dit is een site die websites verkoopt AAN
+        // badkamerspecialisten, niet badkamers aan consumenten. De galerij toont
+        // wél het afgeleverde vakwerk (portfolio).
         'badkamerspecialist' => [
-            'hero'     => 'Een moderne, lichte badkamer, net opgeleverd: strakke tegels, een ruime inloopdouche met glazen wand en natuurlijke materialen, veel daglicht, rustige eigentijdse sfeer met ruimte rondom.',
+            'hero'     => 'Een Nederlandse badkamerspecialist in nette werkkleding, zelfverzekerd en tevreden, in een net opgeleverde moderne badkamer; hij kijkt op zijn smartphone naar een nieuwe klantaanvraag. De focus ligt volledig op de vakman zelf; de badkamer is subtiel en zacht onscherp op de achtergrond, niet als showroom of als product uitgelicht. Documentair en echt, natuurlijk daglicht, ruimte rondom het onderwerp.',
             'detail'   => 'Een strak detail van vakwerk in een moderne badkamer: een nette tegelnaad of een designkraan, schoon en verzorgd, helder daglicht.',
             'gallery1' => 'Een moderne inloopdouche met grote tegels en een glazen wand, licht en strak.',
             'gallery2' => 'Een vrijstaand bad bij een raam met daglicht in een rustige, moderne badkamer.',
