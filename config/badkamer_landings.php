@@ -76,6 +76,8 @@ return [
             'navCta'       => 'Winkelmand',
             'heroBtn'      => 'In winkelmand',
             'ctaLabel'     => 'Bekijk het webshop-voorbeeld',
+            // Kant-en-klare webshop-mockup (eigen browser-frame) i.p.v. de CSS-mockup.
+            'imageSlot'    => 'webshop-preview',
             'galleryLabel' => 'Populair in de shop',
             'gallery'      => [['slot' => 'gallery4', 'price' => '€ 179'], ['slot' => 'gallery5', 'price' => '€ 385'], ['slot' => 'gallery6', 'price' => '€ 349']],
             'bullets'      => [

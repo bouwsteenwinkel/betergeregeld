@@ -20,6 +20,11 @@
     $gallery   = $gallery   ?? [];
     $href      = $site->url('voorbeeld/' . $facet);
     $img       = $site->image('hero');
+    // Optionele, kant-en-klare voorbeeld-afbeelding (bv. een echte webshop-mockup
+    // mét eigen browser-frame). Staat die er, dan tonen we die i.p.v. de CSS-mockup.
+    $imageSlot  = $imageSlot ?? null;
+    $previewImg = $imageSlot ? $site->image($imageSlot) : null;
+    $previewSet = $imageSlot ? $site->imageSrcset($imageSlot) : '';
 @endphp
 
 @once
@@ -74,6 +79,10 @@
         <div class="zkhw-grid">
             {{-- Browser-mockup met CTA naar het volledige live voorbeeld --}}
             <a class="zkhw-window" href="{{ $href }}" aria-label="{{ $ctaLabel }}">
+                @if ($previewImg)
+                    <img src="{{ $previewImg }}" @if ($previewSet) srcset="{{ $previewSet }}" sizes="(max-width:900px) 92vw, 52vw" @endif
+                         alt="{{ $ctaLabel }}" loading="lazy" decoding="async" style="width:100%;height:auto;display:block">
+                @else
                 <div class="zkhw-bar">
                     <span class="zkhw-dot"></span><span class="zkhw-dot"></span><span class="zkhw-dot"></span>
                     <span class="zkhw-url">{{ $urlLabel }}</span>
@@ -107,6 +116,7 @@
                         @endforelse
                     </div>
                 </div>
+                @endif
                 <span class="zkhw-open">{{ $ctaLabel }} →</span>
             </a>
 
