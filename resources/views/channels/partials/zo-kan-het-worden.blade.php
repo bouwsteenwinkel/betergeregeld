@@ -78,7 +78,7 @@
 
         <div class="zkhw-grid">
             {{-- Browser-mockup met CTA naar het volledige live voorbeeld --}}
-            <a class="zkhw-window" href="{{ $href }}" aria-label="{{ $ctaLabel }}">
+            <div class="zkhw-window">
                 @if ($previewImg)
                     <img src="{{ $previewImg }}" @if ($previewSet) srcset="{{ $previewSet }}" sizes="(max-width:900px) 92vw, 52vw" @endif
                          alt="{{ $ctaLabel }}" loading="lazy" decoding="async" style="width:100%;height:auto;display:block">
@@ -117,8 +117,7 @@
                     </div>
                 </div>
                 @endif
-                <span class="zkhw-open">{{ $ctaLabel }} →</span>
-            </a>
+            </div>
 
             {{-- Tekstkolom: wat dit product oplevert --}}
             <div class="zkhw-aside">
@@ -130,7 +129,6 @@
                         </li>
                     @endforeach
                 </ul>
-                <a href="{{ $href }}" class="btn">{{ $ctaLabel }} →</a>
             </div>
         </div>
     </div>

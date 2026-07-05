@@ -36,7 +36,6 @@
                     <h1>{{ $hero['title'] ?? $fLabel }}</h1>
                     @if (! empty($hero['sub']))<p class="lead">{{ $hero['sub'] }}</p>@endif
                     <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
-                    <a href="{{ $site->url('voorbeeld/' . $facet) }}" class="btn btn-ghost" style="margin-left:.6rem">Bekijk het voorbeeld →</a>
                     @if (! empty($hero['note']))<p class="muted" style="margin-top:.8rem;font-size:.9rem">{{ $hero['note'] }}</p>@endif
                     @if (! empty($hero['usps']))
                         <ul class="hero-usps">

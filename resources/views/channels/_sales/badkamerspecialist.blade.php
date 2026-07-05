@@ -28,7 +28,6 @@
                     <h1>Meer badkamerklussen uit je eigen regio</h1>
                     <p class="lead">Een strakke website, webshop of klantenportaal die klanten binnenhaalt terwijl jij op de bouw staat. Wij bouwen 'm, jij bepaalt hoe ver je gaat.</p>
                     <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
-                    <a href="{{ $site->url('voorbeeld') }}" class="btn btn-ghost" style="margin-left:.6rem">Bekijk een voorbeeld →</a>
                     <p class="muted" style="margin-top:.8rem;font-size:.9rem">Gratis &middot; vrijblijvend &middot; voorbeeld van jóuw site, vaak binnen 1 à 2 dagen</p>
                     <ul class="hero-usps">
                         <li>Gevonden worden als iemand een badkamer zoekt in jouw regio</li>
@@ -37,12 +36,11 @@
                     </ul>
                 </div>
                 @if ($heroImg)
-                    <div style="position:relative">
+                    <div>
                         <img src="{{ $heroImg }}"
                              @if ($heroSet) srcset="{{ $heroSet }}" sizes="(max-width:760px) 92vw, 46vw" @endif
                              alt="Voorbeeld van een badkamerwebsite" loading="eager" decoding="async"
                              style="width:100%;height:auto;border-radius:var(--radius);display:block;box-shadow:0 24px 60px -24px rgba(0,0,0,.4)">
-                        <a href="{{ $site->url('voorbeeld') }}" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(255,255,255,.94);color:var(--c-ink);font-weight:700;font-size:.85rem;padding:.5rem 1rem;border-radius:999px;box-shadow:0 8px 24px -8px rgba(0,0,0,.5);white-space:nowrap">🔍 Bekijk dit voorbeeld</a>
                     </div>
                 @endif
             </div>
