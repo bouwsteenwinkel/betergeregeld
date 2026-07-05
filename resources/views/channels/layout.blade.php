@@ -246,18 +246,21 @@
 		   Desktop: alle USP's naast elkaar met scheidingslijnen. Mobiel: één per keer,
 		   automatisch wisselend (geen horizontaal scrollen). */
 		.pitch-strip{background:linear-gradient(100deg,var(--c-primary),color-mix(in srgb,var(--c-primary) 66%,var(--c-cta)));color:#fff}
-		.pitch-strip-inner{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap;gap:0}
-		.pitch-item{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:.72rem 1.7rem;position:relative}
+		.pitch-strip-inner{display:flex;align-items:stretch;gap:0}
+		.pitch-item{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:.7rem;padding:.72rem 1.1rem;position:relative}
+		.pitch-item:first-child{flex:1.7 1 0;justify-content:flex-start;padding-left:.2rem}
+		.pitch-item:last-child{justify-content:flex-end;padding-right:.2rem}
 		.pitch-item:not(:last-child)::after{content:"";position:absolute;right:0;top:22%;bottom:22%;width:1px;background:rgba(255,255,255,.2)}
 		.pitch-ic{flex:0 0 auto;display:inline-flex;color:#fff}
 		.pitch-ic svg{width:26px;height:26px;display:block}
 		.pitch-ic-emoji{font-size:1.4rem;line-height:1}
 		.pitch-txt{display:flex;flex-direction:column;min-width:0}
-		.pitch-title{font-weight:700;font-size:.9rem;line-height:1.2;letter-spacing:.01em}
-		.pitch-sub{font-size:.775rem;line-height:1.2;color:rgba(255,255,255,.8);margin-top:1px}
+		.pitch-title{font-weight:700;font-size:.9rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+		.pitch-sub{font-size:.775rem;line-height:1.2;color:rgba(255,255,255,.8);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 		@media(max-width:680px){
 			.pitch-strip-inner{display:block;position:relative;min-height:54px}
 			.pitch-item{position:absolute;inset:0;opacity:0;transition:opacity .45s ease;pointer-events:none;padding:.5rem 16px}
+			.pitch-item:first-child,.pitch-item:last-child{justify-content:center;padding:.5rem 16px}
 			.pitch-item.is-active{opacity:1}
 			.pitch-item::after{display:none}
 		}
