@@ -45,12 +45,11 @@
                     @endif
                 </div>
                 @if ($heroImg)
-                    <div style="position:relative">
+                    <div>
                         <img src="{{ $heroImg }}"
                              @if ($heroSet) srcset="{{ $heroSet }}" sizes="(max-width:760px) 92vw, 46vw" @endif
                              alt="Voorbeeld voor een badkamerbedrijf" loading="eager" decoding="async"
                              style="width:100%;height:auto;border-radius:var(--radius);display:block;box-shadow:0 24px 60px -24px rgba(0,0,0,.4)">
-                        <a href="{{ $site->url('voorbeeld/' . $facet) }}" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(255,255,255,.94);color:var(--c-ink);font-weight:700;font-size:.85rem;padding:.5rem 1rem;border-radius:999px;box-shadow:0 8px 24px -8px rgba(0,0,0,.5);white-space:nowrap">🔍 Bekijk het voorbeeld</a>
                     </div>
                 @endif
             </div>
