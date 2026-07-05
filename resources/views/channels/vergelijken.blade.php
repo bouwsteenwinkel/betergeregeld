@@ -32,21 +32,43 @@
     <section>
         <div class="wrap">
             <style>
-                .cmp{width:100%;border-collapse:collapse;font-size:.97rem;background:var(--c-surface);border-radius:var(--radius);overflow:hidden}
-                .cmp th,.cmp td{padding:.95rem 1.1rem;text-align:left;border-bottom:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent);vertical-align:top}
-                .cmp thead th{background:color-mix(in srgb,var(--c-ink) 5%,transparent);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}
-                .cmp thead th:last-child{background:var(--c-primary);color:#fff}
-                .cmp td:first-child{font-weight:700;width:26%}
-                .cmp td:last-child{font-weight:600}
+                .cmp{width:100%;border-collapse:separate;border-spacing:0;font-size:.97rem;background:var(--c-bg);border-radius:var(--radius);overflow:hidden;border:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);box-shadow:0 26px 55px -34px rgba(0,0,0,.45)}
+                .cmp th,.cmp td{padding:1.05rem 1.25rem;text-align:left;vertical-align:middle}
+                .cmp tbody tr:not(:last-child) td{border-bottom:1px solid color-mix(in srgb,var(--c-ink) 7%,transparent)}
+                .cmp thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800;padding-top:1.15rem;padding-bottom:1.15rem}
+                .cmp thead th.col-self{color:var(--c-muted)}
+                /* Uitgelichte 'ons'-kolom */
+                .cmp .col-us{background:color-mix(in srgb,var(--c-accent) 8%,transparent)}
+                .cmp thead th.col-us{background:var(--c-primary);color:#fff}
+                .cmp td.col-crit{font-weight:700;width:27%}
+                .cmp td.col-self{color:var(--c-muted)}
+                .cmp td.col-us{font-weight:700}
+                .cmp tbody tr:hover td{background:color-mix(in srgb,var(--c-ink) 3.5%,transparent)}
+                .cmp tbody tr:hover td.col-us{background:color-mix(in srgb,var(--c-accent) 14%,transparent)}
+                .cmp-cell{display:inline-flex;align-items:center;gap:.6rem}
+                .cmp-ic{flex:0 0 auto;width:20px;height:20px}
+                .cmp-ic.yes{color:var(--c-cta)}
+                .cmp-ic.no{color:color-mix(in srgb,var(--c-ink) 34%,transparent)}
+                .cmp-badge{display:inline-block;font-size:.62rem;font-weight:800;letter-spacing:.07em;background:var(--c-cta);color:var(--c-on-cta);padding:.2rem .55rem;border-radius:999px;margin-right:.6rem;vertical-align:middle}
                 .cmp-wrap{overflow-x:auto}
-                @media(max-width:620px){.cmp td:first-child{width:auto}}
+                @media(max-width:620px){.cmp td.col-crit{width:auto}.cmp th,.cmp td{padding:.85rem .9rem}}
             </style>
             <div class="cmp-wrap">
                 <table class="cmp">
-                    <thead><tr><th></th><th>Zelf bouwen</th><th>Laten maken door ons</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="col-self">Zelf bouwen</th>
+                            <th class="col-us"><span class="cmp-badge">Aanbevolen</span>Laten maken door ons</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach ($rows as $row)
-                            <tr><td>{{ $row[0] }}</td><td class="muted">{{ $row[1] }}</td><td>{{ $row[2] }}</td></tr>
+                            <tr>
+                                <td class="col-crit">{{ $row[0] }}</td>
+                                <td class="col-self"><span class="cmp-cell"><svg class="cmp-ic no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>{{ $row[1] }}</span></td>
+                                <td class="col-us"><span class="cmp-cell"><svg class="cmp-ic yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>{{ $row[2] }}</span></td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
