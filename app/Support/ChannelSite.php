@@ -147,6 +147,109 @@ class ChannelSite
         return (string) ($this->cfg['branche'] ?? 'overig');
     }
 
+    /**
+     * Doelgroep-zelfstandignaamwoord (meervoud) voor de pitch-strip, bv.
+     * "badkamerspecialisten". Volgorde: expliciete override (config-kanaal via
+     * cfg['pitch_audience']) → branche-brede map (config/channel_sites.php →
+     * branche_audience, op branche-key of lead-branche) → meervoud van de
+     * nette branche-naam (of, als die ontbreekt, van de key).
+     */
+    public function pitchAudience(): string
+    {
+        // 1) expliciete per-kanaal-override.
+        if ($a = ($this->cfg['pitch_audience'] ?? null)) {
+            return (string) $a;
+        }
+
+        $map = (array) config('channel_sites.branche_audience', []);
+
+        // 2) specifieke niche-override op branche-key (bv. 'restaurant').
+        $bk = $this->brancheKey();
+        if ($bk !== null && $bk !== '' && isset($map[$bk])) {
+            return (string) $map[$bk];
+        }
+
+        // 3) meervoud van de nette branche-naam per niche ("Badkamerspecialist").
+        if ($base = ($this->cfg['branche_name'] ?? null)) {
+            return self::pluralizeNl(mb_strtolower(trim((string) $base)));
+        }
+
+        // 4) groeps-fallback op lead-branche (config-kanalen zonder branche-naam).
+        $b = $this->branche();
+        if ($b !== '' && isset($map[$b])) {
+            return (string) $map[$b];
+        }
+
+        // 5) laatste redmiddel: meervoud van de key.
+        return self::pluralizeNl(mb_strtolower(str_replace(['-', '_'], ' ', (string) ($bk ?: $b))));
+    }
+
+    /**
+     * USP-items voor de pitch-strip (verkoop van ónze niche-website aan de
+     * ondernemer). Het eerste item is branche-specifiek; de rest is vast. Per
+     * kanaal te overschrijven via header.pitch_strip (lijst van
+     * ['icon' => '…', 'text' => '…']).
+     * @return array<int,array{icon:string,text:string}>
+     */
+    public function pitchStripItems(): array
+    {
+        $custom = $this->header()['pitch_strip'] ?? null;
+        if (is_array($custom) && $custom) {
+            return array_values(array_filter(array_map(
+                fn ($i) => is_array($i)
+                    ? ['icon' => (string) ($i['icon'] ?? ''), 'text' => (string) ($i['text'] ?? '')]
+                    : null,
+                $custom
+            )));
+        }
+
+        return [
+            ['icon' => '🛡️', 'text' => 'Speciaal ontwikkeld voor ' . $this->pitchAudience()],
+            ['icon' => '🌐', 'text' => 'Eigen domeinnaam'],
+            ['icon' => '📱', 'text' => 'Volledig mobiel'],
+            ['icon' => '🚀', 'text' => 'Snel online'],
+        ];
+    }
+
+    /**
+     * Eenvoudig Nederlands meervoud — goed genoeg voor branche-namen. Voor de
+     * gevallen waar dit misgaat (leenwoorden e.d.) is er de branche_audience-
+     * override-map in config/channel_sites.php.
+     */
+    private static function pluralizeNl(string $w): string
+    {
+        $w = trim($w);
+        if ($w === '') {
+            return $w;
+        }
+
+        // Vaste, lastige uitgangen (langste eerst).
+        foreach (['school' => 'scholen', 'salon' => 'salons', 'bureau' => 'bureaus', 'oog' => 'ogen'] as $s => $rep) {
+            if (str_ends_with($w, $s)) {
+                return substr($w, 0, -strlen($s)) . $rep;
+            }
+        }
+        // Engelse -ing-leenwoorden (camping) → +s.
+        if (str_ends_with($w, 'ing')) {
+            return $w . 's';
+        }
+        // Klinker-einde → 's (foto's, sauna's).
+        if (preg_match('/[aiouy]$/u', $w)) {
+            return $w . "'s";
+        }
+        // Onbeklemtoonde/vaste uitgangen → +s (loodgieter → loodgieters).
+        if (preg_match('/(e|el|em|en|er|erd|aar|eur|ier|ien|air)$/u', $w)) {
+            return $w . 's';
+        }
+        // Standaard → +en, met inkorting van de lange klinker in een gesloten
+        // lettergreep (zaak → zaken, rijschool is hierboven al afgevangen).
+        if (preg_match('/(aa|ee|oo|uu)[bcdfgklmnprst]$/u', $w)) {
+            $w = preg_replace_callback('/(aa|ee|oo|uu)([bcdfgklmnprst])$/u', fn ($m) => $m[1][0] . $m[2], $w);
+        }
+
+        return $w . 'en';
+    }
+
     public function locale(): string
     {
         return (string) ($this->cfg['locale'] ?? 'nl');

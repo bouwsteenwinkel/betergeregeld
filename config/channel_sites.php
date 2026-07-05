@@ -53,6 +53,26 @@ return [
         'endorsement_url' => 'https://betergeregeld.nl',
     ],
 
+    /*
+     * Doelgroep-zelfstandignaamwoord (MEERVOUD) voor de pitch-strip bovenaan elke
+     * channel-site ("Speciaal ontwikkeld voor <hier>"). Keyed op branche-key (DB-
+     * niches, bv. 'badkamerspecialist') of lead-branche (config-kanalen, bv.
+     * 'horeca'). Alleen invullen waar het automatische meervoud misgaat of net-
+     * ter kan; anders wordt de branche-naam automatisch naar meervoud gezet.
+     */
+    'branche_audience' => [
+        // Config-kanalen (op lead-branche).
+        'horeca'           => 'horecazaken',
+        'bouw_installatie' => 'vakspecialisten',
+        'kapper_beauty'    => 'kappers & salons',
+        // DB-niches met een lastig/leenwoord-meervoud (op branche-key).
+        'restaurant'       => 'restaurants',
+        'cafe'             => 'cafés',
+        'consultant'       => 'consultants',
+        'notaris'          => 'notarissen',
+        'reisbureau'       => 'reisbureaus',
+    ],
+
     'channels' => [
 
         /* ───────────────────────── HORECA (volledig voorbeeld) ───────────────── */

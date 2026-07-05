@@ -3,6 +3,9 @@
     $tel = preg_replace('/\s+/', '', (string) $site->brand('phone'));
     $cta = $site->navCta();
 @endphp
+{{-- Pitch-strip: waarom deze niche-website, geënt op de branche (mobiel + desktop). --}}
+@include('channels.partials.pitch-strip')
+
 {{-- Trust-balk: keurmerk-belofte links, directe contactopties rechts. --}}
 <div class="topbar">
     <div class="wrap topbar-inner">

@@ -242,6 +242,16 @@
 		.faq-acc details[open] > .faq-a{grid-template-rows:1fr}
 		.faq-acc .faq-a-inner{overflow:hidden;min-height:0}
 		.faq .faq-a p,.faq details > p{margin:0;padding:0 1.35rem 1.2rem;color:var(--c-muted);line-height:1.6}
+		/* pitch-strip: waarom deze niche-website (geënt op de branche), boven de trust-balk */
+		.pitch-strip{background:linear-gradient(90deg,var(--c-primary),color-mix(in srgb,var(--c-primary) 78%,var(--c-cta)));color:#fff}
+		.pitch-strip-inner{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.35rem 1.9rem;min-height:44px;padding:.5rem 0;font-size:.86rem;font-weight:600;line-height:1.25}
+		.pitch-item{display:inline-flex;align-items:center;gap:.45rem;white-space:nowrap;position:relative}
+		.pitch-emoji{font-size:1.02rem;line-height:1}
+		@media(min-width:681px){.pitch-item:not(:last-child)::after{content:"•";position:absolute;right:-1.05rem;color:rgba(255,255,255,.5)}}
+		@media(max-width:680px){
+			.pitch-strip-inner{flex-wrap:nowrap;justify-content:flex-start;gap:1.4rem;padding:.55rem 16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+			.pitch-strip-inner::-webkit-scrollbar{display:none}
+		}
 		/* trust-balk boven de nav */
 		.topbar{background:var(--c-ink);color:rgba(255,255,255,.78);font-size:.82rem;letter-spacing:.01em}
 		.topbar-inner{display:flex;align-items:center;justify-content:space-between;min-height:42px;gap:1rem}

@@ -107,6 +107,7 @@ class Site extends Model
             'name'        => $this->name,
             'branche'     => $this->branche?->lead_branche ?? 'overig',
             'branche_key' => $this->branche?->key,
+            'branche_name'=> $this->branche?->name,
             'locale'      => $this->locale,
             'domain'  => $this->domain,
             'status'  => $this->status,
