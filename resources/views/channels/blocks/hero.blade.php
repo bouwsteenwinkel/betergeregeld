@@ -5,7 +5,7 @@
 @endphp
 <section class="hero" data-block="hero">
     <div class="wrap">
-        <div @if ($heroImg) class="grid cols-2" style="align-items:center;gap:2.5rem" @endif>
+        <div @if ($heroImg) class="grid cols-2" style="align-items:start;gap:2.5rem" @endif>
             <div>
                 @if ($block->c('eyebrow'))<span class="eyebrow">{{ $block->c('eyebrow') }}</span>@endif
                 <h1>{{ $block->c('title', $site->name()) }}</h1>
