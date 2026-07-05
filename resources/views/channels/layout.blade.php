@@ -59,6 +59,18 @@
 			var a = e.target.closest('a.btn, .sticky-cta, .nav-drawer-cta');
 			if (a) window.bgTrack('cta_click', { label: (a.textContent || '').trim().slice(0, 40), href: a.getAttribute('href') || '' });
 		});
+		// Zelfde-pagina ankers (#gratis-voorbeeld / #contact) werken alleen als het
+		// doel op de pagina staat. Op pagina's zónder het formulier (contact, legal)
+		// vallen we terug op datzelfde anker op de home.
+		document.addEventListener('click', function (e) {
+			var a = e.target.closest('a[href^="#gratis-voorbeeld"], a[href^="#contact"]');
+			if (!a) return;
+			var id = (a.getAttribute('href') || '').replace(/^#/, '');
+			if (id && !document.getElementById(id)) {
+				e.preventDefault();
+				window.location.assign(@json($site->url('')) + '#' + id);
+			}
+		});
 		document.addEventListener('submit', function (e) {
 			var f = e.target;
 			if (f && f.tagName === 'FORM' && /\/contact$/.test(f.getAttribute('action') || '')) {
@@ -130,6 +142,9 @@
 		/* stappen met verbindende tijdlijn */
 		.steps{display:grid;gap:1.6rem;margin-top:2rem}
 		@media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr);gap:2.2rem}}
+		/* 4+ stappen passen niet netjes op 1 rij (3+1) → 2x2, en dan zonder de
+		   horizontale verbindingslijn (die is voor een enkele rij bedoeld). */
+		@media(min-width:760px){.steps:has(> .step:nth-child(4)){grid-template-columns:repeat(2,1fr)}.steps:has(> .step:nth-child(4)) .step::after{display:none}}
 		.step{position:relative}
 		.step-num{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--c-primary);color:#fff;font-weight:700;font-size:1.15rem;margin-bottom:1rem;position:relative;z-index:1}
 		.step h3{margin-bottom:.3rem}
