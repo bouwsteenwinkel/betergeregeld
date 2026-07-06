@@ -32,7 +32,10 @@ class ChannelSiteController extends Controller
         // demo ("zo zou jouw site eruitzien") verhuist dan naar /voorbeeld.
         if ($salesView = $site->salesHomeView()) {
             $facet   = WebsiteLead::normalizeFacet($request->route('facet'));
-            $landing = $request->route('facet') ? config('badkamer_landings.' . $facet) : null;
+            // Facet-content per channel: channel_landings mapt de site-key naar het
+            // juiste landings-config-bestand (badkamer, rijschool, …).
+            $landingCfg = config('channel_landings.' . $site->key);
+            $landing    = ($request->route('facet') && $landingCfg) ? config($landingCfg . '.' . $facet) : null;
 
             // /{facet} met een bestaande productlanding + landing-view → de
             // toegespitste trigger-pagina voor dat product (waar ads/SEO op landen).
