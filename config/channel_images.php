@@ -18,9 +18,14 @@
 
 return [
 
-    // Provider / model (OpenAI images, key uit config/accessguard.php).
+    // Provider / model (OpenAI images).
     'model'   => env('CHANNEL_IMAGES_MODEL', 'gpt-image-1'),
     'quality' => env('CHANNEL_IMAGES_QUALITY', 'high'),
+
+    // API-key voor beeldgeneratie. Zet CHANNEL_IMAGES_OPENAI_KEY in .env om een
+    // aparte key/project te gebruiken (bv. een dedicated "ImagesGen"-key met eigen
+    // budget); leeg = terugval op de accessguard-AI-key (config/accessguard.php).
+    'api_key' => env('CHANNEL_IMAGES_OPENAI_KEY'),
 
     // Waar de gegenereerde beelden landen (publiek, per kanaal-key).
     'path' => 'channel-media',

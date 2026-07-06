@@ -24,8 +24,14 @@ class ChannelImageGenerator
 
     public function isFake(): bool
     {
-        $key = (string) config('accessguard.ai.api_key', '');
+        $key = (string) ($this->apiKey());
         return $key === '' || str_starts_with($key, 'fake') || str_starts_with($key, 'xxxx');
+    }
+
+    /** OpenAI-key voor beeldgeneratie: dedicated channel_images-key, anders de accessguard-AI-key. */
+    private function apiKey(): string
+    {
+        return (string) (config('channel_images.api_key') ?: config('accessguard.ai.api_key', ''));
     }
 
     /** @return array<string,array{size:string,ratio:string}> */
@@ -82,7 +88,7 @@ class ChannelImageGenerator
 
         // Echte generatie via OpenAI images-API.
         $size = (string) ($this->slots()[$slot]['size'] ?? '1024x1536');
-        $resp = Http::withToken((string) config('accessguard.ai.api_key'))
+        $resp = Http::withToken((string) $this->apiKey())
             ->withOptions(['verify' => $this->verify()])
             ->timeout(120)
             ->post('https://api.openai.com/v1/images/generations', [
@@ -132,7 +138,7 @@ class ChannelImageGenerator
             return ['slot' => $slot, 'status' => 'fake-preview', 'file' => $this->url($channelKey, $slot), 'fake' => true];
         }
 
-        $resp = Http::withToken((string) config('accessguard.ai.api_key'))
+        $resp = Http::withToken((string) $this->apiKey())
             ->withOptions(['verify' => $this->verify()])
             ->timeout(120)
             ->post('https://api.openai.com/v1/images/generations', [
