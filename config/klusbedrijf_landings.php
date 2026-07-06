@@ -38,6 +38,7 @@ return [
             'heroTitle'    => 'Elke klus vakkundig geregeld, groot of klein',
             'urlLabel'     => 'jouw-klusbedrijf.nl',
             'ctaLabel'     => 'Bekijk het volledige voorbeeld',
+            'imageSlot'    => 'website-preview',
             'galleryLabel' => 'Recent afgeronde klussen',
             'gallery'      => [['slot' => 'gallery1'], ['slot' => 'gallery2'], ['slot' => 'gallery3']],
             'bullets'      => [
@@ -76,6 +77,7 @@ return [
             'navCta'       => 'Winkelmand',
             'heroBtn'      => 'In winkelmand',
             'ctaLabel'     => 'Bekijk het webshop-voorbeeld',
+            'imageSlot'    => 'webshop-preview',
             'galleryLabel' => 'Populaire klussen',
             'gallery'      => [['slot' => 'gallery1', 'price' => '€ 75'], ['slot' => 'gallery2', 'price' => '€ 120'], ['slot' => 'gallery3', 'price' => '€ 45']],
             'bullets'      => [
@@ -114,6 +116,7 @@ return [
             'navCta'       => 'Inloggen',
             'heroBtn'      => 'Mijn omgeving',
             'ctaLabel'     => 'Bekijk het portaal-voorbeeld',
+            'imageSlot'    => 'klantenportaal-preview',
             'galleryLabel' => 'Jouw klus in beeld',
             'gallery'      => [['slot' => 'gallery1'], ['slot' => 'gallery2'], ['slot' => 'gallery3']],
             'bullets'      => [
@@ -152,6 +155,7 @@ return [
             'navCta'       => 'Dashboard',
             'heroBtn'      => 'Bekijk demo',
             'ctaLabel'     => 'Bekijk het automatisering-voorbeeld',
+            'imageSlot'    => 'automatisering-preview',
             'galleryLabel' => 'Loopt automatisch',
             'gallery'      => [['slot' => 'gallery1', 'price' => 'Offerte ✓'], ['slot' => 'gallery2', 'price' => 'Factuur ✓'], ['slot' => 'gallery3', 'price' => 'Planning ✓']],
             'bullets'      => [
@@ -190,6 +194,7 @@ return [
             'navCta'       => 'Chat',
             'heroBtn'      => 'Stel je vraag',
             'ctaLabel'     => 'Bekijk het AI-voorbeeld',
+            'imageSlot'    => 'ai-preview',
             'galleryLabel' => 'De assistent aan het werk',
             'gallery'      => [['slot' => 'gallery1', 'price' => 'Chat ✓'], ['slot' => 'gallery2', 'price' => 'Afspraak ✓'], ['slot' => 'gallery3', 'price' => 'Offerte ✓']],
             'bullets'      => [
