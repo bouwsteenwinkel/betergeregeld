@@ -14,4 +14,5 @@
 return [
     'badkamerspecialist' => 'badkamer_landings',
     'rijschool'          => 'rijschool_landings',
+    'klusbedrijf'        => 'klusbedrijf_landings',
 ];
