@@ -193,6 +193,11 @@ class ChannelSiteResource extends Resource
                         return $query->whereIn('id', $ids);
                     }),
             ])
+            // Filter/zoek/sortering in de sessie bewaren, zodat je na een Edit
+            // terugkomt op het overzicht mét je ingestelde filter (bv. lead-branche).
+            ->persistFiltersInSession()
+            ->persistSearchInSession()
+            ->persistSortInSession()
             ->recordUrl(fn (Site $r) => EditChannelSite::getUrl(['record' => $r]))
             ->defaultSort('name');
     }
