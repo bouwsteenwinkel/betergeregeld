@@ -21,8 +21,9 @@ use RuntimeException;
  */
 class GoogleApiAuth
 {
-	public const DEFAULT_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
-	public const RW_SCOPE      = 'https://www.googleapis.com/auth/webmasters';
+	public const DEFAULT_SCOPE    = 'https://www.googleapis.com/auth/webmasters.readonly';
+	public const RW_SCOPE         = 'https://www.googleapis.com/auth/webmasters';
+	public const SITEVERIFY_SCOPE = 'https://www.googleapis.com/auth/siteverification';
 
 	/**
 	 * Pad naar de service-account-JSON. Override via .env GOOGLE_API_KEY_PATH.

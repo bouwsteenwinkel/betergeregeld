@@ -161,6 +161,31 @@ class OpenProviderClient
     }
 
     /**
+     * Voegt één TXT-record toe aan de bestaande DNS-zone (idempotent). Gebruikt
+     * voor o.a. Google-site-verificatie (value = 'google-site-verification=...').
+     * name '' = apex. Een 'duplicate' (record staat er al) negeren we.
+     */
+    public function addTxtRecord(string $domain, string $value, string $name = ''): void
+    {
+        $d    = $this->splitDomain($domain);
+        $fqdn = $d['name'] . '.' . $d['extension'];
+        $ttl  = (int) config('openprovider.ttl', 3600);
+
+        try {
+            $this->call('PUT', '/v1beta/dns/zones/' . $fqdn, [
+                'name'    => $fqdn,
+                'records' => ['add' => [
+                    ['type' => 'TXT', 'name' => $name, 'value' => $value, 'ttl' => $ttl],
+                ]],
+            ]);
+        } catch (RuntimeException $e) {
+            if (! str_contains(strtolower($e->getMessage()), 'duplicate')) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
      * Status van de DNS-zone in ONS OpenProvider-account (voor de admin-lijst):
      *  - registered: bestaat er een zone met records voor dit domein bij ons?
      *  - dns_ok:     wijzen apex (@) én www naar $ip (VPS)?

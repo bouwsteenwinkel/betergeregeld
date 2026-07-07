@@ -66,4 +66,43 @@ class GoogleSearchConsoleClient
 			'json'   => $resp->json(),
 		];
 	}
+
+	/**
+	 * Voegt een property toe (RW-scope). PUT /sites/{siteUrl}. 204 = succes.
+	 * Voor een domein-property is $siteUrl 'sc-domain:example.com'; het
+	 * service-account moet daarvoor eerst geverifieerd eigenaar zijn.
+	 *
+	 * @return array{status:int, json:array|null}
+	 */
+	public function addSite(string $siteUrl): array
+	{
+		$token = $this->auth->accessToken(GoogleApiAuth::RW_SCOPE);
+
+		$resp = Http::withToken($token)
+			->timeout(30)
+			->acceptJson()
+			->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
+			->put(self::API_BASE . '/sites/' . rawurlencode($siteUrl));
+
+		return ['status' => $resp->status(), 'json' => $resp->json()];
+	}
+
+	/**
+	 * Dient een sitemap in (RW-scope). PUT /sites/{siteUrl}/sitemaps/{feedpath}.
+	 * 204 = succes. $feedpath is de volledige sitemap-URL.
+	 *
+	 * @return array{status:int, json:array|null}
+	 */
+	public function submitSitemap(string $siteUrl, string $feedpath): array
+	{
+		$token = $this->auth->accessToken(GoogleApiAuth::RW_SCOPE);
+
+		$resp = Http::withToken($token)
+			->timeout(30)
+			->acceptJson()
+			->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
+			->put(self::API_BASE . '/sites/' . rawurlencode($siteUrl) . '/sitemaps/' . rawurlencode($feedpath));
+
+		return ['status' => $resp->status(), 'json' => $resp->json()];
+	}
 }
