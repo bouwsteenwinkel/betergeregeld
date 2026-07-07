@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ChannelSites\Pages;
 
 use App\Filament\Resources\ChannelSites\ChannelSiteResource;
 use App\Services\OpenProvider\OpenProviderClient;
+use App\Services\Seo\GscProvisioner;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
@@ -58,6 +59,32 @@ class EditChannelSite extends EditRecord
                         Notification::make()
                             ->title('Registratie mislukt')
                             ->body($e->getMessage())
+                            ->danger()->persistent()->send();
+                    }
+                }),
+
+            // Google Search Console inregelen: verifieer (DNS-TXT via OpenProvider),
+            // property toevoegen + sitemap indienen. Alleen bij een gekoppeld domein.
+            Action::make('provisionGsc')
+                ->label('Search inregelen')
+                ->icon('heroicon-m-magnifying-glass')
+                ->color('info')
+                ->visible(fn () => filled($this->record->domain))
+                ->requiresConfirmation()
+                ->modalHeading('Google Search Console inregelen')
+                ->modalDescription(fn () => "Verifieert {$this->record->domain} via een DNS-TXT-record (OpenProvider), voegt de property toe in Search Console en dient de sitemap in. Alleen zinvol voor een live, bereikbaar domein waarvan de DNS in OpenProvider staat.")
+                ->modalSubmitActionLabel('Ja, inregelen')
+                ->action(function (): void {
+                    try {
+                        $res = app(GscProvisioner::class)->provision($this->record);
+                        $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
+                        $n = Notification::make()
+                            ->title($res['ok'] ? 'Search Console ingeregeld' : 'Nog niet compleet')
+                            ->body($body);
+                        ($res['ok'] ? $n->success() : $n->warning())->persistent()->send();
+                    } catch (\Throwable $e) {
+                        Notification::make()
+                            ->title('Inregelen mislukt')->body($e->getMessage())
                             ->danger()->persistent()->send();
                     }
                 }),

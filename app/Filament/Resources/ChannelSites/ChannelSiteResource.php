@@ -198,6 +198,31 @@ class ChannelSiteResource extends Resource
             ->persistFiltersInSession()
             ->persistSearchInSession()
             ->persistSortInSession()
+            ->recordActions([
+                \Filament\Actions\Action::make('provisionGsc')
+                    ->label('Search')
+                    ->icon('heroicon-m-magnifying-glass')
+                    ->color('gray')
+                    ->visible(fn (Site $r) => filled($r->domain))
+                    ->requiresConfirmation()
+                    ->modalHeading('Google Search Console inregelen')
+                    ->modalDescription(fn (Site $r) => "Verifieert {$r->domain} via een DNS-TXT-record (OpenProvider), voegt de property toe in Search Console en dient de sitemap in. Alleen zinvol voor een live, bereikbaar domein waarvan de DNS in OpenProvider staat.")
+                    ->modalSubmitActionLabel('Ja, inregelen')
+                    ->action(function (Site $r): void {
+                        try {
+                            $res = app(\App\Services\Seo\GscProvisioner::class)->provision($r);
+                            $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
+                            $n = \Filament\Notifications\Notification::make()
+                                ->title($res['ok'] ? 'Search Console ingeregeld' : 'Nog niet compleet')
+                                ->body($body);
+                            ($res['ok'] ? $n->success() : $n->warning())->persistent()->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Inregelen mislukt')->body($e->getMessage())
+                                ->danger()->persistent()->send();
+                        }
+                    }),
+            ])
             ->recordUrl(fn (Site $r) => EditChannelSite::getUrl(['record' => $r]))
             ->defaultSort('name');
     }
