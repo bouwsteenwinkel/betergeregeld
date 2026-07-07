@@ -117,22 +117,47 @@ class OpenProviderClient
     }
 
     /**
-     * Maakt een DNS-zone met A-records voor de apex en www die naar $ip wijzen.
-     * OpenProvider verwacht de domein-naam gesplitst (name + extension) en
-     * RELATIEVE record-namen: "" voor de apex (géén "@"), "www" voor de subdomein-A.
+     * Zet de A-records (apex + www) naar $ip. OpenProvider verwacht de domein-naam
+     * gesplitst (name + extension) en RELATIEVE record-namen: "" voor de apex
+     * (géén "@"), "www" voor de subdomein-A.
+     *
+     * Bij registratie met een ns_group maakt OpenProvider al (een lege) zone aan;
+     * bestaat die al, dan voegen we de records toe via een modify (PUT) i.p.v. de
+     * zone opnieuw aan te maken.
      */
-    public function createDnsZone(string $domain, string $ip): void
+    public function configureDnsZone(string $domain, string $ip): void
     {
-        $d   = $this->splitDomain($domain);
-        $ttl = (int) config('openprovider.ttl', 3600);
-        $this->call('POST', '/v1beta/dns/zones', [
-            'domain'  => ['name' => $d['name'], 'extension' => $d['extension']],
-            'type'    => 'master',
-            'records' => [
-                ['type' => 'A', 'name' => '',    'value' => $ip, 'ttl' => $ttl],
-                ['type' => 'A', 'name' => 'www', 'value' => $ip, 'ttl' => $ttl],
-            ],
-        ]);
+        $d    = $this->splitDomain($domain);
+        $fqdn = $d['name'] . '.' . $d['extension'];
+        $ttl  = (int) config('openprovider.ttl', 3600);
+        $records = [
+            ['type' => 'A', 'name' => '',    'value' => $ip, 'ttl' => $ttl],
+            ['type' => 'A', 'name' => 'www', 'value' => $ip, 'ttl' => $ttl],
+        ];
+
+        try {
+            $this->call('POST', '/v1beta/dns/zones', [
+                'domain'  => ['name' => $d['name'], 'extension' => $d['extension']],
+                'type'    => 'master',
+                'records' => $records,
+            ]);
+        } catch (RuntimeException $e) {
+            if (! str_contains(strtolower($e->getMessage()), 'already exist')) {
+                throw $e;
+            }
+            // Zone bestaat al (auto-aangemaakt bij registratie) -> records toevoegen.
+            // "Duplicate record" betekent dat de A-records er al staan: idempotent negeren.
+            try {
+                $this->call('PUT', '/v1beta/dns/zones/' . $fqdn, [
+                    'name'    => $fqdn,
+                    'records' => ['add' => $records],
+                ]);
+            } catch (RuntimeException $e2) {
+                if (! str_contains(strtolower($e2->getMessage()), 'duplicate')) {
+                    throw $e2;
+                }
+            }
+        }
     }
 
     /**
@@ -152,7 +177,7 @@ class OpenProviderClient
         }
 
         $id = $this->registerDomain($domain);
-        $this->createDnsZone($domain, $ip);
+        $this->configureDnsZone($domain, $ip);
 
         return [
             'domain'        => $domain,
