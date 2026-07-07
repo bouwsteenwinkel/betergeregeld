@@ -41,4 +41,15 @@ return [
     'traprenovatie'              => 'traprenovatie_landings',
     'vloerenlegger'              => 'vloerenlegger_landings',
     'zonnepanelen-installateur'  => 'zonnepanelen-installateur_landings',
+
+    // Batch automotive
+    'aanhangwagenspecialist'     => 'aanhangwagenspecialist_landings',
+    'autobedrijf-occasions'      => 'autobedrijf-occasions_landings',
+    'autogarage'                 => 'autogarage_landings',
+    'autoruit-specialist'        => 'autoruit-specialist_landings',
+    'autoschadeherstel'          => 'autoschadeherstel_landings',
+    'bandenservice'              => 'bandenservice_landings',
+    'camperservice'              => 'camperservice_landings',
+    'motorzaak'                  => 'motorzaak_landings',
+    'uitlaat-remmen'             => 'uitlaat-remmen_landings',
 ];
