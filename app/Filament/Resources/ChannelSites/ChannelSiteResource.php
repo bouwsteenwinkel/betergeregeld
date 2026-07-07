@@ -171,6 +171,27 @@ class ChannelSiteResource extends Resource
                             fn (\Illuminate\Database\Eloquent\Builder $b) => $b->where('lead_branche', $v),
                         ),
                     )),
+                SelectFilter::make('hero_filled')->label('Hero-beelden')
+                    ->options([
+                        'vol'   => 'Ja — compleet (5/5)',
+                        'deels' => 'Deels (1–4/5)',
+                        'leeg'  => 'Nee — leeg (0/5)',
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
+                        $v = $data['value'] ?? null;
+                        if ($v === null || $v === '') {
+                            return $query;
+                        }
+                        $ids = \App\Models\Channel\Site::all(['id', 'key'])
+                            ->filter(fn (\App\Models\Channel\Site $s) => match ($v) {
+                                'vol'   => $s->heroImageCount() >= 5,
+                                'deels' => $s->heroImageCount() > 0 && $s->heroImageCount() < 5,
+                                'leeg'  => $s->heroImageCount() === 0,
+                                default => false,
+                            })->pluck('id')->all();
+
+                        return $query->whereIn('id', $ids);
+                    }),
             ])
             ->recordUrl(fn (Site $r) => EditChannelSite::getUrl(['record' => $r]))
             ->defaultSort('name');
