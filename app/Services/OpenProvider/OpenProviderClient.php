@@ -116,17 +116,21 @@ class OpenProviderClient
         return (int) data_get($json, 'data.id');
     }
 
-    /** Maakt een DNS-zone met A-records voor @ en www die naar $ip wijzen. */
+    /**
+     * Maakt een DNS-zone met A-records voor de apex en www die naar $ip wijzen.
+     * OpenProvider verwacht de domein-naam gesplitst (name + extension) en
+     * RELATIEVE record-namen: "" voor de apex (géén "@"), "www" voor de subdomein-A.
+     */
     public function createDnsZone(string $domain, string $ip): void
     {
-        $fqdn = strtolower(trim(preg_replace('#^https?://#', '', $domain), '/. '));
-        $ttl  = (int) config('openprovider.ttl', 3600);
+        $d   = $this->splitDomain($domain);
+        $ttl = (int) config('openprovider.ttl', 3600);
         $this->call('POST', '/v1beta/dns/zones', [
-            'domain' => ['name' => $fqdn],
-            'type'   => 'master',
+            'domain'  => ['name' => $d['name'], 'extension' => $d['extension']],
+            'type'    => 'master',
             'records' => [
-                ['type' => 'A', 'name' => $fqdn,           'value' => $ip, 'ttl' => $ttl, 'prio' => 0],
-                ['type' => 'A', 'name' => 'www.' . $fqdn,  'value' => $ip, 'ttl' => $ttl, 'prio' => 0],
+                ['type' => 'A', 'name' => '',    'value' => $ip, 'ttl' => $ttl],
+                ['type' => 'A', 'name' => 'www', 'value' => $ip, 'ttl' => $ttl],
             ],
         ]);
     }
