@@ -27,9 +27,71 @@ class Site extends Model
         'header' => 'array',
     ];
 
+    /** De 5 "hero-beelden": de website-hero + de vier facet-hero's. */
+    public const HERO_SLOTS = ['hero', 'facet-webshop', 'facet-klantenportaal', 'facet-automatisering', 'facet-ai'];
+
+    /** De 5 "wat het oplevert"-beelden: de facet-previews. */
+    public const OUTCOME_SLOTS = ['website-preview', 'webshop-preview', 'klantenportaal-preview', 'automatisering-preview', 'ai-preview'];
+
     public function branche(): BelongsTo
     {
         return $this->belongsTo(Branche::class, 'channel_branche_id');
+    }
+
+    // ── Voortgangs-/gereedheids-signalen voor de admin-lijst ──────────────────
+
+    /** Is het domein via ons (OpenProvider) geregistreerd? Uit de gesyncte meta. */
+    public function domainRegistered(): bool
+    {
+        return filled(data_get($this->meta, 'domain_registered_at'))
+            || (bool) data_get($this->meta, 'op.registered');
+    }
+
+    /** Wijzen apex + www naar de VPS? Uit de gesyncte meta (knop "Domeinstatus verversen"). */
+    public function dnsOk(): bool
+    {
+        return (bool) data_get($this->meta, 'op.dns_ok');
+    }
+
+    /** Heeft de site content (blokken) — de tekst-prefill is gedaan? */
+    public function contentPrefilled(): bool
+    {
+        return (int) ($this->blocks_count ?? $this->blocks()->count()) > 0;
+    }
+
+    /** Is er een eigen logo voor deze site? */
+    public function hasLogo(): bool
+    {
+        return is_file(public_path('channel-media/' . $this->key . '/logo.webp'))
+            || filled(data_get($this->brand, 'logo_image'));
+    }
+
+    /** Aantal aanwezige hero-beelden (0..5), alleen site-eigen (geen branche-fallback). */
+    public function heroImageCount(): int
+    {
+        return $this->heroCount ??= $this->countOwnImages(self::HERO_SLOTS);
+    }
+
+    /** Aantal aanwezige "wat het oplevert"-beelden (0..5), site-eigen. */
+    public function outcomeImageCount(): int
+    {
+        return $this->outcomeCount ??= $this->countOwnImages(self::OUTCOME_SLOTS);
+    }
+
+    private ?int $heroCount = null;
+
+    private ?int $outcomeCount = null;
+
+    private function countOwnImages(array $slots): int
+    {
+        $gen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
+        $n = 0;
+        foreach ($slots as $slot) {
+            if ($gen->url($this->key, $slot) !== null) {
+                $n++;
+            }
+        }
+        return $n;
     }
 
     public function blocks(): HasMany

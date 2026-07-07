@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -121,8 +122,41 @@ class ChannelSiteResource extends Resource
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn (string $state) => $state === 'live' ? 'Live' : 'Concept')
                     ->color(fn (string $state) => $state === 'live' ? 'success' : 'gray'),
-                TextColumn::make('blocks_count')->label('Blokken')->counts('blocks')->badge(),
-                TextColumn::make('updated_at')->label('Gewijzigd')->since()->sortable(),
+
+                // ── Gereedheid per site (voortgang van de bespoke build) ──────────
+                IconColumn::make('domainRegistered')->label('Domein')->boolean()
+                    ->tooltip('Domein geregistreerd bij OpenProvider (via "Domeinstatus verversen")')
+                    ->state(fn (Site $r) => $r->domainRegistered()),
+                IconColumn::make('dnsOk')->label('DNS')->boolean()
+                    ->tooltip('apex + www wijzen naar de VPS')
+                    ->state(fn (Site $r) => $r->dnsOk()),
+                IconColumn::make('contentPrefilled')->label('Tekst')->boolean()
+                    ->tooltip('Website-tekst / blokken ingevuld')
+                    ->state(fn (Site $r) => $r->contentPrefilled()),
+                IconColumn::make('hasLogo')->label('Logo')->boolean()
+                    ->tooltip('Eigen logo aanwezig')
+                    ->state(fn (Site $r) => $r->hasLogo()),
+                TextColumn::make('heroImages')->label('Hero')->badge()
+                    ->tooltip('Hero-beelden (5×): website + webshop/portaal/automatisering/ai')
+                    ->state(fn (Site $r) => $r->heroImageCount() . '/5')
+                    ->color(fn (Site $r) => match (true) {
+                        $r->heroImageCount() >= 5 => 'success',
+                        $r->heroImageCount() === 0 => 'gray',
+                        default => 'warning',
+                    }),
+                TextColumn::make('outcomeImages')->label('Oplevert')->badge()
+                    ->tooltip('“Wat het oplevert”-beelden (5×): de facet-previews')
+                    ->state(fn (Site $r) => $r->outcomeImageCount() . '/5')
+                    ->color(fn (Site $r) => match (true) {
+                        $r->outcomeImageCount() >= 5 => 'success',
+                        $r->outcomeImageCount() === 0 => 'gray',
+                        default => 'warning',
+                    }),
+
+                TextColumn::make('blocks_count')->label('Blokken')->counts('blocks')->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')->label('Gewijzigd')->since()->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')->options(['draft' => 'Concept', 'live' => 'Live']),

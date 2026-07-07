@@ -161,6 +161,54 @@ class OpenProviderClient
     }
 
     /**
+     * Status van de DNS-zone in ONS OpenProvider-account (voor de admin-lijst):
+     *  - registered: bestaat er een zone met records voor dit domein bij ons?
+     *  - dns_ok:     wijzen apex (@) én www naar $ip (VPS)?
+     * Doet één GET; een niet-bestaande zone levert registered=false op i.p.v. te gooien.
+     *
+     * @return array{registered:bool,dns_ok:bool,apex:?string,www:?string}
+     */
+    public function zoneStatus(string $domain, ?string $ip = null): array
+    {
+        $ip   = $ip ?: (string) config('openprovider.target_ip');
+        $d    = $this->splitDomain($domain);
+        $fqdn = $d['name'] . '.' . $d['extension'];
+
+        try {
+            $json = $this->call('GET', '/v1beta/dns/zones/' . $fqdn . '/records');
+        } catch (RuntimeException $e) {
+            return ['registered' => false, 'dns_ok' => false, 'apex' => null, 'www' => null];
+        }
+
+        $recs = (array) data_get($json, 'data.results', []);
+        if (! $recs) {
+            return ['registered' => false, 'dns_ok' => false, 'apex' => null, 'www' => null];
+        }
+
+        $apex = null;
+        $www = null;
+        $wwwCname = null;
+        foreach ($recs as $r) {
+            $type = (string) data_get($r, 'type');
+            $name = (string) data_get($r, 'name');
+            $val  = (string) data_get($r, 'value');
+            if ($type === 'A' && $name === $fqdn) {
+                $apex = $val;
+            } elseif ($type === 'A' && $name === 'www.' . $fqdn) {
+                $www = $val;
+            } elseif ($type === 'CNAME' && $name === 'www.' . $fqdn) {
+                $wwwCname = $val;
+            }
+        }
+
+        // www is goed als er een A → VPS is, of een CNAME naar de (correcte) apex.
+        $wwwOk = ($www === $ip) || ($wwwCname === $fqdn && $apex === $ip);
+        $dnsOk = ($apex === $ip) && $wwwOk;
+
+        return ['registered' => true, 'dns_ok' => $dnsOk, 'apex' => $apex, 'www' => $www ?: $wwwCname];
+    }
+
+    /**
      * Hoog-niveau: registreer het domein en zet meteen de DNS-zone naar de VPS.
      * @return array{domain:string,domain_id:int,ip:string,registered_at:string}
      */
