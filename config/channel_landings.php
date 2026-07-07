@@ -52,4 +52,16 @@ return [
     'camperservice'              => 'camperservice_landings',
     'motorzaak'                  => 'motorzaak_landings',
     'uitlaat-remmen'             => 'uitlaat-remmen_landings',
+
+    // Batch agrarisch_dieren
+    'dierenarts'                 => 'dierenarts_landings',
+    'dierenpension'              => 'dierenpension_landings',
+    'manege'                     => 'manege_landings',
+    'hoefsmid'                   => 'hoefsmid_landings',
+    'hondentrimsalon'            => 'hondentrimsalon_landings',
+    'paardenfysio'               => 'paardenfysio_landings',
+    'kwekerij'                   => 'kwekerij_landings',
+    'boerderijwinkel'            => 'boerderijwinkel_landings',
+    'imkerij'                    => 'imkerij_landings',
+    'loonbedrijf'                => 'loonbedrijf_landings',
 ];
