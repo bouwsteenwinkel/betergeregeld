@@ -64,4 +64,11 @@ return [
     'boerderijwinkel'            => 'boerderijwinkel_landings',
     'imkerij'                    => 'imkerij_landings',
     'loonbedrijf'                => 'loonbedrijf_landings',
+
+    // Restant (bestaande sites onder correcte branche-keys)
+    'airco-installateur'         => 'airco-installateur_landings',
+    'apk-keuringsstation'        => 'apk-keuringsstation_landings',
+    'car-detailing'              => 'car-detailing_landings',
+    'elektricien'                => 'elektricien_landings',
+    'warmtepomp-installateur'    => 'warmtepomp-installateur_landings',
 ];
