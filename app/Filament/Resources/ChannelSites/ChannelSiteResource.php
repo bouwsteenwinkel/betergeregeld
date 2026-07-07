@@ -162,6 +162,15 @@ class ChannelSiteResource extends Resource
                 SelectFilter::make('status')->options(['draft' => 'Concept', 'live' => 'Live']),
                 SelectFilter::make('channel_branche_id')->label('Branche')
                     ->relationship('branche', 'name'),
+                SelectFilter::make('lead_branche')->label('Lead branche')
+                    ->options(\App\Models\WebsiteLead::BRANCHES)
+                    ->query(fn (\Illuminate\Database\Eloquent\Builder $query, array $data) => $query->when(
+                        $data['value'] ?? null,
+                        fn (\Illuminate\Database\Eloquent\Builder $q, $v) => $q->whereHas(
+                            'branche',
+                            fn (\Illuminate\Database\Eloquent\Builder $b) => $b->where('lead_branche', $v),
+                        ),
+                    )),
             ])
             ->recordUrl(fn (Site $r) => EditChannelSite::getUrl(['record' => $r]))
             ->defaultSort('name');
