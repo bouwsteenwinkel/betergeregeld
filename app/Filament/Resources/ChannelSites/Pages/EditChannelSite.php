@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ChannelSites\Pages;
 
 use App\Filament\Resources\ChannelSites\ChannelSiteResource;
+use App\Services\ChannelSites\GoLiveOrchestrator;
 use App\Services\OpenProvider\OpenProviderClient;
 use App\Services\Plesk\PleskClient;
 use App\Services\Seo\GscProvisioner;
@@ -18,6 +19,28 @@ class EditChannelSite extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            // Hele keten in één klik: OpenProvider (registratie + DNS) → Plesk
+            // (alias + Let's Encrypt) → status live → Google Search Console.
+            Action::make('goLive')
+                ->label('Volledig live')
+                ->icon('heroicon-m-rocket-launch')
+                ->color('success')
+                ->visible(fn () => filled($this->record->domain) && $this->record->status !== 'live')
+                ->requiresConfirmation()
+                ->modalHeading('Site volledig live zetten')
+                ->modalDescription(fn () => "Doorloopt in één keer: 1) domein {$this->record->domain} registreren + DNS bij OpenProvider, 2) Plesk-alias + Let's Encrypt, 3) status op live, 4) Google Search Console inregelen. Stap 1 registreert het domein en brengt kosten met zich mee. Draai dit op de VPS.")
+                ->modalSubmitActionLabel('Ja, volledig live')
+                ->action(function (): void {
+                    $res = app(GoLiveOrchestrator::class)->run($this->record);
+                    $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
+                    Notification::make()
+                        ->title($res['ok'] ? 'Site is volledig live' : 'Keten gestopt (zie stappen)')
+                        ->body($body)
+                        ->{$res['ok'] ? 'success' : 'warning'}()
+                        ->persistent()->send();
+                    $this->refreshFormData(['status', 'meta']);
+                }),
+
             Action::make('preview')
                 ->label('Bekijk site')
                 ->icon('heroicon-m-arrow-top-right-on-square')
