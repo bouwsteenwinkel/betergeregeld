@@ -248,8 +248,24 @@ class OpenProviderClient
         }
 
         $check = $this->checkAvailability($domain);
+
+        // Al geregistreerd? Waarschijnlijk van onszelf. Probeer de DNS-zone te
+        // verzekeren (idempotent): lukt dat, dan beheren wij het domein en is het
+        // "al gedaan"; lukt het niet, dan staat het niet in ons account.
         if (! $check['available']) {
-            throw new RuntimeException("Domein niet beschikbaar (status: {$check['status']}).");
+            try {
+                $this->configureDnsZone($domain, $ip);
+            } catch (RuntimeException $e) {
+                throw new RuntimeException("Domein '{$domain}' is al geregistreerd (status: {$check['status']}) en staat niet in ons OpenProvider-account.");
+            }
+
+            return [
+                'domain'        => $domain,
+                'domain_id'     => 0,
+                'ip'            => $ip,
+                'registered_at' => now()->toIso8601String(),
+                'already'       => true,
+            ];
         }
 
         $id = $this->registerDomain($domain);
@@ -260,6 +276,7 @@ class OpenProviderClient
             'domain_id'     => $id,
             'ip'            => $ip,
             'registered_at' => now()->toIso8601String(),
+            'already'       => false,
         ];
     }
 }

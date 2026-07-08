@@ -47,7 +47,9 @@ class GoLiveOrchestrator
                 $meta['openprovider'] = ['domain_id' => $r['domain_id'], 'ip' => $r['ip']];
                 $site->meta = $meta;
                 $site->save();
-                $steps['1. openprovider'] = "geregistreerd + DNS naar {$r['ip']}";
+                $steps['1. openprovider'] = ($r['already'] ?? false)
+                    ? 'was al geregistreerd; DNS gecontroleerd'
+                    : "geregistreerd + DNS naar {$r['ip']}";
             } else {
                 $steps['1. openprovider'] = 'al geregistreerd';
             }
@@ -59,6 +61,10 @@ class GoLiveOrchestrator
         // 2. Plesk: alias + Let's Encrypt
         try {
             $this->plesk->provisionAlias($domain);
+            $meta = (array) $site->meta;
+            $meta['plesk_provisioned_at'] = now()->toIso8601String();
+            $site->meta = $meta;
+            $site->save();
             $steps['2. plesk'] = "alias van {$this->plesk->parentDomain()} + Let's Encrypt";
         } catch (\Throwable $e) {
             $steps['2. plesk'] = 'FOUT: ' . $e->getMessage();
@@ -77,6 +83,12 @@ class GoLiveOrchestrator
         // 4. Search Console
         try {
             $g = $this->gsc->provision($site);
+            if ($g['ok']) {
+                $meta = (array) $site->meta;
+                $meta['gsc_provisioned_at'] = now()->toIso8601String();
+                $site->meta = $meta;
+                $site->save();
+            }
             foreach ($g['steps'] as $k => $v) {
                 $steps["4. search · {$k}"] = $v;
             }

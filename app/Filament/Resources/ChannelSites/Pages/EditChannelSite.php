@@ -74,9 +74,12 @@ class EditChannelSite extends EditRecord
                         $meta['openprovider'] = ['domain_id' => $result['domain_id'], 'ip' => $result['ip']];
                         $this->record->meta = $meta;
                         $this->record->save();
+                        $already = (bool) ($result['already'] ?? false);
                         Notification::make()
-                            ->title('Domein geregistreerd')
-                            ->body("{$result['domain']} geregistreerd en DNS naar {$result['ip']} gezet. Zet de site op 'live' zodra de DNS is doorgekomen.")
+                            ->title($already ? 'Domein was al geregistreerd' : 'Domein geregistreerd')
+                            ->body($already
+                                ? "{$result['domain']} stond al in ons OpenProvider-account; DNS gecontroleerd. Niets dubbel aangemaakt."
+                                : "{$result['domain']} geregistreerd en DNS naar {$result['ip']} gezet. Zet de site op 'live' zodra de DNS is doorgekomen.")
                             ->success()->send();
                         $this->refreshFormData(['meta']);
                     } catch (\Throwable $e) {
@@ -89,19 +92,24 @@ class EditChannelSite extends EditRecord
 
             // Plesk: domein als alias van betergeregeld.com + Let's Encrypt.
             Action::make('pleskAlias')
-                ->label('Plesk-alias + SSL')
+                ->label(fn () => filled(data_get($this->record->meta, 'plesk_provisioned_at')) ? 'Plesk-alias ✓ (opnieuw)' : 'Plesk-alias + SSL')
                 ->icon('heroicon-m-server')
-                ->color('warning')
+                ->color(fn () => filled(data_get($this->record->meta, 'plesk_provisioned_at')) ? 'gray' : 'warning')
                 ->visible(fn () => filled($this->record->domain))
                 ->requiresConfirmation()
                 ->modalHeading('Plesk-alias aanmaken + certificaat')
-                ->modalDescription(fn () => "Voegt {$this->record->domain} toe als domein-alias van betergeregeld.com in Plesk en (her)geeft het Let's Encrypt-certificaat uit. Draai dit op de VPS zelf (Plesk is daar bereikbaar).")
+                ->modalDescription(fn () => "Voegt {$this->record->domain} toe als domein-alias van betergeregeld.com in Plesk en (her)geeft het Let's Encrypt-certificaat uit. Idempotent: bestaat de alias al, dan wordt niets dubbel aangemaakt. Draai dit op de VPS zelf (Plesk is daar bereikbaar).")
                 ->modalSubmitActionLabel('Ja, aanmaken')
                 ->action(function (): void {
                     try {
                         $res = app(PleskClient::class)->provisionAlias((string) $this->record->domain);
+                        $meta = (array) $this->record->meta;
+                        $meta['plesk_provisioned_at'] = now()->toIso8601String();
+                        $this->record->meta = $meta;
+                        $this->record->save();
                         $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
                         Notification::make()->title('Plesk-alias ingeregeld')->body($body)->success()->persistent()->send();
+                        $this->refreshFormData(['meta']);
                     } catch (\Throwable $e) {
                         Notification::make()->title('Plesk-alias mislukt')->body($e->getMessage())->danger()->persistent()->send();
                     }
@@ -110,17 +118,24 @@ class EditChannelSite extends EditRecord
             // Google Search Console inregelen: verifieer (DNS-TXT via OpenProvider),
             // property toevoegen + sitemap indienen. Alleen bij een gekoppeld domein.
             Action::make('provisionGsc')
-                ->label('Search inregelen')
+                ->label(fn () => filled(data_get($this->record->meta, 'gsc_provisioned_at')) ? 'Search ✓ (opnieuw)' : 'Search inregelen')
                 ->icon('heroicon-m-magnifying-glass')
-                ->color('info')
+                ->color(fn () => filled(data_get($this->record->meta, 'gsc_provisioned_at')) ? 'gray' : 'info')
                 ->visible(fn () => filled($this->record->domain))
                 ->requiresConfirmation()
                 ->modalHeading('Google Search Console inregelen')
-                ->modalDescription(fn () => "Verifieert {$this->record->domain} via een DNS-TXT-record (OpenProvider), voegt de property toe in Search Console en dient de sitemap in. Alleen zinvol voor een live, bereikbaar domein waarvan de DNS in OpenProvider staat.")
+                ->modalDescription(fn () => "Verifieert {$this->record->domain} via een DNS-TXT-record (OpenProvider), voegt de property toe in Search Console en dient de sitemap in. Idempotent: al-geverifieerd/al-toegevoegd wordt overgeslagen. Alleen zinvol voor een live, bereikbaar domein waarvan de DNS in OpenProvider staat.")
                 ->modalSubmitActionLabel('Ja, inregelen')
                 ->action(function (): void {
                     try {
                         $res = app(GscProvisioner::class)->provision($this->record);
+                        if ($res['ok']) {
+                            $meta = (array) $this->record->meta;
+                            $meta['gsc_provisioned_at'] = now()->toIso8601String();
+                            $this->record->meta = $meta;
+                            $this->record->save();
+                            $this->refreshFormData(['meta']);
+                        }
                         $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
                         $n = Notification::make()
                             ->title($res['ok'] ? 'Search Console ingeregeld' : 'Nog niet compleet')

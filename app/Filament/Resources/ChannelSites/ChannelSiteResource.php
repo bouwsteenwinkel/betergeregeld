@@ -153,6 +153,13 @@ class ChannelSiteResource extends Resource
                         default => 'warning',
                     }),
 
+                IconColumn::make('sslDone')->label('SSL')->boolean()
+                    ->tooltip('Plesk-alias + Let\'s Encrypt gedaan')
+                    ->state(fn (Site $r) => filled(data_get($r->meta, 'plesk_provisioned_at'))),
+                IconColumn::make('searchDone')->label('Search')->boolean()
+                    ->tooltip('Google Search Console ingeregeld')
+                    ->state(fn (Site $r) => filled(data_get($r->meta, 'gsc_provisioned_at'))),
+
                 TextColumn::make('blocks_count')->label('Blokken')->counts('blocks')->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')->label('Gewijzigd')->since()->sortable()
