@@ -43,7 +43,10 @@ return [
     // de GEDEELDE document root (de httpdocs van de app). SSL loopt hierbij via
     // SSL It! auto-secure (Plesk-instelling), niet via de CLI-gateway.
     'domain_utility' => env('PLESK_DOMAIN_UTILITY', 'site'),
-    'shared_docroot' => env('PLESK_SHARED_DOCROOT', 'C:/inetpub/vhosts/betergeregeld.com/httpdocs'),
+    // RELATIEF t.o.v. de vhost-root van de subscription (C:\Inetpub\vhosts\
+    // betergeregeld.com\). 'httpdocs' = de docroot van de hoofdapp → gedeeld.
+    // (Een absoluut pad accepteert Plesk niet.)
+    'shared_docroot' => env('PLESK_SHARED_DOCROOT', 'httpdocs'),
 
     // Paneel-cert op :8443 is doorgaans self-signed → verificatie standaard uit.
     // Op productie (localhost) is dat veilig; zet op true met een geldige cert.
