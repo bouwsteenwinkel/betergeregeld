@@ -37,7 +37,9 @@ class GscProvisioner
 			return ['domain' => '', 'steps' => ['skip' => 'geen domein op deze site'], 'ok' => false];
 		}
 
-		$prop    = 'sc-domain:' . $domain;
+		// URL-prefix-property i.p.v. domein-property: sites.add (Webmasters v3)
+		// ondersteunt geen 'sc-domain:'. DNS-verificatie dekt ook de URL-prefix.
+		$prop    = 'https://' . $domain . '/';
 		$sitemap = 'https://' . $domain . '/sitemap.xml';
 
 		if ($site->status !== 'live') {
@@ -71,12 +73,16 @@ class GscProvisioner
 		// 4. property toevoegen
 		$a = $this->gsc->addSite($prop);
 		$addOk = in_array($a['status'], [200, 204], true);
-		$steps['add_site'] = $addOk ? 'toegevoegd' : "mislukt (status {$a['status']})";
+		$steps['add_site'] = $addOk
+			? "toegevoegd ({$prop})"
+			: "mislukt (status {$a['status']}): " . \Illuminate\Support\Str::limit(json_encode($a['json']), 180);
 
 		// 5. sitemap indienen
 		$s = $this->gsc->submitSitemap($prop, $sitemap);
 		$sitemapOk = in_array($s['status'], [200, 204], true);
-		$steps['sitemap'] = $sitemapOk ? 'ingediend' : "mislukt (status {$s['status']})";
+		$steps['sitemap'] = $sitemapOk
+			? 'ingediend'
+			: "mislukt (status {$s['status']}): " . \Illuminate\Support\Str::limit(json_encode($s['json']), 180);
 
 		return ['domain' => $domain, 'steps' => $steps, 'ok' => $addOk && $sitemapOk];
 	}
