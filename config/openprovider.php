@@ -38,4 +38,10 @@ return [
 
     // TTL voor de DNS-records (seconden).
     'ttl' => (int) env('OPENPROVIDER_TTL', 3600),
+
+    // Forceer IPv4 richting de OpenProvider-API (voor IP-whitelisting). Zet op
+    // false als de VPS OpenProvider alleen over IPv6 kan bereiken (dan het IPv6
+    // van de VPS whitelisten). Bij een IPv4-timeout vanaf de VPS: eerst testen
+    // met `curl -4` vs `curl -6 https://api.openprovider.eu/` op de VPS.
+    'force_ipv4' => (bool) env('OPENPROVIDER_FORCE_IPV4', true),
 ];

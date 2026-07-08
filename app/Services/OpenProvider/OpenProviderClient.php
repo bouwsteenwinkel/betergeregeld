@@ -48,7 +48,10 @@ class OpenProviderClient
     private function httpOptions(): array
     {
         $opts = [];
-        if (defined('CURLOPT_IPRESOLVE')) {
+        // IPv4 forceren zodat OpenProvider het gewhiteliste IPv4 ziet. Uit te zetten
+        // (OPENPROVIDER_FORCE_IPV4=false) als de VPS OpenProvider alleen over IPv6
+        // kan bereiken; whitelist dan wel het IPv6 van de VPS bij OpenProvider.
+        if ((bool) config('openprovider.force_ipv4', true) && defined('CURLOPT_IPRESOLVE')) {
             $opts['curl'] = [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4];
         }
         $ca = storage_path('cacert.pem');
