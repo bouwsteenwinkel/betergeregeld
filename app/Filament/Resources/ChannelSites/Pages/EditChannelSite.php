@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ChannelSites\Pages;
 
 use App\Filament\Resources\ChannelSites\ChannelSiteResource;
 use App\Services\OpenProvider\OpenProviderClient;
+use App\Services\Plesk\PleskClient;
 use App\Services\Seo\GscProvisioner;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -60,6 +61,26 @@ class EditChannelSite extends EditRecord
                             ->title('Registratie mislukt')
                             ->body($e->getMessage())
                             ->danger()->persistent()->send();
+                    }
+                }),
+
+            // Plesk: domein als alias van betergeregeld.com + Let's Encrypt.
+            Action::make('pleskAlias')
+                ->label('Plesk-alias + SSL')
+                ->icon('heroicon-m-server')
+                ->color('warning')
+                ->visible(fn () => filled($this->record->domain))
+                ->requiresConfirmation()
+                ->modalHeading('Plesk-alias aanmaken + certificaat')
+                ->modalDescription(fn () => "Voegt {$this->record->domain} toe als domein-alias van betergeregeld.com in Plesk en (her)geeft het Let's Encrypt-certificaat uit. Draai dit op de VPS zelf (Plesk is daar bereikbaar).")
+                ->modalSubmitActionLabel('Ja, aanmaken')
+                ->action(function (): void {
+                    try {
+                        $res = app(PleskClient::class)->provisionAlias((string) $this->record->domain);
+                        $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
+                        Notification::make()->title('Plesk-alias ingeregeld')->body($body)->success()->persistent()->send();
+                    } catch (\Throwable $e) {
+                        Notification::make()->title('Plesk-alias mislukt')->body($e->getMessage())->danger()->persistent()->send();
                     }
                 }),
 
