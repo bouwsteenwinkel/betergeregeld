@@ -33,7 +33,9 @@ class PleskPing extends Command
                 $this->line('  Beschikbare CLI-commando\'s: ' . count($ids));
                 $this->line('  Met "alias": ' . ($alias ? '<info>' . implode(', ', $alias) . '</info>' : '<comment>geen gevonden</comment>'));
                 if ($alias) {
-                    $this->line('  → Zet in .env:  PLESK_ALIAS_UTILITY=' . $alias[0]);
+                    // Domein-alias (domalias/dom...) verkiezen boven admin_alias.
+                    $preferred = array_values(array_filter($alias, fn ($id) => str_contains(strtolower($id), 'dom'))) ?: $alias;
+                    $this->line('  → Zet in .env:  PLESK_ALIAS_UTILITY=' . $preferred[0]);
                 }
             } else {
                 $this->line('  <comment>Kon de CLI-commandolijst niet ophalen (/api/v2/cli/commands).</comment>');
