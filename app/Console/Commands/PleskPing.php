@@ -29,14 +29,23 @@ class PleskPing extends Command
             // Exacte CLI-commandonamen ophalen — zoek de alias-utility.
             $ids = $plesk->listCommandIds();
             if ($ids) {
-                $alias = array_values(array_filter($ids, fn ($id) => str_contains(strtolower($id), 'alias')));
                 $this->line('  Beschikbare CLI-commando\'s: ' . count($ids));
-                $this->line('  Met "alias": ' . ($alias ? '<info>' . implode(', ', $alias) . '</info>' : '<comment>geen gevonden</comment>'));
+
+                $alias = array_values(array_filter($ids, fn ($id) => str_contains(strtolower($id), 'alias')));
+                $this->line('  Met "alias":  ' . ($alias ? '<info>' . implode(', ', $alias) . '</info>' : '<comment>geen</comment>'));
                 if ($alias) {
-                    // Domein-alias (domalias/dom...) verkiezen boven admin_alias.
                     $preferred = array_values(array_filter($alias, fn ($id) => str_contains(strtolower($id), 'dom'))) ?: $alias;
-                    $this->line('  → Zet in .env:  PLESK_ALIAS_UTILITY=' . $preferred[0]);
+                    $this->line('  → PLESK_ALIAS_UTILITY=' . $preferred[0]);
                 }
+
+                // Domein-/site-aanmaak-commando's (voor de aparte-domein-aanpak).
+                $domain = array_values(array_filter($ids, fn ($id) => (bool) preg_match('/^(site|domain|subdomain|webspace)/i', $id)
+                    || (bool) preg_match('/(site|domain|hosting|www|vhost)/i', $id)));
+                $this->line('  Domein/site: ' . ($domain ? '<info>' . implode(', ', $domain) . '</info>' : '<comment>geen</comment>'));
+
+                // SSL/Let's Encrypt-commando's.
+                $ssl = array_values(array_filter($ids, fn ($id) => (bool) preg_match('/ssl|cert|encrypt|sslit|secure/i', $id)));
+                $this->line('  SSL/cert:    ' . ($ssl ? '<info>' . implode(', ', $ssl) . '</info>' : '<comment>geen</comment>'));
             } else {
                 $this->line('  <comment>Kon de CLI-commandolijst niet ophalen (/api/v2/cli/commands).</comment>');
             }
