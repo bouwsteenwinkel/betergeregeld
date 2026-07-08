@@ -58,17 +58,26 @@ class GoLiveOrchestrator
             return ['ok' => false, 'steps' => $steps];
         }
 
-        // 2. Plesk: alias + Let's Encrypt
-        try {
-            $this->plesk->provisionAlias($domain);
-            $meta = (array) $site->meta;
-            $meta['plesk_provisioned_at'] = now()->toIso8601String();
-            $site->meta = $meta;
-            $site->save();
-            $steps['2. plesk'] = "alias van {$this->plesk->parentDomain()} + Let's Encrypt";
-        } catch (\Throwable $e) {
-            $steps['2. plesk'] = 'FOUT: ' . $e->getMessage();
-            return ['ok' => false, 'steps' => $steps];
+        // 2. Plesk: alias + Let's Encrypt (overslaan als al gedaan)
+        if (filled(data_get($site->meta, 'plesk_provisioned_at'))) {
+            $steps['2. plesk'] = 'al gedaan';
+        } else {
+            try {
+                $r = $this->plesk->provisionAlias($domain);
+                foreach ($r['steps'] as $k => $v) {
+                    $steps["2. plesk · {$k}"] = $v;
+                }
+                if (! $r['ok']) {
+                    return ['ok' => false, 'steps' => $steps]; // alias staat, SSL faalde → eerst fixen
+                }
+                $meta = (array) $site->meta;
+                $meta['plesk_provisioned_at'] = now()->toIso8601String();
+                $site->meta = $meta;
+                $site->save();
+            } catch (\Throwable $e) {
+                $steps['2. plesk'] = 'FOUT: ' . $e->getMessage();
+                return ['ok' => false, 'steps' => $steps];
+            }
         }
 
         // 3. Status op live
@@ -80,7 +89,11 @@ class GoLiveOrchestrator
             $steps['3. status'] = 'was al live';
         }
 
-        // 4. Search Console
+        // 4. Search Console (overslaan als al gedaan)
+        if (filled(data_get($site->meta, 'gsc_provisioned_at'))) {
+            $steps['4. search'] = 'al gedaan';
+            return ['ok' => true, 'steps' => $steps];
+        }
         try {
             $g = $this->gsc->provision($site);
             if ($g['ok']) {

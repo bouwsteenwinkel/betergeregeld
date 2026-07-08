@@ -103,13 +103,18 @@ class EditChannelSite extends EditRecord
                 ->action(function (): void {
                     try {
                         $res = app(PleskClient::class)->provisionAlias((string) $this->record->domain);
-                        $meta = (array) $this->record->meta;
-                        $meta['plesk_provisioned_at'] = now()->toIso8601String();
-                        $this->record->meta = $meta;
-                        $this->record->save();
+                        if ($res['ok']) {
+                            $meta = (array) $this->record->meta;
+                            $meta['plesk_provisioned_at'] = now()->toIso8601String();
+                            $this->record->meta = $meta;
+                            $this->record->save();
+                            $this->refreshFormData(['meta']);
+                        }
                         $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
-                        Notification::make()->title('Plesk-alias ingeregeld')->body($body)->success()->persistent()->send();
-                        $this->refreshFormData(['meta']);
+                        $n = Notification::make()
+                            ->title($res['ok'] ? 'Plesk-alias + SSL ingeregeld' : 'Alias OK, SSL nog niet gelukt')
+                            ->body($body);
+                        ($res['ok'] ? $n->success() : $n->warning())->persistent()->send();
                     } catch (\Throwable $e) {
                         Notification::make()->title('Plesk-alias mislukt')->body($e->getMessage())->danger()->persistent()->send();
                     }

@@ -197,12 +197,20 @@ class PleskClient
         $alias = $this->normalize($aliasDomain);
         $steps = [];
 
+        // Alias is de kritieke stap (gooit bij fout). Daarna SSL: een SSL-fout
+        // mag de alias-succes niet maskeren, dus die vangen we apart op.
         $this->addAlias($alias);
         $steps['alias'] = "toegevoegd als alias van {$this->parentDomain()}";
 
-        $this->reissueLetsEncrypt();
-        $steps['ssl'] = 'Let\'s Encrypt (her)uitgegeven';
+        try {
+            $this->reissueLetsEncrypt();
+            $steps['ssl'] = 'Let\'s Encrypt (her)uitgegeven';
+            $ok = true;
+        } catch (\Throwable $e) {
+            $steps['ssl'] = 'FOUT: ' . $e->getMessage();
+            $ok = false;
+        }
 
-        return ['alias' => $alias, 'steps' => $steps, 'ok' => true];
+        return ['alias' => $alias, 'steps' => $steps, 'ok' => $ok];
     }
 }

@@ -230,6 +230,33 @@ class ChannelSiteResource extends Resource
                         }
                     }),
             ])
+            ->toolbarActions([
+                // Bulk: geselecteerde sites in één keer volledig live. De keten is
+                // idempotent — al-voltooide stappen (domein/alias+SSL/live/search)
+                // worden per site overgeslagen. Sites zonder domein genegeerd.
+                \Filament\Actions\BulkAction::make('goLiveBulk')
+                    ->label('Volledig live (geselecteerd)')
+                    ->icon('heroicon-m-rocket-launch')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Geselecteerde sites volledig live zetten')
+                    ->modalDescription('Doorloopt per site de hele keten: OpenProvider-DNS → Plesk-alias + SSL → status live → Google Search Console. Stappen die al gedaan zijn, worden overgeslagen. Sites zonder domein worden genegeerd. Draai dit op de VPS; bij veel sites kan het even duren.')
+                    ->modalSubmitActionLabel('Ja, volledig live')
+                    ->action(function (\Illuminate\Support\Collection $records): void {
+                        $orch = app(\App\Services\ChannelSites\GoLiveOrchestrator::class);
+                        $ok = 0; $fail = 0; $skip = 0;
+                        foreach ($records as $site) {
+                            if (blank($site->domain)) { $skip++; continue; }
+                            $res = $orch->run($site);
+                            $res['ok'] ? $ok++ : $fail++;
+                        }
+                        \Filament\Notifications\Notification::make()
+                            ->title('Volledig live (bulk) klaar')
+                            ->body("{$ok} volledig · {$fail} onvolledig · {$skip} zonder domein. Zie per site de status-kolommen (SSL/Search) en knoppen.")
+                            ->{$fail === 0 ? 'success' : 'warning'}()
+                            ->persistent()->send();
+                    }),
+            ])
             ->recordUrl(fn (Site $r) => EditChannelSite::getUrl(['record' => $r]))
             ->defaultSort('name');
     }
