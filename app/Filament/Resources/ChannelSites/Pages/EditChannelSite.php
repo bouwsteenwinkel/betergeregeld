@@ -22,10 +22,10 @@ class EditChannelSite extends EditRecord
             // Hele keten in één klik: OpenProvider (registratie + DNS) → Plesk
             // (alias + Let's Encrypt) → status live → Google Search Console.
             Action::make('goLive')
-                ->label('Volledig live')
+                ->label(fn () => $this->record->status === 'live' ? '✓ Live (opnieuw)' : 'Volledig live')
                 ->icon('heroicon-m-rocket-launch')
-                ->color('success')
-                ->visible(fn () => filled($this->record->domain) && $this->record->status !== 'live')
+                ->color(fn () => $this->record->status === 'live' ? 'gray' : 'success')
+                ->visible(fn () => filled($this->record->domain))
                 ->requiresConfirmation()
                 ->modalHeading('Site volledig live zetten')
                 ->modalDescription(fn () => "Doorloopt in één keer: 1) domein {$this->record->domain} registreren + DNS bij OpenProvider, 2) Plesk-alias + Let's Encrypt, 3) status op live, 4) Google Search Console inregelen. Stap 1 registreert het domein en brengt kosten met zich mee. Draai dit op de VPS.")
@@ -50,13 +50,13 @@ class EditChannelSite extends EditRecord
             // Domein in 1 keer registreren bij OpenProvider + DNS (A-records) naar de VPS.
             // Alleen zichtbaar als er een domein is dat nog niet via ons geregistreerd is.
             Action::make('registerDomain')
-                ->label('Registreer domein')
+                ->label(fn () => filled(data_get($this->record->meta, 'domain_registered_at')) ? 'Domein ✓ (opnieuw)' : 'Registreer domein')
                 ->icon('heroicon-m-globe-alt')
-                ->color('success')
-                ->visible(fn () => filled($this->record->domain) && blank(data_get($this->record->meta, 'domain_registered_at')))
+                ->color(fn () => filled(data_get($this->record->meta, 'domain_registered_at')) ? 'gray' : 'success')
+                ->visible(fn () => filled($this->record->domain))
                 ->requiresConfirmation()
                 ->modalHeading('Domein registreren bij OpenProvider')
-                ->modalDescription(fn () => "Registreert {$this->record->domain} bij OpenProvider en zet de DNS (A-records @ en www) naar de VPS. Dit is definitief en brengt registratiekosten met zich mee.")
+                ->modalDescription(fn () => "Registreert {$this->record->domain} bij OpenProvider en zet de DNS (A-records @ en www) naar de VPS. Idempotent: is het domein al van ons, dan wordt niets dubbel geregistreerd (alleen de DNS gecontroleerd). Registratie brengt eenmalig kosten met zich mee.")
                 ->modalSubmitActionLabel('Ja, registreren')
                 ->action(function (): void {
                     $op = app(OpenProviderClient::class);

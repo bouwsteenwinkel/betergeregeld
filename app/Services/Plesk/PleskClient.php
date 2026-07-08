@@ -81,6 +81,33 @@ class PleskClient
     }
 
     /**
+     * De id's van beschikbare CLI-commando's (GET /api/v2/cli/commands),
+     * zodat we de exacte utility-naam (bv. voor aliassen) kunnen vinden.
+     *
+     * @return array<int,string>
+     */
+    public function listCommandIds(): array
+    {
+        try {
+            $resp = $this->http()->get(rtrim((string) config('plesk.base_url'), '/') . '/api/v2/cli/commands');
+            if (! $resp->successful()) {
+                return [];
+            }
+            $ids = [];
+            foreach ((array) $resp->json() as $c) {
+                $id = is_array($c) ? ($c['id'] ?? $c['name'] ?? null) : $c;
+                if (is_string($id) && $id !== '') {
+                    $ids[] = $id;
+                }
+            }
+            sort($ids);
+            return $ids;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
      * Draait een Plesk-CLI-utility via de REST-gateway.
      * POST /api/v2/cli/{utility}/call  body {"params": [...]}.
      *

@@ -25,6 +25,21 @@ class PleskPing extends Command
         if ($r['ok']) {
             $this->line("  <info>OK</info>  HTTP {$r['status']}  hostname={$r['hostname']}  versie={$r['version']}");
             $this->newLine();
+
+            // Exacte CLI-commandonamen ophalen — zoek de alias-utility.
+            $ids = $plesk->listCommandIds();
+            if ($ids) {
+                $alias = array_values(array_filter($ids, fn ($id) => str_contains(strtolower($id), 'alias')));
+                $this->line('  Beschikbare CLI-commando\'s: ' . count($ids));
+                $this->line('  Met "alias": ' . ($alias ? '<info>' . implode(', ', $alias) . '</info>' : '<comment>geen gevonden</comment>'));
+                if ($alias) {
+                    $this->line('  → Zet in .env:  PLESK_ALIAS_UTILITY=' . $alias[0]);
+                }
+            } else {
+                $this->line('  <comment>Kon de CLI-commandolijst niet ophalen (/api/v2/cli/commands).</comment>');
+            }
+
+            $this->newLine();
             $this->line('Verbinding werkt. Volgende: `php artisan plesk:alias <site>` op een live domein.');
             return self::SUCCESS;
         }
