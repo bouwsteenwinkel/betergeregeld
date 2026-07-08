@@ -33,6 +33,10 @@ return [
     // Hoofddomein/subscription waar de niche-domeinen als alias onder komen.
     'parent_domain' => env('PLESK_PARENT_DOMAIN', 'betergeregeld.com'),
 
+    // CLI-utility voor domein-aliassen (Plesk: `plesk bin site-alias`). Naam
+    // met koppelteken; aan te passen als jouw Plesk-versie afwijkt.
+    'alias_utility' => env('PLESK_ALIAS_UTILITY', 'site-alias'),
+
     // Paneel-cert op :8443 is doorgaans self-signed → verificatie standaard uit.
     // Op productie (localhost) is dat veilig; zet op true met een geldige cert.
     'verify_ssl' => (bool) env('PLESK_VERIFY_SSL', false),

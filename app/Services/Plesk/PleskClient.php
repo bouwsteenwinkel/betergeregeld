@@ -55,6 +55,32 @@ class PleskClient
     }
 
     /**
+     * Read-only check: bevestigt auth + bereikbaarheid van de Plesk-API.
+     * GET /api/v2/server geeft serverinfo terug (verandert niets).
+     *
+     * @return array{status:int, ok:bool, hostname:?string, version:?string, error:?string}
+     */
+    public function ping(): array
+    {
+        if (! $this->isConfigured()) {
+            return ['status' => 0, 'ok' => false, 'hostname' => null, 'version' => null, 'error' => 'Plesk niet geconfigureerd (.env).'];
+        }
+        try {
+            $resp = $this->http()->get(rtrim((string) config('plesk.base_url'), '/') . '/api/v2/server');
+            $j = (array) $resp->json();
+            return [
+                'status'   => $resp->status(),
+                'ok'       => $resp->successful(),
+                'hostname' => $j['hostname'] ?? null,
+                'version'  => $j['version'] ?? null,
+                'error'    => $resp->successful() ? null : (string) $resp->body(),
+            ];
+        } catch (\Throwable $e) {
+            return ['status' => 0, 'ok' => false, 'hostname' => null, 'version' => null, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Draait een Plesk-CLI-utility via de REST-gateway.
      * POST /api/v2/cli/{utility}/call  body {"params": [...]}.
      *
@@ -92,7 +118,7 @@ class PleskClient
         $alias  = $this->normalize($aliasDomain);
         $parent = $this->parentDomain();
 
-        $r = $this->cli('site_alias', [
+        $r = $this->cli((string) config('plesk.alias_utility', 'site-alias'), [
             '--create', $alias,
             '-domain', $parent,
             '-www', 'true',
