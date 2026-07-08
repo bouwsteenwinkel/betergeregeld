@@ -166,6 +166,60 @@ class PleskClient
     }
 
     /**
+     * Maakt een niche-domein aan als ADDON-domein binnen de betergeregeld.com-
+     * subscription, met de GEDEELDE document root (de app-httpdocs). Zo krijgt
+     * elk domein z'n eigen hosting (en dus eigen certificaat), terwijl ze dezelfde
+     * Laravel-app serveren (die op hostname routeert). Idempotent: bestaat het al,
+     * dan negeren we dat.
+     *
+     * SSL: via SSL It! auto-secure (Plesk-instelling), niet via deze gateway
+     * (die heeft geen sslit/Let's-Encrypt-commando).
+     */
+    public function createSharedDomain(string $domain): void
+    {
+        $d       = $this->normalize($domain);
+        $parent  = $this->parentDomain();
+        $docroot = (string) config('plesk.shared_docroot');
+
+        $r = $this->cli((string) config('plesk.domain_utility', 'site'), [
+            '--create', $d,
+            '-webspace-name', $parent,
+            '-hosting', 'true',
+            '-www-root', $docroot,
+            '-www', 'true',
+        ]);
+
+        if ($r['code'] !== 0) {
+            $msg = strtolower($r['stdout'] . ' ' . $r['stderr']);
+            if (str_contains($msg, 'already exist') || str_contains($msg, 'bestaat al')) {
+                return;
+            }
+            throw new RuntimeException('Addon-domein aanmaken mislukt: ' . trim($r['stdout'] . ' ' . $r['stderr']));
+        }
+    }
+
+    /**
+     * Hoog-niveau (aparte-domein-aanpak): addon-domein met gedeelde docroot.
+     * SSL wordt door SSL It! auto-secure geregeld.
+     *
+     * @return array{domain:string, steps:array<string,string>, ok:bool}
+     */
+    public function provisionSharedDomain(string $domain): array
+    {
+        $d = $this->normalize($domain);
+        $this->createSharedDomain($d);
+
+        return [
+            'domain' => $d,
+            'steps'  => [
+                'domein' => "addon-domein onder {$this->parentDomain()}, docroot " . config('plesk.shared_docroot'),
+                'ssl'    => 'via SSL It! auto-secure (Plesk-instelling)',
+            ],
+            'ok' => true,
+        ];
+    }
+
+    /**
      * (Her)uitgeven van het Let's Encrypt-certificaat via de SSL It!-extensie,
      * zodat de nieuw toegevoegde alias gedekt wordt. Standaard beveiligen we het
      * hoofddomein (dat de aliassen als SAN meeneemt); via config aan te passen.

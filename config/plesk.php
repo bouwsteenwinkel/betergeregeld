@@ -38,6 +38,13 @@ return [
     // accounts, niet voor domeinen. Aan te passen als jouw versie afwijkt.
     'alias_utility' => env('PLESK_ALIAS_UTILITY', 'domalias'),
 
+    // Aparte-domein-aanpak (schaalbaar, eigen cert per domein): utility voor het
+    // aanmaken van een addon-domein binnen de betergeregeld.com-subscription, plus
+    // de GEDEELDE document root (de httpdocs van de app). SSL loopt hierbij via
+    // SSL It! auto-secure (Plesk-instelling), niet via de CLI-gateway.
+    'domain_utility' => env('PLESK_DOMAIN_UTILITY', 'site'),
+    'shared_docroot' => env('PLESK_SHARED_DOCROOT', 'C:/inetpub/vhosts/betergeregeld.com/httpdocs'),
+
     // Paneel-cert op :8443 is doorgaans self-signed → verificatie standaard uit.
     // Op productie (localhost) is dat veilig; zet op true met een geldige cert.
     'verify_ssl' => (bool) env('PLESK_VERIFY_SSL', false),
