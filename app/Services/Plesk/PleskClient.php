@@ -203,8 +203,10 @@ class PleskClient
         $steps['alias'] = "toegevoegd als alias van {$this->parentDomain()}";
 
         try {
-            $this->reissueLetsEncrypt();
-            $steps['ssl'] = 'Let\'s Encrypt (her)uitgegeven';
+            // Per-domein certificaat (het niche-domein zelf), NIET als SAN op het
+            // betergeregeld.com-cert — dat schaalt niet (Let's Encrypt ~100 SAN's).
+            $this->reissueLetsEncrypt($alias);
+            $steps['ssl'] = "Let's Encrypt uitgegeven voor {$alias}";
             $ok = true;
         } catch (\Throwable $e) {
             $steps['ssl'] = 'FOUT: ' . $e->getMessage();
