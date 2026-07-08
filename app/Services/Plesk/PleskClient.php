@@ -145,10 +145,9 @@ class PleskClient
         $alias  = $this->normalize($aliasDomain);
         $parent = $this->parentDomain();
 
-        $r = $this->cli((string) config('plesk.alias_utility', 'site-alias'), [
+        $r = $this->cli((string) config('plesk.alias_utility', 'domalias'), [
             '--create', $alias,
             '-domain', $parent,
-            '-www', 'true',
             '-web', 'true',
             '-mail', 'false',
             '-dns', 'false',
@@ -186,7 +185,6 @@ class PleskClient
             '-webspace-name', $parent,
             '-hosting', 'true',
             '-www-root', $docroot,
-            '-www', 'true',
         ]);
 
         if ($r['code'] !== 0) {

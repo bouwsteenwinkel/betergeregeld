@@ -92,17 +92,17 @@ class EditChannelSite extends EditRecord
 
             // Plesk: domein als alias van betergeregeld.com + Let's Encrypt.
             Action::make('pleskAlias')
-                ->label(fn () => filled(data_get($this->record->meta, 'plesk_provisioned_at')) ? 'Plesk-alias ✓ (opnieuw)' : 'Plesk-alias + SSL')
+                ->label(fn () => filled(data_get($this->record->meta, 'plesk_provisioned_at')) ? 'Plesk-domein ✓ (opnieuw)' : 'Plesk-domein + SSL')
                 ->icon('heroicon-m-server')
                 ->color(fn () => filled(data_get($this->record->meta, 'plesk_provisioned_at')) ? 'gray' : 'warning')
                 ->visible(fn () => filled($this->record->domain))
                 ->requiresConfirmation()
-                ->modalHeading('Plesk-alias aanmaken + certificaat')
-                ->modalDescription(fn () => "Voegt {$this->record->domain} toe als domein-alias van betergeregeld.com in Plesk en (her)geeft het Let's Encrypt-certificaat uit. Idempotent: bestaat de alias al, dan wordt niets dubbel aangemaakt. Draai dit op de VPS zelf (Plesk is daar bereikbaar).")
+                ->modalHeading('Plesk-domein aanmaken (gedeelde docroot)')
+                ->modalDescription(fn () => "Maakt {$this->record->domain} aan als addon-domein onder betergeregeld.com met de gedeelde app-docroot, zodat het z'n eigen certificaat krijgt. Idempotent: bestaat het al, dan wordt niets dubbel aangemaakt. SSL loopt via SSL It! auto-secure. Draai dit op de VPS.")
                 ->modalSubmitActionLabel('Ja, aanmaken')
                 ->action(function (): void {
                     try {
-                        $res = app(PleskClient::class)->provisionAlias((string) $this->record->domain);
+                        $res = app(PleskClient::class)->provisionSharedDomain((string) $this->record->domain);
                         if ($res['ok']) {
                             $meta = (array) $this->record->meta;
                             $meta['plesk_provisioned_at'] = now()->toIso8601String();
@@ -111,12 +111,9 @@ class EditChannelSite extends EditRecord
                             $this->refreshFormData(['meta']);
                         }
                         $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
-                        $n = Notification::make()
-                            ->title($res['ok'] ? 'Plesk-alias + SSL ingeregeld' : 'Alias OK, SSL nog niet gelukt')
-                            ->body($body);
-                        ($res['ok'] ? $n->success() : $n->warning())->persistent()->send();
+                        Notification::make()->title('Plesk-domein ingeregeld')->body($body)->success()->persistent()->send();
                     } catch (\Throwable $e) {
-                        Notification::make()->title('Plesk-alias mislukt')->body($e->getMessage())->danger()->persistent()->send();
+                        Notification::make()->title('Plesk-domein mislukt')->body($e->getMessage())->danger()->persistent()->send();
                     }
                 }),
 

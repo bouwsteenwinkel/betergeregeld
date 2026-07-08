@@ -63,7 +63,9 @@ class GoLiveOrchestrator
             $steps['2. plesk'] = 'al gedaan';
         } else {
             try {
-                $r = $this->plesk->provisionAlias($domain);
+                // Aparte-domein-aanpak (schaalbaar, eigen cert per domein via SSL It!
+                // auto-secure). Addon-domein onder betergeregeld.com met gedeelde docroot.
+                $r = $this->plesk->provisionSharedDomain($domain);
                 foreach ($r['steps'] as $k => $v) {
                     $steps["2. plesk · {$k}"] = $v;
                 }
