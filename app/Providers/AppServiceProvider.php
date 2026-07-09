@@ -17,6 +17,21 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // Filament/Livewire rendert full-page componenten ín een layout en roept
+        // daarbij intern file_exists() aan op een template-string. Draait de server
+        // met open_basedir aan (Plesk/IIS), dan geeft file_exists() een PHP-warning
+        // die Laravel's error-handler tot een fatale ErrorException promoveert → 500
+        // op /admin (de publieke channel-sites raken dit pad niet). We vangen puur
+        // die ene open_basedir-warning af zodat file_exists() gewoon false teruggeeft
+        // en Livewire de layout inline rendert — al het andere gaat ongewijzigd door
+        // naar de vorige (Laravel-)handler.
+        $previous = set_error_handler(function (int $level, string $message, string $file = '', int $line = 0) use (&$previous) {
+            if (str_contains($message, 'open_basedir')) {
+                return true;
+            }
+            return $previous ? ($previous)($level, $message, $file, $line) : false;
+        });
+
         // Quality-scan services: interface → implementatie (mockbaar in tests).
         $this->app->bind(
             \App\Services\QualityScan\Contracts\PageFetcherInterface::class,
