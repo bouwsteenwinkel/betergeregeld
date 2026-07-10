@@ -111,7 +111,11 @@ class EditChannelSite extends EditRecord
                             $this->refreshFormData(['meta']);
                         }
                         $body = collect($res['steps'])->map(fn ($v, $k) => "• {$k}: {$v}")->implode("\n");
-                        Notification::make()->title('Plesk-domein ingeregeld')->body($body)->success()->persistent()->send();
+                        $n = Notification::make()
+                            ->title($res['ok'] ? 'Plesk-domein ingeregeld (incl. SSL)' : 'Domein aangemaakt — SSL MISLUKT')
+                            ->body($body)->persistent();
+                        $res['ok'] ? $n->success() : $n->warning();
+                        $n->send();
                     } catch (\Throwable $e) {
                         Notification::make()->title('Plesk-domein mislukt')->body($e->getMessage())->danger()->persistent()->send();
                     }

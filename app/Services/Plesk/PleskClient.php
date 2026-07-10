@@ -205,16 +205,27 @@ class PleskClient
     public function provisionSharedDomain(string $domain): array
     {
         $d = $this->normalize($domain);
-        $this->createSharedDomain($d);
+        $steps = [];
 
-        return [
-            'domain' => $d,
-            'steps'  => [
-                'domein' => "addon-domein onder {$this->parentDomain()}, docroot " . config('plesk.shared_docroot'),
-                'ssl'    => 'via SSL It! auto-secure (Plesk-instelling)',
-            ],
-            'ok' => true,
-        ];
+        // Domein aanmaken is de kritieke stap (gooit bij fout).
+        $this->createSharedDomain($d);
+        $steps['domein'] = "addon-domein onder {$this->parentDomain()}, docroot " . config('plesk.shared_docroot');
+
+        // SSL ACTIEF uitgeven via SSL It! (i.p.v. blind vertrouwen op auto-secure).
+        // Een SSL-fout mag het domein-succes niet maskeren, dus apart opvangen én
+        // eerlijk in de stap rapporteren (geen valse "gedaan"-melding meer).
+        $ok = true;
+        try {
+            $this->reissueLetsEncrypt($d);
+            $steps['ssl'] = "Let's Encrypt uitgegeven voor {$d}"
+                . (config('plesk.letsencrypt_include_www') ? ' (incl. www)' : '');
+        } catch (\Throwable $e) {
+            $steps['ssl'] = 'FOUT — cert NIET uitgegeven: ' . $e->getMessage()
+                . ' — geef handmatig uit via Plesk → SSL It! → Beveiligen.';
+            $ok = false;
+        }
+
+        return ['domain' => $d, 'steps' => $steps, 'ok' => $ok];
     }
 
     /**
