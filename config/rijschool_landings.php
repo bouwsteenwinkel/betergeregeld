@@ -5,10 +5,9 @@
  * Zelfde structuur als config/badkamer_landings.php, met teksten en diensten
  * die op een autorijschool slaan.
  *
- * NB: nog GEEN 'imageSlot' per facet — zolang die ontbreekt toont de
- * "zo-kan-het-worden"-sectie de CSS-mockup (met de rijschool-hero als banner).
- * Zodra er echte mockup-beelden zijn: plaats ze als slot 'website-preview',
- * 'webshop-preview', enz. en voeg per facet 'imageSlot' toe (net als badkamer).
+ * Elke facet heeft een 'imageSlot' ({facet}-preview) → de "zo-kan-het-worden"-
+ * sectie toont het echte preview-beeld uit channel-media/rijschool/, met de
+ * CSS-mockup als terugval zolang een beeld ontbreekt.
  */
 
 return [
@@ -31,6 +30,7 @@ return [
             ['title' => 'Aanmeldingen blijven uit', 'text' => 'Zonder een duidelijke aanmeldknop haakt een geïnteresseerde af. Elke gemiste aanmelding is een leerling die je maanden had kunnen lesgeven.'],
         ],
         'zkhw' => [
+            'imageSlot'    => 'website-preview',
             'label'        => 'Website',
             'title'        => 'Zo kan het worden: je rijschool professioneel online',
             'intro'        => 'Een leerling kiest een rijschool die betrouwbaar oogt en makkelijk te bereiken is. Je site laat je slagingspercentage, je lesauto\'s en echte reviews zien, met een duidelijke aanmeldknop. We hebben een compleet voorbeeld klaargezet. Klik erdoorheen en stel je voor dat het je eigen rijschool is.',
@@ -67,6 +67,7 @@ return [
             ['title' => 'Cadeaubonnen loop je mis', 'text' => 'Een rijbewijs is een populair cadeau. Met een webshop verkoop je bonnen die je nu misloopt.'],
         ],
         'zkhw' => [
+            'imageSlot'    => 'webshop-preview',
             'label'        => 'Webshop',
             'title'        => 'Zo kan het worden: je lespakketten 24/7 te koop',
             'intro'        => 'Naast lesgeven ook online verkopen? Leerlingen kiezen zelf een lespakket, theoriecursus of cadeaubon, betalen met iDEAL en staan meteen in je administratie. Bekijk hoe jouw aanbod online staat.',
@@ -105,6 +106,7 @@ return [
             ['title' => 'Lessen plannen kost heen-en-weer', 'text' => 'Laat de leerling zelf een moment kiezen dat ook in jouw agenda past.'],
         ],
         'zkhw' => [
+            'imageSlot'    => 'klantenportaal-preview',
             'label'        => 'Leerlingportaal',
             'title'        => 'Zo kan het worden: leerlingen regelen het zelf',
             'intro'        => 'Leerlingen plannen zelf hun lessen, volgen hun voortgang per onderdeel en vinden facturen en hun examendatum in een eigen omgeving. Dat scheelt jou telefoontjes en geapp. Bekijk het voorbeeld van zo\'n leerlingportaal.',
@@ -143,6 +145,7 @@ return [
             ['title' => 'Dubbel werk tussen je systemen', 'text' => 'Aanmelding, planning en boekhouding apart bijhouden? Die kunnen met elkaar praten.'],
         ],
         'zkhw' => [
+            'imageSlot'    => 'automatisering-preview',
             'label'        => 'Automatisering',
             'title'        => 'Zo kan het worden: papierwerk dat zichzelf doet',
             'intro'        => 'Facturen, herinneringen en planning kosten je nu uren. Laat de techniek dat overnemen: een aanmelding wordt een leerlingdossier, facturen en herinneringen gaan vanzelf, en alles staat gekoppeld. Bekijk hoe de back-office voor je werkt.',
@@ -181,6 +184,7 @@ return [
             ['title' => 'Reviews vragen vergeet je', 'text' => 'Na het slagen vraagt de assistent automatisch om een Google-review.'],
         ],
         'zkhw' => [
+            'imageSlot'    => 'ai-preview',
             'label'        => 'AI',
             'title'        => 'Zo kan het worden: een assistent die nooit een aanmelding mist',
             'intro'        => 'Zit je in de auto, dan kun je niet opnemen, en is de leerling vaak al weg. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en plant een proefles in, dag en nacht. Bekijk hoe dat werkt bij een rijschool.',
