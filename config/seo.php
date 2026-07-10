@@ -16,4 +16,16 @@ return [
      * na `config:cache` blijft werken (kale env() geeft dan null).
      */
     'psi_api_key' => env('PSI_API_KEY'),
+
+    /*
+     * Google-accounts (e-mail) die als delegated owner aan elke channel-site-
+     * GSC-property worden toegevoegd. Het service-account blijft de technische
+     * eigenaar (voor de daily-import); deze mensen zien de property daarnaast in
+     * hun EIGEN Search Console. Komma-gescheiden.
+     *   GSC_OWNER_EMAILS=info@bouwsteenwinkel.nl,collega@voorbeeld.nl
+     */
+    'gsc_owner_emails' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('GSC_OWNER_EMAILS', ''))
+    ))),
 ];

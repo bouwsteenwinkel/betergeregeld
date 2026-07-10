@@ -55,14 +55,60 @@ class GoogleSiteVerificationClient
 	/** Is dit domein al als INET_DOMAIN geverifieerd door ons service-account? */
 	public function isVerified(string $domain): bool
 	{
+		return $this->findWebResource($domain) !== null;
+	}
+
+	/**
+	 * Voegt e-mailadressen toe als delegated owner van de geverifieerde property,
+	 * zodat die accounts het domein óók in hun eigen Search Console zien (het
+	 * service-account blijft technisch eigenaar). Idempotent: al-eigenaars worden
+	 * overgeslagen. Vereist dat het domein al geverifieerd is.
+	 *
+	 * @param  string[] $emails
+	 * @return array{status:int, added:string[], already?:bool, skipped?:bool, json?:array|null}
+	 */
+	public function addOwners(string $domain, array $emails): array
+	{
+		$emails = array_values(array_filter(array_map('trim', $emails)));
+		if ($emails === []) {
+			return ['status' => 0, 'added' => [], 'skipped' => true];
+		}
+
+		$resource = $this->findWebResource($domain);
+		if ($resource === null) {
+			throw new RuntimeException("Kan geen eigenaar toevoegen: {$domain} is (nog) niet geverifieerd bij het service-account.");
+		}
+
+		$current = array_map('strtolower', (array) data_get($resource, 'owners', []));
+		$toAdd   = array_values(array_filter($emails, fn ($e) => ! in_array(strtolower($e), $current, true)));
+		if ($toAdd === []) {
+			return ['status' => 200, 'added' => [], 'already' => true];
+		}
+
+		$id     = (string) data_get($resource, 'id');
+		$owners = array_values(array_unique(array_merge((array) data_get($resource, 'owners', []), $toAdd)));
+
+		// webResource.update: PUT mét body (de volledige resource + nieuwe owners).
+		$resp = $this->http()->put(self::API_BASE . '/webResource/' . rawurlencode($id), [
+			'id'     => $id,
+			'site'   => data_get($resource, 'site'),
+			'owners' => $owners,
+		]);
+
+		return ['status' => $resp->status(), 'added' => $toAdd, 'json' => $resp->json()];
+	}
+
+	/** De geverifieerde webResource (id/site/owners) voor dit INET_DOMAIN, of null. */
+	private function findWebResource(string $domain): ?array
+	{
 		$resp = $this->http()->get(self::API_BASE . '/webResource');
 		foreach ((array) data_get($resp->json(), 'items', []) as $item) {
 			if ((string) data_get($item, 'site.type') === 'INET_DOMAIN'
 				&& (string) data_get($item, 'site.identifier') === $domain) {
-				return true;
+				return (array) $item;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	private function http()

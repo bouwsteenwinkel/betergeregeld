@@ -92,6 +92,20 @@ class GscProvisioner
 			? 'ingediend'
 			: "mislukt (status {$s['status']}): " . \Illuminate\Support\Str::limit(json_encode($s['json']), 180);
 
+		// 6. mede-eigenaars: voeg de eigen Google-accounts toe als delegated owner
+		// zodat de property ook in hún Search Console verschijnt. Niet-fataal.
+		$owners = (array) config('seo.gsc_owner_emails', []);
+		if ($owners !== []) {
+			try {
+				$o = $this->verify->addOwners($domain, $owners);
+				$steps['owners'] = ! empty($o['added'])
+					? 'toegevoegd: ' . implode(', ', $o['added'])
+					: (($o['skipped'] ?? false) ? 'geen ingesteld' : 'al eigenaar');
+			} catch (\Throwable $e) {
+				$steps['owners'] = 'mislukt: ' . $e->getMessage();
+			}
+		}
+
 		return ['domain' => $domain, 'steps' => $steps, 'ok' => $addOk && $sitemapOk];
 	}
 }
