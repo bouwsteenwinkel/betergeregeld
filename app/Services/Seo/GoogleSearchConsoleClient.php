@@ -78,11 +78,14 @@ class GoogleSearchConsoleClient
 	{
 		$token = $this->auth->accessToken(GoogleApiAuth::RW_SCOPE);
 
+		// sites.add is een PUT ZONDER body; ->put() zou een lege JSON-body ([])
+		// meesturen → Google 400 "Root element must be a message". ->send() laat
+		// de body weg.
 		$resp = Http::withToken($token)
 			->timeout(30)
 			->acceptJson()
 			->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
-			->put(self::API_BASE . '/sites/' . rawurlencode($siteUrl));
+			->send('PUT', self::API_BASE . '/sites/' . rawurlencode($siteUrl));
 
 		return ['status' => $resp->status(), 'json' => $resp->json()];
 	}
@@ -97,11 +100,12 @@ class GoogleSearchConsoleClient
 	{
 		$token = $this->auth->accessToken(GoogleApiAuth::RW_SCOPE);
 
+		// Ook een PUT zonder body → ->send() i.p.v. ->put() (zie addSite()).
 		$resp = Http::withToken($token)
 			->timeout(30)
 			->acceptJson()
 			->withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
-			->put(self::API_BASE . '/sites/' . rawurlencode($siteUrl) . '/sitemaps/' . rawurlencode($feedpath));
+			->send('PUT', self::API_BASE . '/sites/' . rawurlencode($siteUrl) . '/sitemaps/' . rawurlencode($feedpath));
 
 		return ['status' => $resp->status(), 'json' => $resp->json()];
 	}

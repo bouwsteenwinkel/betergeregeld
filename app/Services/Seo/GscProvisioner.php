@@ -58,14 +58,22 @@ class GscProvisioner
 			$token = $this->verify->getDnsToken($domain);
 			$steps['token'] = 'opgehaald';
 
-			$this->op->addTxtRecord($domain, $token);
-			$steps['dns_txt'] = 'geplaatst via OpenProvider';
+			// TXT plaatsen via OpenProvider. Staat de DNS-zone daar niet (domein
+			// beheerd bij een andere provider), dan faalt dit — geen showstopper:
+			// toon de TXT-waarde zodat 'ie handmatig geplaatst kan worden en draai
+			// daarna opnieuw. De verify hieronder slaagt zodra het record live is.
+			try {
+				$this->op->addTxtRecord($domain, $token);
+				$steps['dns_txt'] = 'geplaatst via OpenProvider';
+			} catch (\Throwable $e) {
+				$steps['dns_txt'] = 'HANDMATIG plaatsen (OpenProvider: ' . $e->getMessage() . ') → TXT op @ met waarde: ' . $token;
+			}
 
 			$v = $this->verify->verify($domain);
 			if (in_array($v['status'], [200, 201], true)) {
 				$steps['verify'] = 'geslaagd';
 			} else {
-				$steps['verify'] = "pending (status {$v['status']}) — DNS propageert nog, draai later opnieuw";
+				$steps['verify'] = "pending (status {$v['status']}) — TXT nog niet zichtbaar (DNS propageert of nog niet geplaatst); draai later opnieuw";
 				return ['domain' => $domain, 'steps' => $steps, 'ok' => false];
 			}
 		}
