@@ -38,25 +38,39 @@ class GoLiveOrchestrator
             return ['ok' => false, 'steps' => ['domein' => 'ontbreekt op deze site']];
         }
 
-        // 1. OpenProvider: registreren + DNS (idempotent op meta.domain_registered_at)
+        // 1. OpenProvider: registreren + DNS-zone (idempotent op meta.domain_registered_at).
+        //    Registratie/zone-config is één keer; de skip-marker betekent NIET dat het
+        //    domein al live is (.nl is async + propageert). Daarom checken we hierna
+        //    ELKE run of het publiek resolvet, en gaan we pas verder als dat klopt.
+        $ip = (string) config('openprovider.target_ip');
         try {
             if (blank(data_get($site->meta, 'domain_registered_at'))) {
                 $r = $this->op->registerWithDns($domain);
+                $ip   = $r['ip'] ?: $ip;
                 $meta = (array) $site->meta;
                 $meta['domain_registered_at'] = $r['registered_at'];
                 $meta['openprovider'] = ['domain_id' => $r['domain_id'], 'ip' => $r['ip']];
                 $site->meta = $meta;
                 $site->save();
-                $steps['1. openprovider'] = ($r['already'] ?? false)
-                    ? 'was al geregistreerd; DNS gecontroleerd'
-                    : "geregistreerd + DNS naar {$r['ip']}";
-            } else {
-                $steps['1. openprovider'] = 'al geregistreerd';
             }
         } catch (\Throwable $e) {
             $steps['1. openprovider'] = 'FOUT: ' . $e->getMessage();
             return ['ok' => false, 'steps' => $steps];
         }
+
+        // 1b. HARDE verificatie: resolvet apex + www echt naar de VPS? Zo niet, stop de
+        //     keten hier (anders faalt Let's Encrypt gegarandeerd op "authorization").
+        //     De registratie-marker blijft staan, dus opnieuw draaien hervat vanaf hier
+        //     zodra de DNS gepropageerd is (meestal enkele minuten tot uren bij een
+        //     verse .nl-registratie).
+        $dns = $this->op->dnsResolvesToTarget($domain, $ip);
+        if (! $dns['ok']) {
+            $steps['1. openprovider'] = "geregistreerd, maar DNS is nog NIET actief "
+                . "(apex={$dns['apex']}, www={$dns['www']}; verwacht {$ip}). "
+                . 'Domein propageert nog of delegatie/ns-group klopt niet — draai opnieuw zodra het resolvet.';
+            return ['ok' => false, 'steps' => $steps];
+        }
+        $steps['1. openprovider'] = "geregistreerd + DNS actief naar {$ip} (apex + www geverifieerd)";
 
         // 2. Plesk: alias + Let's Encrypt (overslaan als al gedaan)
         if (filled(data_get($site->meta, 'plesk_provisioned_at'))) {

@@ -237,7 +237,41 @@ class OpenProviderClient
     }
 
     /**
+     * PUBLIEKE DNS-verificatie: resolvet apex ÉN www echt naar $ip?
+     * Gebruikt de systeem-resolver (publieke DNS), niet ons OpenProvider-account —
+     * dít is de enige betrouwbare check dat een net-geregistreerd/gedelegeerd domein
+     * daadwerkelijk live is. Een net geregistreerd .nl-domein propageert niet direct,
+     * dus vlak na registratie is dit doorgaans (nog) false — dat is de bedoeling.
+     *
+     * @return array{ok:bool, apex:string, www:string}
+     */
+    public function dnsResolvesToTarget(string $domain, ?string $ip = null): array
+    {
+        $ip   = $ip ?: (string) config('openprovider.target_ip');
+        $d    = $this->splitDomain($domain);
+        $fqdn = $d['name'] . '.' . $d['extension'];
+
+        $apex = $this->resolveA($fqdn);
+        $www  = $this->resolveA('www.' . $fqdn);
+
+        return [
+            'ok'   => in_array($ip, $apex, true) && in_array($ip, $www, true),
+            'apex' => $apex ? implode(',', $apex) : '—',
+            'www'  => $www ? implode(',', $www) : '—',
+        ];
+    }
+
+    /** A-records (IPv4) van een host via de publieke resolver; [] bij NXDOMAIN/geen A. */
+    private function resolveA(string $host): array
+    {
+        $recs = @dns_get_record($host, DNS_A) ?: [];
+        return array_values(array_filter(array_map(fn ($r) => $r['ip'] ?? null, $recs)));
+    }
+
+    /**
      * Hoog-niveau: registreer het domein en zet meteen de DNS-zone naar de VPS.
+     * NB: dit garandeert NIET dat het domein al publiek resolvet (.nl is async +
+     * propagatie). Verifieer daarna met dnsResolvesToTarget() vóór je verder gaat.
      * @return array{domain:string,domain_id:int,ip:string,registered_at:string}
      */
     public function registerWithDns(string $domain, ?string $ip = null): array
