@@ -32,7 +32,11 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 43200), // 30 dagen (was 120 min)
+    // Sessieduur hard op minimaal 30 dagen (43200 min), ongeacht een eventuele
+    // kortere SESSION_LIFETIME in de productie-.env. Een langere .env-waarde mag
+    // nog wel: env kan alleen verlengen, niet verkorten onder 30 dagen. Zo blijft
+    // ook de Filament-admin lang ingelogd zonder .env-aanpassing.
+    'lifetime' => max(43200, (int) env('SESSION_LIFETIME', 43200)),
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
