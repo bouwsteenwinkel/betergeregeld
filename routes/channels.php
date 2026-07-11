@@ -67,6 +67,15 @@ $channelRoutes = function () use ($facetKeys) {
         Route::get('/{facet}', [ChannelSiteController::class, 'home'])->where('facet', $facetKeys);
         Route::get('/{facet}/fragment', [ChannelSiteController::class, 'homeFragment'])->where('facet', $facetKeys);
     }
+
+    // Vangnet: elk overig pad op een channel-domein blijft BINNEN de channel en
+    // toont nooit de hoofd-site (betergeregeld.com). Staat bewust als laatste, zodat
+    // alle specifieke routes hierboven eerst matchen. Omdat de channel-domeingroepen
+    // in web.php vóór de domein-loze hoofd-routes worden ge-require'd, wint deze
+    // greedy catch-all van de hoofd-routes (/nl, /en, /afspraak, …) op een channel-
+    // domein. (Route::fallback zou hier NIET werken: de hoofd-/nl-route is een gewone
+    // route die eerder matcht dan een fallback-route.)
+    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '.*');
 };
 
 // 1) Live kanalen op hun eigen domein.

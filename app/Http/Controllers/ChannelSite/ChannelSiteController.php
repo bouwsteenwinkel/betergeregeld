@@ -450,6 +450,16 @@ class ChannelSiteController extends Controller
         return view('channels.lead-sent', ['site' => $this->site()]);
     }
 
+    /**
+     * Vangnet voor onbekende paden op een channel-domein. Retourneert een 404 in
+     * de eigen huisstijl i.p.v. door te vallen naar de hoofd-site (betergeregeld.com);
+     * zie de catch-all onderaan de channel-routegroep in routes/channels.php.
+     */
+    public function notFound(): \Illuminate\Http\Response
+    {
+        return response()->view('channels.not-found', ['site' => $this->site()], 404);
+    }
+
     private function notifyInternal(WebsiteLead $lead, ChannelSite $site): void
     {
         try {
