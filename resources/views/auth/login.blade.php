@@ -26,7 +26,7 @@
 			</div>
 
 			<label class="flex items-center gap-2 text-sm text-[color:var(--color-ink-muted)]">
-				<input type="checkbox" name="remember" value="1" class="rounded border-[color:var(--color-line)] accent-[color:var(--color-accent)]">
+				<input type="checkbox" name="remember" value="1" @checked(old('remember', true)) class="rounded border-[color:var(--color-line)] accent-[color:var(--color-accent)]">
 				<span>{{ __('Onthoud mij') }}</span>
 			</label>
 
