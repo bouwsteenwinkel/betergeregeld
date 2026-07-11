@@ -460,6 +460,16 @@ class ChannelSite
     public function logoImage(): ?string
     {
         $img = $this->brand('logo_image');
+        // Terugval op het conventionele channel-logo als er geen expliciet
+        // merk-logo is ingesteld: public/channel-media/<key>/logo.webp. Het
+        // bestand deployt via git, dus het logo overleeft een brand-regeneratie
+        // (die het DB-veld brand.logo_image kan wissen).
+        if (! $img) {
+            $conv = 'channel-media/' . $this->key . '/logo.webp';
+            if (is_file(public_path($conv))) {
+                $img = $conv;
+            }
+        }
         if (! $img) {
             return null;
         }
