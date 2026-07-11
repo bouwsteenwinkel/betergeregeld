@@ -16,7 +16,7 @@
 			@elseif (! $site->isDemoContext() && $site->brand('footer_name'))
 				{{ $site->brand('footer_name') }}
 			@elseif ($site->logoImage())
-				<img src="{{ $site->logoImage() }}" alt="{{ $site->name() }}" style="height:34px;display:block">
+				<img src="{{ $site->logoImage() }}" alt="{{ $site->name() }}" style="height:44px;display:block">
 			@else
 				{!! $site->brand('logo_text', $site->name()) !!}
 			@endif

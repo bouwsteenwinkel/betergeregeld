@@ -463,7 +463,18 @@ class ChannelSite
         if (! $img) {
             return null;
         }
-        return preg_match('#^https?://#', $img) ? $img : asset(ltrim($img, '/'));
+        if (preg_match('#^https?://#', $img)) {
+            return $img;
+        }
+        $rel = ltrim($img, '/');
+        $url = asset($rel);
+        // Cache-buster op bestandstijd: een vervangen logo (zelfde bestandsnaam)
+        // is meteen zichtbaar, zonder harde browser-refresh.
+        $path = public_path($rel);
+        if (is_file($path)) {
+            $url .= '?v=' . filemtime($path);
+        }
+        return $url;
     }
 
     /**
