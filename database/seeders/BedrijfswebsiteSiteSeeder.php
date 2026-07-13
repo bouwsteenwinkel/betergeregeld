@@ -45,7 +45,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'service' => 'website',
                 'business' => [
                     'label'       => 'Bedrijven in :city',
-                    'intro'       => 'Dit is het ondernemerslandschap in :city en omgeving — de omgeving waarin jij online moet opvallen. Met een sterke website en vindbaarheid sta jij bovenaan als iemand in :city naar jouw dienst zoekt.',
+                    'intro'       => 'Dit is het ondernemerslandschap in :city en omstreken. Hier moet jij online opvallen. Met een sterke website en goede vindbaarheid sta jij bovenaan als iemand in :city naar jouw dienst zoekt.',
                     'query'       => 'bedrijf :city',
                     'limit'       => 8,
                     'min_reviews' => 3,
@@ -74,7 +74,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
         ]);
 
         if ($site->blocks()->exists()) {
-            $this->command?->info('bedrijfswebsite: blokken bestaan al — overgeslagen.');
+            $this->command?->info('bedrijfswebsite: blokken bestaan al, overgeslagen.');
             return;
         }
 
@@ -110,7 +110,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'items' => [
                     ['icon' => '🌐', 'text' => 'Gevonden worden als iemand jouw dienst zoekt in de regio'],
                     ['icon' => '📩', 'text' => 'Offerte- en contactaanvragen rechtstreeks in je mailbox'],
-                    ['icon' => '🚀', 'text' => 'Begin klein en breid later uit — je hoeft nooit opnieuw te beginnen'],
+                    ['icon' => '🚀', 'text' => 'Begin klein en breid later uit, je hoeft nooit opnieuw te beginnen'],
                 ],
             ]],
             ['type' => 'features', 'block_key' => 'diensten-grid', 'sort' => 30, 'locked' => false, 'status' => 'placeholder', 'content' => [
@@ -125,7 +125,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             ]],
             ['type' => 'features', 'block_key' => 'online-uitleg', 'sort' => 34, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'heading' => 'Online regelen wat nu tijd kost',
-                'sub'     => 'Van de eerste aanvraag tot de betaling — laat je website het werk doen zodat jij dat niet hoeft.',
+                'sub'     => 'Van de eerste aanvraag tot de betaling: laat je website het werk doen, dan hoef jij dat niet.',
                 'items'   => [
                     ['icon' => '📝', 'title' => 'Offerte-aanvraag', 'text' => 'Klanten geven via een slim formulier precies door wat ze nodig hebben. Jij krijgt een complete aanvraag.'],
                     ['icon' => '📅', 'title' => 'Online afspraken', 'text' => 'Bezoekers plannen zelf een afspraak of belmoment in je agenda, zonder heen-en-weer gemail.'],
@@ -149,7 +149,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '⏰', 'title' => 'Tijdvakken', 'text' => 'Bied afspraken aan in blokken die passen bij jouw planning, met een maximum per dag.'],
                     ['icon' => '🗓️', 'title' => 'Online agenda', 'text' => 'Beschikbaarheid synchroniseert met je eigen agenda, zodat dubbele boekingen niet kunnen.'],
                     ['icon' => '🔔', 'title' => 'Herinneringen', 'text' => 'Automatische herinnering per mail of sms een dag voor de afspraak. Minder no-shows.'],
-                    ['icon' => '🚫', 'title' => 'Maximum per dag', 'text' => 'Op drukke dagen sluit je vanzelf zodra het maximum bereikt is — geen overvolle agenda.'],
+                    ['icon' => '🚫', 'title' => 'Maximum per dag', 'text' => 'Op drukke dagen sluit je vanzelf zodra het maximum bereikt is, zodat je agenda niet overvol raakt.'],
                 ],
             ]],
             ['type' => 'steps', 'block_key' => 'werkwijze', 'sort' => 50, 'locked' => false, 'status' => 'placeholder', 'content' => [
@@ -165,7 +165,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'sub'     => 'Jij bent ondernemer, geen boekhouder. Wij zetten repeterend werk op de automatische piloot.',
                 'items'   => [
                     ['icon' => '🧾', 'title' => 'Offertes en facturen', 'text' => 'Vanuit een aanvraag rolt automatisch een nette offerte of factuur met btw, op naam en met je huisstijl.'],
-                    ['icon' => '📨', 'title' => 'Klantberichten', 'text' => 'Bevestigingen, herinneringen en een bedankje na afloop — automatisch, in jouw tone of voice.'],
+                    ['icon' => '📨', 'title' => 'Klantberichten', 'text' => 'Bevestigingen, herinneringen en een bedankje na afloop, automatisch verstuurd in je eigen stijl.'],
                     ['icon' => '🔗', 'title' => 'Koppelingen', 'text' => 'Koppel je boekhouding, agenda of kassa, zodat gegevens niet dubbel ingevoerd hoeven te worden.'],
                     ['icon' => '📊', 'title' => 'Overzicht', 'text' => 'Een dagoverzicht van aanvragen, afspraken en omzet in één helder scherm.'],
                 ],
@@ -185,7 +185,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '📞', 'title' => 'Telefoon-assistent', 'text' => 'Een AI-assistent neemt op als jij aan het werk bent en beantwoordt vragen over diensten en openingstijden.'],
                     ['icon' => '📝', 'title' => 'Offertes opstellen', 'text' => 'AI helpt bij het opstellen van een offerte op basis van wat de klant doorgeeft. Jij controleert en verstuurt.'],
                     ['icon' => '💬', 'title' => 'Website-chat', 'text' => 'Een chat op je site beantwoordt veelgestelde vragen direct, dag en nacht.'],
-                    ['icon' => '✍️', 'title' => 'Teksten schrijven', 'text' => 'Automatische teksten voor je website, nieuwsbrief en social media — in jouw stijl.'],
+                    ['icon' => '✍️', 'title' => 'Teksten schrijven', 'text' => 'Automatische teksten voor je website, nieuwsbrief en social media, in je eigen stijl.'],
                 ],
             ]],
             ['type' => 'cta', 'block_key' => 'ai-cta', 'sort' => 66, 'locked' => false, 'status' => 'placeholder', 'content' => [
@@ -205,7 +205,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'heading' => 'Veelgestelde vragen',
                 'items'   => [
                     ['q' => 'Kan ik zelf teksten en foto’s aanpassen?', 'a' => 'Ja. Je logt in en past teksten, prijzen en afbeeldingen aan. Handig als je iets wilt bijwerken of een dienst toevoegt.'],
-                    ['q' => 'Wat kost het en zit ik ergens aan vast?', 'a' => 'Je krijgt vooraf een heldere prijsindicatie. Je begint klein en breidt uit wanneer je er klaar voor bent — je zit nergens onnodig aan vast.'],
+                    ['q' => 'Wat kost het en zit ik ergens aan vast?', 'a' => 'Je krijgt vooraf een heldere prijsindicatie. Je begint klein en breidt uit wanneer je er klaar voor bent. Je zit nergens onnodig aan vast.'],
                     ['q' => 'Kan de site koppelen met mijn systemen?', 'a' => 'Voor veel boekhoud-, agenda- en kassasystemen is een koppeling mogelijk. Anders krijg je overzichten netjes per mail.'],
                     ['q' => 'Hoe snel staat mijn site online?', 'a' => 'Een gratis voorbeeld zie je vaak binnen 1 à 2 dagen. Een complete site staat meestal binnen twee weken live.'],
                 ],
@@ -214,7 +214,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'heading' => 'Bel of maak een afspraak',
                 'sub'     => 'Vraag of spoed? Neem gerust contact op.',
                 'hours'   => [
-                    ['day' => 'Maandag t/m vrijdag', 'time' => '09:00 – 17:30'],
+                    ['day' => 'Maandag t/m vrijdag', 'time' => '09:00 - 17:30'],
                     ['day' => 'Zaterdag', 'time' => 'Op afspraak'],
                     ['day' => 'Zondag', 'time' => 'Gesloten'],
                 ],
