@@ -65,7 +65,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'logo_tagline' => 'Website, webshop en klantenportaal voor jouw bedrijf',
                 'trustline'    => 'Betrouwbaar vakwerk · 4,8 ★',
                 'logo_image'   => 'channel-media/bedrijfswebsite/logo.webp',
-                'footer_logo'  => 'channel-media/bedrijfswebsite/logo.webp',
+                'footer_logo'  => '/channel-media/bedrijfswebsite/logo.webp',
             ],
             'meta'    => [
                 'home_title'       => 'Jouw Website | Professionele website voor jouw bedrijf',
@@ -123,14 +123,23 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '🎨', 'title' => 'Beeld en huisstijl', 'text' => 'Nette fotografie en een herkenbare huisstijl die vertrouwen wekt bij nieuwe klanten.'],
                 ],
             ]],
-            ['type' => 'features', 'block_key' => 'online-uitleg', 'sort' => 34, 'locked' => false, 'status' => 'placeholder', 'content' => [
-                'heading' => 'Online regelen wat nu tijd kost',
-                'sub'     => 'Van de eerste aanvraag tot de betaling: laat je website het werk doen, dan hoef jij dat niet.',
+            ['type' => 'features', 'block_key' => 'webshop-uitleg', 'sort' => 34, 'locked' => false, 'status' => 'placeholder', 'content' => [
+                'heading' => 'Verkoop online, ook als je winkel of kantoor dicht is',
+                'sub'     => 'Van een enkel product tot een compleet assortiment of servicepakket. Klanten bestellen en betalen zelf, jij levert.',
                 'items'   => [
-                    ['icon' => '📝', 'title' => 'Offerte-aanvraag', 'text' => 'Klanten geven via een slim formulier precies door wat ze nodig hebben. Jij krijgt een complete aanvraag.'],
-                    ['icon' => '📅', 'title' => 'Online afspraken', 'text' => 'Bezoekers plannen zelf een afspraak of belmoment in je agenda, zonder heen-en-weer gemail.'],
-                    ['icon' => '💳', 'title' => 'Direct betalen', 'text' => 'Reken producten, aanbetalingen of facturen direct af met iDEAL, Apple Pay of creditcard.'],
-                    ['icon' => '📂', 'title' => 'Klantportaal', 'text' => 'Klanten vinden hun offertes, facturen en documenten terug in een eigen beveiligde omgeving.'],
+                    ['icon' => '🛒', 'title' => 'Producten en diensten', 'text' => 'Zet je aanbod online met foto, prijs en voorraad. Van één artikel tot een volledige catalogus.'],
+                    ['icon' => '💳', 'title' => 'Direct betaald', 'text' => 'Klanten rekenen meteen af met iDEAL, Apple Pay of creditcard. Geen facturen achteraf najagen.'],
+                    ['icon' => '🎟️', 'title' => 'Bonnen en pakketten', 'text' => 'Verkoop cadeaubonnen, strippenkaarten of servicepakketten die klanten zelf inwisselen.'],
+                    ['icon' => '📦', 'title' => 'Verzenden of afhalen', 'text' => 'De klant kiest verzending of afhalen op een gekozen moment. Jij krijgt een duidelijke orderbon.'],
+                ],
+            ]],
+            ['type' => 'pricelist', 'block_key' => 'webshop-producten', 'sort' => 38, 'locked' => false, 'status' => 'placeholder', 'content' => [
+                'eyebrow' => 'Webshop',
+                'heading' => 'Populaire producten',
+                'items'   => [
+                    ['name' => 'Bestverkochte product', 'desc' => 'Je populairste artikel met foto, voorraad en directe betaling via iDEAL. Klaar om te verzenden of af te halen.', 'price' => '€ 49,95'],
+                    ['name' => 'Servicepakket', 'desc' => 'Een terugkerende dienst als vast pakket, bijvoorbeeld onderhoud of een strippenkaart voor tien beurten.', 'price' => '€ 149'],
+                    ['name' => 'Cadeaubon', 'desc' => 'Laat klanten een tegoedbon kopen die ze zelf gebruiken of cadeau geven. Direct per e-mail geleverd.', 'price' => '€ 25'],
                 ],
             ]],
             ['type' => 'pricelist', 'block_key' => 'tarieven', 'sort' => 40, 'locked' => false, 'status' => 'placeholder', 'content' => [
