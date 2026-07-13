@@ -438,7 +438,17 @@
 </head>
 <body>
 	<a class="skip-link" href="#main">Naar inhoud</a>
-	@if (! $site->isLive())
+	@if ($site->get('meta.preview.is_preview'))
+		{{-- Voorbeeld-balk: houdt de conversie (terug naar ons aanbod) buiten de
+		     site-body, zodat de body een echte one-pager van de ondernemer blijft. --}}
+		<div style="background:#0f172a;color:#e2e8f0;font-size:.82rem;padding:.5rem 1rem;display:flex;gap:.8rem;align-items:center;justify-content:center;flex-wrap:wrap">
+			<span>Dit is een voorbeeld van hoe de website van <strong style="color:#fff">{{ $site->name() }}</strong> eruit kan zien.</span>
+			@php $srcCh = $site->get('meta.preview.source_channel'); @endphp
+			@if ($srcCh)
+				<a href="{{ url('/_site/' . $srcCh) }}" style="color:#fff;font-weight:700;text-decoration:underline;white-space:nowrap">Wil je zo'n website? →</a>
+			@endif
+		</div>
+	@elseif (! $site->isLive())
 		<div style="background:#1c1917;color:#fbbf24;text-align:center;font-size:.8rem;padding:.4rem">
 			PREVIEW · concept "{{ $site->key }}" · nog niet live (geen domein gekoppeld)
 		</div>
@@ -453,7 +463,7 @@
 	@include('channels.partials.footer')
 
 	{{-- Sticky mobiele CTA: verschijnt na het scrollen voorbij de hero. --}}
-	<a href="#contact" class="sticky-cta">Gratis voorbeeld aanvragen</a>
+	<a href="#contact" class="sticky-cta">{{ $site->get('meta.preview.is_preview') ? 'Maak een afspraak' : 'Gratis voorbeeld aanvragen' }}</a>
 	<script>
 	(function () {
 		var el = document.querySelector('.sticky-cta');
@@ -478,5 +488,9 @@
 		}
 	})();
 	</script>
+	@if ($site->get('meta.preview.is_preview'))
+		@include('channels.partials.preview-hero-autogen')
+		@include('channels.partials.preview-nav-scroll')
+	@endif
 </body>
 </html>

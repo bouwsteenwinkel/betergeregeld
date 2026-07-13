@@ -400,6 +400,19 @@ class ChannelSiteController extends Controller
 
         $appointmentType = $data['appointment_type'] ?? null;
 
+        // Self-service voorbeeldsite: komt de lead van een gegenereerde preview-site
+        // (key preview-...), attribueer 'm dan aan het bron-kanaal en koppel de al
+        // bestaande preview (URL + status 'ready'). Het bron-kanaal + de invoer
+        // staan in de preview-meta die PreviewSiteGenerator heeft weggeschreven.
+        $isPreview     = str_starts_with($site->key, 'preview-');
+        $sourceChannel = $isPreview
+            ? (string) ($site->get('meta.preview.source_channel') ?: $site->key)
+            : $site->key;
+        $previewUrl = $isPreview ? url('/_site/' . $site->key) : null;
+        if ($isPreview && ($bt = $site->get('meta.preview.input.business_type'))) {
+            $answers['type_bedrijf'] = $bt;
+        }
+
         $lead = WebsiteLead::create([
             'company'            => $data['company'] ?? null,
             'branche'            => $site->branche(),
@@ -414,11 +427,24 @@ class ChannelSiteController extends Controller
             'features'           => ! empty($data['features']) ? array_values($data['features']) : null,
             'appointment_type'   => $appointmentType,
             'appointment_status' => $appointmentType ? 'requested' : null,
-            'channel'            => $site->key,
-            'source'             => 'channel',
+            'channel'            => $sourceChannel,
+            'source'             => $isPreview ? 'preview' : 'channel',
             'status'             => 'new',
-            'preview_status'     => 'todo',
+            'preview_status'     => $isPreview ? 'ready' : 'todo',
+            'preview_url'        => $previewUrl,
         ]);
+
+        // De preview is nu aangevraagd: markeer 'm claimed zodat de cleanup 'm laat
+        // staan voor de opvolging.
+        if ($isPreview) {
+            \App\Models\Channel\Site::where('key', $site->key)
+                ->get()
+                ->each(function ($m) {
+                    $meta = (array) $m->meta;
+                    $meta['preview']['claimed'] = true;
+                    $m->update(['meta' => $meta]);
+                });
+        }
 
         // Online-via-Meet + een gekozen moment → meteen een echte afspraak boeken
         // (agenda-event + Google Meet-link + bevestigingsmail via BookingService).

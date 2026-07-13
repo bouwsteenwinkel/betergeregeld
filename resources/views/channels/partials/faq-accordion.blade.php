@@ -4,7 +4,7 @@
     $faqItems = array_values(array_filter((array) ($items ?? []), fn ($x) => is_array($x) && ($x['q'] ?? $x['title'] ?? '') !== ''));
 @endphp
 @if ($faqItems)
-    <div class="faq faq-acc">
+    <div class="faq faq-acc {{ ($sharp ?? false) ? 'faq-sharp' : '' }}">
         @foreach ($faqItems as $i => $qa)
             <details @if ($i === 0) open @endif>
                 <summary>{{ $qa['q'] ?? $qa['title'] ?? '' }}</summary>

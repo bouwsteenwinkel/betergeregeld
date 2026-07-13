@@ -14,6 +14,7 @@
  */
 
 use App\Http\Controllers\ChannelSite\ChannelSiteController;
+use App\Http\Controllers\ChannelSite\PreviewToolController;
 use App\Http\Middleware\ResolveChannelSite;
 use App\Services\ChannelSiteResolver;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,13 @@ $channelRoutes = function () use ($facetKeys) {
     // Voorbeeld-/demolaag: "zo zou jouw site eruitzien". Aparte pagina zodat de
     // hoofd-URL de verkooppitch aan de ondernemer kan zijn (twee-lagen-model).
     Route::get('/voorbeeld', [ChannelSiteController::class, 'demo']);
+
+    // Self-service "voorbeeld in 60 seconden"-tool: intake + synchrone generatie.
+    // De gegenereerde previews leven als eigen site op /_site/preview-...
+    Route::get('/voorbeeld-maken', [PreviewToolController::class, 'form']);
+    Route::post('/voorbeeld-maken', [PreviewToolController::class, 'generate']);
+    // Asynchrone branche-hero-generatie op een preview-pagina (JS roept dit aan).
+    Route::post('/hero-image', [PreviewToolController::class, 'heroImage']);
 
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
     Route::get('/contact', [ChannelSiteController::class, 'contact']);

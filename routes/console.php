@@ -16,6 +16,12 @@ Schedule::command('monitor:prune-metrics')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Self-service voorbeeldsites — verlopen, niet-opgeëiste previews opruimen.
+Schedule::command('channel:previews-cleanup')
+    ->hourly()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // VPS-monitoring — mail bij offline/volle-schijf-overgangen (alleen bij wijziging).
 Schedule::command('monitor:check-alerts')
     ->everyFiveMinutes()

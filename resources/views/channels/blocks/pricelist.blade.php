@@ -1,5 +1,5 @@
-@php /** @var \App\Models\Channel\Block $block */ $items = (array) $block->c('items', []); @endphp
-<section data-block="pricelist" class="pricelist">
+@php /** @var \App\Models\Channel\Block $block */ $items = (array) $block->c('items', []); $plBg = $block->c('punchy') ? $site->image('hero') : null; @endphp
+<section data-block="pricelist" @if ($block->c('anchor')) id="{{ $block->c('anchor') }}" @endif class="pricelist {{ $block->c('punchy') ? 'punchy' : '' }} {{ $plBg ? 'has-bg' : '' }}" @if ($plBg) style="--pl-bg:url('{{ $plBg }}')" @endif>
     <div class="wrap">
         <div class="pl-head">
             @if ($block->c('eyebrow'))<span class="kicker" style="justify-content:center"><span class="kicker-line"></span> {{ $block->c('eyebrow') }}</span>@endif
@@ -20,7 +20,7 @@
                                 $price = preg_replace('/(\d[\d.,]*)/', '€ $1', $price, 1);
                             }
                         @endphp
-                        <div class="pl-price">{{ $price }}</div>
+                        <div class="pl-price"><span class="pl-price-val">{{ $price }}</span></div>
                     @endif
                 </div>
             @endforeach
@@ -46,4 +46,22 @@
     .pricelist .pl-price{margin-top:auto;padding-top:1rem;border-top:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);
         color:var(--c-primary);font-weight:800;font-size:1.4rem;letter-spacing:-.01em;text-align:right}
     @media(max-width:560px){.pricelist .pl-card{padding:1.3rem 1.25rem}.pricelist .pl-price{font-size:1.3rem}}
+
+    /* Punchy-variant: scherpere hoeken, accent-topbalk, prijs als accent-chip. */
+    .pricelist.punchy .pl-card{border-radius:6px;border:1px solid color-mix(in srgb,var(--c-ink) 12%,transparent);border-top:3px solid var(--c-accent)}
+    .pricelist.punchy .pl-price{border-top:1px solid color-mix(in srgb,var(--c-ink) 9%,transparent);text-align:right}
+    .pricelist.punchy .pl-price-val{display:inline-block;background:var(--c-accent);color:var(--c-on-accent,#fff);
+        padding:.4rem .8rem;border-radius:5px;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+    .pricelist.punchy .pl-card:hover .pl-price-val{filter:brightness(1.06)}
+
+    /* Beeld-achtergrond met zwarte gloed: donker genoeg voor leesbare witte tekst. */
+    .pricelist.has-bg{position:relative;background:#0b0b10 var(--pl-bg) center/cover no-repeat}
+    .pricelist.has-bg::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(8,8,12,.74),rgba(8,8,12,.82))}
+    .pricelist.has-bg .wrap{position:relative;z-index:1}
+    .pricelist.has-bg .pl-head h2{color:#fff}
+    .pricelist.has-bg .pl-sub{color:rgba(255,255,255,.82)}
+    .pricelist.has-bg .pl-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-top:3px solid var(--c-accent);box-shadow:0 24px 54px -30px rgba(0,0,0,.9);backdrop-filter:blur(3px)}
+    .pricelist.has-bg .pl-name{color:#fff}
+    .pricelist.has-bg .pl-desc{color:rgba(255,255,255,.78)}
+    .pricelist.has-bg .pl-price{border-top-color:rgba(255,255,255,.18)}
 </style>

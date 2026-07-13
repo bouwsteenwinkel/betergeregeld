@@ -124,7 +124,7 @@ class ChannelImageGenerator
      *
      * @return array{slot:string,status:string,file:?string,fake:bool}
      */
-    public function generateRaw(string $channelKey, string $slot, string $prompt, string $size = '1536x1024', bool $force = false): array
+    public function generateRaw(string $channelKey, string $slot, string $prompt, string $size = '1536x1024', bool $force = false, ?string $quality = null): array
     {
         if (! $force && $this->url($channelKey, $slot) !== null) {
             return ['slot' => $slot, 'status' => 'bestaat-al', 'file' => $this->url($channelKey, $slot), 'fake' => $this->isFake()];
@@ -146,7 +146,7 @@ class ChannelImageGenerator
                 'model'   => (string) config('channel_images.model', 'gpt-image-1'),
                 'prompt'  => $prompt,
                 'size'    => $size,
-                'quality' => (string) config('channel_images.quality', 'high'),
+                'quality' => $quality ?: (string) config('channel_images.quality', 'high'),
                 'n'       => 1,
             ]);
 

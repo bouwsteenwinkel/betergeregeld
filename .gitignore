@@ -34,3 +34,6 @@ Thumbs.db
 /public/channel-media/**/*.png
 # ... behalve de deterministische OG-/social-kaarten (klein, via channel:og herbouwbaar)
 !/public/channel-media/**/og.png
+# Wegwerp-media van self-service voorbeeldsites (preview-<token>): runtime-gegenereerd,
+# opgeruimd door channel:previews-cleanup. Nooit committen.
+/public/channel-media/preview-*/

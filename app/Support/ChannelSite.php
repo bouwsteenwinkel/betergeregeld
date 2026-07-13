@@ -95,6 +95,11 @@ class ChannelSite
      */
     public function isDemoContext(): bool
     {
+        // Preview-sites (self-service voorbeeldtool) zijn de site van de ondernemer
+        // zelf: geen verkoop-/pitch-chrome, net als de /voorbeeld-demo.
+        if ($this->get('meta.preview.is_preview')) {
+            return true;
+        }
         try {
             return \Illuminate\Support\Str::contains(request()->path(), 'voorbeeld');
         } catch (\Throwable $e) {
@@ -352,6 +357,13 @@ class ChannelSite
             ];
         }
 
+        // Preview-one-pager: het menu bestaat uit on-page ankers naar secties op
+        // dezelfde pagina. Geen page-rewrite en geen 'Prijzen'-injectie (dat zijn
+        // verkoop-subpagina's die op de klant-site niet thuishoren).
+        if ($this->get('meta.preview.is_preview')) {
+            return $menu;
+        }
+
         // Ankers waarvoor nu een eigen pagina bestaat → naar die pagina i.p.v. een
         // (vaak niet-bestaand) home-anker.
         $pageForAnchor = ['#diensten' => 'diensten', '#werkwijze' => 'werkwijze', '#reviews' => 'cases', '#contact' => 'contact'];
@@ -411,8 +423,9 @@ class ChannelSite
             return $this->url();
         }
         if (str_starts_with($href, '#')) {
-            // Het aanvraagformulier staat op ELKE pagina → same-page anker.
-            if (in_array($href, ['#contact', '#gratis-voorbeeld'], true)) {
+            // Het aanvraagformulier staat op ELKE pagina → same-page anker. Op een
+            // preview-one-pager zijn ALLE menu-ankers secties op dezelfde pagina.
+            if (in_array($href, ['#contact', '#gratis-voorbeeld'], true) || $this->get('meta.preview.is_preview')) {
                 return $href;
             }
             // Overige ankers verwijzen naar een home-sectie → absoluut naar home.
@@ -494,6 +507,12 @@ class ChannelSite
     public function image(string $slot): ?string
     {
         $gen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
+        // Preview-sites (self-service voorbeeldtool) hebben geen branche en mogen
+        // NOOIT terugvallen op een sector-beeld (dat gaf o.a. een timmerman bij een
+        // nagelsalon). Alleen het eigen, per-branche gegenereerde beeld telt.
+        if ($this->get('meta.preview.is_preview')) {
+            return $gen->url($this->key, $slot);
+        }
         return $gen->url($this->key, $slot) ?? $gen->url($this->branche(), $slot);
     }
 
