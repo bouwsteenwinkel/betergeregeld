@@ -43,10 +43,13 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                 'niche'   => 'bedrijf',
                 'niches'  => 'bedrijven',
                 'service' => 'website',
+                // Index-pagina (/plaatsen): owner-pitch, net als badkamer.
+                'h1'      => 'Bedrijven door heel Nederland online laten groeien',
+                'intro'   => 'Heb je een bedrijf en wil je meer klanten binnenhalen? We helpen ondernemers door heel Nederland aan een website, webshop en slimme tools die aanvragen opleveren. Kies je plaats en zie wat we in jouw regio doen.',
                 'business' => [
                     'label'       => 'Bedrijven in :city',
-                    'intro'       => 'Dit is het ondernemerslandschap in :city en omstreken. Hier moet jij online opvallen. Met een sterke website en goede vindbaarheid sta jij bovenaan als iemand in :city naar jouw dienst zoekt.',
-                    'query'       => 'bedrijf :city',
+                    'intro'       => 'Zo ziet het ondernemerslandschap in :city en omgeving eruit. Zorg dat jouw bedrijf hiertussen opvalt met een sterke website en goede vindbaarheid.',
+                    'query'       => 'bedrijf in :city',
                     'limit'       => 8,
                     'min_reviews' => 3,
                 ],
