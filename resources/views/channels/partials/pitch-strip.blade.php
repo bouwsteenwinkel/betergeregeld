@@ -2,7 +2,9 @@
     /** @var \App\Support\ChannelSite $site */
     // Verkoop-strip voor ÓNZE niche-website aan de ondernemer. Niet op de
     // klant-demo (/voorbeeld), waar de bezoeker de site van de klant zelf ziet.
-    $items = $site->isDemoContext() ? [] : $site->pitchStripItems();
+    // Per kanaal uit te zetten met header.pitch_strip = false.
+    $hideStrip = ($site->header()['pitch_strip'] ?? null) === false;
+    $items = ($site->isDemoContext() || $hideStrip) ? [] : $site->pitchStripItems();
 
     // Line-art iconen (stroke = currentColor), in de stijl van de rest van de site.
     $icons = [

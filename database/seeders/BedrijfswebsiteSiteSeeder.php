@@ -24,6 +24,8 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             'theme'        => [
                 'primary'      => '#16324f',
                 'accent'       => '#ef6033',
+                'cta'          => '#1685c4',   // diamant-blauw (Groeidiamant), primaire CTA
+                'on_cta'       => '#ffffff',
                 'ink'          => '#1c2530',
                 'muted'        => '#5b6b78',
                 'bg'           => '#f7f9fb',
@@ -73,6 +75,9 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             'meta'    => [
                 'home_title'       => 'Jouw Website | Professionele website voor jouw bedrijf',
                 'home_description' => 'Een strakke website, webshop of klantenportaal die klanten binnenhaalt terwijl jij aan het werk bent. Vraag een gratis voorbeeld aan met jouw bedrijfsnaam.',
+            ],
+            'header'  => [
+                'pitch_strip' => false,   // geen pitch-strip boven de header op dit kanaal
             ],
         ]);
 

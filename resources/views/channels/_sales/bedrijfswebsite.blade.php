@@ -1,8 +1,8 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $facets  = $facets ?? (array) config('groeidiamant.facets', []);
-    $heroImg = $site->image('hero');
-    $heroSet = $site->imageSrcset('hero');
+    $heroImg = $site->image('herobg');
+    $heroSet = $site->imageSrcset('herobg');
 @endphp
 @extends('channels.layout')
 
@@ -11,35 +11,43 @@
 
 @if ($heroImg)
     @push('head')
-        <link rel="preload" as="image" href="{{ $heroImg }}" @if ($heroSet) imagesrcset="{{ $heroSet }}" imagesizes="(max-width:760px) 92vw, 46vw" @endif fetchpriority="high">
+        <link rel="preload" as="image" href="{{ $heroImg }}" @if ($heroSet) imagesrcset="{{ $heroSet }}" imagesizes="100vw" @endif fetchpriority="high">
     @endpush
 @endif
 
 @section('content')
 
-    <section class="hero" data-section="hero">
+    {{-- Full-bleed hero: beeld over de volledige breedte, tekst overlaid op de
+         donkere linkerzone (.hero--shot = foto + links-donkere gradient-overlay). --}}
+    @if ($heroImg)
+        <style>
+            /* Tekst dichter naar de linker viewport-rand: op desktop de lege ruimte
+               links halveren t.o.v. de gecentreerde container (~17vw i.p.v. ~34vw).
+               Tekstkolom blijft begrensd zodat de regels niet te lang worden. */
+            .hero--shot .hero-text{max-width:600px}
+            @media(min-width:1000px){
+                .hero--shot .wrap{max-width:none;padding-left:17vw;padding-right:22px}
+            }
+        </style>
+    @endif
+    <section class="hero @if ($heroImg) hero--shot @endif" data-section="hero">
+        @if ($heroImg)
+            <div class="hero-bg">
+                <img src="{{ $heroImg }}" @if ($heroSet) srcset="{{ $heroSet }}" sizes="100vw" @endif
+                     alt="Ondernemer bekijkt zijn nieuwe bedrijfswebsite op een tablet" loading="eager" decoding="async" fetchpriority="high">
+            </div>
+        @endif
         <div class="wrap">
-            <div @if ($heroImg) class="grid cols-2" style="align-items:start;gap:2.6rem" @endif>
-                <div>
-                    <span class="eyebrow">Voor jouw bedrijf</span>
-                    <h1>Meer klanten en omzet uit je eigen regio</h1>
-                    <p class="lead">Een strakke website, webshop of klantenportaal die klanten binnenhaalt terwijl jij aan het werk bent. Wij bouwen 'm, jij bepaalt hoe ver je gaat.</p>
-                    <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
-                    <p class="muted" style="margin-top:.8rem;font-size:.9rem">Gratis &middot; vrijblijvend &middot; voorbeeld van jóuw site, vaak binnen 1 à 2 dagen</p>
-                    <ul class="hero-usps">
-                        <li>Gevonden worden als iemand jouw dienst zoekt in de regio</li>
-                        <li>Offerteaanvragen rechtstreeks in je mailbox</li>
-                        <li>Begin klein en breid later uit, je hoeft nooit opnieuw te beginnen</li>
-                    </ul>
-                </div>
-                @if ($heroImg)
-                    <div>
-                        <img src="{{ $heroImg }}"
-                             @if ($heroSet) srcset="{{ $heroSet }}" sizes="(max-width:760px) 92vw, 46vw" @endif
-                             alt="Voorbeeld van een bedrijfswebsite" loading="eager" decoding="async"
-                             style="width:100%;height:auto;border-radius:var(--radius);display:block;box-shadow:0 24px 60px -24px rgba(0,0,0,.4)">
-                    </div>
-                @endif
+            <div class="hero-text">
+                <h1>Zie jouw nieuwe website in 60 seconden</h1>
+                <p class="lead">Meer klanten uit je eigen regio, zonder gedoe. Vertel kort wat je doet en bekijk meteen een gratis voorbeeld van jouw site.</p>
+                <a href="#gratis-voorbeeld" class="btn">Maak mijn gratis voorbeeld</a>
+                <p class="muted" style="margin-top:.8rem;font-size:.9rem">Klaar in 60 seconden, geen account, geen kosten, nergens aan vast</p>
+                <ul class="hero-usps">
+                    <li>Meteen resultaat, geen dagen wachten</li>
+                    <li>Gevonden worden zodra iemand jouw dienst zoekt</li>
+                    <li>Gratis en vrijblijvend, stop wanneer je wilt</li>
+                </ul>
             </div>
         </div>
     </section>
