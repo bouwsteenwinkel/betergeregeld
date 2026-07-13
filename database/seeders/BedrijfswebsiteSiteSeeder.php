@@ -82,6 +82,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             $site->blocks()->create([
                 'type'      => $b['type'],
                 'block_key' => $b['block_key'],
+                'facet'     => $b['facet'] ?? null,   // leeg = altijd tonen; anders alleen onder die groeistap
                 'sort'      => $b['sort'],
                 'enabled'   => true,
                 'locked'    => $b['locked'],
@@ -123,7 +124,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '🎨', 'title' => 'Beeld en huisstijl', 'text' => 'Nette fotografie en een herkenbare huisstijl die vertrouwen wekt bij nieuwe klanten.'],
                 ],
             ]],
-            ['type' => 'features', 'block_key' => 'webshop-uitleg', 'sort' => 34, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'features', 'block_key' => 'webshop-uitleg', 'facet' => 'webshop', 'sort' => 34, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'heading' => 'Verkoop online, ook als je winkel of kantoor dicht is',
                 'sub'     => 'Van een enkel product tot een compleet assortiment of servicepakket. Klanten bestellen en betalen zelf, jij levert.',
                 'items'   => [
@@ -133,7 +134,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '📦', 'title' => 'Verzenden of afhalen', 'text' => 'De klant kiest verzending of afhalen op een gekozen moment. Jij krijgt een duidelijke orderbon.'],
                 ],
             ]],
-            ['type' => 'pricelist', 'block_key' => 'webshop-producten', 'sort' => 38, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'pricelist', 'block_key' => 'webshop-producten', 'facet' => 'webshop', 'sort' => 38, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'eyebrow' => 'Webshop',
                 'heading' => 'Populaire producten',
                 'items'   => [
@@ -151,7 +152,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['name' => 'Compleet', 'desc' => 'Webshop of klantenportaal met betalingen, koppelingen met je systemen en automatische administratie.', 'price' => 'op aanvraag'],
                 ],
             ]],
-            ['type' => 'features', 'block_key' => 'afspraken-voordeel', 'sort' => 45, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'features', 'block_key' => 'afspraken-voordeel', 'facet' => 'klantenportaal', 'sort' => 45, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'heading' => 'Afspraken en aanvragen slim inplannen',
                 'sub'     => 'Verdeel je werk over de week en houd overzicht. Klanten kiezen zelf een moment dat past.',
                 'items'   => [
@@ -169,7 +170,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['title' => 'Live', 'text' => 'Ben je enthousiast, dan maken we het af, koppelen we betalingen en gaat de site live. Meestal binnen twee weken.'],
                 ],
             ]],
-            ['type' => 'features', 'block_key' => 'auto-uitleg', 'sort' => 55, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'features', 'block_key' => 'auto-uitleg', 'facet' => 'automatisering', 'sort' => 55, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'heading' => 'Automatiseer je administratie',
                 'sub'     => 'Jij bent ondernemer, geen boekhouder. Wij zetten repeterend werk op de automatische piloot.',
                 'items'   => [
@@ -179,7 +180,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '📊', 'title' => 'Overzicht', 'text' => 'Een dagoverzicht van aanvragen, afspraken en omzet in één helder scherm.'],
                 ],
             ]],
-            ['type' => 'cta', 'block_key' => 'auto-cta', 'sort' => 58, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'cta', 'block_key' => 'auto-cta', 'facet' => 'automatisering', 'sort' => 58, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'title'     => 'Minder administratie, meer overzicht',
                 'sub'       => 'We laten in je gratis voorbeeld zien hoe een aanvraag, offerte en factuur er voor jouw bedrijf uitzien.',
                 'cta_label' => 'Gratis voorbeeld aanvragen',
@@ -187,7 +188,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             ['type' => 'gallery', 'block_key' => 'galerij', 'sort' => 60, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'heading' => 'Een indruk van ons werk',
             ]],
-            ['type' => 'features', 'block_key' => 'ai-uitleg', 'sort' => 62, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'features', 'block_key' => 'ai-uitleg', 'facet' => 'ai', 'sort' => 62, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'heading' => 'AI voor jouw bedrijf',
                 'sub'     => 'Concrete inzet van AI, geen fratsen. Voor als je handen vol zitten en de telefoon toch gaat.',
                 'items'   => [
@@ -197,7 +198,7 @@ class BedrijfswebsiteSiteSeeder extends Seeder
                     ['icon' => '✍️', 'title' => 'Teksten schrijven', 'text' => 'Automatische teksten voor je website, nieuwsbrief en social media, in je eigen stijl.'],
                 ],
             ]],
-            ['type' => 'cta', 'block_key' => 'ai-cta', 'sort' => 66, 'locked' => false, 'status' => 'placeholder', 'content' => [
+            ['type' => 'cta', 'block_key' => 'ai-cta', 'facet' => 'ai', 'sort' => 66, 'locked' => false, 'status' => 'placeholder', 'content' => [
                 'title'     => 'Laat de telefoon aan, ook als je aan het werk bent',
                 'sub'       => 'Vraag een demo aan en hoor zelf hoe de AI-assistent jouw bedrijf aan de lijn te woord staat.',
                 'cta_label' => 'Gratis voorbeeld aanvragen',
