@@ -51,8 +51,9 @@ class ChannelImageGenerator
         // Fallback: losse webp/png/jpg, of de fake-mode SVG-preview.
         $rel = $this->relativePath($channelKey, $slot);
         foreach (['webp', 'png', 'jpg', 'svg'] as $ext) {
-            if (File::exists(public_path("{$rel}.{$ext}"))) {
-                return asset("{$rel}.{$ext}");
+            $abs = public_path("{$rel}.{$ext}");
+            if (File::exists($abs)) {
+                return $this->bust(asset("{$rel}.{$ext}"), $abs);
             }
         }
         return null;
@@ -210,11 +211,22 @@ class ChannelImageGenerator
         $out = [];
         foreach (glob("{$dir}/{$slot}-*.webp") ?: [] as $f) {
             if (preg_match('/-(\d+)\.webp$/', $f, $m)) {
-                $out[(int) $m[1]] = asset($this->relativeDir($channelKey) . '/' . basename($f));
+                $out[(int) $m[1]] = $this->bust(asset($this->relativeDir($channelKey) . '/' . basename($f)), $f);
             }
         }
         krsort($out);
         return $out;
+    }
+
+    /**
+     * Hangt een cache-buster (`?v=<mtime>`) aan een beeld-URL zodat een nieuwe
+     * generatie met dezelfde bestandsnaam tóch door Cloudflare/browser wordt
+     * ververst. Zonder mtime (bv. bestand net weg) blijft de URL ongewijzigd.
+     */
+    private function bust(string $url, string $file): string
+    {
+        $mt = @filemtime($file);
+        return $mt ? $url . '?v=' . $mt : $url;
     }
 
     /** srcset-string voor responsive beeld, of leeg als er geen varianten zijn. */
