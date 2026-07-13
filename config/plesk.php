@@ -57,9 +57,15 @@ return [
     // Let's Encrypt: ook www-alias meenemen bij het (her)uitgeven.
     'letsencrypt_include_www' => (bool) env('PLESK_LE_INCLUDE_WWW', true),
 
+    // SSL It!-extensie wordt via de CLI-gateway aangeroepen als een geregistreerd
+    // commando (`plesk ext sslit ...`), NIET via `extension --exec` (dat draait een
+    // scriptbestand en zag `--secure-domain` aan voor een scriptnaam → "not found").
+    'letsencrypt_utility' => env('PLESK_LE_UTILITY', 'sslit'),
+
     // CLI-parameters voor de SSL It!-extensie ((her)uitgifte Let's Encrypt).
-    // {domain} wordt vervangen door het te beveiligen domein. De sslit-syntax
-    // verschilt per Plesk-versie; pas hier aan als het commando afwijkt.
-    // Draai op de VPS `plesk ext sslit --help` voor de exacte vlaggen.
-    'letsencrypt_params' => ['--exec', 'sslit', '--secure-domain', '-domain', '{domain}'],
+    // {domain} wordt vervangen door het te beveiligen domein. Gedocumenteerde
+    // syntax: `plesk ext sslit --certificate -issue -domain <d> -secure-domain`.
+    // De sslit-syntax kan per Plesk-versie afwijken; draai op de VPS
+    // `plesk ext sslit --help` en pas zo nodig aan (env PLESK_LE_UTILITY / hier).
+    'letsencrypt_params' => ['--certificate', '-issue', '-domain', '{domain}', '-secure-domain'],
 ];

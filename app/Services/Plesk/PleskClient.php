@@ -241,10 +241,13 @@ class PleskClient
         $target = $this->normalize($domain ?: $this->parentDomain());
 
         // Configureerbaar CLI-commando (sslit-syntax verschilt per versie).
-        $params = (array) config('plesk.letsencrypt_params', ['--exec', 'sslit', '--secure-domain', '-domain', '{domain}']);
-        $params = array_map(fn ($p) => str_replace('{domain}', $target, (string) $p), $params);
+        // Via de geregistreerde gateway-utility 'sslit' (= `plesk ext sslit ...`),
+        // niet via 'extension --exec' (dat verwacht een scriptbestand).
+        $utility = (string) config('plesk.letsencrypt_utility', 'sslit');
+        $params  = (array) config('plesk.letsencrypt_params', ['--certificate', '-issue', '-domain', '{domain}', '-secure-domain']);
+        $params  = array_map(fn ($p) => str_replace('{domain}', $target, (string) $p), $params);
 
-        $r = $this->cli('extension', $params);
+        $r = $this->cli($utility, $params);
         if ($r['code'] !== 0) {
             throw new RuntimeException('Let\'s Encrypt (her)uitgeven mislukt: ' . trim($r['stdout'] . ' ' . $r['stderr']));
         }
