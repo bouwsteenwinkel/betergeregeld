@@ -83,6 +83,7 @@ return [
     'auto-airco-service'           => 'auto-airco-service_landings',
     'autotransport'                => 'autotransport_landings',
     'bakkerij'                     => 'bakkerij_landings',
+    'bedrijfswebsite'              => 'bedrijfswebsite_landings',
     'barbersites'                  => 'barbersites_landings',
     'Barhetpilsje'                 => 'Barhetpilsje_landings',
     'beautysites'                  => 'beautysites_landings',
