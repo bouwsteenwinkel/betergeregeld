@@ -63,6 +63,7 @@ class PreviewSiteGenerator
 
         $brandName = $company !== '' ? $company : 'Voorbeeld';
         $key       = 'preview-' . Str::lower(Str::random(12));
+        $profile   = $this->goalProfile($goal);
 
         return Site::create([
             'channel_branche_id' => null,   // los van elke branche: puur uit site.theme
@@ -78,13 +79,9 @@ class PreviewSiteGenerator
                 'trustline'    => 'Voorbeeld, in een halve minuut gemaakt',
             ],
             'header' => [
-                'menu' => [
-                    ['label' => 'Diensten', 'href' => '#diensten'],
-                    ['label' => 'Werkwijze', 'href' => '#werkwijze'],
-                    ['label' => 'Prijzen', 'href' => '#tarieven'],
-                    ['label' => 'Contact', 'href' => '#contact'],
-                ],
-                'cta' => ['label' => 'Maak een afspraak', 'href' => '#contact'],
+                // Nav-labels + header-CTA per doel (anchors blijven gelijk).
+                'menu' => array_map(fn ($m) => ['label' => $m[0], 'href' => $m[1]], $profile['nav']),
+                'cta'  => $profile['nav_cta'],
             ],
             'meta' => [
                 'home_title'       => $brandName,
@@ -147,7 +144,7 @@ class PreviewSiteGenerator
         $brand['logo_tagline'] = $data['tagline'] ?? ($brand['logo_tagline'] ?? '');
         $site->update(['meta' => $meta, 'brand' => $brand]);
 
-        foreach ($this->blocksFrom($data) as $b) {
+        foreach ($this->blocksFrom($data, $goal) as $b) {
             $site->blocks()->create([
                 'type'      => $b['type'],
                 'facet'     => $b['facet'] ?? null,
@@ -197,7 +194,105 @@ class PreviewSiteGenerator
         return "Bedrijfsnaam: {$name}.\n"
             . "Type bedrijf: {$type}.\n"
             . "Belangrijkste doel van de ondernemer: {$goalLabel}.\n\n"
-            . 'Genereer de content voor de voorbeeld-hoofdpagina. Vul ALLE velden, toegespitst op dit type bedrijf.';
+            . $this->goalGuidance($goal) . "\n\n"
+            . 'Genereer de content voor de voorbeeld-hoofdpagina. Vul ALLE velden, toegespitst op DIT type bedrijf EN het bovenstaande doel. '
+            . 'De velden services, prices, steps en faq krijgen een andere invulling per doel (zie hierboven); volg dat strikt.';
+    }
+
+    /**
+     * Per-doel CONCRETE inhoudelijke sturing. Zonder dit levert het model voor elk
+     * doel bijna dezelfde site; hiermee verschillen hero, services, prices, steps en
+     * faq echt per gekozen doel. Werkt samen met goalProfile() (structuur/CTA's).
+     */
+    private function goalGuidance(string $goal): string
+    {
+        return match ($goal) {
+            'webshop' => "Het doel is producten of diensten ONLINE VERKOPEN (een webshop). Richt de content daarop:\n"
+                . "- hero_title/hero_sub gaan over online kopen, bestellen en bezorgd/afgehaald krijgen, NIET over een afspraak maken.\n"
+                . "- services = de belangrijkste PRODUCTCATEGORIEEN of bestsellers van dit type bedrijf (geen diensten). services_heading bijvoorbeeld 'Ons assortiment' of 'Populair in de winkel'.\n"
+                . "- prices = concrete PRODUCTEN met realistische prijs (name = productnaam, desc = korte productregel, price = bedrag). prices_heading bijvoorbeeld 'Populaire producten'.\n"
+                . "- steps = het BESTELPROCES: kiezen, afrekenen, bezorgd of afhalen.\n"
+                . "- faq = over verzendkosten, levertijd, retourneren en betaalmethoden.",
+            'klantenportaal' => "Het doel is een KLANTENPORTAAL waar klanten zelf zaken online regelen. Richt de content daarop:\n"
+                . "- hero gaat over zelf online regelen via een eigen account (afspraken, documenten, facturen), 24/7.\n"
+                . "- services = de FUNCTIES van het portaal (bv. afspraken plannen, documenten inzien, facturen betalen, voortgang volgen). services_heading bijvoorbeeld 'Wat je zelf kunt regelen'.\n"
+                . "- prices = pakket-/abonnementsvormen of algemene tarieven.\n"
+                . "- steps = account aanmaken, inloggen, zelf regelen.\n"
+                . "- faq = over inloggen, veiligheid en privacy van het portaal.",
+            'automatisering' => "Het doel is ADMINISTRATIE EN PROCESSEN AUTOMATISEREN. Richt de content daarop:\n"
+                . "- hero gaat over tijd besparen en fouten voorkomen door automatisering.\n"
+                . "- services = concrete TAKEN die geautomatiseerd worden (offertes, facturen, herinneringen, urenregistratie, planning). services_heading bijvoorbeeld 'Wat we voor je automatiseren'.\n"
+                . "- prices = pakketten, meestal per maand.\n"
+                . "- steps = koppelen, instellen, automatisch laten lopen.\n"
+                . "- faq = over koppelingen met bestaande software, veiligheid en of het past bij dit bedrijf.",
+            'ai' => "Het doel is AI INZETTEN (telefoon, chat, offertes). Richt de content daarop:\n"
+                . "- hero gaat over 24/7 bereikbaar zijn en sneller reageren met AI.\n"
+                . "- services = AI-TOEPASSINGEN (telefoonassistent die opneemt, chatbot op de site, automatische offertes, e-mails beantwoorden). services_heading bijvoorbeeld 'Wat AI voor je doet'.\n"
+                . "- prices = pakketten, meestal per maand.\n"
+                . "- steps = kennismaken, de AI trainen op jouw bedrijf, live gaan.\n"
+                . "- faq = over betrouwbaarheid, wanneer een mens overneemt en de kosten.",
+            default => "Het doel is MEER KLANTEN EN AANVRAGEN via een professionele website. Richt de content daarop:\n"
+                . "- hero gaat over gevonden worden en makkelijk een afspraak of aanvraag doen.\n"
+                . "- services = de belangrijkste DIENSTEN van dit bedrijf.\n"
+                . "- prices = tarieven of pakketten.\n"
+                . "- steps = de werkwijze: contact, uitvoering, resultaat.\n"
+                . "- faq = over werkwijze, prijzen en planning.",
+        };
+    }
+
+    /**
+     * Per-doel STRUCTUUR: nav-labels, hero-CTA's en de afsluitende sectie. Zo krijgt
+     * elk doel een herkenbaar andere pagina (webshop eindigt met een winkel-CTA i.p.v.
+     * de afspraak-widget; portaal/AI/automatisering hebben eigen CTA-teksten). Anchors
+     * blijven gelijk (#diensten/#tarieven/#werkwijze/#contact) zodat de on-page links
+     * op de one-pager blijven werken; alleen de LABELS en de laatste sectie verschillen.
+     *
+     * @return array<string,mixed>
+     */
+    private function goalProfile(string $goal): array
+    {
+        return match ($goal) {
+            'webshop' => [
+                'nav'       => [['Assortiment', '#diensten'], ['Producten', '#tarieven'], ['Bestellen', '#werkwijze'], ['Contact', '#contact']],
+                'nav_cta'   => ['label' => 'Bekijk de webshop', 'href' => '#tarieven'],
+                'hero_cta'  => ['label' => 'Bekijk de webshop', 'href' => '#tarieven'],
+                'hero_cta2' => ['label' => 'Ons assortiment', 'href' => '#diensten'],
+                'last'      => 'cta',
+                'cta'       => ['title' => 'Klaar om te bestellen?', 'sub' => 'Bekijk het volledige assortiment en bestel eenvoudig online.', 'label' => 'Naar de webshop', 'href' => '#tarieven'],
+            ],
+            'klantenportaal' => [
+                'nav'       => [['Functies', '#diensten'], ['Zo werkt het', '#werkwijze'], ['Tarieven', '#tarieven'], ['Inloggen', '#contact']],
+                'nav_cta'   => ['label' => 'Inloggen', 'href' => '#contact'],
+                'hero_cta'  => ['label' => 'Naar mijn account', 'href' => '#contact'],
+                'hero_cta2' => ['label' => 'Zo werkt het', 'href' => '#werkwijze'],
+                'last'      => 'booking',
+                'booking'   => ['heading' => 'Plan een kennismaking', 'sub' => 'Kies een moment, dan laten we je persoonlijke portaal zien.', 'deposit' => 0],
+            ],
+            'automatisering' => [
+                'nav'       => [['Wat we automatiseren', '#diensten'], ['Zo werkt het', '#werkwijze'], ['Pakketten', '#tarieven'], ['Contact', '#contact']],
+                'nav_cta'   => ['label' => 'Plan een demo', 'href' => '#contact'],
+                'hero_cta'  => ['label' => 'Plan een gratis demo', 'href' => '#contact'],
+                'hero_cta2' => ['label' => 'Wat kan ik automatiseren?', 'href' => '#diensten'],
+                'last'      => 'booking',
+                'booking'   => ['heading' => 'Plan een gratis demo', 'sub' => 'Kies een moment, dan laten we zien wat je kunt automatiseren.', 'deposit' => 0],
+            ],
+            'ai' => [
+                'nav'       => [['Wat AI doet', '#diensten'], ['Zo werkt het', '#werkwijze'], ['Pakketten', '#tarieven'], ['Contact', '#contact']],
+                'nav_cta'   => ['label' => 'Plan een demo', 'href' => '#contact'],
+                'hero_cta'  => ['label' => 'Plan een gratis demo', 'href' => '#contact'],
+                'hero_cta2' => ['label' => 'Wat doet de AI?', 'href' => '#diensten'],
+                'last'      => 'booking',
+                'booking'   => ['heading' => 'Plan een gratis demo', 'sub' => 'Kies een moment, dan laten we de AI-assistent live zien.', 'deposit' => 0],
+            ],
+            default => [
+                'nav'       => [['Diensten', '#diensten'], ['Werkwijze', '#werkwijze'], ['Prijzen', '#tarieven'], ['Contact', '#contact']],
+                'nav_cta'   => ['label' => 'Maak een afspraak', 'href' => '#contact'],
+                'hero_cta'  => ['label' => 'Maak een afspraak', 'href' => '#contact'],
+                'hero_cta2' => ['label' => 'Bekijk diensten', 'href' => '#diensten'],
+                'last'      => 'booking',
+                'booking'   => ['heading' => 'Maak een afspraak', 'sub' => 'Kies een datum en tijd, vul je gegevens in en je plek staat vast.', 'deposit' => 10],
+            ],
+        };
     }
 
     /** JSON-schema (alleen de hoofdpagina, voor snelheid). */
@@ -247,21 +342,25 @@ class PreviewSiteGenerator
 
     /* ─────────────────────────── Site opbouwen ───────────────────────────── */
 
-    /** Mapt de gegenereerde JSON naar de hoofdpagina-blokken. */
-    private function blocksFrom(array $d): array
+    /**
+     * Mapt de gegenereerde JSON naar de hoofdpagina-blokken. Het gekozen doel bepaalt
+     * de hero-CTA's (uit goalProfile) en de AFSLUITENDE sectie: een webshop eindigt met
+     * een winkel-CTA i.p.v. de afspraak-widget; overige doelen met de boek-/demo-widget.
+     */
+    private function blocksFrom(array $d, string $goal = 'website'): array
     {
+        $profile = $this->goalProfile($goal);
         $reviews = array_map(fn ($r) => ['stars' => 5, 'text' => $r['text'] ?? '', 'author' => $r['author'] ?? ''], $d['reviews'] ?? []);
 
-        return [
+        $blocks = [
             ['type' => 'hero', 'key' => 'hero', 'sort' => 10, 'content' => [
                 'title' => $d['hero_title'] ?? null,
                 'sub' => $d['hero_sub'] ?? null,
-                // Dit is de site van de ondernemer zelf: CTA's gaan over de klant een
-                // afspraak/contact laten maken, NIET over ons voorbeeld-aanbod.
-                'cta_label' => 'Maak een afspraak', 'cta_href' => '#contact',
-                'cta2_label' => 'Bekijk diensten', 'cta2_href' => '#diensten',
+                // Hero-CTA's per doel: afspraak, webshop bekijken, inloggen, demo plannen.
+                'cta_label' => $profile['hero_cta']['label'], 'cta_href' => $profile['hero_cta']['href'],
+                'cta2_label' => $profile['hero_cta2']['label'], 'cta2_href' => $profile['hero_cta2']['href'],
                 // Full-width hero: kleur-achtergrond tot het AI-branchebeeld is
-                // gegenereerd (gebeurt asynchroon op de preview-pagina zelf). Bewust
+                // gegenereerd (parallel, zie fillContent + generateHeroImage). Bewust
                 // GEEN eyebrow-pill en GEEN note onder de knoppen.
                 'full_bleed' => true,
             ]],
@@ -270,7 +369,8 @@ class PreviewSiteGenerator
                 'items' => $d['services'] ?? [], 'connected' => true, 'anchor' => 'diensten',
             ]],
             ['type' => 'pricelist', 'key' => 'tarieven', 'sort' => 40, 'content' => [
-                'eyebrow' => 'Tarieven', 'heading' => $d['prices_heading'] ?? 'Onze tarieven',
+                'eyebrow' => $goal === 'webshop' ? 'Assortiment' : 'Tarieven',
+                'heading' => $d['prices_heading'] ?? 'Onze tarieven',
                 'items' => $d['prices'] ?? [], 'punchy' => true, 'anchor' => 'tarieven',
             ]],
             ['type' => 'steps', 'key' => 'werkwijze', 'sort' => 50, 'content' => [
@@ -285,17 +385,28 @@ class PreviewSiteGenerator
             ['type' => 'faq', 'key' => 'faq', 'sort' => 80, 'content' => [
                 'heading' => 'Veelgestelde vragen', 'items' => $d['faq'] ?? [], 'punchy' => true,
             ]],
-            // Interactieve boek-widget als contact-sectie (datum > tijd > gegevens >
-            // optionele aanbetaling). Front-end/preview; echte Mollie + agenda volgt.
-            ['type' => 'booking', 'key' => 'contact', 'sort' => 90, 'content' => [
-                'heading' => 'Maak een afspraak',
-                'sub' => 'Kies een datum en tijd, vul je gegevens in en je plek staat vast.',
-                'services' => array_values(array_filter(array_map(fn ($p) => $p['name'] ?? null, $d['prices'] ?? []))),
-                'deposit' => 10,
-            ]],
-            // Bewust GEEN wizard/groeipad-blokken: dit is de site van de ondernemer
-            // zelf (one-pager), niet onze verkoop-/lead-funnel voor websites.
         ];
+
+        // Afsluitende sectie per doel. Webshop = winkel-CTA (de datum/tijd/aanbetaling-
+        // widget past niet bij online verkopen); overige doelen = boek-/demo-widget.
+        if (($profile['last'] ?? 'booking') === 'cta') {
+            $c = $profile['cta'];
+            $blocks[] = ['type' => 'cta', 'key' => 'contact', 'sort' => 90, 'content' => [
+                'title' => $c['title'], 'sub' => $c['sub'], 'cta_label' => $c['label'], 'cta_href' => $c['href'],
+            ]];
+        } else {
+            $b = $profile['booking'];
+            $blocks[] = ['type' => 'booking', 'key' => 'contact', 'sort' => 90, 'content' => [
+                'heading' => $b['heading'],
+                'sub' => $b['sub'],
+                'services' => array_values(array_filter(array_map(fn ($p) => $p['name'] ?? null, $d['prices'] ?? []))),
+                'deposit' => $b['deposit'] ?? 0,
+            ]];
+        }
+
+        // Bewust GEEN wizard/groeipad-blokken: dit is de site van de ondernemer zelf
+        // (one-pager), niet onze verkoop-/lead-funnel voor websites.
+        return $blocks;
     }
 
     /* ─────────────────────────── Hero-beeld (AI) ─────────────────────────── */
