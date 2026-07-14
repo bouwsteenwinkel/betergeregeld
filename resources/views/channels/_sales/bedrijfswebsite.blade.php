@@ -44,7 +44,7 @@
             <div class="hero-text">
                 <h1>Zie jouw nieuwe website in 60 seconden</h1>
                 <p class="lead">Meer klanten uit je eigen regio, zonder gedoe. Vertel kort wat je doet en bekijk meteen een gratis voorbeeld van jouw site.</p>
-                <a href="#gratis-voorbeeld" class="btn">Maak mijn gratis voorbeeld</a>
+                <a href="{{ $site->url('voorbeeld-maken') }}" class="btn">Maak mijn gratis voorbeeld</a>
                 <p class="muted" style="margin-top:.8rem;font-size:.9rem">Klaar in 60 seconden, geen account, geen kosten, nergens aan vast</p>
                 <ul class="hero-usps">
                     <li>Meteen resultaat, geen dagen wachten</li>
@@ -93,7 +93,7 @@
         'lead'   => 'Van een eerste professionele site tot online verkopen en slimme automatisering. Klik op een fase voor het volledige verhaal en een echt voorbeeld.',
     ])
 
-    @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe jouw site eruit zou zien?'])
+    @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe jouw site eruit zou zien?', 'ctaHref' => $site->url('voorbeeld-maken')])
 
     <div id="contact" class="scroll-anchor" aria-hidden="true"></div>
     @include('channels.partials.lead-wizard', ['site' => $site, 'facet' => 'website'])

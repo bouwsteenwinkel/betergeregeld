@@ -67,9 +67,20 @@ class PreviewToolController extends Controller
             return response()->json(['ok' => false, 'error' => $result['error'] ?? 'onbekend'], 502);
         }
 
+        // Previews leven op /_site/{key}, en die route bestaat ALLEEN op het
+        // hoofddomein (betergeregeld.com). Op een live channel-domein
+        // (bv. jouw-bedrijfswebsite.nl) vangt de greedy catch-all elk /_site/...-pad
+        // af naar de 404. Draait de tool op zo'n live domein, bouw de preview-URL
+        // dan expliciet op het hoofddomein; lokaal (draft, geen domein) blijft de
+        // huidige host correct.
+        $path = '/_site/' . $result['key'];
+        $url  = $this->site()->isLive()
+            ? rtrim(config('app.url'), '/') . $path
+            : url($path);
+
         return response()->json([
             'ok'  => true,
-            'url' => url('/_site/' . $result['key']),
+            'url' => $url,
         ]);
     }
 

@@ -78,6 +78,13 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             ],
             'header'  => [
                 'pitch_strip' => false,   // geen pitch-strip boven de header op dit kanaal
+                // Nav-CTA (rechtsboven, op elke pagina) → de self-service instant-tool,
+                // niet het contactformulier onderaan. De tool is de sterkste hook
+                // ("zie je site in 60 seconden"); de lead-wizard blijft als fallback.
+                'cta' => [
+                    'label' => 'Maak gratis voorbeeld',
+                    'href'  => 'voorbeeld-maken',
+                ],
             ],
         ]);
 
