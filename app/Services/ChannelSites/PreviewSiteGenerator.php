@@ -249,24 +249,6 @@ class PreviewSiteGenerator
                 . "- prices = concrete PRODUCTEN met realistische prijs (name = productnaam, desc = korte productregel, price = bedrag). prices_heading bijvoorbeeld 'Populaire producten'.\n"
                 . "- steps = het BESTELPROCES: kiezen, afrekenen, bezorgd of afhalen.\n"
                 . "- faq = over verzendkosten, levertijd, retourneren en betaalmethoden.",
-            'klantenportaal' => "Het doel is een KLANTENPORTAAL waar klanten zelf zaken online regelen. Richt de content daarop:\n"
-                . "- hero gaat over zelf online regelen via een eigen account (afspraken, documenten, facturen), 24/7.\n"
-                . "- services = de FUNCTIES van het portaal (bv. afspraken plannen, documenten inzien, facturen betalen, voortgang volgen). services_heading bijvoorbeeld 'Wat je zelf kunt regelen'.\n"
-                . "- prices = pakket-/abonnementsvormen of algemene tarieven.\n"
-                . "- steps = account aanmaken, inloggen, zelf regelen.\n"
-                . "- faq = over inloggen, veiligheid en privacy van het portaal.",
-            'automatisering' => "Het doel is ADMINISTRATIE EN PROCESSEN AUTOMATISEREN. Richt de content daarop:\n"
-                . "- hero gaat over tijd besparen en fouten voorkomen door automatisering.\n"
-                . "- services = concrete TAKEN die geautomatiseerd worden (offertes, facturen, herinneringen, urenregistratie, planning). services_heading bijvoorbeeld 'Wat we voor je automatiseren'.\n"
-                . "- prices = pakketten, meestal per maand.\n"
-                . "- steps = koppelen, instellen, automatisch laten lopen.\n"
-                . "- faq = over koppelingen met bestaande software, veiligheid en of het past bij dit bedrijf.",
-            'ai' => "Het doel is AI INZETTEN (telefoon, chat, offertes). Richt de content daarop:\n"
-                . "- hero gaat over 24/7 bereikbaar zijn en sneller reageren met AI.\n"
-                . "- services = AI-TOEPASSINGEN (telefoonassistent die opneemt, chatbot op de site, automatische offertes, e-mails beantwoorden). services_heading bijvoorbeeld 'Wat AI voor je doet'.\n"
-                . "- prices = pakketten, meestal per maand.\n"
-                . "- steps = kennismaken, de AI trainen op jouw bedrijf, live gaan.\n"
-                . "- faq = over betrouwbaarheid, wanneer een mens overneemt en de kosten.",
             default => "Het doel is MEER KLANTEN EN AANVRAGEN via een professionele website. Richt de content daarop:\n"
                 . "- hero gaat over gevonden worden en makkelijk een afspraak of aanvraag doen.\n"
                 . "- services = de belangrijkste DIENSTEN van dit bedrijf.\n"
@@ -295,30 +277,6 @@ class PreviewSiteGenerator
                 'hero_cta2' => ['label' => 'Ons assortiment', 'href' => '#diensten'],
                 'last'      => 'cta',
                 'cta'       => ['title' => 'Klaar om te bestellen?', 'sub' => 'Bekijk het volledige assortiment en bestel eenvoudig online.', 'label' => 'Naar de webshop', 'href' => '#tarieven'],
-            ],
-            'klantenportaal' => [
-                'nav'       => [['Functies', '#diensten'], ['Zo werkt het', '#werkwijze'], ['Tarieven', '#tarieven'], ['Inloggen', '#contact']],
-                'nav_cta'   => ['label' => 'Inloggen', 'href' => '#contact'],
-                'hero_cta'  => ['label' => 'Naar mijn account', 'href' => '#contact'],
-                'hero_cta2' => ['label' => 'Zo werkt het', 'href' => '#werkwijze'],
-                'last'      => 'booking',
-                'booking'   => ['heading' => 'Plan een kennismaking', 'sub' => 'Kies een moment, dan laten we je persoonlijke portaal zien.', 'deposit' => 0],
-            ],
-            'automatisering' => [
-                'nav'       => [['Wat we automatiseren', '#diensten'], ['Zo werkt het', '#werkwijze'], ['Pakketten', '#tarieven'], ['Contact', '#contact']],
-                'nav_cta'   => ['label' => 'Plan een demo', 'href' => '#contact'],
-                'hero_cta'  => ['label' => 'Plan een gratis demo', 'href' => '#contact'],
-                'hero_cta2' => ['label' => 'Wat kan ik automatiseren?', 'href' => '#diensten'],
-                'last'      => 'booking',
-                'booking'   => ['heading' => 'Plan een gratis demo', 'sub' => 'Kies een moment, dan laten we zien wat je kunt automatiseren.', 'deposit' => 0],
-            ],
-            'ai' => [
-                'nav'       => [['Wat AI doet', '#diensten'], ['Zo werkt het', '#werkwijze'], ['Pakketten', '#tarieven'], ['Contact', '#contact']],
-                'nav_cta'   => ['label' => 'Plan een demo', 'href' => '#contact'],
-                'hero_cta'  => ['label' => 'Plan een gratis demo', 'href' => '#contact'],
-                'hero_cta2' => ['label' => 'Wat doet de AI?', 'href' => '#diensten'],
-                'last'      => 'booking',
-                'booking'   => ['heading' => 'Plan een gratis demo', 'sub' => 'Kies een moment, dan laten we de AI-assistent live zien.', 'deposit' => 0],
             ],
             default => [
                 'nav'       => [['Diensten', '#diensten'], ['Werkwijze', '#werkwijze'], ['Prijzen', '#tarieven'], ['Contact', '#contact']],
@@ -760,13 +718,14 @@ class PreviewSiteGenerator
 
     /* ──────────────────────────────── Doelen ─────────────────────────────── */
 
-    /** Doel-key => label (stuurt de nadruk in de content + latere facet-lazy-load). */
+    /**
+     * Doel-key => label. Bewust maar TWEE keuzes: in ~60 seconden is het enige
+     * onderscheid dat echt een andere site oplevert service (meer klanten) versus
+     * een webshop (producten). Onbekende/oude keys vallen terug op 'website'.
+     */
     public const GOALS = [
-        'website'        => 'meer klanten en aanvragen via een professionele website',
-        'webshop'        => 'producten of diensten online verkopen',
-        'klantenportaal' => 'klanten zelf afspraken en documenten laten regelen',
-        'automatisering' => 'administratie en processen automatiseren',
-        'ai'             => 'AI inzetten (telefoon, chat, offertes)',
+        'website' => 'meer klanten en aanvragen voor je diensten',
+        'webshop' => 'producten online verkopen',
     ];
 
     private function normalizeGoal(string $goal): string

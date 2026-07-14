@@ -115,7 +115,7 @@
 
             <div class="vm-field">
                 <label>Wat wil je vooral bereiken?</label>
-                @php $goalTitles = ['website' => 'Meer klanten', 'webshop' => 'Online verkopen', 'klantenportaal' => 'Klantenportaal', 'automatisering' => 'Automatiseren', 'ai' => 'AI inzetten']; @endphp
+                @php $goalTitles = ['website' => 'Meer klanten', 'webshop' => 'Webshop']; @endphp
                 <div class="vm-goals">
                     @foreach ($goals as $key => $label)
                         <label class="vm-goal">
