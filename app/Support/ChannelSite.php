@@ -311,6 +311,14 @@ class ChannelSite
             // te zetten als de CTA harder moet contrasteren met het beeld.
             'cta'    => null,
             'on_cta' => null,
+            // Tweede accent + levendigheids-tokens (voorbeeld-tool sfeer-paletten).
+            // Allemaal null-default; cssVars() valt veilig terug op het oude gedrag,
+            // dus channel-sites die deze keys niet zetten renderen byte-identiek.
+            'accent_2'    => null,   // 2e accentkleur (feature-badges, golflijnen, verlopen)
+            'on_accent_2' => null,   // tekstkleur op accent_2
+            'tint'        => null,   // getinte sectie-achtergrond (i.p.v. plat surface)
+            'hero_grad_b' => null,   // 2e stop van het hero-verloop
+            'step_grad_b' => null,   // 2e stop van het step-num-verloop
         ], (array) ($this->cfg['theme'] ?? []));
     }
 
@@ -331,6 +339,14 @@ class ChannelSite
             // Footer-achtergrond apart, zodat donkere thema's (ink = lichte tekst)
             // geen lichte footer krijgen. Default = ink (ongewijzigd licht thema).
             '--c-footer-bg' => $t['footer_bg'] ?? $t['ink'],
+            // Tweede accent + levendigheids-tokens. Elke fallback = exact het oude,
+            // hardgecodeerde gedrag uit de block-blades, dus sites zonder deze theme-
+            // keys renderen ongewijzigd.
+            '--c-accent-2'    => $t['accent_2'] ?? $t['accent'],
+            '--c-on-accent-2' => $t['on_accent_2'] ?? ($t['on_accent'] ?? $t['ink']),
+            '--c-tint'        => $t['tint'] ?? $t['surface'],
+            '--c-hero-grad-b' => $t['hero_grad_b'] ?? 'color-mix(in srgb,var(--c-primary) 62%,#0b1020)',
+            '--c-step-grad-b' => $t['step_grad_b'] ?? 'color-mix(in srgb,var(--c-accent) 55%,#000)',
             '--font'         => $t['font'],
             '--font-display' => $t['font_display'] ?: $t['font'],
             '--radius'      => $t['radius'],

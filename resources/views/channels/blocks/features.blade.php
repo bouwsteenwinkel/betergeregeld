@@ -39,9 +39,11 @@
             </div>
             <style>
                 .features-connected{position:relative;display:grid;gap:1.4rem;margin-top:.5rem}
-                .fc-wave{position:absolute;top:20px;height:24px;color:var(--c-accent);opacity:.55;z-index:0;pointer-events:none;display:none}
+                .fc-wave{position:absolute;top:20px;height:24px;color:var(--c-accent-2);opacity:.55;z-index:0;pointer-events:none;display:none}
                 .fc-item{position:relative;text-align:center;padding:0 .3rem;z-index:1}
                 .fc-badge{width:64px;height:64px;border-radius:50%;background:var(--c-accent);color:var(--c-on-accent,#fff);display:grid;place-items:center;margin:0 auto 1rem;position:relative;z-index:1;border:5px solid var(--c-bg,#fff);box-shadow:0 10px 22px -10px var(--c-accent)}
+                /* Alternerende badges: even kaarten in het 2e accent (valt terug op accent = ongewijzigd). */
+                .fc-item:nth-child(even) .fc-badge{background:var(--c-accent-2);color:var(--c-on-accent-2,#fff);box-shadow:0 10px 22px -10px var(--c-accent-2)}
                 .fc-item h3{font-size:1.05rem;margin:0 0 .35rem;color:var(--c-ink)}
                 .fc-item p{color:var(--c-muted);font-size:.9rem;line-height:1.45;margin:0}
                 @media (min-width:820px){.fc-wave{display:block}}

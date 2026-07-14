@@ -13,7 +13,7 @@
 @endphp
 {{-- "Zo werkt het" e.d.: gaat over ONS proces, niet over de niche → geen niche-foto,
      maar de gedeelde genummerde-stappen-component. Zelfde stijl op elke trigger-site. --}}
-<section data-block="steps" @if ($block->c('anchor')) id="{{ $block->c('anchor') }}" @endif style="background:var(--c-surface)">
+<section data-block="steps" @if ($block->c('anchor')) id="{{ $block->c('anchor') }}" @endif style="background:var(--c-tint)">
     <div class="wrap">
         <div style="text-align:center;max-width:640px;margin:0 auto">
             @if ($block->c('eyebrow'))<span class="kicker" style="justify-content:center"><span class="kicker-line"></span> {{ $block->c('eyebrow') }}</span>@endif
@@ -44,10 +44,10 @@
                GOLVENDE verbindingslijn (SVG), lichte hover-pop. */
             .steps-playful{position:relative}
             .steps-playful .step{text-align:center;position:relative;z-index:1}
-            .steps-playful .step-num{background:linear-gradient(135deg,var(--c-accent),color-mix(in srgb,var(--c-accent) 55%,#000));
-                box-shadow:0 0 0 6px var(--c-surface),0 12px 24px -10px var(--c-accent);transition:transform .18s ease}
+            .steps-playful .step-num{background:linear-gradient(135deg,var(--c-accent),var(--c-step-grad-b));
+                box-shadow:0 0 0 6px var(--c-tint),0 12px 24px -10px var(--c-accent);transition:transform .18s ease}
             .steps-playful .step:hover .step-num{transform:translateY(-5px) scale(1.07) rotate(-5deg)}
-            .steps-playful .sp-wave{position:absolute;top:12px;left:16.6%;width:66.8%;height:24px;color:var(--c-accent);opacity:.55;z-index:0;pointer-events:none;display:none}
+            .steps-playful .sp-wave{position:absolute;top:12px;left:16.6%;width:66.8%;height:24px;color:var(--c-accent-2);opacity:.55;z-index:0;pointer-events:none;display:none}
             @media (min-width:760px){
                 .steps-playful .step:not(:last-child)::after{display:none}
                 .steps-playful .sp-wave{display:block}

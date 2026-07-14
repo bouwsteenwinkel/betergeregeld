@@ -27,8 +27,9 @@ class PreviewToolController extends Controller
     public function form(): View
     {
         return view('channels.voorbeeld-maken', [
-            'site'  => $this->site(),
-            'goals' => PreviewSiteGenerator::GOALS,
+            'site'   => $this->site(),
+            'goals'  => PreviewSiteGenerator::GOALS,
+            'sferen' => PreviewSiteGenerator::SFEREN,
         ]);
     }
 
@@ -48,10 +49,17 @@ class PreviewToolController extends Controller
         $data = $request->validate([
             'company'       => ['required', 'string', 'max:120'],
             'business_type' => ['required', 'string', 'max:120'],
-            'color'         => ['required', 'string', 'regex:/^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/'],
             'goal'          => ['required', 'string', 'in:' . implode(',', array_keys(PreviewSiteGenerator::GOALS))],
+            'sfeer'         => ['required', 'string', 'in:' . implode(',', array_keys(PreviewSiteGenerator::SFEREN))],
+            // Kleur is nu OPTIONEEL (eigen-kleur-override); leeg = het sfeer-palet.
+            'color'         => ['nullable', 'string', 'regex:/^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/'],
+            // Optionele content-verrijking.
+            'key_services'  => ['nullable', 'string', 'max:200'],
+            'place'         => ['nullable', 'string', 'max:80'],
+            'usp'           => ['nullable', 'string', 'max:160'],
         ], [], [
-            'company' => 'bedrijfsnaam', 'business_type' => 'type bedrijf', 'color' => 'kleur', 'goal' => 'doel',
+            'company' => 'bedrijfsnaam', 'business_type' => 'type bedrijf', 'goal' => 'doel', 'sfeer' => 'uitstraling',
+            'color' => 'kleur', 'key_services' => 'kerndiensten', 'place' => 'plaats', 'usp' => 'onderscheider',
         ]);
 
         try {

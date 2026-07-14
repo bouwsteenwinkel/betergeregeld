@@ -57,9 +57,23 @@ class PreviewSiteGenerator
     {
         $company = trim((string) ($input['company'] ?? ''));
         $type    = trim((string) ($input['business_type'] ?? ''));
-        $color   = $this->normalizeHex((string) ($input['color'] ?? '#2563eb'));
         $goal    = $this->normalizeGoal((string) ($input['goal'] ?? 'website'));
+        $sfeer   = $this->normalizeSfeer((string) ($input['sfeer'] ?? 'fris-modern'));
         $source  = trim((string) ($input['source_channel'] ?? ''));
+
+        // Extra (optionele) content-input; verrijkt alleen de Claude-prompt.
+        $place       = trim((string) ($input['place'] ?? ''));
+        $keyServices = trim((string) ($input['key_services'] ?? ''));
+        $usp         = trim((string) ($input['usp'] ?? ''));
+
+        // Kleur is nu OPTIONEEL: leeg = het curated sfeer-palet; ingevuld = eigen-kleur-
+        // override waaruit accent-2 en de getinte varianten worden afgeleid.
+        $colorRaw = trim((string) ($input['color'] ?? ''));
+        $ownColor = $colorRaw !== '' ? $this->normalizeHex($colorRaw) : null;
+        $theme    = $this->themeFromPalette($sfeer, $ownColor);
+        // Effectieve primaire kleur (voor het hero-beeld-accent), zodat het beeld bij
+        // het gekozen palet past ook zonder eigen kleur.
+        $effectiveColor = $ownColor ?? self::SFEREN[$sfeer]['primary'];
 
         $brandName = $company !== '' ? $company : 'Voorbeeld';
         $key       = 'preview-' . Str::lower(Str::random(12));
@@ -72,7 +86,7 @@ class PreviewSiteGenerator
             'domain' => null,
             'status' => 'draft',
             'locale' => 'nl',
-            'theme'  => $this->themeFromColor($color),
+            'theme'  => $theme,
             'brand'  => [
                 'logo_text'    => $brandName,
                 'logo_tagline' => '',
@@ -88,7 +102,10 @@ class PreviewSiteGenerator
                 'home_description' => '',
                 'preview' => [
                     'is_preview'     => true,
-                    'input'          => ['company' => $company, 'business_type' => $type, 'color' => $color, 'goal' => $goal],
+                    'input'          => [
+                        'company' => $company, 'business_type' => $type, 'color' => $effectiveColor, 'goal' => $goal,
+                        'sfeer' => $sfeer, 'place' => $place, 'key_services' => $keyServices, 'usp' => $usp,
+                    ],
                     'source_channel' => $source !== '' ? $source : null,
                     'expires_at'     => now()->addHours(self::TTL_HOURS)->toIso8601String(),
                     'claimed'        => false,
@@ -116,16 +133,20 @@ class PreviewSiteGenerator
             return ['ok' => true, 'already' => true];
         }
 
-        $company = (string) data_get($preview, 'input.company', '');
-        $type    = (string) data_get($preview, 'input.business_type', '');
-        $goal    = $this->normalizeGoal((string) data_get($preview, 'input.goal', 'website'));
+        $company     = (string) data_get($preview, 'input.company', '');
+        $type        = (string) data_get($preview, 'input.business_type', '');
+        $goal        = $this->normalizeGoal((string) data_get($preview, 'input.goal', 'website'));
+        $sfeer       = $this->normalizeSfeer((string) data_get($preview, 'input.sfeer', 'fris-modern'));
+        $place       = (string) data_get($preview, 'input.place', '');
+        $keyServices = (string) data_get($preview, 'input.key_services', '');
+        $usp         = (string) data_get($preview, 'input.usp', '');
 
         $client = app(AnthropicClient::class);
         $data = $client->structuredCall([
             'model'             => $this->model($client),
             'max_tokens'        => 3200,
             'system'            => $this->systemPrompt(),
-            'user'              => $this->userPrompt($company, $type, $goal),
+            'user'              => $this->userPrompt($company, $type, $goal, $sfeer, $place, $keyServices, $usp),
             'tool_name'         => 'lever_voorbeeldsite',
             'tool_description'  => 'Lever de voorbeeldsite-content via dit gereedschap. Antwoord niet in chat-tekst.',
             'tool_input_schema' => $this->schema(),
@@ -186,15 +207,30 @@ class PreviewSiteGenerator
             SYS;
     }
 
-    private function userPrompt(string $company, string $type, string $goal): string
+    private function userPrompt(string $company, string $type, string $goal, string $sfeer = 'fris-modern', string $place = '', string $keyServices = '', string $usp = ''): string
     {
         $name = $company !== '' ? $company : '(verzin een korte, passende naam)';
         $goalLabel = self::GOALS[$goal] ?? 'meer klanten en aanvragen';
 
+        // Optionele, door de ondernemer aangeleverde context; alleen toevoegen als
+        // gevuld, zodat een leeg formulier de prompt (en de snelheid) ongemoeid laat.
+        $extra = '';
+        if ($keyServices !== '') {
+            $extra .= "Kerndiensten of producten in de woorden van de ondernemer: {$keyServices}. Baseer de services, prices en steps hierop.\n";
+        }
+        if ($place !== '') {
+            $extra .= "Werkgebied of plaats: {$place}. Laat hero_sub, faq en reviews hier natuurlijk naar verwijzen voor lokale vindbaarheid.\n";
+        }
+        if ($usp !== '') {
+            $extra .= "Wat dit bedrijf onderscheidt: {$usp}. Laat dit terugkomen in hero_sub en in een van de usps.\n";
+        }
+
         return "Bedrijfsnaam: {$name}.\n"
             . "Type bedrijf: {$type}.\n"
-            . "Belangrijkste doel van de ondernemer: {$goalLabel}.\n\n"
-            . $this->goalGuidance($goal) . "\n\n"
+            . "Belangrijkste doel van de ondernemer: {$goalLabel}.\n"
+            . 'Toon van de teksten: ' . $this->sfeerTone($sfeer) . ".\n"
+            . $extra
+            . "\n" . $this->goalGuidance($goal) . "\n\n"
             . 'Genereer de content voor de voorbeeld-hoofdpagina. Vul ALLE velden, toegespitst op DIT type bedrijf EN het bovenstaande doel. '
             . 'De velden services, prices, steps en faq krijgen een andere invulling per doel (zie hierboven); volg dat strikt.';
     }
@@ -511,6 +547,179 @@ class PreviewSiteGenerator
             'footer_bg' => $this->darken($hex, 0.72),
             'radius'    => '14px',
         ];
+    }
+
+    /**
+     * Curated sfeer-paletten: elk een harmonieus MULTI-kleuren schema (primaire kleur
+     * + tweede accent + getinte surface/tint + donkere footer) met een bijpassende
+     * copy-toon en system-font-stack. Deze vervangen de platte 1-kleur-keuze en geven
+     * de voorbeeldsites echte levendigheid. on_accent2 is per palet WCAG-gecheckt.
+     */
+    public const SFEREN = [
+        'fris-modern' => [
+            'primary' => '#2563eb', 'accent2' => '#06b6d4', 'on_accent2' => '#0f172a',
+            'bg' => '#ffffff', 'surface' => '#eff6ff', 'tint' => '#e0f2fe', 'footer' => '#0b1e3b',
+            'font_display' => "system-ui, -apple-system, 'Segoe UI', sans-serif",
+            'tone' => 'helder, direct en to-the-point, zonder opsmuk',
+        ],
+        'warm-persoonlijk' => [
+            'primary' => '#ea580c', 'accent2' => '#e11d48', 'on_accent2' => '#ffffff',
+            'bg' => '#fffdf9', 'surface' => '#fff5ed', 'tint' => '#ffe9dc', 'footer' => '#3d1e12',
+            'font_display' => "'Iowan Old Style', Georgia, 'Times New Roman', serif",
+            'tone' => 'warm, uitnodigend en persoonlijk, jij-en-ik',
+        ],
+        'premium-rustig' => [
+            'primary' => '#0f766e', 'accent2' => '#b08968', 'on_accent2' => '#241a12',
+            'bg' => '#ffffff', 'surface' => '#f5f3ef', 'tint' => '#ece7df', 'footer' => '#08201d',
+            'font_display' => "'Iowan Old Style', Georgia, 'Times New Roman', serif",
+            'tone' => 'rustig, zelfverzekerd en verzorgd, weinig uitroeptekens',
+        ],
+        'speels-kleurrijk' => [
+            'primary' => '#7c3aed', 'accent2' => '#f59e0b', 'on_accent2' => '#3a2600',
+            'bg' => '#ffffff', 'surface' => '#faf5ff', 'tint' => '#f3e8ff', 'footer' => '#2a1350',
+            'font_display' => "system-ui, -apple-system, 'Segoe UI', sans-serif",
+            'tone' => 'energiek en luchtig, mag een knipoog hebben',
+        ],
+        'degelijk-betrouwbaar' => [
+            'primary' => '#1d4ed8', 'accent2' => '#0f766e', 'on_accent2' => '#ffffff',
+            'bg' => '#ffffff', 'surface' => '#f1f5f9', 'tint' => '#e2e8f0', 'footer' => '#0f1e38',
+            'font_display' => "system-ui, -apple-system, 'Segoe UI', sans-serif",
+            'tone' => 'nuchter en feitelijk, zonder superlatieven',
+        ],
+        'natuurlijk-rustig' => [
+            'primary' => '#15803d', 'accent2' => '#84cc16', 'on_accent2' => '#14290a',
+            'bg' => '#ffffff', 'surface' => '#f0fdf4', 'tint' => '#dcfce7', 'footer' => '#0b3d24',
+            'font_display' => "'Iowan Old Style', Georgia, 'Times New Roman', serif",
+            'tone' => 'natuurlijk, nuchter en betrokken',
+        ],
+    ];
+
+    /**
+     * Bouwt het volledige thema uit een curated sfeer-palet. Optioneel overschrijft de
+     * bezoeker de primaire kleur (eigen huisstijl); dan wordt de rest (2e accent, getinte
+     * varianten, footer) daaruit afgeleid. Zet ALLE nieuwe tokens (accent_2, on_accent_2,
+     * tint, hero_grad_b, step_grad_b), zodat de site levendig en leesbaar rendert.
+     */
+    public function themeFromPalette(string $sfeer, ?string $ownColor = null): array
+    {
+        $p = self::SFEREN[$this->normalizeSfeer($sfeer)];
+
+        $primary = $p['primary'];
+        $accent2 = $p['accent2'];
+        $onAcc2  = $p['on_accent2'];
+        $bg      = $p['bg'];
+        $surface = $p['surface'];
+        $tint    = $p['tint'];
+        $footer  = $p['footer'];
+
+        // Eigen-kleur-override: neem de primaire kleur over, leid de rest deterministisch af.
+        if ($ownColor !== null && $ownColor !== '') {
+            $primary = $this->normalizeHex($ownColor);
+            $accent2 = $this->deriveAccent2($primary, $p['accent2']);
+            $onAcc2  = $this->luminance($accent2) > 0.55 ? '#0f172a' : '#ffffff';
+            $surface = $this->mix($primary, 6);
+            $tint    = $this->mix($primary, 12);
+            $footer  = $this->darken($primary, 0.7);
+            $bg      = '#ffffff';
+        }
+
+        $onColor = $this->luminance($primary) > 0.55 ? '#0f172a' : '#ffffff';
+
+        return [
+            'primary'      => $primary,
+            'accent'       => $primary,
+            'cta'          => $primary,
+            'on_accent'    => $onColor,
+            'on_cta'       => $onColor,
+            'accent_2'     => $accent2,
+            'on_accent_2'  => $onAcc2,
+            'ink'          => '#0f172a',
+            'muted'        => '#64748b',
+            'bg'           => $bg,
+            'surface'      => $surface,
+            'tint'         => $tint,
+            'footer_bg'    => $footer,
+            'hero_grad_b'  => $accent2,   // hero-verloop loopt primary -> 2e accent
+            'step_grad_b'  => $accent2,   // step-num-verloop loopt accent -> 2e accent
+            'font'         => 'system-ui, -apple-system, sans-serif',
+            'font_display' => $p['font_display'],
+            'radius'       => '14px',
+        ];
+    }
+
+    /** Whitelist op geldige sfeer-keys; default = fris-modern. */
+    public function normalizeSfeer(string $sfeer): string
+    {
+        $sfeer = strtolower(trim($sfeer));
+        return array_key_exists($sfeer, self::SFEREN) ? $sfeer : 'fris-modern';
+    }
+
+    /** Toon-instructie voor de content-prompt, per sfeer. */
+    private function sfeerTone(string $sfeer): string
+    {
+        return self::SFEREN[$this->normalizeSfeer($sfeer)]['tone'];
+    }
+
+    /**
+     * Leidt een levendig 2e accent af uit de eigen kleur (hue +28 graden, S en L
+     * geclampt zodat het altijd fris en leesbaar is). Te grijze bronkleuren (weinig
+     * chroma) leveren geen goed 2e accent op; dan valt het terug op het palet-accent.
+     */
+    private function deriveAccent2(string $hex, string $fallback): string
+    {
+        [$h, $s, $l] = $this->hexToHsl($hex);
+        if ($s < 0.15) {
+            return $fallback;
+        }
+        $h = fmod($h + 28, 360);
+        $s = max(0.50, min(0.85, $s));
+        $l = max(0.42, min(0.52, $l));
+        return $this->hslToHex($h, $s, $l);
+    }
+
+    /** Mengt $hex met wit; $pct = percentage kleur (rest wit). Voor getinte surfaces. */
+    private function mix(string $hex, float $pct): string
+    {
+        [$r, $g, $b] = $this->rgb($hex);
+        $f = max(0.0, min(1.0, $pct / 100));
+        $m = fn ($c) => (int) round($c * $f + 255 * (1 - $f));
+        return sprintf('#%02x%02x%02x', $m($r), $m($g), $m($b));
+    }
+
+    /** @return array{0:float,1:float,2:float} hue(0-360), sat(0-1), light(0-1) */
+    private function hexToHsl(string $hex): array
+    {
+        [$r, $g, $b] = array_map(fn ($c) => $c / 255, $this->rgb($hex));
+        $max = max($r, $g, $b);
+        $min = min($r, $g, $b);
+        $d = $max - $min;
+        $l = ($max + $min) / 2;
+        if ($d == 0.0) {
+            return [0.0, 0.0, $l];
+        }
+        $s = $d / (1 - abs(2 * $l - 1));
+        $h = match (true) {
+            $max === $r => fmod(($g - $b) / $d, 6),
+            $max === $g => (($b - $r) / $d) + 2,
+            default     => (($r - $g) / $d) + 4,
+        };
+        return [fmod($h * 60 + 360, 360), $s, $l];
+    }
+
+    private function hslToHex(float $h, float $s, float $l): string
+    {
+        $c = (1 - abs(2 * $l - 1)) * $s;
+        $x = $c * (1 - abs(fmod($h / 60, 2) - 1));
+        $m = $l - $c / 2;
+        [$r, $g, $b] = match (true) {
+            $h < 60  => [$c, $x, 0.0],
+            $h < 120 => [$x, $c, 0.0],
+            $h < 180 => [0.0, $c, $x],
+            $h < 240 => [0.0, $x, $c],
+            $h < 300 => [$x, 0.0, $c],
+            default  => [$c, 0.0, $x],
+        };
+        return sprintf('#%02x%02x%02x', (int) round(($r + $m) * 255), (int) round(($g + $m) * 255), (int) round(($b + $m) * 255));
     }
 
     /** Normaliseert naar #rrggbb; valt terug op een nette blauw bij onzin. */

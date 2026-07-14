@@ -27,8 +27,11 @@
     </section>
     <style>
         .hero-full{position:relative;overflow:hidden;padding:0;min-height:clamp(520px,72vh,760px);display:flex;align-items:center;
-            background:linear-gradient(120deg,var(--c-primary),color-mix(in srgb,var(--c-primary) 62%,#0b1020))}
-        .hero-full::before{content:"";position:absolute;inset:0;background-image:var(--hero-img,none);background-size:cover;background-position:center;opacity:0;transition:opacity .8s ease}
+            background:linear-gradient(120deg,var(--c-primary),var(--c-hero-grad-b))}
+        /* Subtiele 2e-accent gloed rechtsboven voor diepte zolang er nog geen fotobeeld is. */
+        .hero-full::after{content:"";position:absolute;top:-30%;right:-10%;width:60%;height:120%;background:radial-gradient(circle,color-mix(in srgb,var(--c-accent-2) 55%,transparent),transparent 62%);opacity:.5;pointer-events:none;z-index:0}
+        .hero-full.has-img::after{opacity:0}
+        .hero-full::before{content:"";position:absolute;inset:0;background-image:var(--hero-img,none);background-size:cover;background-position:center;opacity:0;transition:opacity .8s ease;z-index:0}
         .hero-full.has-img::before{opacity:1}
         /* Scrim: donkere verloop links zodat witte tekst altijd leesbaar is, ook op het beeld. */
         .hero-full-scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,14,26,.72) 0%,rgba(10,14,26,.45) 42%,rgba(10,14,26,.05) 78%)}

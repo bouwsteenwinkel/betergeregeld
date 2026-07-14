@@ -31,6 +31,18 @@
     .vm-goal:has(input:checked) .vm-tick svg{opacity:1}
     .vm-goal b{display:block;color:var(--c-ink);font-size:.95rem}
     .vm-goal span{color:var(--c-muted);font-size:.82rem}
+    /* Sfeer-kaarten: 2-kleuren mini-swatch in de bestaande .vm-goal-kaart */
+    .vm-sfeer-swatch{width:44px;height:32px;border-radius:8px;flex:0 0 auto;margin-top:.05rem;box-shadow:inset 0 0 0 1px rgba(15,23,42,.12)}
+    /* Uitklapbare optionele secties (eigen kleur, persoonlijker maken) */
+    .vm-more{margin-bottom:1.5rem;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
+    .vm-more>summary{cursor:pointer;padding:.85rem 1rem;font-weight:600;color:var(--c-ink);list-style:none;display:flex;align-items:center;gap:.55rem}
+    .vm-more>summary::-webkit-details-marker{display:none}
+    .vm-more>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--c-muted);border-bottom:2px solid var(--c-muted);transform:rotate(-45deg);transition:transform .15s}
+    .vm-more[open]>summary::before{transform:rotate(45deg)}
+    .vm-more-body{padding:.1rem 1rem 1rem}
+    .vm-more-body .vm-field{margin-bottom:1rem}
+    .vm-more-body .vm-field:last-child{margin-bottom:.2rem}
+    textarea.vm-input{resize:vertical;min-height:2.6rem}
     .vm-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
     .vm-error{display:none;margin-top:1rem;padding:.8rem 1rem;border-radius:10px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;font-size:.9rem}
     /* Laadscherm */
@@ -74,16 +86,31 @@
             </div>
 
             <div class="vm-field">
-                <label>Kies je primaire kleur</label>
-                <p class="vm-hint">Deze kleur bepaalt de uitstraling van je voorbeeld.</p>
-                <div class="vm-colors" id="vm-colors">
-                    @foreach (['#2563eb' => 'Blauw', '#0ea5e9' => 'Lichtblauw', '#059669' => 'Groen', '#ea580c' => 'Oranje', '#dc2626' => 'Rood', '#7c3aed' => 'Paars', '#0f172a' => 'Antraciet'] as $hex => $naam)
-                        <button type="button" class="vm-swatch" data-color="{{ $hex }}" title="{{ $naam }}"
-                                style="background:{{ $hex }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}" aria-label="{{ $naam }}"></button>
+                <label>Welke uitstraling past bij je bedrijf?</label>
+                <p class="vm-hint">Dit bepaalt het kleurenschema en de sfeer van je voorbeeld.</p>
+                @php
+                    $sfeerTitles = [
+                        'fris-modern'          => ['Fris en modern', 'Helder en strak'],
+                        'warm-persoonlijk'     => ['Warm en persoonlijk', 'Uitnodigend'],
+                        'premium-rustig'       => ['Premium en rustig', 'Verzorgd'],
+                        'speels-kleurrijk'     => ['Speels en kleurrijk', 'Energiek'],
+                        'degelijk-betrouwbaar' => ['Degelijk en betrouwbaar', 'Nuchter'],
+                        'natuurlijk-rustig'    => ['Natuurlijk en rustig', 'Groen en kalm'],
+                    ];
+                @endphp
+                <div class="vm-goals">
+                    @foreach ($sferen as $key => $s)
+                        <label class="vm-goal">
+                            <input type="radio" name="sfeer" value="{{ $key }}" {{ $loop->first ? 'checked' : '' }} required>
+                            <span class="vm-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                            <span class="vm-sfeer-swatch" aria-hidden="true" style="background:linear-gradient(120deg,{{ $s['primary'] }} 0 50%,{{ $s['accent2'] }} 50% 100%)"></span>
+                            <span>
+                                <b>{{ $sfeerTitles[$key][0] ?? $key }}</b>
+                                <span>{{ $sfeerTitles[$key][1] ?? '' }}</span>
+                            </span>
+                        </label>
                     @endforeach
-                    <input type="color" id="vm-color-native" class="vm-color-native" value="#2563eb" aria-label="Eigen kleur kiezen">
                 </div>
-                <input type="hidden" name="color" id="vm-color" value="#2563eb">
             </div>
 
             <div class="vm-field">
@@ -102,6 +129,43 @@
                     @endforeach
                 </div>
             </div>
+
+            <details class="vm-more" id="vm-color-details">
+                <summary>Liever je eigen kleur? (optioneel)</summary>
+                <div class="vm-more-body">
+                    <p class="vm-hint">We passen de gekozen sfeer aan op jouw kleur.</p>
+                    <div class="vm-colors" id="vm-colors">
+                        @foreach (['#2563eb' => 'Blauw', '#0ea5e9' => 'Lichtblauw', '#059669' => 'Groen', '#ea580c' => 'Oranje', '#dc2626' => 'Rood', '#7c3aed' => 'Paars', '#0f172a' => 'Antraciet'] as $hex => $naam)
+                            <button type="button" class="vm-swatch" data-color="{{ $hex }}" title="{{ $naam }}"
+                                    style="background:{{ $hex }}" aria-pressed="false" aria-label="{{ $naam }}"></button>
+                        @endforeach
+                        <input type="color" id="vm-color-native" class="vm-color-native" value="#2563eb" aria-label="Eigen kleur kiezen">
+                    </div>
+                </div>
+            </details>
+            <input type="hidden" name="color" id="vm-color" value="">
+
+            <details class="vm-more">
+                <summary>Maak het persoonlijker (optioneel)</summary>
+                <div class="vm-more-body">
+                    <div class="vm-field">
+                        <label for="vm-services">Waar ben je vooral goed in?</label>
+                        <p class="vm-hint">Je belangrijkste diensten of producten, in je eigen woorden.</p>
+                        <textarea class="vm-input" id="vm-services" name="key_services" maxlength="200" rows="2"
+                                  placeholder="Bijvoorbeeld: cv-ketel vervangen, lekkage snel verhelpen, badkamer aanleggen"></textarea>
+                    </div>
+                    <div class="vm-field">
+                        <label for="vm-place">In welke plaats of regio werk je?</label>
+                        <input class="vm-input" type="text" id="vm-place" name="place" maxlength="80"
+                               placeholder="Bijvoorbeeld: Zwolle en omgeving">
+                    </div>
+                    <div class="vm-field">
+                        <label for="vm-usp">Wat maakt jullie anders?</label>
+                        <input class="vm-input" type="text" id="vm-usp" name="usp" maxlength="160"
+                               placeholder="Bijvoorbeeld: binnen 24 uur ter plaatse">
+                    </div>
+                </div>
+            </details>
 
             <div class="vm-hp" aria-hidden="true">
                 <label>Laat dit veld leeg<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
@@ -144,8 +208,22 @@
     swatches.forEach(function (s) { s.addEventListener('click', function () { setColor(s.dataset.color); }); });
     native.addEventListener('input', function () { setColor(native.value); });
 
+    // Eigen kleur is een OVERRIDE op het sfeer-palet. Dicht = geen override (leeg).
+    // Open = kies een kleur; standaard de eerste swatch zodat er meteen iets staat.
+    var colorDetails = document.getElementById('vm-color-details');
+    if (colorDetails) {
+        colorDetails.addEventListener('toggle', function () {
+            if (colorDetails.open) {
+                if (!colorHidden.value && swatches[0]) { setColor(swatches[0].dataset.color); }
+            } else {
+                colorHidden.value = '';
+                swatches.forEach(function (s) { s.setAttribute('aria-pressed', 'false'); });
+            }
+        });
+    }
+
     var steps = [
-        'Je kleur toepassen...',
+        'Je sfeer en kleuren toepassen...',
         'Teksten schrijven voor jouw vak...',
         'Een passend beeld maken voor je site...',
         'Diensten, tarieven en reviews...',
