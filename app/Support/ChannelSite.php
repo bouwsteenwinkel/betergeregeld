@@ -685,6 +685,38 @@ class ChannelSite
         return view()->exists($view) ? $view : null;
     }
 
+    /**
+     * Stuurt dit kanaal een verkeerde/verwijderde URL naar de eigen homepage
+     * i.p.v. een 404-foutpagina te tonen? Opt-in via config/channel_soft_404.php.
+     */
+    public function redirectsNotFoundToHome(): bool
+    {
+        return in_array($this->key, (array) config('channel_soft_404', []), true);
+    }
+
+    /**
+     * Bespoke plaatsen-view voor deze site (index|province|show), of de gedeelde
+     * fallback. Opt-in per site via het bestaan van
+     * channels/_places/{key}/{name}.blade.php — laat andere kanalen ongemoeid.
+     */
+    public function placeView(string $name): string
+    {
+        $bespoke = "channels._places.{$this->key}.{$name}";
+
+        return view()->exists($bespoke) ? $bespoke : "channels.places.{$name}";
+    }
+
+    /**
+     * Bespoke blog-view voor deze site (index|show), of de gedeelde fallback.
+     * Opt-in via channels/_blog/{key}/{name}.blade.php.
+     */
+    public function blogView(string $name): string
+    {
+        $bespoke = "channels._blog.{$this->key}.{$name}";
+
+        return view()->exists($bespoke) ? $bespoke : "channels.blog.{$name}";
+    }
+
     /** Bespoke blade > blok-gedreven (DB) > generieke config-home. */
     public function homeView(): string
     {

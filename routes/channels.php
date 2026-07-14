@@ -16,6 +16,7 @@
 use App\Http\Controllers\ChannelSite\ChannelSiteController;
 use App\Http\Controllers\ChannelSite\PreviewToolController;
 use App\Http\Controllers\ChannelSite\SavePreviewController;
+use App\Http\Middleware\BlockChannelPages;
 use App\Http\Middleware\ResolveChannelSite;
 use App\Services\ChannelSiteResolver;
 use Illuminate\Support\Facades\Route;
@@ -102,7 +103,7 @@ $channelRoutes = function () use ($facetKeys) {
 // 1) Live kanalen op hun eigen domein.
 foreach (app(ChannelSiteResolver::class)->live() as $site) {
     Route::domain($site->domain())
-        ->middleware(ResolveChannelSite::class)
+        ->middleware([ResolveChannelSite::class, BlockChannelPages::class])
         ->group($channelRoutes);
 }
 
@@ -112,5 +113,5 @@ foreach (app(ChannelSiteResolver::class)->live() as $site) {
 //    zodat een preview óók op het channel-domein zelf opent (voelt als de eigen
 //    site van de klant) i.p.v. dat de catch-all 'm naar de 404 stuurt.
 Route::prefix('_site/{channelKey}')
-    ->middleware(ResolveChannelSite::class)
+    ->middleware([ResolveChannelSite::class, BlockChannelPages::class])
     ->group($channelRoutes);

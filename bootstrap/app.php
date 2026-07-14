@@ -46,5 +46,17 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Soft-404-kanalen (config/channel_soft_404.php): een niet-bestaande
+        // plaats-/blog-slug (abort 404 / firstOrFail) stuurt de bezoeker naar de
+        // eigen homepage i.p.v. een foutpagina. Andere kanalen/requests: default.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, Request $request) {
+            if (! app()->bound(\App\Support\ChannelSite::class)) {
+                return null;
+            }
+            $site = app(\App\Support\ChannelSite::class);
+            if ($site->redirectsNotFoundToHome()) {
+                return redirect($site->url(''), 302);
+            }
+            return null;
+        });
     })->create();

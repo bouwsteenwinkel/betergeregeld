@@ -75,6 +75,7 @@
             <div class="vm-field">
                 <label for="vm-company">Wat is je bedrijfsnaam?</label>
                 <input class="vm-input" type="text" id="vm-company" name="company" maxlength="120" required
+                       value="{{ old('company', request('bedrijf')) }}"
                        placeholder="Bijvoorbeeld: Van Dijk Installatietechniek" autocomplete="organization">
             </div>
 

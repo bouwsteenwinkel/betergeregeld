@@ -22,18 +22,30 @@ class BedrijfswebsiteSiteSeeder extends Seeder
             'lead_branche' => 'zakelijke-dienstverlening',
             'active'       => true,
             'theme'        => [
-                'primary'      => '#16324f',
-                'accent'       => '#ef6033',
-                'cta'          => '#1685c4',   // diamant-blauw (Groeidiamant), primaire CTA
+                // Doorgetrokken uit de nieuwe homepage-styling (_sales/bedrijfswebsite):
+                // Archivo + donkerblauw #12386B / helder blauw #1D5DA0 op warm off-white.
+                // Zo volgen alle gedeelde layout-pagina's (tool, diensten, prijzen,
+                // contact, plaatsen, blog, legal, nav, footer) automatisch de homepage-look,
+                // kanaal-scoped via de thema-CSS-variabelen.
+                'primary'      => '#12386B',
+                'accent'       => '#1D5DA0',
+                'on_accent'    => '#ffffff',
+                'cta'          => '#12386B',   // primaire knop = donkerblauw (zoals homepage)
                 'on_cta'       => '#ffffff',
-                'ink'          => '#1c2530',
-                'muted'        => '#5b6b78',
-                'bg'           => '#f7f9fb',
+                'ink'          => '#1A1A1A',
+                'muted'        => '#6B6864',
+                'bg'           => '#FAF9F7',
                 'surface'      => '#ffffff',
-                'radius'       => '12px',
-                'font'         => "'Inter', system-ui, sans-serif",
-                'font_display' => "'Sora', system-ui, sans-serif",
-                'font_url'     => 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap',
+                'tint'         => '#F1EFEB',   // getinte/beige sectie-achtergrond
+                'footer_bg'    => '#12386B',   // donkerblauwe footer, net als de homepage
+                'accent_2'     => '#1D5DA0',
+                'on_accent_2'  => '#ffffff',
+                'hero_grad_b'  => '#0C2A50',
+                'step_grad_b'  => '#0C2A50',
+                'radius'       => '8px',
+                'font'         => "'Archivo', system-ui, sans-serif",
+                'font_display' => "'Archivo', system-ui, sans-serif",
+                'font_url'     => 'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap',
             ],
             'blueprint' => array_map(
                 fn ($t) => ['type' => $t['type'], 'status' => $t['status'], 'locked' => $t['locked']],

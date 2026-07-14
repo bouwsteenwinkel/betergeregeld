@@ -456,13 +456,23 @@
 		</div>
 	@endif
 
-	@include('channels.partials.nav')
+	{{-- bedrijfswebsite-kanaal krijgt de betergeregeld-header/footer van de homepage,
+	     zodat de hele funnel dezelfde huisstijl heeft. Andere kanalen: ongewijzigd. --}}
+	@if ($site->key === 'bedrijfswebsite')
+		@include('channels._sales._bg-nav')
+	@else
+		@include('channels.partials.nav')
+	@endif
 
 	<main id="main">
 		@yield('content')
 	</main>
 
-	@include('channels.partials.footer')
+	@if ($site->key === 'bedrijfswebsite')
+		@include('channels._sales._bg-footer')
+	@else
+		@include('channels.partials.footer')
+	@endif
 
 	{{-- Sticky mobiele CTA: verschijnt na het scrollen voorbij de hero. --}}
 	<a href="#contact" class="sticky-cta">{{ $site->get('meta.preview.is_preview') ? 'Maak een afspraak' : 'Gratis voorbeeld aanvragen' }}</a>

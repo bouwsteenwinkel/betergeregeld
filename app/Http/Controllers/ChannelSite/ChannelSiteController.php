@@ -176,8 +176,10 @@ class ChannelSiteController extends Controller
 
     public function places(): View
     {
-        return view('channels.places.index', [
-            'site'      => $this->site(),
+        $site = $this->site();
+
+        return view($site->placeView('index'), [
+            'site'      => $site,
             'provinces' => app(\App\Services\ChannelSiteResolver::class)->provinces(),
         ]);
     }
@@ -189,7 +191,7 @@ class ChannelSiteController extends Controller
         $name     = $resolver->provinceName($prov);
         abort_if($name === null, 404);
 
-        return view('channels.places.province', [
+        return view($this->site()->placeView('province'), [
             'site'       => $this->site(),
             'provName'   => $name,
             'provSlug'   => $prov,
@@ -241,7 +243,7 @@ class ChannelSiteController extends Controller
         // SEO-gating: alleen plaatsen met genoeg echte bedrijven indexeren.
         $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3);
 
-        return view('channels.places.show', [
+        return view($site->placeView('show'), [
             'site'       => $site,
             'place'      => $data,
             'placeName'  => $data['naam'],
@@ -267,7 +269,7 @@ class ChannelSiteController extends Controller
             ->orderByDesc('published_at')
             ->paginate(12);
 
-        return view('channels.blog.index', ['site' => $site, 'posts' => $posts]);
+        return view($site->blogView('index'), ['site' => $site, 'posts' => $posts]);
     }
 
     public function blogShow(Request $request): View
@@ -280,7 +282,7 @@ class ChannelSiteController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return view('channels.blog.show', ['site' => $site, 'post' => $post]);
+        return view($site->blogView('show'), ['site' => $site, 'post' => $post]);
     }
 
     /* ─────────────────────────────── SEO ─────────────────────────────────── */
@@ -298,6 +300,11 @@ class ChannelSiteController extends Controller
             'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog'];
         foreach (array_keys((array) config('groeidiamant.facets', [])) as $facet) {
             $paths[] = $facet;
+        }
+        // Per-kanaal geblokkeerde pagina's (config/channel_page_blocklist.php) geven
+        // een 404 (BlockChannelPages) en horen dus niet in de sitemap.
+        if ($blocked = (array) config('channel_page_blocklist.' . $site->key, [])) {
+            $paths = array_values(array_filter($paths, fn ($p) => ! in_array($p, $blocked, true)));
         }
         $urls = array_map(fn ($p) => ['loc' => $site->url($p)], $paths);
 
@@ -481,9 +488,16 @@ class ChannelSiteController extends Controller
      * de eigen huisstijl i.p.v. door te vallen naar de hoofd-site (betergeregeld.com);
      * zie de catch-all onderaan de channel-routegroep in routes/channels.php.
      */
-    public function notFound(): \Illuminate\Http\Response
+    public function notFound(): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
     {
-        return response()->view('channels.not-found', ['site' => $this->site()], 404);
+        $site = $this->site();
+
+        // Soft-404-kanalen: onbekende URL's gaan naar de homepage i.p.v. een foutpagina.
+        if ($site->redirectsNotFoundToHome()) {
+            return redirect($site->url(''), 302);
+        }
+
+        return response()->view('channels.not-found', ['site' => $site], 404);
     }
 
     private function notifyInternal(WebsiteLead $lead, ChannelSite $site): void
