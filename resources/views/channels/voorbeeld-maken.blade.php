@@ -280,17 +280,18 @@
             }
             var d = res.data;
 
-            // Fase 2: tekst en beeld PARALLEL. Tekst is verplicht; het beeld is
-            // best-effort en krijgt een tijdcap, zodat een trage beeld-call de
-            // bezoeker niet eindeloos laat wachten (de preview-pagina probeert het
-            // beeld desnoods zelf opnieuw).
+            // Fase 2: tekst en beeld(en) PARALLEL. Tekst is verplicht; de beelden zijn
+            // best-effort en krijgen een tijdcap, zodat een trage beeld-call de
+            // bezoeker niet eindeloos laat wachten (de preview toont anders een nette
+            // kleur-/placeholder-variant). Bij een webshop komt er een productraster bij.
+            var cap = function () { return new Promise(function (resolve) { setTimeout(function () { resolve({ capped: true }); }, 75000); }); };
             var content = post(d.contentUrl);
-            var heroCap = new Promise(function (resolve) { setTimeout(function () { resolve({ capped: true }); }, 75000); });
-            var hero = Promise.race([post(d.heroUrl), heroCap]);
+            var hero = Promise.race([post(d.heroUrl), cap()]);
+            var products = d.productsUrl ? Promise.race([post(d.productsUrl), cap()]) : Promise.resolve(null);
 
             return content.then(function (c) {
                 if (!c || !c.ok) { throw new Error((c && c.error) || 'content'); }
-                return hero.then(function () { return d.url; });
+                return Promise.all([hero, products]).then(function () { return d.url; });
             });
         }).then(function (url) {
             stopProgress();

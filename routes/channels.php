@@ -38,6 +38,8 @@ $channelRoutes = function () use ($facetKeys) {
     Route::post('/voorbeeld-maken', [PreviewToolController::class, 'start']);
     Route::post('/content', [PreviewToolController::class, 'content']);
     Route::post('/hero-image', [PreviewToolController::class, 'heroImage']);
+    // Webshop: 3x2-productraster (parallel met /content en /hero-image).
+    Route::post('/products-image', [PreviewToolController::class, 'productsImage']);
 
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
     Route::get('/contact', [ChannelSiteController::class, 'contact']);

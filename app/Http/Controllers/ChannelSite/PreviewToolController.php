@@ -73,13 +73,19 @@ class PreviewToolController extends Controller
         // ze hangen alle onder dezelfde /_site/{key}-groep.
         $base = url('/_site/' . $site->key);
 
-        return response()->json([
+        $payload = [
             'ok'         => true,
             'key'        => $site->key,
             'url'        => $base,
             'contentUrl' => $base . '/content',
             'heroUrl'    => $base . '/hero-image',
-        ]);
+        ];
+        // Webshop: ook een 3x2-productraster genereren (parallel, best-effort).
+        if (($data['goal'] ?? '') === 'webshop') {
+            $payload['productsUrl'] = $base . '/products-image';
+        }
+
+        return response()->json($payload);
     }
 
     /**
@@ -139,6 +145,35 @@ class PreviewToolController extends Controller
 
         try {
             $res = $generator->generateHeroImage($model);
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['ok' => false, 'error' => 'fout'], 502);
+        }
+
+        return response()->json($res, empty($res['ok']) ? 502 : 200);
+    }
+
+    /**
+     * Genereert (parallel, best-effort) het 3x2-productraster voor een webshop-preview.
+     * De productgrid-blade snijdt dit via CSS in 6 tegels. Alleen webshop-previews.
+     */
+    public function productsImage(PreviewSiteGenerator $generator): JsonResponse
+    {
+        @set_time_limit(120);
+        ignore_user_abort(true);
+
+        $site = $this->site();
+        if (! $site->get('meta.preview.is_preview')) {
+            return response()->json(['ok' => false, 'error' => 'geen-preview'], 404);
+        }
+
+        $model = Site::where('key', $site->key)->first();
+        if (! $model) {
+            return response()->json(['ok' => false, 'error' => 'niet-gevonden'], 404);
+        }
+
+        try {
+            $res = $generator->generateProductsImage($model);
         } catch (\Throwable $e) {
             report($e);
             return response()->json(['ok' => false, 'error' => 'fout'], 502);

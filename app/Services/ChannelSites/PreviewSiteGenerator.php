@@ -246,7 +246,8 @@ class PreviewSiteGenerator
             'webshop' => "Het doel is producten of diensten ONLINE VERKOPEN (een webshop). Richt de content daarop:\n"
                 . "- hero_title/hero_sub gaan over online kopen, bestellen en bezorgd/afgehaald krijgen, NIET over een afspraak maken.\n"
                 . "- services = de belangrijkste PRODUCTCATEGORIEEN of bestsellers van dit type bedrijf (geen diensten). services_heading bijvoorbeeld 'Ons assortiment' of 'Populair in de winkel'.\n"
-                . "- prices = concrete PRODUCTEN met realistische prijs (name = productnaam, desc = korte productregel, price = bedrag). prices_heading bijvoorbeeld 'Populaire producten'.\n"
+                . "- VUL het veld 'products' met precies 6 concrete, realistische PRODUCTEN voor dit type winkel: name = korte productnaam, price = bedrag met euroteken (bv. '€ 24,95'), category = 1 tot 2 woorden productcategorie. Kies producten uit 2 tot 3 verschillende categorieen zodat het assortiment gevarieerd oogt.\n"
+                . "- prices = laat je hier leeg of vul dezelfde topproducten; de webshop toont 'products' als productgrid.\n"
                 . "- steps = het BESTELPROCES: kiezen, afrekenen, bezorgd of afhalen.\n"
                 . "- faq = over verzendkosten, levertijd, retourneren en betaalmethoden.",
             default => "Het doel is MEER KLANTEN EN AANVRAGEN via een professionele website. Richt de content daarop:\n"
@@ -324,6 +325,12 @@ class PreviewSiteGenerator
                     'items' => ['type' => 'object', 'required' => ['name', 'desc', 'price'], 'properties' => [
                         'name' => $str, 'desc' => $str, 'price' => $str,
                     ]]],
+                // Optioneel, ALLEEN voor het doel 'webshop': 6 concrete producten voor
+                // het productgrid (naam, prijs, categorie). Bij andere doelen leeg.
+                'products' => ['type' => 'array', 'maxItems' => 6,
+                    'items' => ['type' => 'object', 'required' => ['name', 'price'], 'properties' => [
+                        'name' => $str, 'price' => $str, 'category' => $str,
+                    ]]],
                 'steps' => ['type' => 'array', 'minItems' => 3, 'maxItems' => 3,
                     'items' => ['type' => 'object', 'required' => ['title', 'text'], 'properties' => ['title' => $str, 'text' => $str]]],
                 'reviews' => ['type' => 'array', 'minItems' => 3, 'maxItems' => 3,
@@ -346,6 +353,31 @@ class PreviewSiteGenerator
         $profile = $this->goalProfile($goal);
         $reviews = array_map(fn ($r) => ['stars' => 5, 'text' => $r['text'] ?? '', 'author' => $r['author'] ?? ''], $d['reviews'] ?? []);
 
+        // Producten voor de webshop-productgrid: liefst het aparte 'products'-veld,
+        // anders de prices als terugval zodat het grid altijd gevuld is.
+        $products = $d['products'] ?? [];
+        if (empty($products)) {
+            $products = array_map(
+                fn ($p) => ['name' => $p['name'] ?? '', 'price' => $p['price'] ?? '', 'category' => ''],
+                $d['prices'] ?? []
+            );
+        }
+
+        // Winkel (webshop) toont een echt productgrid met gesneden AI-productbeeld;
+        // andere doelen houden de tarieven-lijst.
+        $shopBlock = $goal === 'webshop'
+            ? ['type' => 'productgrid', 'key' => 'tarieven', 'sort' => 40, 'content' => [
+                'eyebrow'  => 'Webshop',
+                'heading'  => $d['prices_heading'] ?? 'Populair in de winkel',
+                'products' => $products,
+                'anchor'   => 'tarieven',
+            ]]
+            : ['type' => 'pricelist', 'key' => 'tarieven', 'sort' => 40, 'content' => [
+                'eyebrow' => 'Tarieven',
+                'heading' => $d['prices_heading'] ?? 'Onze tarieven',
+                'items' => $d['prices'] ?? [], 'punchy' => true, 'anchor' => 'tarieven',
+            ]];
+
         $blocks = [
             ['type' => 'hero', 'key' => 'hero', 'sort' => 10, 'content' => [
                 'title' => $d['hero_title'] ?? null,
@@ -362,11 +394,7 @@ class PreviewSiteGenerator
                 'heading' => $d['services_heading'] ?? 'Wat we voor je doen', 'sub' => $d['services_sub'] ?? null,
                 'items' => $d['services'] ?? [], 'connected' => true, 'anchor' => 'diensten',
             ]],
-            ['type' => 'pricelist', 'key' => 'tarieven', 'sort' => 40, 'content' => [
-                'eyebrow' => $goal === 'webshop' ? 'Assortiment' : 'Tarieven',
-                'heading' => $d['prices_heading'] ?? 'Onze tarieven',
-                'items' => $d['prices'] ?? [], 'punchy' => true, 'anchor' => 'tarieven',
-            ]],
+            $shopBlock,
             ['type' => 'steps', 'key' => 'werkwijze', 'sort' => 50, 'content' => [
                 'heading' => 'Zo werkt het', 'items' => $d['steps'] ?? [], 'playful' => true, 'anchor' => 'werkwijze',
             ]],
@@ -434,6 +462,46 @@ class PreviewSiteGenerator
         // van het beeldbestand (ChannelImageGenerator::url → hero rendert 'has-img').
         // Zo botst deze parallelle beeld-call niet met de meta-update van fillContent.
         return ['ok' => true, 'url' => $res['file']];
+    }
+
+    /**
+     * Genereert (parallel, best-effort) EEN net 3x2-productraster voor de webshop en
+     * slaat het op als slot 'products'. De productgrid-blade snijdt dit via CSS in 6
+     * tegels. Alleen zinvol op een webshop-preview; anders overslaan.
+     *
+     * @return array{ok:bool,url?:string,error?:string}
+     */
+    public function generateProductsImage(Site $site): array
+    {
+        $preview = (array) data_get($site->meta, 'preview', []);
+        if (empty($preview['is_preview'])) {
+            return ['ok' => false, 'error' => 'geen-preview'];
+        }
+        if ($this->normalizeGoal((string) data_get($preview, 'input.goal', 'website')) !== 'webshop') {
+            return ['ok' => false, 'error' => 'geen-webshop'];
+        }
+
+        $type = (string) data_get($preview, 'input.business_type', '');
+
+        $gen = app(ChannelImageGenerator::class);
+        $res = $gen->generateRaw($site->key, 'products', $this->productsPrompt($type), '1536x1024', false, 'medium');
+
+        if (empty($res['file'])) {
+            return ['ok' => false, 'error' => $res['status'] ?? 'mislukt'];
+        }
+        return ['ok' => true, 'url' => $res['file']];
+    }
+
+    /** Prompt voor een strak 3x2-raster van 6 branche-producten (voor CSS-slicing). */
+    private function productsPrompt(string $type): string
+    {
+        $type = trim($type) !== '' ? trim($type) : 'lokale winkel';
+
+        return "A clean e-commerce product catalog grid, exactly 3 columns and 2 rows (6 equal cells), showing 6 DIFFERENT typical retail products sold by a Dutch \"{$type}\" webshop. "
+            . 'Each product is centered in its own equal cell on a plain seamless pure white background, evenly spaced with generous consistent margins between the cells. '
+            . 'Catalog product photography, soft even studio lighting, gentle natural shadow under each product, sharp focus, realistic and modern. '
+            . 'A perfectly aligned regular grid so each of the 6 cells can be cropped out separately as a square thumbnail. '
+            . 'Absolutely no text, no words, no letters, no labels, no price tags, no logos, no watermarks.';
     }
 
     /** Art-directed prompt voor een geloofwaardig, branche-specifiek hero-beeld. */
