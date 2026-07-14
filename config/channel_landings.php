@@ -84,6 +84,7 @@ return [
     'autotransport'                => 'autotransport_landings',
     'bakkerij'                     => 'bakkerij_landings',
     'bedrijfswebsite'              => 'bedrijfswebsite_landings',
+    'bedrijfswebsite-redesign'     => 'bedrijfswebsite-redesign_landings',
     'barbersites'                  => 'barbersites_landings',
     'Barhetpilsje'                 => 'Barhetpilsje_landings',
     'beautysites'                  => 'beautysites_landings',
