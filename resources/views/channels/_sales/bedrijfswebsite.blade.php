@@ -21,12 +21,15 @@
          donkere linkerzone (.hero--shot = foto + links-donkere gradient-overlay). --}}
     @if ($heroImg)
         <style>
-            /* Tekst dichter naar de linker viewport-rand: op desktop de lege ruimte
-               links halveren t.o.v. de gecentreerde container (~17vw i.p.v. ~34vw).
-               Tekstkolom blijft begrensd zodat de regels niet te lang worden. */
-            .hero--shot .hero-text{max-width:600px}
+            /* Hero-tekst betrouwbaar LINKS in de donkere zone. De layout maakt
+               .hero--shot .wrap een grid; die zetten we hier terug naar block zodat
+               de tekstkolom niet richting het midden schuift. */
+            .hero--shot .hero-text{max-width:560px}
             @media(min-width:1000px){
-                .hero--shot .wrap{max-width:none;padding-left:17vw;padding-right:22px}
+                /* .hero--shot is display:flex; zonder width:100% krimpt .wrap tot z'n
+                   inhoud en centreert 'ie via margin:auto (tekst leek daardoor rechts).
+                   Vul de breedte → normale gecentreerde 1140-container, tekst links erin. */
+                .hero--shot .wrap{display:block;width:100%;max-width:1140px;margin-inline:auto}
             }
         </style>
     @endif
