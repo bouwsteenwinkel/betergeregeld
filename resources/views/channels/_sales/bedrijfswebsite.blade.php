@@ -21,15 +21,18 @@
          donkere linkerzone (.hero--shot = foto + links-donkere gradient-overlay). --}}
     @if ($heroImg)
         <style>
-            /* Hero-tekst betrouwbaar LINKS in de donkere zone. De layout maakt
-               .hero--shot .wrap een grid; die zetten we hier terug naar block zodat
-               de tekstkolom niet richting het midden schuift. */
+            /* .hero--shot is display:flex; de .wrap is dus een flex-item. Flex-items
+               hebben min-width:auto en krimpen niet onder hun inhoud → de tekst werd
+               daardoor te breed (leek naar rechts geduwd op desktop). min-width:0 +
+               width:100% + margin-auto = normale gecentreerde 1140-container, tekst
+               links in de donkere gradient-zone. */
+            .hero--shot .wrap{display:block;width:100%;max-width:1140px;min-width:0;margin-inline:auto;box-sizing:border-box}
             .hero--shot .hero-text{max-width:560px}
-            @media(min-width:1000px){
-                /* .hero--shot is display:flex; zonder width:100% krimpt .wrap tot z'n
-                   inhoud en centreert 'ie via margin:auto (tekst leek daardoor rechts).
-                   Vul de breedte → normale gecentreerde 1140-container, tekst links erin. */
-                .hero--shot .wrap{display:block;width:100%;max-width:1140px;margin-inline:auto}
+            /* Mobiel: wrap op exacte viewport-breedte + tekst-cap in vw-eenheden,
+               zodat de kop/lead nooit buiten beeld lopen op smalle schermen. */
+            @media(max-width:999px){
+                .hero--shot .wrap{width:100vw;max-width:100vw;padding-left:20px;padding-right:20px;margin-inline:0}
+                .hero--shot .hero-text{max-width:calc(100vw - 40px)}
             }
         </style>
     @endif
