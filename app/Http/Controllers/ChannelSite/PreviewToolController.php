@@ -32,15 +32,14 @@ class PreviewToolController extends Controller
         ]);
     }
 
-    /** Genereert de voorbeeldsite en geeft de preview-URL terug (JSON, voor de fetch). */
-    public function generate(Request $request, PreviewSiteGenerator $generator): JsonResponse
+    /**
+     * Fase 1 van de tool (snel, geen AI): maak de preview-site en geef de key + de
+     * twee vervolg-endpoints terug. De browser roept /content en /hero-image daarna
+     * PARALLEL aan, zodat de ~35s tekst-call en de ~25-55s beeld-call tegelijk lopen
+     * en de preview compleet (mét beeld) opent i.p.v. het beeld 30-60s later inploft.
+     */
+    public function start(Request $request, PreviewSiteGenerator $generator): JsonResponse
     {
-        // De synchrone Claude-call duurt ~30-45s; de standaard PHP-limiet van 30s
-        // zou 'm afkappen. Geef deze ene request ruim de tijd (client wacht met een
-        // laadscherm). Prod (IIS/FastCGI) heeft hiervoor een ruime request-timeout.
-        @set_time_limit(120);
-        ignore_user_abort(true);
-
         // Honeypot: bots vullen het verborgen 'website'-veld.
         if (filled($request->input('website'))) {
             return response()->json(['ok' => false, 'error' => 'ongeldig'], 422);
@@ -56,27 +55,57 @@ class PreviewToolController extends Controller
         ]);
 
         try {
-            $result = $generator->generate($data + ['source_channel' => $this->site()->key]);
+            $site = $generator->startSite($data + ['source_channel' => $this->site()->key]);
         } catch (\Throwable $e) {
             report($e);
-            return response()->json(['ok' => false, 'error' => 'generatie-mislukt'], 502);
+            return response()->json(['ok' => false, 'error' => 'start-mislukt'], 502);
         }
 
-        if (empty($result['ok'])) {
-            Log::warning('preview_generate: ' . ($result['error'] ?? 'onbekend'));
-            return response()->json(['ok' => false, 'error' => $result['error'] ?? 'onbekend'], 502);
-        }
+        // Preview + vervolg-endpoints op de HUIDIGE host (channel-domein of hoofddomein);
+        // ze hangen alle onder dezelfde /_site/{key}-groep.
+        $base = url('/_site/' . $site->key);
 
-        // Preview opent op /_site/{key} op de HUIDIGE host, dus op een live
-        // channel-domein (bv. jouw-bedrijfswebsite.nl) blijft de bezoeker op dat
-        // domein en voelt het als de eigen site. Dit werkt omdat de catch-all van
-        // de channel-domeingroep '_site/'-paden niet meer afvangt (zie de
-        // where-constraint in routes/channels.php), zodat het pad doorvalt naar de
-        // domein-loze preview-groep.
         return response()->json([
-            'ok'  => true,
-            'url' => url('/_site/' . $result['key']),
+            'ok'         => true,
+            'key'        => $site->key,
+            'url'        => $base,
+            'contentUrl' => $base . '/content',
+            'heroUrl'    => $base . '/hero-image',
         ]);
+    }
+
+    /**
+     * Fase 2a (parallel met /hero-image): schrijf de content van de preview via de
+     * ~35s Claude-call en vul de blokken. Aangeroepen door het laadscherm.
+     */
+    public function content(PreviewSiteGenerator $generator): JsonResponse
+    {
+        // Claude-call ~30-45s; standaard PHP-limiet van 30s zou 'm afkappen.
+        @set_time_limit(120);
+        ignore_user_abort(true);
+
+        $site = $this->site();
+        if (! $site->get('meta.preview.is_preview')) {
+            return response()->json(['ok' => false, 'error' => 'geen-preview'], 404);
+        }
+
+        $model = Site::where('key', $site->key)->first();
+        if (! $model) {
+            return response()->json(['ok' => false, 'error' => 'niet-gevonden'], 404);
+        }
+
+        try {
+            $res = $generator->fillContent($model);
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['ok' => false, 'error' => 'content-mislukt'], 502);
+        }
+
+        if (empty($res['ok'])) {
+            Log::warning('preview_content: ' . ($res['error'] ?? 'onbekend'));
+        }
+
+        return response()->json($res, empty($res['ok']) ? 502 : 200);
     }
 
     /**

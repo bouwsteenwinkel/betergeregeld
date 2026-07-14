@@ -30,16 +30,100 @@ class PreviewSiteGenerator
      * @param  array{company:string,business_type:string,color:string,goal:string}  $input
      * @return array{ok:bool,error?:string,key?:string,site?:Site,usage?:array}
      */
+    /**
+     * Volledige generatie in één keer (tekst + site). Behouden voor CLI/tinker; de
+     * web-tool splitst dit in startSite() + fillContent() zodat tekst en hero-beeld
+     * PARALLEL kunnen lopen.
+     */
     public function generate(array $input): array
     {
-        $company  = trim((string) ($input['company'] ?? ''));
-        $type     = trim((string) ($input['business_type'] ?? ''));
-        $color    = $this->normalizeHex((string) ($input['color'] ?? '#2563eb'));
-        $goal     = $this->normalizeGoal((string) ($input['goal'] ?? 'website'));
-        $source   = trim((string) ($input['source_channel'] ?? ''));
+        $site = $this->startSite($input);
+        $res  = $this->fillContent($site);
+
+        if (empty($res['ok'])) {
+            return ['ok' => false, 'error' => $res['error'] ?? 'onbekend'];
+        }
+
+        return ['ok' => true, 'key' => $site->key, 'site' => $site, 'usage' => $res['usage'] ?? null];
+    }
+
+    /**
+     * Fase 1 (snel, GEEN AI): maak de tijdelijke preview-site (thema, branding, meta
+     * met de ruwe invoer), nog zonder content-blokken. Zo geeft de tool meteen de key
+     * terug en kunnen de tekst-call (fillContent) en de beeld-call (generateHeroImage)
+     * daarna PARALLEL lopen i.p.v. na elkaar.
+     */
+    public function startSite(array $input): Site
+    {
+        $company = trim((string) ($input['company'] ?? ''));
+        $type    = trim((string) ($input['business_type'] ?? ''));
+        $color   = $this->normalizeHex((string) ($input['color'] ?? '#2563eb'));
+        $goal    = $this->normalizeGoal((string) ($input['goal'] ?? 'website'));
+        $source  = trim((string) ($input['source_channel'] ?? ''));
+
+        $brandName = $company !== '' ? $company : 'Voorbeeld';
+        $key       = 'preview-' . Str::lower(Str::random(12));
+
+        return Site::create([
+            'channel_branche_id' => null,   // los van elke branche: puur uit site.theme
+            'key'    => $key,
+            'name'   => $brandName,
+            'domain' => null,
+            'status' => 'draft',
+            'locale' => 'nl',
+            'theme'  => $this->themeFromColor($color),
+            'brand'  => [
+                'logo_text'    => $brandName,
+                'logo_tagline' => '',
+                'trustline'    => 'Voorbeeld, in een halve minuut gemaakt',
+            ],
+            'header' => [
+                'menu' => [
+                    ['label' => 'Diensten', 'href' => '#diensten'],
+                    ['label' => 'Werkwijze', 'href' => '#werkwijze'],
+                    ['label' => 'Prijzen', 'href' => '#tarieven'],
+                    ['label' => 'Contact', 'href' => '#contact'],
+                ],
+                'cta' => ['label' => 'Maak een afspraak', 'href' => '#contact'],
+            ],
+            'meta' => [
+                'home_title'       => $brandName,
+                'home_description' => '',
+                'preview' => [
+                    'is_preview'     => true,
+                    'input'          => ['company' => $company, 'business_type' => $type, 'color' => $color, 'goal' => $goal],
+                    'source_channel' => $source !== '' ? $source : null,
+                    'expires_at'     => now()->addHours(self::TTL_HOURS)->toIso8601String(),
+                    'claimed'        => false,
+                    'facets_filled'  => [],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Fase 2 (de ~35s Claude-call): schrijf de content en vul de blokken van een
+     * reeds aangemaakte preview-site. Idempotent: bestaan er al blokken (dubbele
+     * submit), dan niets doen. Schrijft bewust NIET naar velden die generateHeroImage
+     * ook aanraakt, zodat de parallelle beeld-call niet met deze update botst.
+     *
+     * @return array{ok:bool,error?:string,usage?:array,already?:bool}
+     */
+    public function fillContent(Site $site): array
+    {
+        $preview = (array) data_get($site->meta, 'preview', []);
+        if (empty($preview['is_preview'])) {
+            return ['ok' => false, 'error' => 'geen-preview'];
+        }
+        if ($site->blocks()->exists()) {
+            return ['ok' => true, 'already' => true];
+        }
+
+        $company = (string) data_get($preview, 'input.company', '');
+        $type    = (string) data_get($preview, 'input.business_type', '');
+        $goal    = $this->normalizeGoal((string) data_get($preview, 'input.goal', 'website'));
 
         $client = app(AnthropicClient::class);
-
         $data = $client->structuredCall([
             'model'             => $this->model($client),
             'max_tokens'        => 3200,
@@ -54,9 +138,29 @@ class PreviewSiteGenerator
             return ['ok' => false, 'error' => $client->lastError ?: 'geen-data'];
         }
 
-        $site = $this->buildSite($company, $type, $color, $goal, $data, $source);
+        // SEO-titels + tagline bijwerken met de gegenereerde content. generateHeroImage
+        // schrijft NIET naar meta/brand, dus geen lost-update-race met deze schrijf.
+        $meta = (array) $site->meta;
+        $meta['home_title']       = $data['meta_title'] ?? $site->name;
+        $meta['home_description'] = $data['meta_description'] ?? '';
+        $brand = (array) $site->brand;
+        $brand['logo_tagline'] = $data['tagline'] ?? ($brand['logo_tagline'] ?? '');
+        $site->update(['meta' => $meta, 'brand' => $brand]);
 
-        return ['ok' => true, 'key' => $site->key, 'site' => $site, 'usage' => $client->lastUsage()];
+        foreach ($this->blocksFrom($data) as $b) {
+            $site->blocks()->create([
+                'type'      => $b['type'],
+                'facet'     => $b['facet'] ?? null,
+                'block_key' => $b['key'],
+                'sort'      => $b['sort'],
+                'enabled'   => true,
+                'locked'    => ($b['type'] === 'wizard'),
+                'status'    => in_array($b['type'], ['wizard', 'groeipad'], true) ? 'klaar' : 'placeholder',
+                'content'   => $b['content'] ?? null,
+            ]);
+        }
+
+        return ['ok' => true, 'usage' => $client->lastUsage()];
     }
 
     /** Sonnet: balans tussen snelheid en kwaliteit. Overschrijfbaar via env. */
@@ -143,64 +247,6 @@ class PreviewSiteGenerator
 
     /* ─────────────────────────── Site opbouwen ───────────────────────────── */
 
-    private function buildSite(string $company, string $type, string $color, string $goal, array $d, string $source = ''): Site
-    {
-        $brandName = $company !== '' ? $company : ($d['brand_name'] ?? 'Voorbeeld');
-        $key       = 'preview-' . Str::lower(Str::random(12));
-
-        $site = Site::create([
-            'channel_branche_id' => null,   // los van elke branche: puur uit site.theme
-            'key'    => $key,
-            'name'   => $brandName,
-            'domain' => null,
-            'status' => 'draft',
-            'locale' => 'nl',
-            'theme'  => $this->themeFromColor($color),
-            'brand'  => [
-                'logo_text'    => $brandName,
-                'logo_tagline' => $d['tagline'] ?? '',
-                'trustline'    => 'Voorbeeld, in een halve minuut gemaakt',
-            ],
-            'header' => [
-                'menu' => [
-                    ['label' => 'Diensten', 'href' => '#diensten'],
-                    ['label' => 'Werkwijze', 'href' => '#werkwijze'],
-                    ['label' => 'Prijzen', 'href' => '#tarieven'],
-                    ['label' => 'Contact', 'href' => '#contact'],
-                ],
-                'cta' => ['label' => 'Maak een afspraak', 'href' => '#contact'],
-            ],
-            'meta' => [
-                'home_title'       => $d['meta_title'] ?? $brandName,
-                'home_description' => $d['meta_description'] ?? '',
-                // Alles wat cleanup + lazy facet-generatie + lead-opvolging nodig heeft.
-                'preview' => [
-                    'is_preview'     => true,
-                    'input'          => ['company' => $company, 'business_type' => $type, 'color' => $color, 'goal' => $goal],
-                    'source_channel' => $source !== '' ? $source : null,
-                    'expires_at'     => now()->addHours(self::TTL_HOURS)->toIso8601String(),
-                    'claimed'        => false,
-                    'facets_filled'  => [],
-                ],
-            ],
-        ]);
-
-        foreach ($this->blocksFrom($d) as $b) {
-            $site->blocks()->create([
-                'type'      => $b['type'],
-                'facet'     => $b['facet'] ?? null,
-                'block_key' => $b['key'],
-                'sort'      => $b['sort'],
-                'enabled'   => true,
-                'locked'    => ($b['type'] === 'wizard'),
-                'status'    => in_array($b['type'], ['wizard', 'groeipad'], true) ? 'klaar' : 'placeholder',
-                'content'   => $b['content'] ?? null,
-            ]);
-        }
-
-        return $site;
-    }
-
     /** Mapt de gegenereerde JSON naar de hoofdpagina-blokken. */
     private function blocksFrom(array $d): array
     {
@@ -279,11 +325,9 @@ class PreviewSiteGenerator
             return ['ok' => false, 'error' => $res['status'] ?? 'mislukt'];
         }
 
-        // Onthoud dat het beeld er is (voorkomt dubbele generatie bij herladen).
-        $meta = (array) $site->meta;
-        $meta['preview']['hero_image'] = true;
-        $site->update(['meta' => $meta]);
-
+        // Bewust GEEN meta-schrijf hier: of het beeld er is, blijkt uit het bestaan
+        // van het beeldbestand (ChannelImageGenerator::url → hero rendert 'has-img').
+        // Zo botst deze parallelle beeld-call niet met de meta-update van fillContent.
         return ['ok' => true, 'url' => $res['file']];
     }
 

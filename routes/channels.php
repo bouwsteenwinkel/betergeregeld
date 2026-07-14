@@ -32,8 +32,11 @@ $channelRoutes = function () use ($facetKeys) {
     // Self-service "voorbeeld in 60 seconden"-tool: intake + synchrone generatie.
     // De gegenereerde previews leven als eigen site op /_site/preview-...
     Route::get('/voorbeeld-maken', [PreviewToolController::class, 'form']);
-    Route::post('/voorbeeld-maken', [PreviewToolController::class, 'generate']);
-    // Asynchrone branche-hero-generatie op een preview-pagina (JS roept dit aan).
+    // Fase 1: maak de preview-site (snel). Fase 2 draait PARALLEL vanaf het laadscherm:
+    // /content (de tekst-call) + /hero-image (het branche-beeld), zodat beide tegelijk
+    // lopen en de preview compleet opent i.p.v. het beeld 30-60s later inploft.
+    Route::post('/voorbeeld-maken', [PreviewToolController::class, 'start']);
+    Route::post('/content', [PreviewToolController::class, 'content']);
     Route::post('/hero-image', [PreviewToolController::class, 'heroImage']);
 
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);

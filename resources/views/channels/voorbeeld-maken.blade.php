@@ -147,8 +147,8 @@
     var steps = [
         'Je kleur toepassen...',
         'Teksten schrijven voor jouw vak...',
-        'Diensten en tarieven invullen...',
-        'Reviews en veelgestelde vragen...',
+        'Een passend beeld maken voor je site...',
+        'Diensten, tarieven en reviews...',
         'De laatste hand aan je pagina...'
     ];
     var timer = null;
@@ -175,26 +175,51 @@
         runProgress();
 
         var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        fetch(form.action, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-            body: new FormData(form)
-        }).then(function (r) {
-            return r.json().then(function (data) { return { ok: r.ok, data: data }; });
-        }).then(function (res) {
-            if (res.ok && res.data && res.data.url) {
-                progressEl.style.width = '100%';
-                stepEl.textContent = 'Klaar. Je voorbeeld staat klaar.';
-                window.location.href = res.data.url;
-            } else {
-                throw new Error((res.data && res.data.error) || 'onbekend');
-            }
-        }).catch(function () {
+        var jsonHeaders = { 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' };
+
+        function fail() {
             stopProgress();
             overlay.classList.remove('on');
             errorEl.textContent = 'Het maken van je voorbeeld lukte net niet. Probeer het zo nog een keer.';
             errorEl.style.display = 'block';
-        });
+        }
+        function post(url) {
+            return fetch(url, { method: 'POST', headers: jsonHeaders })
+                .then(function (r) { return r.json().catch(function () { return {}; }); })
+                .catch(function () { return { ok: false }; });
+        }
+
+        // Fase 1: maak de site-key (snel, geen AI).
+        fetch(form.action, {
+            method: 'POST',
+            headers: jsonHeaders,
+            body: new FormData(form)
+        }).then(function (r) {
+            return r.json().then(function (data) { return { ok: r.ok, data: data }; });
+        }).then(function (res) {
+            if (!res.ok || !res.data || !res.data.contentUrl) {
+                throw new Error((res.data && res.data.error) || 'start');
+            }
+            var d = res.data;
+
+            // Fase 2: tekst en beeld PARALLEL. Tekst is verplicht; het beeld is
+            // best-effort en krijgt een tijdcap, zodat een trage beeld-call de
+            // bezoeker niet eindeloos laat wachten (de preview-pagina probeert het
+            // beeld desnoods zelf opnieuw).
+            var content = post(d.contentUrl);
+            var heroCap = new Promise(function (resolve) { setTimeout(function () { resolve({ capped: true }); }, 75000); });
+            var hero = Promise.race([post(d.heroUrl), heroCap]);
+
+            return content.then(function (c) {
+                if (!c || !c.ok) { throw new Error((c && c.error) || 'content'); }
+                return hero.then(function () { return d.url; });
+            });
+        }).then(function (url) {
+            stopProgress();
+            progressEl.style.width = '100%';
+            stepEl.textContent = 'Klaar. Je voorbeeld staat klaar.';
+            window.location.href = url;
+        }).catch(fail);
     });
 })();
 </script>
