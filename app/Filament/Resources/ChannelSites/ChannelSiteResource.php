@@ -21,10 +21,21 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ChannelSiteResource extends Resource
 {
     protected static ?string $model = Site::class;
+
+    /**
+     * Laadt blocks_count mee zodat de lijst-kolommen (contentPrefilled) geen
+     * count-query per rij doen. Zonder dit deed de lijst een N+1 over de remote
+     * DB → 60s-timeout bij honderden sites.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('blocks');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 

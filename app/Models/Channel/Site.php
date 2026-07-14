@@ -82,13 +82,34 @@ class Site extends Model
 
     private ?int $outcomeCount = null;
 
+    /** @var string[]|null Eén keer ingelezen bestandsnamen in de eigen media-map. */
+    private ?array $ownImageFiles = null;
+
+    /**
+     * Telt hoeveel van de gegeven slots een eigen beeld hebben. Scant de media-map
+     * ÉÉN keer (i.p.v. per slot te globben via de resolver) — cruciaal voor de
+     * admin-lijst die dit per rij over honderden sites doet.
+     */
     private function countOwnImages(array $slots): int
     {
-        $gen = app(\App\Services\ChannelSites\ChannelImageGenerator::class);
+        $files = $this->ownImageFiles ??= (function (): array {
+            $dir = public_path('channel-media/' . $this->key);
+            return is_dir($dir) ? array_map('basename', glob($dir . '/*.{webp,png,jpg,svg}', GLOB_BRACE) ?: []) : [];
+        })();
+
+        if (! $files) {
+            return 0;
+        }
+
         $n = 0;
         foreach ($slots as $slot) {
-            if ($gen->url($this->key, $slot) !== null) {
-                $n++;
+            // Match een responsive variant ({slot}-1536.webp) of een losse {slot}.ext.
+            $re = '/^' . preg_quote($slot, '/') . '(-\d+)?\.(webp|png|jpg|svg)$/';
+            foreach ($files as $f) {
+                if (preg_match($re, $f)) {
+                    $n++;
+                    break;
+                }
             }
         }
         return $n;
