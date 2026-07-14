@@ -83,7 +83,12 @@ $channelRoutes = function () use ($facetKeys) {
     // greedy catch-all van de hoofd-routes (/nl, /en, /afspraak, …) op een channel-
     // domein. (Route::fallback zou hier NIET werken: de hoofd-/nl-route is een gewone
     // route die eerder matcht dan een fallback-route.)
-    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '.*');
+    //
+    // Uitzondering: '_site/...'-paden NIET afvangen (negatieve lookahead), zodat een
+    // gegenereerde preview op /_site/{key} óók op een live channel-domein doorvalt
+    // naar de domein-loze preview-groep hieronder en op het channel-domein zelf
+    // opent. Zonder deze uitzondering slokte de catch-all elk /_site/...-pad op → 404.
+    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '(?!_site/).*');
 };
 
 // 1) Live kanalen op hun eigen domein.
@@ -93,7 +98,11 @@ foreach (app(ChannelSiteResolver::class)->live() as $site) {
         ->group($channelRoutes);
 }
 
-// 2) Preview/concept op het hoofddomein: /_site/{channelKey}/...
+// 2) Preview/concept op /_site/{channelKey}/... — domein-loos, dus dit matcht op
+//    ELK host (hoofddomein én een live channel-domein). De catch-all in de
+//    domeingroep hierboven sluit '_site/'-paden bewust uit (zie where-constraint),
+//    zodat een preview óók op het channel-domein zelf opent (voelt als de eigen
+//    site van de klant) i.p.v. dat de catch-all 'm naar de 404 stuurt.
 Route::prefix('_site/{channelKey}')
     ->middleware(ResolveChannelSite::class)
     ->group($channelRoutes);
