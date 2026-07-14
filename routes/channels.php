@@ -15,6 +15,7 @@
 
 use App\Http\Controllers\ChannelSite\ChannelSiteController;
 use App\Http\Controllers\ChannelSite\PreviewToolController;
+use App\Http\Controllers\ChannelSite\SavePreviewController;
 use App\Http\Middleware\ResolveChannelSite;
 use App\Services\ChannelSiteResolver;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,8 @@ $channelRoutes = function () use ($facetKeys) {
     Route::post('/hero-image', [PreviewToolController::class, 'heroImage']);
     // Webshop: 3x2-productraster (parallel met /content en /hero-image).
     Route::post('/products-image', [PreviewToolController::class, 'productsImage']);
+    // "Bewaar dit voorbeeld": maakt een klant-account (WebsiteLead) + koppelt de preview.
+    Route::post('/bewaren', [SavePreviewController::class, 'save'])->middleware('throttle:10,1');
 
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
     Route::get('/contact', [ChannelSiteController::class, 'contact']);

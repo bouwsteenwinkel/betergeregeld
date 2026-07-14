@@ -3,11 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * Eén centrale lead voor "website laten maken": komt binnen via de intake-flow
  * van elk kanaal/branche en wordt in de betergeregeld-admin opgevolgd. Per lead
  * is de branche zichtbaar zodat we vooraf een passende voorbeeldsite klaarzetten.
+ *
+ * Dient tevens als lichtgewicht, wachtwoordloos KLANT-ACCOUNT voor de voorbeeld-tool:
+ * een klant (op e-mail) kan meerdere voorbeeldsites opslaan ({@see SavedPreview}), krijgt
+ * een persoonlijke maglink (token_hash) en reminder-mails (consent + reminder_stage).
  */
 class WebsiteLead extends Model
 {
@@ -21,16 +27,68 @@ class WebsiteLead extends Model
         'status', 'assigned_to', 'notes', 'contacted_at',
         'appointment_at', 'appointment_type', 'appointment_status', 'meet_link',
         'google_event_id', 'google_calendar_id',
+        // Klant-account (voorbeeld opslaan + reminders)
+        'consent', 'token_hash', 'token_expires_at',
+        'reminder_stage', 'next_reminder_at', 'unsubscribed_at', 'saved_at',
     ];
 
     protected $casts = [
-        'within_radius'  => 'boolean',
-        'distance_km'    => 'integer',
-        'contacted_at'   => 'datetime',
-        'appointment_at' => 'datetime',
-        'answers'        => 'array',
-        'features'       => 'array',
+        'within_radius'    => 'boolean',
+        'distance_km'      => 'integer',
+        'contacted_at'     => 'datetime',
+        'appointment_at'   => 'datetime',
+        'answers'          => 'array',
+        'features'         => 'array',
+        'consent'          => 'boolean',
+        'token_expires_at' => 'datetime',
+        'next_reminder_at' => 'datetime',
+        'unsubscribed_at'  => 'datetime',
+        'saved_at'         => 'datetime',
     ];
+
+    /** Door de klant opgeslagen voorbeeldsites. */
+    public function savedPreviews(): HasMany
+    {
+        return $this->hasMany(SavedPreview::class);
+    }
+
+    /**
+     * De wachtwoordloze revisit-token (aangemaakt indien nog leeg). Bewust een
+     * PERMANENTE, niet-gehashte random token in de token_hash-kolom: reminders worden
+     * later verstuurd en moeten dezelfde link kunnen meesturen (een sha256-hash is niet
+     * te reconstrueren). Low-stakes (toont enkel de eigen, niet-gevoelige voorbeelden),
+     * consistent met het bestaande unsubscribe_token-patroon.
+     */
+    public function revisitToken(): string
+    {
+        if (! $this->token_hash) {
+            $this->forceFill(['token_hash' => Str::random(64)])->save();
+        }
+
+        return $this->token_hash;
+    }
+
+    /**
+     * De persoonlijke "mijn voorbeelden"-URL. Altijd op het HOOFDDOMEIN
+     * (config('app.url')): het opslaan gebeurt op een channel-domein en de mail wordt
+     * vanuit de CLI verstuurd, dus url()/de huidige host is hier niet betrouwbaar.
+     */
+    public function revisitUrl(): string
+    {
+        return rtrim((string) config('app.url'), '/') . '/mijn-voorbeelden/' . $this->revisitToken();
+    }
+
+    /** Afmeldlink (stopt reminders) op het hoofddomein. */
+    public function unsubscribeUrl(): string
+    {
+        return $this->revisitUrl() . '/afmelden';
+    }
+
+    /** Zoekt een lead bij een revisit-token; null als onbekend. */
+    public static function findByRevisitToken(string $token): ?self
+    {
+        return strlen($token) >= 20 ? static::where('token_hash', $token)->first() : null;
+    }
 
     // ── Branche-gestuurde intake-definities (uit config/intake.php) ──────
 

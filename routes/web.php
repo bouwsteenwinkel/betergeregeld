@@ -72,6 +72,15 @@ Route::prefix('afspraak')->group(function () {
     Route::post('/boeken', [\App\Http\Controllers\AppointmentController::class, 'book'])->middleware('throttle:20,1');
 });
 
+// Wachtwoordloze klant-pagina "mijn voorbeelden" (persoonlijke token-link uit de mail).
+// Buiten de locale-prefix zodat de e-maillink schoon en stabiel is.
+Route::get('/mijn-voorbeelden/{token}', [\App\Http\Controllers\SavedPreviewsController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]+')->name('saved-previews.show');
+Route::post('/mijn-voorbeelden/{token}/favoriet', [\App\Http\Controllers\SavedPreviewsController::class, 'favorite'])
+    ->where('token', '[A-Za-z0-9]+')->middleware('throttle:30,1')->name('saved-previews.favorite');
+Route::get('/mijn-voorbeelden/{token}/afmelden', [\App\Http\Controllers\SavedPreviewsController::class, 'unsubscribe'])
+    ->where('token', '[A-Za-z0-9]+')->name('saved-previews.unsubscribe');
+
 // Google-agenda koppelen (afsprakenplanner, fase 1b). Alleen ingelogde admin.
 Route::middleware(['web', 'auth'])->prefix('admin/google-agenda')->group(function () {
     Route::get('/', [\App\Http\Controllers\GoogleAgendaController::class, 'status'])->name('google-agenda.status');

@@ -22,6 +22,13 @@ Schedule::command('channel:previews-cleanup')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Opgeslagen voorbeelden — reminder-mails (dag 1 en dag 4) naar klanten die nog
+// niets lieten horen; stopt bij opt-out of zodra het team de lead oppakt.
+Schedule::command('previews:send-reminders')
+    ->dailyAt('09:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // VPS-monitoring — mail bij offline/volle-schijf-overgangen (alleen bij wijziging).
 Schedule::command('monitor:check-alerts')
     ->everyFiveMinutes()

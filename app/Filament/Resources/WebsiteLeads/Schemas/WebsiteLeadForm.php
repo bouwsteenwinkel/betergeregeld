@@ -6,11 +6,13 @@ use App\Models\WebsiteLead;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 
 class WebsiteLeadForm
 {
@@ -80,6 +82,49 @@ class WebsiteLeadForm
                         TextInput::make('preview_url')->label('Voorbeeldsite-URL')->url()->maxLength(255),
                         Select::make('preview_status')->label('Status voorbeeldsite')
                             ->options(WebsiteLead::PREVIEW_STATUSES),
+                    ]),
+
+                Section::make('Opgeslagen voorbeelden (klant-account)')
+                    ->description('Wat de klant zelf bewaarde via de tool. De favoriet (★) is het ontwerp dat hij het mooist vindt.')
+                    ->schema([
+                        Placeholder::make('account_status')->label('Account & reminders')
+                            ->content(function (?WebsiteLead $record): string {
+                                if (! $record) {
+                                    return '—';
+                                }
+                                $bits = ['Opt-in: ' . ($record->consent ? 'ja' : 'nee')];
+                                if ($record->unsubscribed_at) {
+                                    $bits[] = 'afgemeld';
+                                } elseif ($record->next_reminder_at) {
+                                    $bits[] = 'volgende reminder ' . $record->next_reminder_at->format('d-m-Y');
+                                } elseif ($record->consent) {
+                                    $bits[] = 'reminders klaar';
+                                }
+                                if ($record->saved_at) {
+                                    $bits[] = 'opgeslagen ' . $record->saved_at->format('d-m-Y');
+                                }
+
+                                return implode(' · ', $bits);
+                            }),
+                        Placeholder::make('saved_previews_list')->label('Bewaarde voorbeelden')
+                            ->content(function (?WebsiteLead $record): HtmlString {
+                                if (! $record || $record->savedPreviews->isEmpty()) {
+                                    return new HtmlString('<span style="color:#64748b">Nog geen voorbeelden opgeslagen.</span>');
+                                }
+
+                                $html = $record->savedPreviews->sortByDesc('favorite')->map(function ($p): string {
+                                    $tags = collect($p->designSummary())
+                                        ->map(fn ($v, $k) => e(ucfirst($k)) . ': ' . e($v))->implode(' · ');
+                                    $star = $p->favorite ? '★ ' : '';
+                                    $url = e($p->url());
+
+                                    return '<div style="margin-bottom:.5rem">'
+                                        . '<a href="' . $url . '" target="_blank" style="color:#1685c4;font-weight:600">' . $star . 'Open voorbeeld</a>'
+                                        . '<br><span style="color:#64748b;font-size:.85em">' . $tags . '</span></div>';
+                                })->implode('');
+
+                                return new HtmlString($html);
+                            })->columnSpanFull(),
                     ]),
 
                 Section::make('Afspraak')
