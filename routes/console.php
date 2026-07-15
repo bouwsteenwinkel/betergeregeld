@@ -29,6 +29,18 @@ Schedule::command('previews:send-reminders')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Afspraak-herinneringen (24u en 1u vooraf) tegen no-show op het gratis gesprek.
+// Bewust NIET dailyAt zoals de previews-reminder hierboven: die stuurt "ergens op
+// dag 1", een paar uur speling maakt daar niets uit. Hier hangt het bericht aan een
+// tijdstip, en 1x per dag draaien zou een afspraak van 09:00 een "herinnering" van
+// 24 tot 48 uur vooraf geven, of de 1u-mail helemaal missen. Elk kwartier houdt de
+// afwijking onder de 15 minuten; het command is idempotent (kolommen op de
+// afspraak), dus vaak draaien kost alleen een lege query.
+Schedule::command('appointments:send-reminders')
+    ->everyFifteenMinutes()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // VPS-monitoring — mail bij offline/volle-schijf-overgangen (alleen bij wijziging).
 Schedule::command('monitor:check-alerts')
     ->everyFiveMinutes()

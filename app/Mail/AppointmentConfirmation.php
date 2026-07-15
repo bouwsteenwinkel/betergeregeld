@@ -27,10 +27,25 @@ class AppointmentConfirmation extends Mailable
         return new Content(
             view: 'emails.appointment-confirmation',
             with: [
-                'appt' => $this->appointment,
-                'tz'   => (string) config('scheduling.timezone', 'Europe/Amsterdam'),
+                'appt'      => $this->appointment,
+                'tz'        => (string) config('scheduling.timezone', 'Europe/Amsterdam'),
+                'cancelUrl' => $this->cancelUrl(),
             ],
         );
+    }
+
+    /**
+     * De persoonlijke annuleer-/verzetlink. Altijd op het HOOFDDOMEIN
+     * (config('app.url')): geboekt wordt er vanaf elk channel-domein en de mail kan
+     * vanuit de CLI vertrekken, dus url()/de huidige host is hier niet betrouwbaar.
+     * Null bij een afspraak zonder token (buiten BookingService aangemaakt), dan
+     * valt de mail terug op "beantwoord deze mail".
+     */
+    private function cancelUrl(): ?string
+    {
+        return $this->appointment->cancel_token
+            ? rtrim((string) config('app.url'), '/') . '/afspraak/annuleren/' . $this->appointment->cancel_token
+            : null;
     }
 
     public function attachments(): array

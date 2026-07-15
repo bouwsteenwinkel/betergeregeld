@@ -70,6 +70,16 @@ require __DIR__ . '/channels.php';
 Route::prefix('afspraak')->group(function () {
     Route::get('/beschikbaarheid', [\App\Http\Controllers\AppointmentController::class, 'availability']);
     Route::post('/boeken', [\App\Http\Controllers\AppointmentController::class, 'book'])->middleware('throttle:20,1');
+
+    // Annuleren/verzetten via de persoonlijke cancel_token-link uit de bevestigingsmail.
+    // Staat hier (buiten de locale-prefix) zodat de mail-link schoon en stabiel is, net
+    // als de revisit-link hieronder. De POST's zijn publiek en token-geraden, dus geknepen.
+    Route::get('/annuleren/{token}', [\App\Http\Controllers\AppointmentCancelController::class, 'show'])
+        ->where('token', '[A-Za-z0-9]+')->name('appointment.cancel');
+    Route::post('/annuleren/{token}', [\App\Http\Controllers\AppointmentCancelController::class, 'cancel'])
+        ->where('token', '[A-Za-z0-9]+')->middleware('throttle:10,1')->name('appointment.cancel.submit');
+    Route::post('/annuleren/{token}/verzetten', [\App\Http\Controllers\AppointmentCancelController::class, 'reschedule'])
+        ->where('token', '[A-Za-z0-9]+')->middleware('throttle:10,1')->name('appointment.reschedule');
 });
 
 // Wachtwoordloze klant-pagina "mijn voorbeelden" (persoonlijke token-link uit de mail).
