@@ -256,10 +256,24 @@
         var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         var jsonHeaders = { 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' };
 
-        function fail() {
+        // Funnel-events. bgTrack bestaat altijd (channels/partials/analytics-head),
+        // ook zonder container; dan blijven ze in de dataLayer staan.
+        if (window.bgTrack) {
+            window.bgTrack('preview_start', {
+                business_type: (form.querySelector('[name="business_type"]') || {}).value || '',
+                goal: (form.querySelector('[name="goal"]:checked') || form.querySelector('[name="goal"]') || {}).value || ''
+            });
+        }
+        var t0 = Date.now();
+
+        // De server stuurt bij een limiet (429) een eigen uitleg mee; die is
+        // duidelijker dan de algemene melding, dus die tonen we dan.
+        function fail(err) {
             stopProgress();
             overlay.classList.remove('on');
-            errorEl.textContent = 'Het maken van je voorbeeld lukte net niet. Probeer het zo nog een keer.';
+            errorEl.textContent = (err && err.userMessage)
+                ? err.userMessage
+                : 'Het maken van je voorbeeld lukte net niet. Probeer het zo nog een keer.';
             errorEl.style.display = 'block';
         }
         function post(url) {
@@ -277,7 +291,9 @@
             return r.json().then(function (data) { return { ok: r.ok, data: data }; });
         }).then(function (res) {
             if (!res.ok || !res.data || !res.data.contentUrl) {
-                throw new Error((res.data && res.data.error) || 'start');
+                var e = new Error((res.data && res.data.error) || 'start');
+                if (res.data && res.data.message) { e.userMessage = res.data.message; }
+                throw e;
             }
             var d = res.data;
 
@@ -298,8 +314,17 @@
             stopProgress();
             progressEl.style.width = '100%';
             stepEl.textContent = 'Klaar. Je voorbeeld staat klaar.';
+            // Het moment dat telt: de bezoeker krijgt echt een site te zien.
+            if (window.bgTrack) {
+                window.bgTrack('preview_ready', { seconds: Math.round((Date.now() - t0) / 1000) });
+            }
             window.location.href = url;
-        }).catch(fail);
+        }).catch(function (err) {
+            if (window.bgTrack) {
+                window.bgTrack('preview_failed', { reason: (err && err.message) || 'onbekend' });
+            }
+            fail(err);
+        });
     });
 })();
 </script>

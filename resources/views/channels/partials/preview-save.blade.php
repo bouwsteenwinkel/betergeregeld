@@ -111,6 +111,9 @@
             if (!res.ok || !res.data || !res.data.ok) { throw new Error('mislukt'); }
             if (res.data.revisitUrl) { revisit.href = res.data.revisitUrl; }
             stepForm.hidden = true; stepDone.hidden = false;
+            // Dit is het leadmoment: er ontstaat een WebsiteLead met e-mailadres.
+            // Hier hangt straks de Ads-conversie aan.
+            if (window.bgTrack) { window.bgTrack('preview_saved', { site: {!! json_encode($site->key) !!} }); }
         }).catch(function () {
             submit.disabled = false; submit.textContent = 'Bewaar mijn voorbeeld';
             errorEl.textContent = 'Het opslaan lukte net niet. Probeer het zo nog een keer.';

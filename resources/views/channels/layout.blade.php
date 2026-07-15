@@ -6,6 +6,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="{{ $site->theme()['primary'] }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+
+	{{-- Consent Mode-defaults + dataLayer + (optioneel) GTM. Staat bewust bovenaan:
+	     de 'consent default'-call moet vóór elke tag in de dataLayer staan. --}}
+	@include('channels.partials.analytics-head')
+
 	{{-- Demo-/mockup-pagina's (/voorbeeld) nooit indexeren: het zijn voorbeelden,
 	     geen echte content, en anders concurreren ze met de trigger-pagina's. --}}
 	<meta name="robots" content="@yield('robots', $site->isLive() && ! $site->isDemoContext() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow')">
@@ -440,7 +445,11 @@
 	<a class="skip-link" href="#main">Naar inhoud</a>
 	@if ($site->get('meta.preview.is_preview'))
 		{{-- Voorbeeld-balk: houdt de conversie (terug naar ons aanbod) buiten de
-		     site-body, zodat de body een echte one-pager van de ondernemer blijft. --}}
+		     site-body, zodat de body een echte one-pager van de ondernemer blijft.
+		     BEWUST niet sticky: .nav is zelf al sticky (top:0, zie de CSS hieronder),
+		     dus twee vaste balken vechten om dezelfde plek en op mobiel vreten ze
+		     samen een zevende van het scherm. Dat hij wegscrollt is opgevangen door
+		     channels.partials.preview-prompt, die juist bij interesse verschijnt. --}}
 		<div style="background:#0f172a;color:#e2e8f0;font-size:.82rem;padding:.5rem 1rem;display:flex;gap:.8rem;align-items:center;justify-content:center;flex-wrap:wrap">
 			<span>Dit is een voorbeeld van hoe de website van <strong style="color:#fff">{{ $site->name() }}</strong> eruit kan zien.</span>
 			<button type="button" data-pv-save-open style="background:var(--c-cta,#1685c4);color:#fff;font-weight:700;border:0;border-radius:6px;padding:.32rem .8rem;font-size:.82rem;cursor:pointer;white-space:nowrap">Bewaar dit voorbeeld</button>
@@ -450,6 +459,7 @@
 			@endif
 		</div>
 		@include('channels.partials.preview-save')
+		@include('channels.partials.preview-prompt')
 	@elseif (! $site->isLive())
 		<div style="background:#1c1917;color:#fbbf24;text-align:center;font-size:.8rem;padding:.4rem">
 			PREVIEW · concept "{{ $site->key }}" · nog niet live (geen domein gekoppeld)

@@ -37,6 +37,28 @@
     }
     return s;
   }
+  // Google Consent Mode v2. Pusht de keuze naar de dataLayer zodat Google-tags
+  // (GTM/GA4/Ads) weten wat mag. Puur additief: zonder container blijft het een
+  // ongelezen item in de queue, dus dit is veilig voor elke tenant.
+  // De defaults ('denied') staan in de <head>, zie channels/partials/analytics-head.
+  function pushConsentMode(choices) {
+    try {
+      window.dataLayer = window.dataLayer || [];
+      var yes = function (k) { return choices[k] === true || choices[k] === 1 || choices[k] === '1'; };
+      // Consent-commando's moeten als arguments-object in de dataLayer, niet als
+      // gewone array — vandaar deze gtag-vorm in plaats van een directe push.
+      function gtag() { window.dataLayer.push(arguments); }
+      gtag('consent', 'update', {
+        ad_storage: yes('marketing') ? 'granted' : 'denied',
+        ad_user_data: yes('marketing') ? 'granted' : 'denied',
+        ad_personalization: yes('marketing') ? 'granted' : 'denied',
+        analytics_storage: yes('analytics') ? 'granted' : 'denied',
+        functionality_storage: yes('functional') ? 'granted' : 'denied',
+        personalization_storage: yes('functional') ? 'granted' : 'denied'
+      });
+    } catch (e) {}
+  }
+
   function saveChoices(choices, status) {
     // Persist lokaal METEEN — onafhankelijk van of de server-fetch slaagt.
     // Zonder dit: bij CORS-/netwerk-fout krijgt de gebruiker bij elke
@@ -50,6 +72,7 @@
       localStorage.setItem(POLICY_KEY, String(CFG.policy_version));
     } catch (e) {}
     setCookie(COOKIE_NAME, consentId, COOKIE_DAYS);
+    pushConsentMode(choices);
     injectScripts(consentId);
 
     // Sync naar server in achtergrond — server upsert met dezelfde UUID

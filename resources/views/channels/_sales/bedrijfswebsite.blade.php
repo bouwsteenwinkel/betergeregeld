@@ -12,6 +12,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+@endverbatim
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{{-- Deze pagina staat buiten channels.layout en miste daardoor de robots-guard
+     die daar op $site->isLive() zit: een concept-kanaal werd hier gewoon
+     geïndexeerd. Zelfde regel als de layout, zodat draft = uit de zoekresultaten. --}}
+<meta name="robots" content="{{ $site->isLive() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow' }}">
+
+{{-- Meten + consent. Deze pagina is het landingspunt van de advertenties en had
+     als enige geen dataLayer en geen cookiebanner. Beide staan bewust vóór de
+     rest van de <head>. --}}
+@include('channels.partials.analytics-head')
+<script src="{{ url('/cmp/loader.js') }}?tenant=channels&lang=nl" async></script>
+@verbatim
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -39,6 +52,18 @@
   @media (max-width: 760px) {
     .m-stack2 { grid-template-columns: 1fr !important; }
     .m-nolift { transform: none !important; }
+  }
+  /* Smalle toestellen (±320px): de CTA-knoppen hebben inline white-space:nowrap
+     en royale padding, waardoor hun min-content ~305px is. In een flexbox trekt
+     die min-breedte de hele kolom mee, ook met width:100%, en dat duwde de pagina
+     ~9px buiten beeld. nowrap en padding staan inline, dus die moeten hier met
+     !important overruled worden. */
+  @media (max-width: 380px) {
+    #hero-btn, #slot-btn {
+      width: 100%; min-width: 0;
+      white-space: normal !important;
+      padding: 0 14px !important;
+    }
   }
   @media (prefers-reduced-motion: reduce) { .anim-float { animation: none !important; } }
 </style>
@@ -147,7 +172,15 @@
       <div style="max-width: 46ch;">
         <p style="font-size: 20px; line-height: 1.5; color: #2E2C29; margin: 0 0 10px; font-weight: 600;">"Bel je? Dan neem ik zelf op."</p>
         <div style="font-size: 15px; color: #6B6864; font-weight: 700;">Joshua de Vos, eigenaar</div>
-        <a href="tel:+31882545101" style="display: inline-block; margin-top: 12px; font-size: 16px; font-weight: 700; color: #12386B;">Bel 088 2545101</a>
+        {{-- Bellen én zelf plannen: niet iedereen belt liever, en /afspraak was
+             tot nu toe nergens vanaf gelinkt. --}}
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 12px;">
+          <a href="tel:+31882545101" style="font-size: 16px; font-weight: 700; color: #12386B;">Bel 088 2545101</a>
+          <span style="color: #C4C1BC;">of</span>
+@endverbatim
+          <a href="{{ $site->url('afspraak') }}" class="lnk" style="font-size: 16px; font-weight: 700; color: #12386B; text-decoration: underline; text-underline-offset: 3px;">plan zelf een gesprek &rarr;</a>
+@verbatim
+        </div>
       </div>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px;">
@@ -166,8 +199,15 @@
     </div>
   </section>
 
-  <!-- ===================== GOOGLE REVIEWS ===================== -->
-  <section style="padding: 64px 0; margin: 0 calc(50% - 50vw); width: 100vw; background: #FAF9F7; color: #1A1A1A; border-top: 1px solid #E5E3DF; overflow: hidden;">
+  <!-- ===================== GOOGLE REVIEWS =====================
+       Deze sectie presenteert zich als echte Google-reviews (Google-logo, "op
+       Google", link naar het profiel). Ze rendert daarom ALLEEN als er echte
+       reviews in `reviews` staan én `reviewStats` de echte score bevat. Staat
+       een van beide leeg, dan verbergt renderReviews() de hele sectie. Vul
+       nooit met verzonnen teksten: nepreviews zijn een oneerlijke
+       handelspraktijk (ACM) en dit blok claimt expliciet dat ze van Google
+       komen. -->
+  <section data-reviews hidden style="padding: 64px 0; margin: 0 calc(50% - 50vw); width: 100vw; background: #FAF9F7; color: #1A1A1A; border-top: 1px solid #E5E3DF; overflow: hidden;">
     <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
       <h2 style="font-size: clamp(28px, 3.4vw, 40px); line-height: 1.08; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 20px; max-width: 22ch;">Wat andere ondernemers zeggen</h2>
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
@@ -180,12 +220,12 @@
         <span style="font-size: 16px; font-weight: 700; color: #1A1A1A;">Google-reviews</span>
       </div>
       <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; margin-bottom: 36px;">
-        <span style="font-size: 52px; font-weight: 900; letter-spacing: -0.03em; line-height: 1;">4,8</span>
+        <span id="rev-score" style="font-size: 52px; font-weight: 900; letter-spacing: -0.03em; line-height: 1;"></span>
         <span style="position: relative; display: inline-block; font-size: 26px; letter-spacing: 2px; line-height: 1;">
           <span style="color: #D8D5D0;">★★★★★</span>
-          <span style="position: absolute; left: 0; top: 0; color: #FBBC04; overflow: hidden; width: 96%; white-space: nowrap;">★★★★★</span>
+          <span id="rev-stars" style="position: absolute; left: 0; top: 0; color: #FBBC04; overflow: hidden; width: 0; white-space: nowrap;">★★★★★</span>
         </span>
-        <span style="font-size: 17px; color: #6B6864; font-weight: 600;">29 reviews</span>
+        <span id="rev-count" style="font-size: 17px; color: #6B6864; font-weight: 600;"></span>
         <a href="https://www.google.com/search?q=Betergeregeld+ICT" target="_blank" rel="noopener" style="font-size: 15px; font-weight: 800; color: #12386B; text-decoration: underline; text-underline-offset: 3px;">Bekijk op Google →</a>
       </div>
       <div data-reviewscroll id="reviewscroll" style="display: flex; gap: 0; overflow-x: auto; padding: 4px 0; cursor: grab; scrollbar-width: none;"></div>
@@ -344,20 +384,17 @@
     { n: 5, title: 'Groei & schaal', body: 'Meer aanvragen dan je aankunt? We helpen je opschalen: extra mensen inwerken, meerdere vestigingen, nieuwe diensten.', example: 'Van der Meer ging van twee naar vijf man en opende een tweede standplaats. De site groeide gewoon mee.' }
   ];
 
-  // PLACEHOLDER REVIEWS: vervang elke 'text' door de echte Google-review voordat dit live gaat.
-  var reviews = [
-    { name: 'Voorbeeldklant 1', branche: 'Dakdekker', place: 'Zwolle', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 2', branche: 'Bakkerij', place: 'Groningen', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 3', branche: 'Installateur', place: 'Eindhoven', rating: 4, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 4', branche: 'Hovenier', place: 'Breda', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 5', branche: 'Garage', place: 'Rotterdam', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 6', branche: 'Kapper', place: 'Den Haag', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 7', branche: 'Dakdekker', place: 'Utrecht', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 8', branche: 'Installateur', place: 'Nijmegen', rating: 4, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 9', branche: 'Hovenier', place: 'Apeldoorn', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 10', branche: 'Bakkerij', place: 'Tilburg', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' },
-    { name: 'Voorbeeldklant 11', branche: 'Garage', place: 'Arnhem', rating: 5, text: '[ VOORBEELD: reviewtekst wordt aangeleverd ]' }
-  ];
+  // ECHTE Google-reviews, overgenomen uit het Google Business Profile.
+  // Leeg = de reviewsectie rendert niet. Dat is bewust: het blok toont een
+  // Google-logo en zegt "op Google" onder elke naam, dus alles hierin wordt
+  // gepresenteerd als een echte klantbeoordeling.
+  //   { name: 'Voornaam A.', branche: 'Dakdekker', place: 'Zwolle', rating: 5, text: '...' }
+  // `name`/`branche`/`place` zijn vrij; `text` moet letterlijk de review zijn.
+  var reviews = [];
+
+  // Gemiddelde score en het totale aantal reviews op Google. Vul allebei met de
+  // echte cijfers van het profiel; laat op null zolang die er niet zijn.
+  var reviewStats = { score: null, count: null };
 
   // PRIJZEN: eenmalige bedragen staan vast. Maandbedragen conform design.
   var pricing = {
@@ -550,6 +587,18 @@
 
   // ---------- reviews scroller ----------
   function renderReviews() {
+    var section = document.querySelector('[data-reviews]');
+    if (!section) return;
+    // Geen echte reviews of geen echte score: sectie blijft weg. Zo kan er nooit
+    // een half gevuld "Google-reviews"-blok live staan.
+    var ready = reviews.length > 0 && reviewStats && reviewStats.score != null && reviewStats.count != null;
+    if (!ready) { section.hidden = true; return; }
+    section.hidden = false;
+
+    $('rev-score').textContent = String(reviewStats.score).replace('.', ',');
+    $('rev-count').textContent = reviewStats.count + (reviewStats.count === 1 ? ' review' : ' reviews');
+    $('rev-stars').style.width = Math.max(0, Math.min(100, (reviewStats.score / 5) * 100)) + '%';
+
     var el = $('reviewscroll');
     el.innerHTML = reviews.concat(reviews).map(function (r, i) {
       return '<div style="flex:0 0 300px;padding:' + (i === 0 ? '6px 28px 6px 0' : '6px 28px') + ';border-left:' + (i === 0 ? 'none' : '1px solid #E5E3DF') + ';display:flex;flex-direction:column;gap:12px">'

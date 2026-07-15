@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
+use App\Models\WebsiteLead;
 use App\Services\Scheduling\BookingService;
 use App\Services\Scheduling\SlotEngine;
 use App\Services\Scheduling\SlotTakenException;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Publieke afspraken-API, gedeeld door alle trigger-sites (same-origin per domein).
@@ -44,6 +48,12 @@ class AppointmentController extends Controller
             ], 409);
         }
 
+        // Een boeking is een lead. Zonder dit levert de widget alleen een Appointment
+        // op: niet zichtbaar tussen de website-leads, en niemand krijgt bericht.
+        // Bewust hier en niet in BookingService: die wordt ook aangeroepen vanuit
+        // ChannelSiteController::leadStore(), waar de lead al bestaat (dubbele rij).
+        $this->recordLead($appt, $data);
+
         $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
 
         return response()->json([
@@ -54,5 +64,76 @@ class AppointmentController extends Controller
                 ? 'Je afspraak staat! De Google Meet-link staat in je bevestigingsmail.'
                 : 'Je afspraak staat! Je ontvangt de bevestiging en de Meet-link per e-mail.',
         ]);
+    }
+
+    /**
+     * Legt de boeking vast als WebsiteLead en stuurt de interne melding. Bestaat er
+     * al een lead met dit e-mailadres (bv. iemand die eerder zijn voorbeeld bewaarde),
+     * dan wordt die bijgewerkt i.p.v. gedupliceerd — zelfde dedupe-regel als de
+     * bewaar-flow. Best-effort: een fout hier mag de bevestigde afspraak niet omver
+     * halen, dus alleen loggen.
+     *
+     * @param  array<string,mixed>  $data
+     */
+    private function recordLead(Appointment $appt, array $data): void
+    {
+        try {
+            $email = (string) $data['email'];
+            $lead  = WebsiteLead::firstOrNew(['email' => $email]);
+            $isNew = ! $lead->exists;
+
+            $lead->contact_name = $lead->contact_name ?: (string) $data['name'];
+            if (! empty($data['phone'])) {
+                $lead->phone = $data['phone'];
+            }
+            if (! empty($data['note'])) {
+                $lead->message = $data['note'];
+            }
+            if ($isNew) {
+                $lead->source  = 'afspraak';
+                $lead->channel = (string) ($data['source_site'] ?? '') ?: null;
+            }
+
+            // De afspraak zelf wint altijd: dit is het verste punt in de funnel.
+            $lead->status             = 'appointment';
+            $lead->appointment_at     = $appt->starts_at;
+            $lead->appointment_type   = $appt->type;
+            $lead->appointment_status = $appt->status;
+            $lead->meet_link          = $appt->meet_url;
+            $lead->google_event_id    = $appt->google_event_id;
+            $lead->save();
+
+            $this->notifyInternal($lead, $appt, $isNew);
+        } catch (\Throwable $e) {
+            Log::warning('appointment_lead: ' . $e->getMessage());
+        }
+    }
+
+    /** Interne ping bij een nieuwe boeking. Zelfde ontvanger als de channel-leads. */
+    private function notifyInternal(WebsiteLead $lead, Appointment $appt, bool $isNew): void
+    {
+        try {
+            $to = config('mail.from.address');
+            if (! $to) {
+                return;
+            }
+            $tz   = (string) config('scheduling.timezone', 'Europe/Amsterdam');
+            $when = $appt->starts_at->setTimezone($tz)->format('d-m-Y H:i');
+
+            Mail::raw(
+                "Nieuwe afspraak ingepland.\n\n"
+                . "Wanneer: {$when}\n"
+                . "Naam: {$lead->contact_name}\n"
+                . "Contact: {$lead->email} · " . ($lead->phone ?: '—') . "\n"
+                . 'Via: ' . ($lead->channel ?: 'onbekend') . "\n"
+                . 'Bericht: ' . ($lead->message ?: '—') . "\n"
+                . 'Meet: ' . ($appt->meet_url ?: '—') . "\n\n"
+                . ($isNew ? "Dit is een nieuwe lead.\n\n" : "Bestaande lead bijgewerkt.\n\n")
+                . 'Opvolgen in de admin → Website-leads.',
+                fn ($m) => $m->to($to)->subject("Nieuwe afspraak {$when}: {$lead->contact_name}")
+            );
+        } catch (\Throwable $e) {
+            Log::warning('appointment_lead_mail: ' . $e->getMessage());
+        }
     }
 }
