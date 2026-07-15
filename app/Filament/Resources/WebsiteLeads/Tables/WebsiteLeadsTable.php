@@ -76,6 +76,16 @@ class WebsiteLeadsTable
                     ->color(fn ($state) => str_contains((string) $state, 'gepland') ? 'warning' : 'gray')
                     ->toggleable(),
 
+                // Herkomst van de klik. Standaard verborgen: de meeste leads komen niet
+                // uit een advertentie, dus als kolom zou het vooral streepjes opleveren.
+                TextColumn::make('utm_campaign')->label('Campagne')->badge()->color('primary')
+                    ->description(fn (WebsiteLead $r) => trim(implode(' / ', array_filter([$r->utm_source, $r->utm_medium]))) ?: null)
+                    ->placeholder('—')->searchable()->toggleable()->toggledHiddenByDefault(),
+
+                IconColumn::make('gclid')->label('Ads-klik')->boolean()
+                    ->tooltip(fn (WebsiteLead $r) => $r->gclid ? 'Terug te melden als offline conversie' : null)
+                    ->toggleable()->toggledHiddenByDefault(),
+
                 TextColumn::make('phone')->label('Telefoon')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('email')->label('E-mail')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('assigned_to')->label('Toegewezen')->toggleable()->toggledHiddenByDefault(),
@@ -90,6 +100,9 @@ class WebsiteLeadsTable
                 TernaryFilter::make('appointment_at')->label('Heeft afspraak')
                     ->nullable()->trueLabel('Met afspraak')->falseLabel('Zonder afspraak'),
                 TernaryFilter::make('within_radius')->label('Binnen 50 km'),
+                // Om na een gewonnen deal de conversie-upload naar Ads samen te stellen.
+                TernaryFilter::make('gclid')->label('Uit een Ads-klik')
+                    ->nullable()->trueLabel('Met gclid')->falseLabel('Zonder gclid'),
             ])
             ->recordActions([
                 Action::make('resendLink')->label('Stuur link')->icon('heroicon-o-envelope')->color('gray')

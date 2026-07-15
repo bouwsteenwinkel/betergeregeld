@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ChannelSite;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\CaptureAdAttribution;
 use App\Mail\PreviewSavedMail;
 use App\Models\Channel\Site;
 use App\Models\SavedPreview;
@@ -71,6 +72,11 @@ class SavePreviewController extends Controller
         ]);
         $lead->status   = $lead->status ?: 'new';
         $lead->saved_at = $lead->saved_at ?: now();
+
+        // Klik-herkomst uit de cookie die op de landingspagina is gezet: de URL-
+        // parameters van de advertentieklik zijn hier allang weg. First touch wint,
+        // dus een tweede bewaaractie laat de oorspronkelijke campagne staan.
+        $lead->fillAttributionOnce(CaptureAdAttribution::fromRequest($request));
         $lead->save();
 
         // Opgeslagen preview koppelen; de eerste van de klant wordt de favoriet.

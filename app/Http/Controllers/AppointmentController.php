@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\CaptureAdAttribution;
 use App\Models\Appointment;
 use App\Models\WebsiteLead;
 use App\Services\Scheduling\BookingService;
@@ -52,7 +53,9 @@ class AppointmentController extends Controller
         // op: niet zichtbaar tussen de website-leads, en niemand krijgt bericht.
         // Bewust hier en niet in BookingService: die wordt ook aangeroepen vanuit
         // ChannelSiteController::leadStore(), waar de lead al bestaat (dubbele rij).
-        $this->recordLead($appt, $data);
+        // De herkomst komt uit de cookie: dit is een POST, dus de klik-parameters van
+        // de landingspagina staan niet in deze URL.
+        $this->recordLead($appt, $data, CaptureAdAttribution::fromRequest($request));
 
         $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
 
@@ -74,8 +77,9 @@ class AppointmentController extends Controller
      * halen, dus alleen loggen.
      *
      * @param  array<string,mixed>  $data
+     * @param  array<string,string>  $attribution  klik-herkomst (gclid/utm_*)
      */
-    private function recordLead(Appointment $appt, array $data): void
+    private function recordLead(Appointment $appt, array $data, array $attribution = []): void
     {
         try {
             $email = (string) $data['email'];
@@ -93,6 +97,10 @@ class AppointmentController extends Controller
                 $lead->source  = 'afspraak';
                 $lead->channel = (string) ($data['source_site'] ?? '') ?: null;
             }
+
+            // First touch wint, ook hier: boekt iemand een afspraak nadat hij eerder
+            // zijn voorbeeld bewaarde, dan blijft de klik uit de bewaar-flow de bron.
+            $lead->fillAttributionOnce($attribution);
 
             // De afspraak zelf wint altijd: dit is het verste punt in de funnel.
             $lead->status             = 'appointment';

@@ -22,6 +22,9 @@ class WebsiteLead extends Model
         'postcode', 'city', 'address', 'distance_km', 'within_radius',
         'branche', 'facet', 'channel',
         'current_website', 'message', 'source',
+        // Klik-herkomst (zie CaptureAdAttribution): voedt de offline conversion import.
+        'gclid', 'gbraid', 'wbraid',
+        'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
         'answers', 'features',
         'preview_url', 'preview_status',
         'status', 'assigned_to', 'notes', 'contacted_at',
@@ -50,6 +53,54 @@ class WebsiteLead extends Model
     public function savedPreviews(): HasMany
     {
         return $this->hasMany(SavedPreview::class);
+    }
+
+    // ── Klik-herkomst (advertenties) ─────────────────────────────────────
+
+    /** De herkomst-velden, in de volgorde waarin ze getoond worden. */
+    public const ATTRIBUTION_FIELDS = [
+        'gclid'        => 'Google klik-ID (gclid)',
+        'gbraid'       => 'gbraid (iOS-web)',
+        'wbraid'       => 'wbraid (iOS-app)',
+        'utm_source'   => 'Bron (utm_source)',
+        'utm_medium'   => 'Medium (utm_medium)',
+        'utm_campaign' => 'Campagne (utm_campaign)',
+        'utm_term'     => 'Zoekwoord (utm_term)',
+        'utm_content'  => 'Variant (utm_content)',
+    ];
+
+    /**
+     * Zet de klik-herkomst, maar alléén op velden die nog leeg zijn: first touch wint.
+     * Zo blijft vastliggen welke klik deze klant de funnel in bracht. Zou een tweede
+     * bewaaractie of een latere afspraak de herkomst overschrijven, dan verschuift die
+     * met terugwerkende kracht naar de laatste aanraking en levert dezelfde lead bij
+     * elke rapportage een andere campagne op.
+     *
+     * Bewust hier en niet in de controllers: er zijn twee plekken waar een lead
+     * ontstaat (bewaar-flow en afspraak-flow) en die moeten niet uit elkaar lopen.
+     *
+     * @param  array<string,string>  $attribution
+     */
+    public function fillAttributionOnce(array $attribution): void
+    {
+        foreach (array_keys(self::ATTRIBUTION_FIELDS) as $field) {
+            if (blank($this->{$field}) && filled($attribution[$field] ?? null)) {
+                $this->{$field} = $attribution[$field];
+            }
+        }
+    }
+
+    /** Gevulde herkomst-velden (label => waarde); leeg als de lead niet uit een klik kwam. */
+    public function attribution(): array
+    {
+        $out = [];
+        foreach (self::ATTRIBUTION_FIELDS as $field => $label) {
+            if (filled($this->{$field})) {
+                $out[$label] = (string) $this->{$field};
+            }
+        }
+
+        return $out;
     }
 
     /**

@@ -62,6 +62,27 @@ class WebsiteLeadForm
                         Textarea::make('message')->label('Wensen / bericht')->rows(3)->columnSpanFull(),
                     ]),
 
+                Section::make('Herkomst (advertentieklik)')
+                    ->description('Vastgelegd bij het eerste bezoek. De gclid is nodig om een gewonnen lead als offline conversie terug te melden aan Google Ads.')
+                    ->collapsed(fn (?WebsiteLead $record) => ! $record || ! $record->attribution())
+                    ->schema([
+                        Placeholder::make('attribution_list')->label('Klik-herkomst')
+                            ->content(function (?WebsiteLead $record): HtmlString {
+                                if (! $record || ! $record->attribution()) {
+                                    return new HtmlString('<span style="color:#64748b">Niet via een advertentie binnengekomen.</span>');
+                                }
+
+                                $html = collect($record->attribution())->map(
+                                    fn (string $value, string $label): string => '<div style="margin-bottom:.35rem">'
+                                        . '<span style="color:#64748b;font-size:.85em">' . e($label) . '</span><br>'
+                                        . '<span style="font-family:ui-monospace,monospace;word-break:break-all">' . e($value) . '</span>'
+                                        . '</div>'
+                                )->implode('');
+
+                                return new HtmlString($html);
+                            })->columnSpanFull(),
+                    ]),
+
                 Section::make('Uitvraag (branche-specifiek)')
                     ->description('Gewenste functies + antwoorden — voeden de 1-page design-brief.')
                     ->schema([

@@ -17,6 +17,24 @@ return Application::configure(basePath: dirname(__DIR__))
         // set and URL::route() generates http:// links under HTTPS pages.
         $middleware->trustProxies(at: '*');
 
+        // Klik-herkomst vastleggen. Op de hele web-groep en niet alleen op de
+        // channel-routes, omdat de afspraken-API (POST /afspraak/boeken) daarbuiten
+        // valt terwijl juist daar een lead ontstaat. Append: moet ná EncryptCookies
+        // draaien, anders is de cookie bij het lezen nog versleuteld. Doet niets
+        // zolang er geen advertentie-parameter in de URL staat.
+        $middleware->web(append: [
+            \App\Http\Middleware\CaptureAdAttribution::class,
+        ]);
+
+        // De CMP zet cmp_consent_id zelf vanuit JavaScript (resources/cmp/loader.js),
+        // dus onversleuteld. Zonder deze uitzondering probeert EncryptCookies hem te
+        // ontsleutelen, faalt dat, en ziet de server de cookie helemaal niet. Daardoor
+        // kon server-side niet worden vastgesteld of iemand toestemming gaf, wat
+        // CaptureAdAttribution juist nodig heeft om de advertentie-cookie te gaten.
+        $middleware->encryptCookies(except: [
+            'cmp_consent_id',
+        ]);
+
         $middleware->alias([
             'setlocale' => \App\Http\Middleware\SetLocale::class,
             'tool.limit' => \App\Http\Middleware\EnforceToolRateLimit::class,
