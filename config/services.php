@@ -51,6 +51,11 @@ return [
     'anthropic' => [
         'api_key'  => env('ANTHROPIC_API_KEY'),
         'key_path' => env('ANTHROPIC_KEY_PATH'),
+        // Model voor de voorbeeld-tool. Hoort hier en niet als kale env() in de
+        // generator: na `config:cache` geeft env() buiten een config-file null, en
+        // dan valt de tool stil terug op het translator-model zonder dat iemand het
+        // merkt. Leeg = het translator-model van AnthropicClient.
+        'model_preview' => env('ANTHROPIC_MODEL_PREVIEW'),
     ],
 
     // Google Places (new v1) — voedt de "bedrijven in de regio"-sectie op de

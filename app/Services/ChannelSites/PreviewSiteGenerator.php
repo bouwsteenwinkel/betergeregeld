@@ -181,10 +181,17 @@ class PreviewSiteGenerator
         return ['ok' => true, 'usage' => $client->lastUsage()];
     }
 
-    /** Sonnet: balans tussen snelheid en kwaliteit. Overschrijfbaar via env. */
+    /**
+     * Sonnet: balans tussen snelheid en kwaliteit. Overschrijfbaar via
+     * ANTHROPIC_MODEL_PREVIEW, maar via config: een kale env() geeft na
+     * `config:cache` op productie null, waarna dit stil terugvalt op het
+     * translator-model. env() blijft als fallback voor niet-gecachete omgevingen.
+     */
     private function model(AnthropicClient $client): string
     {
-        return (string) env('ANTHROPIC_MODEL_PREVIEW', $client->translatorModel());
+        $model = (string) (config('services.anthropic.model_preview') ?: env('ANTHROPIC_MODEL_PREVIEW', ''));
+
+        return $model !== '' ? $model : $client->translatorModel();
     }
 
     /* ─────────────────────────── Prompt + schema ─────────────────────────── */
