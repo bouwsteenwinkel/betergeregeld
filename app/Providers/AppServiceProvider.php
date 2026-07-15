@@ -62,6 +62,30 @@ class AppServiceProvider extends ServiceProvider
         // 60/min lets a single IP comfortably run 3–5 tests before throttling.
         RateLimiter::for('speedtest', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
 
+        // Voorbeeld-tool: elke NIEUWE preview kost een Claude-call (tekst) plus een
+        // tot twee gpt-image-calls (hero, en bij webshop het productraster). Die
+        // rekening loopt per submit, dus het aanmaken is gelimiteerd per IP. Een
+        // echte bezoeker maakt er een handvol; dit knelt pas bij geautomatiseerd
+        // misbruik. Herhaalde calls op een BESTAANDE preview zijn al gratis:
+        // fillContent stopt op bestaande blokken en generateRaw op een bestaand
+        // beeldbestand.
+        $previewBusy = fn () => response()->json([
+            'ok'      => false,
+            'error'   => 'te-veel',
+            'message' => 'Je hebt net al een paar voorbeelden gemaakt. Probeer het over een uur nog eens, of bel ons even, dan maken we hem samen af.',
+        ], 429);
+
+        RateLimiter::for('preview-start', fn (Request $request) => [
+            Limit::perHour(5)->by($request->ip())->response($previewBusy),
+            Limit::perDay(15)->by($request->ip())->response($previewBusy),
+        ]);
+
+        // De AI-vervolgstappen (/content, /hero-image, /products-image). Per preview
+        // zijn ze idempotent, maar gelijktijdige calls kunnen langs die check racen
+        // en alsnog dubbel inkopen. Ruim genoeg voor het laadscherm (3 calls per
+        // preview), krap genoeg om hameren te stoppen.
+        RateLimiter::for('preview-ai', fn (Request $request) => Limit::perMinute(12)->by($request->ip()));
+
         // Bookkeeping audit log: every create/update/delete on these models
         // writes to bookkeeping_audit_log via the observer.
         BookkeepingTransaction::observe(BookkeepingAuditObserver::class);

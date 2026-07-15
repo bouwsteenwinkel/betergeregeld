@@ -3,14 +3,44 @@
     $services = array_values(array_filter((array) $block->c('services', []), fn ($s) => is_string($s) && $s !== ''));
     $deposit  = $block->c('deposit');                 // bedrag in hele euro's, of null
     $phone    = $site->brand('phone');
+
+    // Dit blok DEMONSTREERT online afspreken; het boekt niets en int niets. Het
+    // hoort dus alleen op een preview thuis, waar de bezoeker de ondernemer zelf
+    // is die zijn eigen voorbeeldsite bekijkt. Op een echte site zou het tegen
+    // echte klanten liegen ("aanbetaling gelukt") terwijl er niets gebeurt, dus
+    // daar valt het terug op een eerlijke contactsectie. Echte boekingen voor
+    // klantsites vragen een agenda + Mollie-account per klant; dat bestaat nog niet.
+    $isPreview = (bool) $site->get('meta.preview.is_preview');
+
+    // Waar de ondernemer een ECHT gesprek met ons kan inplannen (bestaande
+    // afsprakenwidget op ons eigen kanaal). Alleen zinvol vanaf een preview.
+    $srcCh   = (string) ($site->get('meta.preview.source_channel') ?: '');
+    $talkUrl = $srcCh !== '' ? url('/_site/' . $srcCh . '/afspraak') : null;
+
     $cfg = [
         'services' => $services,
         'deposit'  => $deposit ? (int) $deposit : null,
         'openDays' => [1, 2, 3, 4, 5, 6],             // ma-za (0 = zo dicht)
         'slots'    => ['09:30', '10:15', '11:00', '11:45', '13:15', '14:00', '14:45', '15:30', '16:15'],
-        'preview'  => (bool) $site->get('meta.preview.is_preview'),
     ];
 @endphp
+
+@unless ($isPreview)
+    {{-- Geen demo-widget op een echte site: hij zou een afspraak bevestigen die
+         nergens landt. Eerlijk alternatief met dezelfde #contact-ankerplek. --}}
+    <section data-block="booking" id="contact" class="booking">
+        <div class="wrap">
+            <div class="bk-head">
+                <span class="kicker" style="justify-content:center"><span class="kicker-line"></span> Contact</span>
+                <h2>{{ $block->c('heading', 'Maak een afspraak') }}</h2>
+                @if ($block->c('sub'))<p class="muted bk-sub">{{ $block->c('sub') }}</p>@endif
+                @if ($phone)
+                    <p class="bk-sub" style="margin-top:1rem"><a class="btn" href="tel:{{ preg_replace('/\s+/', '', $phone) }}">Bel {{ $phone }}</a></p>
+                @endif
+            </div>
+        </div>
+    </section>
+@else
 <section data-block="booking" id="contact" class="booking">
     <div class="wrap">
         <div class="bk-head">
@@ -69,34 +99,44 @@
             </div>
 
             @if ($cfg['deposit'])
-                {{-- Stap 4: aanbetaling (Mollie/iDEAL) --}}
+                {{-- Stap 4: aanbetaling. Dit is een VOORBEELD van wat de klant van de
+                     ondernemer zou zien; er wordt niets afgeschreven. De knop zegt dat
+                     ook, zodat niemand denkt dat hij hier echt betaalt. --}}
                 <div class="bk-pane" data-step="4" hidden>
                     <div class="bk-summary" data-summary></div>
                     <div class="bk-deposit">
                         <div>
                             <strong>Aanbetaling &euro;{{ $cfg['deposit'] }}</strong>
-                            <p class="muted">Je betaalt nu een kleine aanbetaling om je plek vast te zetten. Het restbedrag reken je in de salon af.</p>
+                            <p class="muted">Zo legt je klant zijn plek vast met een kleine aanbetaling. Het restbedrag rekent hij bij jou af.</p>
                         </div>
                         <span class="bk-ideal">iDEAL</span>
                     </div>
                     <div class="bk-actions">
                         <button type="button" class="bk-back" data-back="3">← terug</button>
-                        <button type="button" class="btn bk-pay" data-pay>Betaal &euro;{{ $cfg['deposit'] }} en bevestig</button>
+                        <button type="button" class="btn bk-pay" data-pay>Bekijk de bevestiging</button>
                     </div>
-                    <p class="bk-secure">Beveiligd betalen via Mollie</p>
+                    <p class="bk-secure">Voorbeeld: er wordt niets afgeschreven. Op je echte site loopt dit via iDEAL.</p>
                 </div>
             @endif
 
-            {{-- Succes --}}
+            {{-- Succes: dit is wat de KLANT van de ondernemer zou zien. Daaronder
+                 zeggen we er eerlijk bij dat er niets verstuurd is, en bieden we
+                 het enige wat hier wél echt kan: een gesprek met ons inplannen. --}}
             <div class="bk-pane bk-done" data-step="done" hidden>
                 <div class="bk-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></div>
                 <h3>Afspraak aangevraagd</h3>
                 <p class="muted" data-done-text></p>
-                @if ($phone)<p class="muted">Liever bellen? <a href="tel:{{ preg_replace('/\s+/', '', $phone) }}">{{ $phone }}</a></p>@endif
+                <div class="bk-real">
+                    <p class="bk-real-note">Dit was een voorbeeld: er is niets verstuurd en er is niets afgeschreven. Zo ziet je klant het straks wel.</p>
+                    @if ($talkUrl)
+                        <a class="btn bk-real-cta" href="{{ $talkUrl }}">Wil je dit op je eigen site? Plan een gesprek</a>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
 </section>
+@endunless
 
 <style>
     .booking .bk-head{text-align:center;max-width:640px;margin:0 auto 1.1rem}
@@ -137,6 +177,9 @@
     .booking .bk-ideal{flex:0 0 auto;font-weight:800;font-size:.8rem;letter-spacing:.03em;color:#cc0066;background:#fff;border:1px solid #ffd0e6;border-radius:5px;padding:.4rem .6rem}
     .booking .bk-pay{background:var(--c-accent);color:var(--c-on-accent,#fff)}
     .booking .bk-secure{text-align:center;color:var(--c-muted);font-size:.78rem;margin:.8rem 0 0}
+    .booking .bk-real{margin-top:1.6rem;padding-top:1.3rem;border-top:1px solid color-mix(in srgb,var(--c-ink) 12%,transparent)}
+    .booking .bk-real-note{color:var(--c-muted);font-size:.85rem;max-width:44ch;margin:0 auto .9rem;line-height:1.55}
+    .booking .bk-real-cta{display:inline-block}
     .booking .bk-done{text-align:center;padding:1.4rem 0}
     .booking .bk-check{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--c-accent) 15%,transparent);color:var(--c-accent);display:grid;place-items:center;margin:0 auto 1rem}
     .booking .bk-check svg{width:32px;height:32px}
@@ -241,15 +284,14 @@
     });
 
     var pay = q('[data-pay]');
-    if (pay) pay.addEventListener('click', function () {
-        pay.disabled = true; pay.textContent = 'Bezig met betalen...';
-        setTimeout(finish, 900); // preview: simuleert de Mollie/iDEAL-redirect
-    });
+    if (pay) pay.addEventListener('click', function () { finish(); });
 
     function finish() {
         var g = collect();
-        var txt = 'Bedankt ' + (g.name || '') + '. We hebben je aanvraag voor ' + fmtDate(state.date) + ' om ' + state.time + ' uur ontvangen'
-            + (cfg.deposit ? ' en je aanbetaling is gelukt' : '') + '. Je krijgt een bevestiging per e-mail.';
+        // Dit is de tekst die de KLANT van de ondernemer straks zou zien. Wat er
+        // in dit voorbeeld echt (niet) gebeurde, staat eronder in .bk-real.
+        var txt = 'Bedankt ' + (g.name || '') + '. Je aanvraag voor ' + fmtDate(state.date) + ' om ' + state.time + ' uur staat genoteerd'
+            + (cfg.deposit ? ' en de aanbetaling is voldaan' : '') + '. Je krijgt een bevestiging per e-mail.';
         q('[data-done-text]').innerHTML = txt;
         qa('.bk-steps li').forEach(function (li) { li.classList.add('is-done'); li.classList.remove('is-active'); });
         setStep('done');

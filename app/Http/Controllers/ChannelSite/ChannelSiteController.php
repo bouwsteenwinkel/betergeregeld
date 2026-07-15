@@ -122,6 +122,17 @@ class ChannelSiteController extends Controller
         return view('channels.contact', ['site' => $this->site()]);
     }
 
+    /**
+     * Zelf een kennismaking inplannen. Losse pagina omdat /contact op sommige
+     * kanalen (o.a. bedrijfswebsite) bewust geblokkeerd is, terwijl de
+     * afsprakenwidget daar juist wél de bestemming is van CTA's, zoals die
+     * onderaan een gegenereerde preview.
+     */
+    public function appointment(): View
+    {
+        return view('channels.afspraak', ['site' => $this->site()]);
+    }
+
     public function services(): View
     {
         return view('channels.services', ['site' => $this->site()]);

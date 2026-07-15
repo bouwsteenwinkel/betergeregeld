@@ -37,16 +37,24 @@ $channelRoutes = function () use ($facetKeys) {
     // Fase 1: maak de preview-site (snel). Fase 2 draait PARALLEL vanaf het laadscherm:
     // /content (de tekst-call) + /hero-image (het branche-beeld), zodat beide tegelijk
     // lopen en de preview compleet opent i.p.v. het beeld 30-60s later inploft.
-    Route::post('/voorbeeld-maken', [PreviewToolController::class, 'start']);
-    Route::post('/content', [PreviewToolController::class, 'content']);
-    Route::post('/hero-image', [PreviewToolController::class, 'heroImage']);
+    // Elke nieuwe preview kost 1 Claude-call + 1 à 2 gpt-image-calls, dus het
+    // aanmaken is per IP gelimiteerd (zie 'preview-start' in AppServiceProvider).
+    Route::post('/voorbeeld-maken', [PreviewToolController::class, 'start'])->middleware('throttle:preview-start');
+    Route::post('/content', [PreviewToolController::class, 'content'])->middleware('throttle:preview-ai');
+    Route::post('/hero-image', [PreviewToolController::class, 'heroImage'])->middleware('throttle:preview-ai');
     // Webshop: 3x2-productraster (parallel met /content en /hero-image).
-    Route::post('/products-image', [PreviewToolController::class, 'productsImage']);
+    Route::post('/products-image', [PreviewToolController::class, 'productsImage'])->middleware('throttle:preview-ai');
     // "Bewaar dit voorbeeld": maakt een klant-account (WebsiteLead) + koppelt de preview.
     Route::post('/bewaren', [SavePreviewController::class, 'save'])->middleware('throttle:10,1');
 
     Route::get('/over-ons', [ChannelSiteController::class, 'about']);
     Route::get('/contact', [ChannelSiteController::class, 'contact']);
+    // Zelf een kennismaking inplannen (bestaande afsprakenwidget). Eigen pagina
+    // omdat /contact op sommige kanalen geblokkeerd is. Let op: dit is het EXACTE
+    // pad '/afspraak'; de data-endpoints '/afspraak/beschikbaarheid' en
+    // '/afspraak/boeken' staan in web.php en vallen via de catch-all-uitzondering
+    // hieronder door.
+    Route::get('/afspraak', [ChannelSiteController::class, 'appointment']);
     Route::get('/diensten', [ChannelSiteController::class, 'services']);
     Route::get('/groeidiamant', [ChannelSiteController::class, 'groeidiamant']);
     Route::get('/prijzen', [ChannelSiteController::class, 'pricing']);
@@ -93,11 +101,17 @@ $channelRoutes = function () use ($facetKeys) {
     // domein. (Route::fallback zou hier NIET werken: de hoofd-/nl-route is een gewone
     // route die eerder matcht dan een fallback-route.)
     //
-    // Uitzondering: '_site/...'-paden NIET afvangen (negatieve lookahead), zodat een
+    // Uitzondering 1: '_site/...'-paden NIET afvangen (negatieve lookahead), zodat een
     // gegenereerde preview op /_site/{key} óók op een live channel-domein doorvalt
     // naar de domein-loze preview-groep hieronder en op het channel-domein zelf
     // opent. Zonder deze uitzondering slokte de catch-all elk /_site/...-pad op → 404.
-    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '(?!_site/).*');
+    //
+    // Uitzondering 2: 'afspraak/...' (de data-endpoints /afspraak/beschikbaarheid en
+    // /afspraak/boeken uit web.php). De afsprakenwidget roept die same-origin aan, dus
+    // op een channel-domein at de catch-all ze op en laadde de widget nooit z'n
+    // momenten. Alleen de SUBpaden vallen door; '/afspraak' zelf is hierboven een
+    // echte channel-pagina.
+    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '(?!_site/|afspraak/).*');
 };
 
 // 1) Live kanalen op hun eigen domein.
