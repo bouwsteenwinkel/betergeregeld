@@ -397,7 +397,10 @@ class ChannelSiteController extends Controller
             'features.*'       => ['string', 'max:60'],
             'appointment_type' => ['nullable', 'in:onsite,meet'],
             'appointment_note' => ['nullable', 'string', 'max:500'],
-            'appointment_at'   => ['nullable', 'date'],
+            // after:now sluit alleen het triviale geval af (oude of gemanipuleerde
+            // POST met een moment in het verleden). Of het moment écht vrij is,
+            // beslist BookingService, dat is het enige punt waar dat waar blijft.
+            'appointment_at'   => ['nullable', 'date', 'after:now'],
         ], [], [
             'contact_name' => 'naam', 'email' => 'e-mail', 'phone' => 'telefoon',
         ]);
@@ -466,9 +469,11 @@ class ChannelSiteController extends Controller
 
         // Online-via-Meet + een gekozen moment → meteen een echte afspraak boeken
         // (agenda-event + Google Meet-link + bevestigingsmail via BookingService).
+        $appointment = null;
+        $appointmentFailed = false;
         if ($appointmentType === 'meet' && filled($data['appointment_at'] ?? null)) {
             try {
-                app(\App\Services\Scheduling\BookingService::class)->book([
+                $appointment = app(\App\Services\Scheduling\BookingService::class)->book([
                     'name'        => $data['contact_name'],
                     'email'       => $data['email'],
                     'phone'       => $data['phone'],
@@ -476,17 +481,42 @@ class ChannelSiteController extends Controller
                     'source_site' => $site->key,
                     'note'        => 'Via gratis-voorbeeld-aanvraag' . (! empty($data['company']) ? ' — ' . $data['company'] : ''),
                 ]);
-                $lead->update(['appointment_status' => 'booked']);
+                // Het MOMENT moet mee, niet alleen de status: BookingService::leadFor()
+                // koppelt een afspraak terug aan de lead op e-mail + appointment_at.
+                // Zonder appointment_at vindt annuleren/verzetten deze lead nooit en
+                // blijft hij op 'booked' staan terwijl de afspraak al weg is.
+                $lead->update([
+                    'appointment_status' => 'booked',
+                    'appointment_at'     => $appointment->starts_at,
+                    'meet_link'          => $appointment->meet_url,
+                    'google_event_id'    => $appointment->google_event_id,
+                ]);
             } catch (\App\Services\Scheduling\SlotTakenException $e) {
-                // Slot net bezet: lead blijft 'requested', we plannen handmatig na.
+                // Niet terug naar het formulier met withErrors(): de lead staat er
+                // hierboven al in, dus opnieuw verzenden geeft een dubbele rij. De
+                // aanvraag zelf is gelukt, alleen het moment viel weg. Daarom door
+                // naar de bedankpagina, maar mét de waarheid: de bezoeker kreeg
+                // "Gekozen: di 21 jul om 11:00" te zien en mag niet in de veronder-
+                // stelling blijven dat die afspraak staat. Lead blijft 'requested'.
+                $appointmentFailed = true;
             } catch (\Throwable $e) {
+                // Onverwachte fout (agenda, mail, DB): voor de bezoeker precies even
+                // erg, want ook dan is er geen afspraak. Zelfde eerlijke terugkoppeling.
                 report($e);
+                $appointmentFailed = true;
             }
         }
 
         $this->notifyInternal($lead, $site);
 
-        return redirect($site->url('bedankt'));
+        // De bedankpagina zweeg over de afspraak, waardoor geslaagd en mislukt er
+        // identiek uitzagen. Beide gevallen krijgen nu hun eigen boodschap mee.
+        return redirect($site->url('bedankt'))->with('appointment', [
+            'failed' => $appointmentFailed,
+            'label'  => $appointment
+                ? \App\Support\Intake\AppointmentSlots::labelFor($appointment->starts_at->format('Y-m-d H:i'))
+                : null,
+        ]);
     }
 
     public function leadSent(): View
