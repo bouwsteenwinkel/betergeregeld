@@ -61,7 +61,7 @@
                 <div class="feature-card">
                     <h3>Je bent niet vindbaar in Google</h3>
                     <span class="feature-rule"></span>
-                    <p>Wie “rijschool {{ '{plaats}' }}” zoekt, moet jóu vinden. Nu vissen andere rijscholen die leerlingen voor je neus weg.</p>
+                    <p>Wie zoekt op “rijschool” en jouw plaats, moet jóu vinden. Nu vissen andere rijscholen die leerlingen voor je neus weg.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Aanmeldingen blijven uit</h3>

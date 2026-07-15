@@ -58,7 +58,7 @@
                 <div class="feature-card">
                     <h3>Je bent niet vindbaar in Google</h3>
                     <span class="feature-rule"></span>
-                    <p>Wie “schoenenwinkel {plaats}” zoekt, moet jóu vinden. Nu vissen andere bedrijven die klanten voor je neus weg.</p>
+                    <p>Wie zoekt op “schoenenwinkel” en jouw plaats, moet jóu vinden. Nu vissen andere bedrijven die klanten voor je neus weg.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Aanvragen blijven uit</h3>
