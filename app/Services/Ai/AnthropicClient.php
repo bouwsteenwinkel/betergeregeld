@@ -161,9 +161,12 @@ class AnthropicClient
 				'cache_control' => ['type' => 'ephemeral'],
 			]];
 		}
-		if (isset($opts['temperature'])) {
-			$payload['temperature'] = (float) $opts['temperature'];
-		}
+		// LET OP: de huidige writer-modellen (o.a. claude-opus-4-7) deprecaten de
+		// `temperature`-parameter en geven HTTP 400 "temperature is deprecated for
+		// this model" zodra hij wordt meegestuurd. Dat liet elke tekst-generatie
+		// (plaats-intro's, FAQ, blog) stil terugvallen op fake-content. We sturen
+		// hem daarom niet meer mee; callers mogen 'temperature' blijven meegeven
+		// (wordt genegeerd) zodat hun code niet hoeft te wijzigen.
 
 		try {
 			$resp = Http::timeout(180)

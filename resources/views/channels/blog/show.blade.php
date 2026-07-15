@@ -30,6 +30,25 @@
     <meta property="article:author" content="{{ $site->displayName() }}">
 @endpush
 
+@push('head')
+	@if ($post->published_at)<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">@endif
+	@if ($post->updated_at)<meta property="article:modified_time" content="{{ $post->updated_at->toIso8601String() }}">@endif
+	{{-- Article-schema. \x40 = @ (Blade-directive-escape). --}}
+	<script type="application/ld+json">
+	{!! json_encode(array_filter([
+		"\x40context"      => 'https://schema.org',
+		"\x40type"         => 'Article',
+		'headline'         => $post->title,
+		'description'      => $post->excerpt,
+		'inLanguage'       => $site->locale(),
+		'datePublished'    => optional($post->published_at)->toIso8601String(),
+		'dateModified'     => optional($post->updated_at)->toIso8601String(),
+		'mainEntityOfPage' => ["\x40type" => 'WebPage', "\x40id" => $site->url('blog/' . $post->slug)],
+		'publisher'        => ["\x40id" => $site->url('') . '#org'],
+	], fn ($v) => $v !== null && $v !== '')) !!}
+	</script>
+@endpush
+
 @section('content')
 	<article>
 		<section class="hero">

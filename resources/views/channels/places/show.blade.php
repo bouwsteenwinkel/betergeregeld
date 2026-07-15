@@ -1,39 +1,20 @@
 @php
 	/** @var \App\Support\ChannelSite $site */
-	$c        = (array) ($content ?? []);
-	$business = (array) ($business ?? []);
-	$biz      = (array) ($businesses ?? []);
-	$nearby   = (array) ($nearby ?? []);
-	$facets   = (array) config('groeidiamant.facets', []);
-	$faq      = (array) ($c['faq'] ?? []);
+	$pl   = $site->get('places', []);
+	$repl = fn ($t) => str_replace(':city', $placeName, (string) $t);
+	$h    = $site->get('home', []);
+	$service = $pl['service'] ?? 'website';
+	$placePrefill = $placeName;
 
-	$host = function ($url) {
-		$h = parse_url((string) $url, PHP_URL_HOST);
-		return $h ? preg_replace('/^www\./', '', $h) : '';
-	};
-
-	// JSON-LD: Service (areaServed = plaats) + LocalBusiness-provider + breadcrumb + FAQ.
-	$canonical = $site->url('plaatsen/' . $placeSlug);
-	$ld = [
-		['@context' => 'https://schema.org', '@type' => 'Service',
-			'name' => $c['h1'] ?? ('Website voor je bedrijf in ' . $placeName),
-			'description' => $c['meta_description'] ?? '',
-			'areaServed' => ['@type' => 'City', 'name' => $placeName,
-				'containedInPlace' => ['@type' => 'AdministrativeArea', 'name' => $place['provincie'] ?? 'Nederland']],
-			'provider' => ['@type' => 'Organization', 'name' => $site->name(), 'url' => $site->url('')],
-			'url' => $canonical],
-		['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [
-			['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => $site->url('')],
-			['@type' => 'ListItem', 'position' => 2, 'name' => 'Plaatsen', 'item' => $site->url('plaatsen')],
-			['@type' => 'ListItem', 'position' => 3, 'name' => $placeName, 'item' => $canonical],
-		]],
+	// Ondersteunende alinea: 3 niche+stad-varianten, deterministisch per stad
+	// gekozen. Zo is de tekst onder de unieke AI-intro niet 1-op-1 gelijk aan
+	// andere steden (minder duplicate-content-signaal). :city / :service placeholders.
+	$angles = [
+		'Wie in :city een vakman zoekt, kiest wie het snelst vertrouwen wekt. Wij zorgen dat jouw :service daar bovenaan staat: snel, vindbaar in Google en gemaakt voor je klanten in :city en omgeving.',
+		'In :city draait het om gevonden worden op het juiste moment. Met een :service die klopt, laat je zien wie je bent en waarom mensen in :city juist jou moeten bellen.',
+		'Klanten in :city vergelijken snel en beslissen nog sneller. Een verzorgde :service die op elke telefoon werkt, geeft je in :city net dat streepje voor.',
 	];
-	if ($faq) {
-		$ld[] = ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => array_map(fn ($f) => [
-			'@type' => 'Question', 'name' => $f['q'],
-			'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
-		], $faq)];
-	}
+	$angle = str_replace([':city', ':service'], [$placeName, $service], $angles[abs(crc32($site->key . '|' . $placeSlug)) % count($angles)]);
 @endphp
 @extends('channels.layout')
 
@@ -50,12 +31,39 @@
 	@endforeach
 @endpush
 
+@push('head')
+	{{-- Per-stad Service-schema (areaServed = de stad) + BreadcrumbList. \x40 = @. --}}
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context" => 'https://schema.org',
+		"\x40type"    => 'Service',
+		'name'        => $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)),
+		'serviceType' => $service,
+		'areaServed'  => ["\x40type" => 'City', 'name' => $placeName],
+		'provider'    => ["\x40id" => $site->url('') . '#org'],
+		'url'         => $site->url('plaatsen/' . $placeSlug),
+		'inLanguage'  => $site->locale(),
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"     => 'https://schema.org',
+		"\x40type"        => 'BreadcrumbList',
+		'itemListElement' => [
+			["\x40type" => 'ListItem', 'position' => 1, 'name' => 'Home',     'item' => $site->url('')],
+			["\x40type" => 'ListItem', 'position' => 2, 'name' => 'Plaatsen', 'item' => $site->url('plaatsen')],
+			["\x40type" => 'ListItem', 'position' => 3, 'name' => $placeName, 'item' => $site->url('plaatsen/' . $placeSlug)],
+		],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
+@endpush
+
 @section('content')
 	<section class="hero">
 		<div class="wrap">
-			<span class="eyebrow">{{ $placeName }}</span>
-			<h1>{{ $c['h1'] ?? ('Website voor je bedrijf in ' . $placeName) }}</h1>
-			@if (!empty($c['hero_lead']))<p class="lead" style="max-width:60ch">{{ $c['hero_lead'] }}</p>@endif
+			{{-- Geen eyebrow-pill (afspraak). --}}
+			<h1>{{ $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)) }}</h1>
+			<p class="lead" style="max-width:58ch">{{ $site->placeIntro($placeSlug, $placeName) }}</p>
 			<a href="#contact" class="btn">Gratis voorbeeld in {{ $placeName }}</a>
 		</div>
 	</section>
@@ -72,22 +80,14 @@
 	@if ($biz)
 		<section style="background:var(--c-surface)">
 			<div class="wrap">
-				<span class="kicker"><span class="kicker-line"></span> In de regio</span>
-				<h2>{{ $business['label'] ?: ('Bedrijven in ' . $placeName) }}</h2>
-				@if (!empty($business['intro']))<p class="muted" style="max-width:70ch;margin-bottom:1.6rem">{{ $business['intro'] }}</p>@endif
-				<div class="grid cols-4" style="gap:1rem">
-					@foreach ($biz as $b)
-						<div class="card" style="display:flex;flex-direction:column;gap:.35rem">
-							<h3 style="font-size:1.02rem;line-height:1.25">{{ $b['name'] }}</h3>
-							@if (!empty($b['type']))<span class="muted" style="font-size:.8rem">{{ $b['type'] }}</span>@endif
-							@if (!empty($b['rating']))
-								<div style="font-size:.85rem;font-weight:700;color:var(--c-accent)">★ {{ number_format((float) $b['rating'], 1, ',', '') }}<span class="muted" style="font-weight:400"> · {{ $b['reviews'] }} reviews</span></div>
-							@endif
-							@if (!empty($b['address']))<p class="muted" style="font-size:.82rem;margin-top:.1rem">{{ $b['address'] }}</p>@endif
-							<div style="margin-top:auto;display:flex;gap:.8rem;padding-top:.5rem;font-size:.85rem;font-weight:600">
-								@if (!empty($b['website']))<a href="{{ $b['website'] }}" target="_blank" rel="noopener nofollow" style="color:var(--c-cta)">{{ $host($b['website']) ?: 'Website' }} →</a>@endif
-								@if (!empty($b['maps']))<a href="{{ $b['maps'] }}" target="_blank" rel="noopener nofollow" class="muted">Route</a>@endif
-							</div>
+				<h2>Wat je krijgt in {{ $placeName }}</h2>
+				<div class="grid cols-4" style="margin-top:1.4rem">
+					@foreach ($h['features'] as $f)
+						<div class="card">
+							{{-- Altijd inline-SVG (nooit emoji). --}}
+							<div style="color:var(--c-primary);margin-bottom:.5rem">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
+							<h3>{{ $f['title'] }}</h3>
+							<p class="muted" style="font-size:.95rem">{{ $f['text'] }}</p>
 						</div>
 					@endforeach
 				</div>
@@ -139,30 +139,12 @@
 		</section>
 	@endif
 
-	{{-- Zoveel mogelijk interne links: alle plaatsen in dezelfde provincie. --}}
-	@if ($nearby)
-		<section>
-			<div class="wrap">
-				<span class="kicker"><span class="kicker-line"></span> {{ $place['provincie'] ?? 'In de buurt' }}</span>
-				<h2>Ook actief in de omgeving</h2>
-				<div style="display:flex;gap:.5rem .9rem;flex-wrap:wrap;margin-top:1rem;line-height:1.9">
-					@foreach ($nearby as $slug => $name)
-						<a href="{{ $site->url('plaatsen/' . $slug) }}" style="font-size:.9rem;font-weight:600;text-decoration:none;color:inherit">{{ $name }}</a>
-					@endforeach
-				</div>
-				<p style="margin-top:1.4rem"><a href="{{ $site->url('plaatsen') }}" style="font-weight:700;color:var(--c-cta)">Alle plaatsen bekijken →</a></p>
-			</div>
-		</section>
-	@endif
-
-	<section class="cta-band" data-section="cta">
-		<div class="wrap">
-			<div class="cta-band-inner">
-				<div>
-					<h2>{{ $c['cta_title'] ?? ('Aan de slag in ' . $placeName . '?') }}</h2>
-					@if (!empty($c['cta']))<p>{{ $c['cta'] }}</p>@endif
-				</div>
-				<a href="#contact" class="btn">Gratis voorbeeld aanvragen</a>
+	<section style="background:var(--c-surface)">
+		<div class="wrap" style="max-width:720px">
+			<h2>Een {{ $service }} die werkt in {{ $placeName }}</h2>
+			<div class="prose" style="margin-top:1rem">
+				<p>{{ $angle }}</p>
+				<p>Geen lange contracten of technisch gedoe. We zetten vooraf een gratis voorbeeld klaar dat is afgestemd op jouw zaak in {{ $placeName }}, zodat je precies ziet wat je krijgt voordat je iets beslist.</p>
 			</div>
 		</div>
 	</section>

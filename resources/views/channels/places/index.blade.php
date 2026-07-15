@@ -15,9 +15,9 @@
 @section('content')
 	<section class="hero">
 		<div class="wrap">
-			<span class="eyebrow">{{ $r('eyebrow', 'Heel Nederland') }}</span>
-			<h1>{{ $r('h1', 'In heel Nederland actief') }}</h1>
-			@if ($r('intro'))<p class="lead" style="max-width:60ch">{{ $r('intro') }}</p>@endif
+			{{-- Geen eyebrow-pill (afspraak). --}}
+			<h1>{{ $pl['h1'] ?? 'In heel Nederland actief' }}</h1>
+			@if (!empty($pl['intro']))<p class="lead" style="max-width:54ch">{{ $pl['intro'] }}</p>@endif
 			<a href="#contact" class="btn">Gratis voorbeeld aanvragen</a>
 		</div>
 	</section>
