@@ -308,8 +308,11 @@ class ChannelSiteController extends Controller
 
         // Vaste content-pagina's: home, de Groeidiamant-facetlandingen (belangrijkste
         // SEO-pagina's), en alle informatieve pagina's.
+        // 'afspraak' hoort hier thuis: het is een echte, indexeerbare pagina en op dit
+        // kanaal het einddoel van de trechter, maar hij stond in geen enkele sitemap.
+        // (/voorbeeld-maken staat er bewust NIET in: die is noindex,nofollow.)
         $paths = ['', 'over-ons', 'contact', 'diensten', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
-            'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog'];
+            'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog', 'afspraak'];
         foreach (array_keys((array) config('groeidiamant.facets', [])) as $facet) {
             $paths[] = $facet;
         }

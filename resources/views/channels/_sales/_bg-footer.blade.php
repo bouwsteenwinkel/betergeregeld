@@ -63,12 +63,18 @@
 
             <div>
                 <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #7FB0DE; margin-bottom: 12px;">Pagina's</div>
-                {{-- Links naar secties óp de homepage (de losse pagina's zijn verwijderd). --}}
+                {{-- Links naar secties óp de homepage (de losse pagina's zijn verwijderd),
+                     plus de twee échte rubrieken. Blog en Plaatsen stonden nergens in de
+                     site gelinkt: 598 plaatspagina's en 22 blogartikelen waren daardoor
+                     weespagina's, alleen te vinden via de sitemap. Google leidt daar geen
+                     enkele autoriteit naartoe, en een bezoeker kwam er nooit. --}}
                 <div style="display: flex; flex-direction: column;">
                     <a href="{{ $site->url('') }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Home</a>
                     <a href="{{ $site->url('') . '#prijzen' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Prijzen</a>
                     <a href="{{ $site->url('') . '#werkwijze' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Werkwijze</a>
                     <a href="{{ $site->url('') . '#automatisering' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Automatisering</a>
+                    <a href="{{ $site->url('blog') }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Blog</a>
+                    <a href="{{ $site->url('plaatsen') }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Werkgebied</a>
                     <a href="{{ $site->url('') . '#contact' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Contact</a>
                 </div>
             </div>
@@ -87,8 +93,12 @@
             </div>
         </div>
 
+        {{-- .webp van 606px (2x de weergavemaat) i.p.v. de PNG van 1080x1080: die was
+             592 KB en laadde eager in de footer van álle 622 pagina's van dit kanaal,
+             goed voor het leeuwendeel van het paginagewicht. Nu 26 KB, en lazy: hij
+             staat onderaan, dus niemand heeft hem nodig bij het eerste scherm. --}}
         <a href="tel:+31882545101" style="flex: 0 1 300px; max-width: 340px; display: flex; align-items: stretch;">
-            <img src="/channel-media/bedrijfswebsite/joshua-blue-3.png" alt="Liever even bellen? Bel 088 2545101" style="width: 100%; max-width: 303px; height: auto; object-fit: contain; object-position: center bottom; display: block; margin-bottom: -32px">
+            <img src="/channel-media/bedrijfswebsite/joshua-blue-3.webp" alt="Liever even bellen? Bel 088 2545101" width="303" height="303" loading="lazy" decoding="async" style="width: 100%; max-width: 303px; height: auto; object-fit: contain; object-position: center bottom; display: block; margin-bottom: -32px">
         </a>
     </div>
 

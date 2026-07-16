@@ -119,6 +119,52 @@ Route::middleware('throttle:speedtest')->group(function () {
 // Sitemap is locale-agnostic — Google expects it at the document root.
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'sitemap'])->name('sitemap');
 
+/*
+ * robots.txt van het HOOFDdomein.
+ *
+ * Stond tot nu toe als statisch bestand in public/. Dat werd door de webserver
+ * geserveerd vóórdat Laravel aan bod kwam, dus ook op elk channel-domein: die kregen
+ * allemaal deze lijst, mét "Sitemap: https://betergeregeld.com/sitemap.xml". Hun eigen
+ * per-kanaal robots-route (routes/channels.php) draaide nooit, en hun eigen sitemap
+ * (622 URL's op jouw-bedrijfswebsite.nl) werd dus aan geen enkele crawler gemeld.
+ *
+ * Nu een route: de channel-domeingroepen worden vóór dit bestand geladen, dus daar wint
+ * hun eigen robots-route en valt alleen het hoofddomein hier terug.
+ */
+Route::get('/robots.txt', function () {
+    $lines = [
+        'User-agent: *',
+        'Disallow: /admin/',
+        'Disallow: /login',
+        'Disallow: /logout',
+        'Disallow: /register',
+        'Disallow: /verify-email',
+        'Disallow: /two-factor',
+        'Disallow: /dashboard',
+        'Disallow: /password',
+        'Disallow: /settings',
+        'Disallow: /billing',
+        'Disallow: /webhooks/',
+        'Disallow: /api/',
+        '',
+        '# Tool-deeppaths waar je geen URL voor zou willen indexeren',
+        'Disallow: /*/tools/favicon-generator/result/',
+        'Disallow: /*/tools/favicon-generator/download/',
+        'Disallow: /*/tools/pdf-merge/download/',
+        'Disallow: /*/tools/boekhouden',
+        '',
+        '# AccessGuard token-flows',
+        'Disallow: /*/accessguard/notifications/unsubscribe/',
+        '',
+        '# Cloudflare e-mail-protection artefact (geen echte pagina)',
+        'Disallow: /cdn-cgi/',
+        '',
+        'Sitemap: ' . url('/sitemap.xml'),
+    ];
+
+    return response(implode("\n", $lines) . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+})->name('robots');
+
 // CMP — public-facing endpoints. Locale-agnostic; loader/scripts worden
 // geserveerd zonder authenticatie en met CORS open zodat externe sites
 // (bouwsteenwinkel.nl, brikl.nl, etc.) ze kunnen embedden.
