@@ -10,66 +10,101 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * Herinneringen voor geboekte afspraken. Cadans: 24 uur vooraf en 1 uur vooraf.
+ * Herinneringen voor geboekte afspraken. Cadans: 2 dagen vooraf en de ochtend van de
+ * afspraak zelf (beide instelbaar via config/scheduling.php).
  *
- * Waarom twee momenten: het gesprek is gratis en vrijblijvend en staat dagen
- * vooruit, dus no-show is het grootste lek. De 24u-mail komt op tijd om nog te
- * kunnen verzetten (dat is de gewenste uitkomst, een verzette afspraak is geen
- * verloren lead). De 1u-mail vangt de mensen die het gewoon vergeten en zet de
- * Meet-link binnen handbereik op het moment dat ze hem nodig hebben.
+ * Waarom twee momenten: het gesprek is gratis en vrijblijvend en staat dagen vooruit,
+ * dus no-show is het grootste lek. De mail van 2 dagen vooraf komt ruim op tijd om nog
+ * te kunnen verzetten (een verzette afspraak is geen verloren lead). De mail op de dag
+ * zelf vangt de mensen die het simpelweg vergeten waren.
  *
- * Waarom niet alleen 24u: wie 's ochtends de mail leest en om 16:00 moet, is dat
- * om 16:00 kwijt. Waarom niet alleen 1u: dan is verzetten geen optie meer en is
- * afzeggen het enige alternatief voor niet komen opdagen.
+ * "De dag van de afspraak" is een lokaal klokuur, geen vast aantal uren vooraf: wie om
+ * 16:00 moet, heeft niets aan een mail die om 15:00 kwam als hij zijn ochtend al
+ * volgepland had. Daarom een vast ochtenduur, met één uitzondering — zie sendAtFor().
  */
 class SendAppointmentReminders extends Command
 {
     protected $signature = 'appointments:send-reminders';
 
-    protected $description = 'Stuurt herinneringen voor geboekte afspraken (24 uur en 1 uur vooraf).';
+    protected $description = 'Stuurt herinneringen voor geboekte afspraken (2 dagen vooraf en op de dag zelf).';
+
+    private const KIND_LEAD   = '2d';
+    private const KIND_DAY_OF = 'day_of';
+
+    private const COLUMNS = [
+        self::KIND_LEAD   => 'reminder_2d_sent_at',
+        self::KIND_DAY_OF => 'reminder_day_of_sent_at',
+    ];
 
     public function handle(): int
     {
-        $now = Carbon::now();
-        $sent = 0;
-        $skipped = 0;
+        $tz  = (string) config('scheduling.timezone', 'Europe/Amsterdam');
+        $now = Carbon::now($tz);
+
+        $leadDays = (int) config('scheduling.reminders.lead_days', 2);
+        $sent     = 0;
+        $skipped  = 0;
 
         // Alleen 'booked'. Dat sluit in één keer cancelled/completed/no_show uit én
         // 'held' (een reservering tijdens het invullen is geen afspraak om aan te
-        // herinneren). starts_at > now houdt alles in het verleden buiten de deur.
+        // herinneren). Het venster loopt tot lead_days vooruit: verder weg dan dat kan
+        // geen enkele herinnering toe zijn, en alles in het verleden valt af.
         $appointments = Appointment::query()
             ->where('status', 'booked')
             ->where('starts_at', '>', $now)
-            ->where('starts_at', '<=', $now->copy()->addDay())
+            ->where('starts_at', '<=', $now->copy()->addDays($leadDays))
             ->where(function ($q) {
-                $q->whereNull('reminder_24h_sent_at')->orWhereNull('reminder_1h_sent_at');
+                $q->whereNull('reminder_2d_sent_at')->orWhereNull('reminder_day_of_sent_at');
             })
             ->orderBy('starts_at')
             ->get();
 
         foreach ($appointments as $appt) {
-            $kind = $this->dueKind($appt, $now);
+            // Staat de afspraak vandaag, dan is de mail van 2 dagen vooraf niet meer waar:
+            // hij zou "we spreken elkaar [datum]" zeggen over iets van vandaag, en de
+            // dag-van-mail doet dat werk al. Afstempelen zonder te sturen, anders pikt een
+            // volgende run hem alsnog op.
+            //
+            // Dit móét vóór dueKind(): na scheduler-uitval staan beide vensters open, en
+            // om 06:00 is de dag-van-mail nog niet toe (die wacht op 08:00) terwijl de
+            // 2d-mail dat wél is. Zonder deze voorrang vertrok die om 06:00 alsnog, en
+            // kreeg de klant twee uur later óók nog de dag-van-mail.
+            if ($appt->reminder_2d_sent_at === null && $this->isVandaag($appt, $now, $tz)) {
+                $appt->forceFill(['reminder_2d_sent_at' => $now])->save();
+            }
+
+            $kind = $this->dueKind($appt, $now, $tz);
 
             if ($kind === null) {
                 $skipped++;
                 continue;
             }
 
-            $column = $kind === '1h' ? 'reminder_1h_sent_at' : 'reminder_24h_sent_at';
+            if (! $this->claim($appt, $kind, $now)) {
+                // Een parallelle run was ons voor. Verzenden en stempelen waren eerder
+                // twee losse stappen, waardoor twee runs dezelfde mail konden sturen.
+                $skipped++;
+                continue;
+            }
 
             try {
                 Mail::to($appt->email)->send(new AppointmentReminder($appt, $kind));
             } catch (\Throwable $e) {
-                // Eén kapot mailadres mag de rest van de batch niet blokkeren; de
-                // kolom blijft leeg, dus de volgende run probeert het opnieuw.
+                // Claim terugdraaien zodat de volgende run het opnieuw probeert; één
+                // kapot mailadres mag de rest van de batch niet blokkeren.
+                //
+                // Via de query en niet via $appt->save(): claim() schreef de stempel om
+                // dit model heen, dus in het geheugen staat de kolom nog op null. Een
+                // forceFill(null) is dan "geen wijziging" en Eloquent schrijft niets weg —
+                // waarna de claim blijft staan en deze klant nooit meer een herinnering
+                // krijgt.
+                Appointment::query()->where('id', $appt->id)->update([self::COLUMNS[$kind] => null]);
+
                 Log::warning("appointment_reminder_mail (#{$appt->id}, {$kind}): " . $e->getMessage());
                 $skipped++;
                 continue;
             }
 
-            // Pas ná een geslaagde verzending stempelen: dit is wat dubbel sturen
-            // voorkomt bij de volgende run.
-            $appt->forceFill([$column => $now])->save();
             $sent++;
         }
 
@@ -79,41 +114,88 @@ class SendAppointmentReminders extends Command
     }
 
     /**
-     * Welke herinnering is deze afspraak nu toe? Null = geen.
-     * De 1u-mail gaat vóór op de 24u-mail: staat de afspraak nog maar een uur weg
-     * en is er nooit een 24u-mail gegaan (bijv. laat geboekt), dan is "over een uur"
-     * het enige eerlijke bericht.
+     * Claim de herinnering vóór het versturen, met een voorwaardelijke UPDATE. Slaagt
+     * die bij precies één rij, dan is deze run de enige die deze mail verstuurt.
      */
-    private function dueKind(Appointment $appt, Carbon $now): ?string
+    private function claim(Appointment $appt, string $kind, Carbon $now): bool
     {
-        $start = Carbon::parse($appt->starts_at);
+        $column = self::COLUMNS[$kind];
 
-        if ($start->lte($now->copy()->addHour())) {
-            return $this->isDue($appt, 'reminder_1h_sent_at', $start, 1, $now) ? '1h' : null;
-        }
+        $claimed = Appointment::query()
+            ->where('id', $appt->id)
+            ->whereNull($column)
+            ->update([$column => $now]);
 
-        return $this->isDue($appt, 'reminder_24h_sent_at', $start, 24, $now) ? '24h' : null;
+        return $claimed === 1;
     }
 
     /**
-     * Een herinnering is toe als hij nog niet ging én de afspraak al geboekt was
-     * toen het venster openging. Die tweede eis voorkomt de rare dubbelslag bij
-     * een late boeking: wie vandaag om 10:00 boekt voor 15:00 zit al binnen het
-     * 24u-venster en zou binnen een kwartier na de bevestigingsmail een
-     * "herinnering" krijgen aan iets dat hij net zelf inplande.
+     * Welke herinnering is deze afspraak nu toe? Null = geen.
+     *
+     * De dag-van-mail gaat vóór op die van 2 dagen vooraf: staat de afspraak vandaag,
+     * dan is "vandaag" het enige eerlijke bericht.
      */
-    private function isDue(Appointment $appt, string $column, Carbon $start, int $hoursBefore, Carbon $now): bool
+    private function dueKind(Appointment $appt, Carbon $now, string $tz): ?string
     {
-        if ($appt->{$column} !== null) {
+        foreach ([self::KIND_DAY_OF, self::KIND_LEAD] as $kind) {
+            if ($this->isDue($appt, $kind, $now, $tz)) {
+                return $kind;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Een herinnering is toe als hij nog niet ging, zijn verzendmoment is aangebroken,
+     * én de afspraak al geboekt was toen dat moment aanbrak.
+     *
+     * Die laatste eis voorkomt de rare dubbelslag bij een late boeking: wie vanochtend
+     * om 10:00 boekt voor vanmiddag 15:00 zit al voorbij beide verzendmomenten en zou
+     * anders binnen een kwartier na zijn bevestigingsmail een "herinnering" krijgen aan
+     * iets dat hij net zelf inplande. Zo iemand krijgt geen herinnering meer, en dat is
+     * de bedoeling: hij boekte een paar uur geleden, de bevestiging is nog vers.
+     */
+    private function isDue(Appointment $appt, string $kind, Carbon $now, string $tz): bool
+    {
+        if ($appt->{self::COLUMNS[$kind]} !== null) {
             return false;
         }
 
-        $windowOpensAt = $start->copy()->subHours($hoursBefore);
+        $sendAt = $this->sendAtFor($appt, $kind, $tz);
 
-        if ($now->lt($windowOpensAt)) {
+        if ($now->lt($sendAt)) {
             return false;
         }
 
-        return $appt->created_at === null || Carbon::parse($appt->created_at)->lt($windowOpensAt);
+        return $appt->created_at === null || Carbon::parse($appt->created_at)->setTimezone($tz)->lt($sendAt);
+    }
+
+    /** Valt de afspraak op de kalenderdag die nu bezig is? (lokale tijdzone) */
+    private function isVandaag(Appointment $appt, Carbon $now, string $tz): bool
+    {
+        return Carbon::parse($appt->starts_at)->setTimezone($tz)->isSameDay($now);
+    }
+
+    /** Het moment waarop deze herinnering hoort te vertrekken, in de lokale tijdzone. */
+    private function sendAtFor(Appointment $appt, string $kind, string $tz): Carbon
+    {
+        $start = Carbon::parse($appt->starts_at)->setTimezone($tz);
+
+        if ($kind === self::KIND_LEAD) {
+            // subDays() en niet subHours(48): over de zomertijdgrens is een dag geen
+            // vaste 24 uur, en "2 dagen vooraf" hoort op hetzelfde klokuur te vallen.
+            return $start->copy()->subDays((int) config('scheduling.reminders.lead_days', 2));
+        }
+
+        $hour   = (int) config('scheduling.reminders.day_of_hour', 8);
+        $sendAt = $start->copy()->startOfDay()->setTime($hour, 0);
+
+        // Een afspraak om 08:00 zou anders zijn "herinnering" precies bij aanvang
+        // krijgen, en eentje om 07:00 pas erna. Zit het ochtenduur te dicht op de
+        // afspraak, dan schuift de mail naar voren tot minimaal min_lead_minutes ervoor.
+        $latest = $start->copy()->subMinutes((int) config('scheduling.reminders.min_lead_minutes', 60));
+
+        return $sendAt->gt($latest) ? $latest : $sendAt;
     }
 }

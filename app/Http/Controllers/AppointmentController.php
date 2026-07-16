@@ -6,6 +6,7 @@ use App\Http\Middleware\CaptureAdAttribution;
 use App\Models\Appointment;
 use App\Models\WebsiteLead;
 use App\Services\Scheduling\BookingService;
+use App\Services\Scheduling\CalendarUnavailableException;
 use App\Services\Scheduling\SlotEngine;
 use App\Services\Scheduling\SlotTakenException;
 use Carbon\CarbonImmutable;
@@ -21,11 +22,32 @@ class AppointmentController extends Controller
 {
     public function availability(Request $request, SlotEngine $engine): JsonResponse
     {
+        // Zonder validatie gooide Carbon::parse() op elke onzin-invoer (?from=x) een
+        // ongevangen exception: een 500 op een publieke, ongeknepen route.
+        $request->validate([
+            'from' => 'nullable|date',
+            'to'   => 'nullable|date',
+        ]);
+
         $tz   = (string) config('scheduling.timezone', 'Europe/Amsterdam');
         $from = $request->filled('from') ? CarbonImmutable::parse($request->query('from'), $tz) : null;
         $to   = $request->filled('to') ? CarbonImmutable::parse($request->query('to'), $tz) : null;
 
-        return response()->json(['days' => $engine->slots($from, $to)]);
+        try {
+            $days = $engine->slots($from, $to);
+        } catch (CalendarUnavailableException $e) {
+            // Liever geen sloten tonen dan sloten die misschien al bezet zijn: de agenda
+            // is nu onleesbaar, dus elk "vrij" zou een gok zijn.
+            Log::error('appointment_availability_calendar: ' . $e->getMessage());
+
+            return response()->json([
+                'days'    => [],
+                'error'   => 'calendar_unavailable',
+                'message' => 'We kunnen de agenda nu even niet uitlezen. Probeer het zo opnieuw.',
+            ], 503);
+        }
+
+        return response()->json(['days' => $days]);
     }
 
     public function book(Request $request, BookingService $service): JsonResponse
@@ -47,6 +69,15 @@ class AppointmentController extends Controller
                 'ok'      => false,
                 'message' => 'Dit tijdstip is net bezet. Kies een ander moment.',
             ], 409);
+        } catch (CalendarUnavailableException $e) {
+            // Niet doorboeken op een agenda die we niet kunnen lezen: dan zetten we
+            // iemand mogelijk boven op een bestaande afspraak.
+            Log::error('appointment_book_calendar: ' . $e->getMessage());
+
+            return response()->json([
+                'ok'      => false,
+                'message' => 'We kunnen de agenda nu even niet bereiken. Probeer het over een paar minuten opnieuw.',
+            ], 503);
         }
 
         // Een boeking is een lead. Zonder dit levert de widget alleen een Appointment
@@ -106,7 +137,7 @@ class AppointmentController extends Controller
             $lead->status             = 'appointment';
             $lead->appointment_at     = $appt->starts_at;
             $lead->appointment_type   = $appt->type;
-            $lead->appointment_status = $appt->status;
+            $lead->appointment_status = $appt->leadAppointmentStatus();
             $lead->meet_link          = $appt->meet_url;
             $lead->google_event_id    = $appt->google_event_id;
             $lead->save();
@@ -117,12 +148,19 @@ class AppointmentController extends Controller
         }
     }
 
-    /** Interne ping bij een nieuwe boeking. Zelfde ontvanger als de channel-leads. */
+    /**
+     * Interne ping bij een nieuwe boeking.
+     *
+     * Bewust scheduling.notify_email en niet mail.from.address: dat laatste is een
+     * afzender, geen postbus. Op de voorbeeldwaarde (hello@example.com) verdween deze
+     * melding geruisloos, en een gemiste afspraakmelding merk je pas als de klant voor
+     * een lege Meet-kamer zit.
+     */
     private function notifyInternal(WebsiteLead $lead, Appointment $appt, bool $isNew): void
     {
         try {
-            $to = config('mail.from.address');
-            if (! $to) {
+            $to = (string) config('scheduling.notify_email');
+            if ($to === '') {
                 return;
             }
             $tz   = (string) config('scheduling.timezone', 'Europe/Amsterdam');

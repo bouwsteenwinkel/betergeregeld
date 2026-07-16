@@ -31,6 +31,7 @@ trait SchedulingSchema
         '2026_07_04_141002_create_availability_exceptions_table',
         '2026_07_04_141005_create_appointments_table',
         '2026_07_15_120000_add_reminder_columns_to_appointments',
+        '2026_07_16_090000_retime_appointment_reminders_and_track_calendar_sync',
     ];
 
     /**

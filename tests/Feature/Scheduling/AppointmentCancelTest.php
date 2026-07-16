@@ -212,7 +212,7 @@ class AppointmentCancelTest extends SchedulingTestCase
             'email'              => 'jan@example.nl',
             'status'             => 'appointment',
             'appointment_at'     => $appt->starts_at,
-            'appointment_status' => 'booked',
+            'appointment_status' => 'confirmed',
         ]);
 
         $this->post('/afspraak/annuleren/' . $appt->cancel_token . '/verzetten', [
@@ -224,7 +224,7 @@ class AppointmentCancelTest extends SchedulingTestCase
         // Zonder dit blijft de lead achter als 'contacted/cancelled' terwijl er een
         // nieuwe afspraak staat: de admin ziet dan een gesprek dat niemand opvolgt.
         $this->assertSame('appointment', $lead->status);
-        $this->assertSame('booked', $lead->appointment_status);
+        $this->assertSame('confirmed', $lead->appointment_status);
         $this->assertSame(
             $this->moment(self::VRIJDAG, '14:00')->toDateTimeString(),
             $lead->appointment_at->toDateTimeString()

@@ -140,7 +140,16 @@
         // Zelfde bron als de boekwidget (SlotEngine), zodat hier nooit een moment
         // staat dat het boeken daarna afkeurt.
         fetch('/afspraak/beschikbaarheid', { headers: { 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
+            // Een 503 (agenda onbereikbaar) laat fetch niet struikelen; zonder deze
+            // controle lijkt het alsof er geen enkel moment vrij is. De parse zit achter
+            // de ok-controle: een 502/503 van IIS is HTML, en die mag de bezoeker geen
+            // rauwe parse-fout opleveren.
+            .then(function (r) {
+                if (r.ok) { return r.json(); }
+                return r.json().catch(function () { return {}; }).then(function (b) {
+                    throw new Error(b && b.message ? b.message : 'onbereikbaar');
+                });
+            })
             .then(function (j) {
                 days = j.days || {}; elLoad.hidden = true;
                 var keys = Object.keys(days);
@@ -153,7 +162,10 @@
                     b.addEventListener('click', function () { selDay(date, b); });
                     elDays.appendChild(b); if (i === 0) selDay(date, b);
                 });
-            }).catch(function () { elLoad.textContent = 'Kon de momenten niet laden. Ververs de pagina of mail ons.'; });
+            }).catch(function (e) {
+                elLoad.hidden = false;
+                elLoad.textContent = (e && e.message && e.message !== 'onbereikbaar') ? e.message : 'Kon de momenten niet laden. Ververs de pagina of mail ons.';
+            });
 
         function selDay(date, btn) {
             elDays.querySelectorAll('.day').forEach(function (d) { d.classList.remove('is-sel'); });

@@ -87,7 +87,18 @@
     }
 
     fetch('/afspraak/beschikbaarheid', { headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json(); })
+        // Een 503 laat fetch niet struikelen, dus zonder deze controle liep een
+        // onbereikbare agenda door als een lege lijst: "geen momenten beschikbaar",
+        // terwijl de agenda in werkelijkheid gewoon vol had kunnen zitten of leeg.
+        // De json()-parse zit achter de ok-controle en in een catch: een 502/503 van
+        // IIS is een HTML-pagina, en die zou de bezoeker anders een rauwe
+        // "Unexpected token '<'" voorschotelen.
+        .then(function (r) {
+            if (r.ok) { return r.json(); }
+            return r.json().catch(function () { return {}; }).then(function (b) {
+                throw new Error(b && b.message ? b.message : 'onbereikbaar');
+            });
+        })
         .then(function (j) {
             days = j.days || {};
             elLoading.hidden = true;
@@ -104,7 +115,12 @@
                 if (i === 0) selectDay(date, b);
             });
         })
-        .catch(function () { elLoading.textContent = 'Kon de beschikbaarheid niet laden. Probeer het later opnieuw.'; });
+        .catch(function (e) {
+            elLoading.hidden = false;
+            elLoading.textContent = (e && e.message && e.message !== 'onbereikbaar')
+                ? e.message
+                : 'Kon de beschikbaarheid niet laden. Probeer het later opnieuw.';
+        });
 
     function selectDay(date, btn) {
         elDays.querySelectorAll('.bkg-day').forEach(function (d) { d.classList.remove('is-sel'); });

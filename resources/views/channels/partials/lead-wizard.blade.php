@@ -350,7 +350,16 @@
         function load() {
             if (loaded) return; loaded = true;
             fetch('/afspraak/beschikbaarheid', { headers: { 'Accept': 'application/json' } })
-                .then(function (r) { return r.json(); })
+                // Een 503 (agenda onbereikbaar) laat fetch niet struikelen; zonder deze
+                // controle toont de wizard "geen momenten" terwijl we het simpelweg niet
+                // weten. De parse zit achter de ok-controle: een 502/503 van IIS is HTML,
+                // en die mag de bezoeker geen rauwe parse-fout opleveren.
+                .then(function (r) {
+                    if (r.ok) { return r.json(); }
+                    return r.json().catch(function () { return {}; }).then(function (b) {
+                        throw new Error(b && b.message ? b.message : 'onbereikbaar');
+                    });
+                })
                 .then(function (j) {
                     days = j.days || {}; elLoad.hidden = true;
                     var keys = Object.keys(days);
@@ -363,7 +372,10 @@
                         b.addEventListener('click', function () { selDay(date, b); });
                         elDays.appendChild(b); if (i === 0) selDay(date, b);
                     });
-                }).catch(function () { elLoad.textContent = 'Kon de momenten niet laden.'; });
+                }).catch(function (e) {
+                    elLoad.hidden = false;
+                    elLoad.textContent = (e && e.message && e.message !== 'onbereikbaar') ? e.message : 'Kon de momenten niet laden.';
+                });
         }
         function selDay(date, btn) {
             elDays.querySelectorAll('.lwz-pday').forEach(function (d) { d.classList.remove('is-sel'); });

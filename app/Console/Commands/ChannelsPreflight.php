@@ -6,6 +6,7 @@ use App\Models\Channel\Site;
 use App\Services\Ai\AnthropicClient;
 use App\Services\ChannelSites\ChannelImageGenerator;
 use App\Services\Scheduling\Contracts\CalendarGateway;
+use App\Services\Scheduling\GoogleCalendarGateway;
 use App\Services\Scheduling\StubCalendarGateway;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -68,7 +69,7 @@ class ChannelsPreflight extends Command
 
     /** Kolommen op appointments die de herinneringsjob elk kwartier aanraakt. */
     private const AFSPRAAK_KOLOMMEN = [
-        'reminder_24h_sent_at', 'reminder_1h_sent_at',
+        'reminder_2d_sent_at', 'reminder_day_of_sent_at',
     ];
 
     public function handle(): int
@@ -432,7 +433,25 @@ class ChannelsPreflight extends Command
             return;
         }
 
-        $this->info_('agenda', 'Google Calendar gekoppeld; boekingen landen in ' . config('scheduling.google.calendar_id') . '.');
+        // Het echte gekoppelde account opvragen, niet config('...calendar_id') tonen: die
+        // staat op 'primary' en is dus dezelfde tekst of je nu met de zakelijke of met
+        // een privé-agenda gekoppeld bent. Precies de vergissing die je hier wilt zien.
+        $account  = $gateway instanceof GoogleCalendarGateway ? $gateway->connectedEmail() : null;
+        $verwacht = (string) config('scheduling.google.expected_account');
+
+        if ($account === null) {
+            $this->fout('agenda', 'Er is een tokenbestand, maar het gekoppelde account is niet op te vragen (token ingetrokken of verlopen?). Boekingen landen dan in geen enkele agenda. Koppel opnieuw.');
+
+            return;
+        }
+
+        if ($verwacht !== '' && strcasecmp($account, $verwacht) !== 0) {
+            $this->fout('agenda', "De agenda is gekoppeld met {$account}, maar de afspraken horen in {$verwacht}. Koppel opnieuw met het juiste account.");
+
+            return;
+        }
+
+        $this->goed('agenda', "Google Calendar gekoppeld met {$account}; boekingen landen in de agenda '" . config('scheduling.google.calendar_id') . "' van dat account.");
     }
 
     // ------------------------------------------------------------ rapportage
