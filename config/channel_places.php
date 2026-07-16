@@ -68,7 +68,7 @@ return [
             'Word gevonden in :city (:region) als iemand een :niche zoekt. Wij bouwen :trades een :service die klanten oplevert. Vooraf krijg je gratis en vrijblijvend een voorbeeld.',
             ':trades in :city en omgeving groeien online met betergeregeld: een :service, webshop en slimme tools die aanvragen opleveren. Bekijk hoe.',
             'Een :service voor je :trade in :city die klussen oplevert: vindbaar in Google, je vakwerk in beeld en aanvragen rechtstreeks in je mailbox.',
-            'Meer klanten voor je :trade in :city? Wij regelen je online groei van begin tot eind. Vooraf een gratis voorbeeld, geen lange contracten.',
+            'Meer klanten voor je :trade in :city? Wij regelen je online groei van begin tot eind. Vooraf een gratis voorbeeld, en je weet je prijs voordat je iets beslist.',
         ],
 
         'h1' => [
@@ -99,7 +99,7 @@ return [
         ],
 
         'trust' => [
-            'Betergeregeld helpt ondernemers door heel Nederland online groeien, dus ook :trades in :city (:region). Vaste prijs vooraf, een Nederlands team dat opneemt en meedenkt, en geen lange contracten. We zetten eerst een gratis voorbeeld van jóuw bedrijf klaar, zodat je precies ziet wat je krijgt voordat je iets beslist.',
+            'Betergeregeld helpt ondernemers door heel Nederland online groeien, dus ook :trades in :city (:region). Vaste prijs vooraf en een Nederlands team dat opneemt en meedenkt. We zetten eerst een gratis voorbeeld van jóuw bedrijf klaar, zodat je precies ziet wat je krijgt voordat je iets beslist.',
             'Geen technisch gedoe en geen verrassingen achteraf. Voor :trades in :city werken we met een duidelijke prijs, een vast aanspreekpunt en een aanpak die met je meegroeit. Bij jou op locatie in de regio of gewoon online, net wat jou uitkomt.',
             'Het vertrouwen van ondernemers in :city en heel Nederland is waar we het van moeten hebben. Daarom leveren we echt maatwerk, denken we mee over wat jouw :trade nodig heeft, en zijn we bereikbaar als er iets is. Je begint klein en breidt uit wanneer het jou uitkomt.',
         ],
@@ -125,7 +125,7 @@ return [
             ],
             [
                 'q' => 'Wat kost een :service voor mijn :trade?',
-                'a' => 'Je krijgt vooraf een duidelijke, vaste prijs, geen verrassingen achteraf en geen lange contracten. Wat het precies wordt hangt af van wat je nodig hebt (alleen een site, of ook een webshop, portaal of automatisering). Het gratis voorbeeld is altijd vrijblijvend.',
+                'a' => 'Je krijgt vooraf een duidelijke, vaste prijs en geen verrassingen achteraf. Wat het precies wordt hangt af van wat je nodig hebt (alleen een site, of ook een webshop, portaal of automatisering). Het gratis voorbeeld is altijd vrijblijvend.',
             ],
             [
                 'q' => 'Hoe snel sta ik online?',

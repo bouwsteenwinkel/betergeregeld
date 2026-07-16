@@ -4,6 +4,9 @@ namespace Tests\Feature\Scheduling;
 
 use App\Models\Appointment;
 use App\Models\WebsiteLead;
+use App\Services\Scheduling\CalendarUnavailableException;
+use App\Services\Scheduling\Contracts\CalendarGateway;
+use App\Services\Scheduling\StubCalendarGateway;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Scheduling\SchedulingTestCase;
 
@@ -106,7 +109,10 @@ class AppointmentBookingTest extends SchedulingTestCase
         $this->assertSame('bedrijfswebsite', $lead->channel);
         $this->assertSame('Jan Jansen', $lead->contact_name);
         $this->assertSame('0612345678', $lead->phone);
-        $this->assertSame('booked', $lead->appointment_status);
+        // 'confirmed' en niet 'booked': de lead-administratie kent alleen de waarden uit
+        // WebsiteLead::APPOINTMENT_STATUSES, en de rauwe afspraak-status stond in geen
+        // enkel filter of keuzemenu van de admin.
+        $this->assertSame('confirmed', $lead->appointment_status);
         $this->assertSame(
             $this->moment(self::VRIJDAG, '11:00')->toDateTimeString(),
             $lead->appointment_at->toDateTimeString()
@@ -183,5 +189,52 @@ class AppointmentBookingTest extends SchedulingTestCase
         $this->postJson('/afspraak/boeken', $this->payload())->assertOk();
 
         $this->assertSame(1, Appointment::where('status', 'booked')->count());
+    }
+
+    // ── Onbereikbare agenda ──────────────────────────────────────────────
+
+    /** Vervangt de agenda door eentje die er het zwijgen toe doet. */
+    private function agendaOnbereikbaar(): void
+    {
+        $this->app->bind(CalendarGateway::class, fn () => new class extends StubCalendarGateway
+        {
+            public function busyPeriods(\Carbon\CarbonInterface $from, \Carbon\CarbonInterface $to): array
+            {
+                throw new CalendarUnavailableException('Google onbereikbaar');
+            }
+        });
+    }
+
+    #[Test]
+    public function een_onbereikbare_agenda_geeft_geen_lege_lijst_maar_een_503(): void
+    {
+        // Het verschil tussen "er is niets vrij" en "we weten het niet". Als 200 met een
+        // lege lijst, dan meldt de widget doodleuk "geen momenten beschikbaar" terwijl de
+        // agenda misschien juist bomvol staat.
+        $this->agendaOnbereikbaar();
+
+        $this->getJson('/afspraak/beschikbaarheid')
+            ->assertStatus(503)
+            ->assertJson(['error' => 'calendar_unavailable', 'days' => []]);
+    }
+
+    #[Test]
+    public function boeken_op_een_onbereikbare_agenda_wordt_geweigerd(): void
+    {
+        $this->agendaOnbereikbaar();
+
+        $this->postJson('/afspraak/boeken', $this->payload())
+            ->assertStatus(503)
+            ->assertJson(['ok' => false]);
+
+        $this->assertSame(0, Appointment::count(), 'liever geen afspraak dan een dubbele');
+    }
+
+    #[Test]
+    public function een_onzinnige_datum_geeft_een_nette_validatiefout_en_geen_500(): void
+    {
+        // Publieke, ongeknepen route: Carbon::parse('x') gooide hier ongevangen, dus elke
+        // bot met een rare querystring kreeg een 500.
+        $this->getJson('/afspraak/beschikbaarheid?from=x')->assertStatus(422);
     }
 }

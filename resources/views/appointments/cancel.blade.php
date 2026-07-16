@@ -11,8 +11,17 @@
     <meta name="robots" content="noindex,nofollow">
     <title>Je afspraak · Beter Geregeld</title>
     <style>
+        /* De gedeelde kalender (partials/slot-calendar) hangt aan deze variabelen in
+           plaats van aan vaste kleuren. Deze pagina staat buiten de channel-layout en
+           heeft dus geen thema-tokens; hier zetten we ze op het eigen palet.
+
+           --c-primary is de donkerdere tint (de hover-kleur van .btn-primary) en niet
+           #1685c4: de gekozen dag is wit-op-gevuld, en op #1685c4 haalt dat 4.05:1,
+           net onder de 4.5 die tekst nodig heeft. De lichtere tint blijft wel het
+           accent voor de stip, want die draagt geen tekst. */
+        :root{--c-primary:#12719f;--c-on-primary:#fff;--c-accent:#1685c4;--c-ink:#0f172a;--c-muted:#64748b;--c-bg:#f7f9fb;--radius:8px}
         body{margin:0;font:16px/1.55 system-ui,-apple-system,'Segoe UI',sans-serif;color:#0f172a;background:#f7f9fb}
-        .box{max-width:560px;margin:10vh auto 4rem;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:2rem;box-shadow:0 18px 40px -32px rgba(15,23,42,.4)}
+        .box{max-width:720px;margin:10vh auto 4rem;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:2rem;box-shadow:0 18px 40px -32px rgba(15,23,42,.4)}
         h1{font-size:1.35rem;margin:0 0 .5rem}
         h2{font-size:1rem;margin:0 0 .75rem}
         p{color:#64748b;margin:.3rem 0}
@@ -33,15 +42,8 @@
         .btn-primary{background:#1685c4;color:#fff}
         .btn-primary:hover{background:#12719f}
         .btn:disabled{opacity:.45;cursor:not-allowed}
-        .days,.times{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 .75rem}
-        .day,.time{border:1px solid #e2e8f0;background:#fff;border-radius:8px;padding:.45rem .7rem;font:inherit;font-size:.9rem;cursor:pointer;line-height:1.2}
-        .day{text-align:center;min-width:56px}
-        .day small{display:block;color:#94a3b8;font-size:.7rem}
-        .day b{display:block;font-size:1.05rem}
-        .day.is-sel,.time.is-sel{border-color:#1685c4;background:#eff8fd;color:#0f172a}
-        .day:hover,.time:hover{border-color:#94a3b8}
         .muted{font-size:.85rem;color:#94a3b8}
-        .actions{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+        .actions{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:1.1rem}
     </style>
 </head>
 <body>
@@ -95,12 +97,10 @@
             <form method="POST" action="/afspraak/annuleren/{{ $token }}/verzetten" data-move>
                 @csrf
                 <input type="hidden" name="starts_at" value="">
-                <p class="muted" data-loading>Momenten laden...</p>
-                <p class="muted" data-empty hidden>Er zijn nu geen vrije momenten. Mail ons, dan prikken we samen een datum.</p>
-                <div data-body hidden>
-                    <div class="days" data-days></div>
-                    <div class="times" data-times></div>
-                </div>
+                @include('partials.slot-calendar', [
+                    'emptyText' => 'Er zijn nu geen vrije momenten. Mail ons, dan prikken we samen een datum.',
+                    'metaTekst' => false,
+                ])
                 <div class="actions">
                     <button type="submit" class="btn btn-primary" data-submit disabled>Verzet mijn afspraak</button>
                     <span class="muted" data-chosen hidden></span>
@@ -128,50 +128,21 @@
         var form = document.querySelector('[data-move]');
         if (!form) return;
         var at = form.querySelector('input[name="starts_at"]'),
-            elLoad = form.querySelector('[data-loading]'), elEmpty = form.querySelector('[data-empty]'),
-            elBody = form.querySelector('[data-body]'), elDays = form.querySelector('[data-days]'),
-            elTimes = form.querySelector('[data-times]'), elChosen = form.querySelector('[data-chosen]'),
+            elChosen = form.querySelector('[data-chosen]'),
             elSubmit = form.querySelector('[data-submit]');
-        var days = {};
-        var WD = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
-            MO = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-        function lab(d) { var p = d.split('-'), x = new Date(+p[0], +p[1] - 1, +p[2]); return { wd: WD[x.getDay()], dm: x.getDate() + ' ' + MO[x.getMonth()] }; }
 
-        // Zelfde bron als de boekwidget (SlotEngine), zodat hier nooit een moment
-        // staat dat het boeken daarna afkeurt.
-        fetch('/afspraak/beschikbaarheid', { headers: { 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
-            .then(function (j) {
-                days = j.days || {}; elLoad.hidden = true;
-                var keys = Object.keys(days);
-                if (!keys.length) { elEmpty.hidden = false; return; }
-                elBody.hidden = false;
-                keys.forEach(function (date, i) {
-                    var l = lab(date), b = document.createElement('button');
-                    b.type = 'button'; b.className = 'day'; b.dataset.date = date;
-                    b.innerHTML = '<small>' + l.wd + '</small><b>' + l.dm.split(' ')[0] + '</b>' + l.dm.split(' ')[1];
-                    b.addEventListener('click', function () { selDay(date, b); });
-                    elDays.appendChild(b); if (i === 0) selDay(date, b);
-                });
-            }).catch(function () { elLoad.textContent = 'Kon de momenten niet laden. Ververs de pagina of mail ons.'; });
-
-        function selDay(date, btn) {
-            elDays.querySelectorAll('.day').forEach(function (d) { d.classList.remove('is-sel'); });
-            btn.classList.add('is-sel'); elTimes.innerHTML = '';
-            (days[date] || []).forEach(function (time) {
-                var t = document.createElement('button');
-                t.type = 'button'; t.className = 'time'; t.textContent = time;
-                t.addEventListener('click', function () { pick(date, time, t); });
-                elTimes.appendChild(t);
-            });
-        }
-        function pick(date, time, btn) {
-            elTimes.querySelectorAll('.time').forEach(function (t) { t.classList.remove('is-sel'); });
-            btn.classList.add('is-sel'); at.value = date + ' ' + time;
-            var l = lab(date);
-            elChosen.hidden = false; elChosen.textContent = 'Nieuw: ' + l.wd + ' ' + l.dm + ' om ' + time + ' uur';
-            elSubmit.disabled = false;
-        }
+        // Zelfde component én dezelfde bron als de boekwidget (SlotEngine), zodat hier
+        // nooit een moment staat dat het boeken daarna afkeurt.
+        window.bgSlotCalendar(form.querySelector('[data-slotcal]'), {
+            onPick: function (keuze) {
+                at.value = keuze.waarde;
+                elChosen.hidden = false;
+                elChosen.textContent = 'Nieuw: ' + keuze.kort + ' om ' + keuze.time + ' uur';
+                elSubmit.disabled = false;
+            },
+            onEmpty: function () { elSubmit.disabled = true; },
+            onError: function () { elSubmit.disabled = true; }
+        });
     })();
     </script>
     @endif

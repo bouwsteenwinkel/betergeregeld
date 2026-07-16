@@ -14,7 +14,7 @@ Commando's draai je vanuit de project-root op de server.
 ## 0. Geautomatiseerde check vooraf
 
 ```powershell
-php artisan channels:preflight bedrijfswebsite
+php artisan channels:preflight --channel=bedrijfswebsite
 ```
 
 Dit command controleert het merendeel van de handmatige stappen uit hoofdstuk 3
@@ -82,7 +82,8 @@ php artisan migrate --force
 scheduled task kan die prompt niet beantwoorden. Het command hangt of breekt af, en
 je hebt dan half gemigreerd.
 
-Deze acht migraties horen na afloop aanwezig te zijn:
+Deze migraties horen na afloop aanwezig te zijn (de lijst is een oriëntatie, geen
+afvinklijst: `migrate --force` draait sowieso alles wat openstaat):
 
 ```
 2026_06_28_120000_create_website_leads_table.php
@@ -93,7 +94,14 @@ Deze acht migraties horen na afloop aanwezig te zijn:
 2026_07_04_141000_create_availability_rules_table.php
 2026_07_04_141002_create_availability_exceptions_table.php
 2026_07_04_141005_create_appointments_table.php
+2026_07_15_120000_add_reminder_columns_to_appointments.php
+2026_07_16_090000_retime_appointment_reminders_and_track_calendar_sync.php
 ```
+
+De laatste zet de herinnerings-cadans om naar 2 dagen + de dag zelf en **verwijdert** de
+oude kolommen `reminder_24h_sent_at`/`reminder_1h_sent_at`. Afspraken die vlak voor deze
+deploy al een 24u-mail kregen, krijgen daarna gewoon hun dag-van-mail: een ander bericht,
+geen dubbele.
 
 Let op de datumvolgorde: de `07_04`-scheduling-migraties zijn later toegevoegd dan de
 `07_14`-migraties. Controleer daarom op aanwezigheid, niet op batchnummer:
@@ -139,15 +147,9 @@ technisch live maar functioneel stuk, meestal zonder foutmelding.
 
 ### 3.1 MAIL_FROM_ADDRESS (kritiek)
 
-`config('mail.from.address')` is in dit project zowel afzender **als ontvanger** van alle
-interne meldingen: nieuwe boeking (`AppointmentController::notifyInternal`), nieuwe lead
-(`ChannelSiteController::notifyInternal`) en "Voorbeeld opgeslagen"
-(`SavePreviewController`). Alle drie slaan de mail stil over als de waarde leeg is, en
-alles zit in een `try/catch` die hooguit een `Log::warning` schrijft.
-
-De default in `.env.example` is `MAIL_FROM_ADDRESS="hello@example.com"`. Staat die
-waarde er nog, dan gaan **alle leads naar een niet-bestaand adres en ziet niemand een
-fout**. Je merkt het pas als je je afvraagt waarom de campagne niets oplevert.
+`config('mail.from.address')` is de **afzender** van alle uitgaande mail. Staat hier de
+voorbeeldwaarde, dan vertrekt er mail namens een niet-bestaand domein en filtert de
+ontvanger hem weg.
 
 ```ini
 MAIL_FROM_ADDRESS="no-reply@betergeregeld.com"
@@ -159,6 +161,24 @@ Verifiëren:
 ```powershell
 php artisan tinker --execute="echo config('mail.from.address');"   # nooit hello@example.com
 ```
+
+**De ontvanger van interne meldingen is losgetrokken** van deze afzender. Nieuwe boeking
+(`AppointmentController::notifyInternal`), nieuwe lead (`ChannelSiteController::notifyInternal`)
+en de agenda-/mailstoringen uit `BookingService` gaan naar `SCHEDULING_NOTIFY_EMAIL`
+(default `info@bouwsteenwinkel.nl`). Dat is bewust: `MAIL_FROM_ADDRESS` is een afzender,
+geen postbus die iemand leest, en op de voorbeeldwaarde `hello@example.com` verdwenen al
+die meldingen geruisloos.
+
+```ini
+SCHEDULING_NOTIFY_EMAIL=info@bouwsteenwinkel.nl
+SCHEDULING_ORGANIZER_EMAIL=info@bouwsteenwinkel.nl
+```
+
+`SCHEDULING_ORGANIZER_EMAIL` is het Reply-To op de bevestigings- en herinneringsmails; die
+nodigen expliciet uit om te antwoorden, dus dit moet een postbus zijn die je leest.
+
+"Voorbeeld opgeslagen" (`SavePreviewController`) gebruikt nog wél `mail.from.address` als
+ontvanger; die is in deze ronde niet aangeraakt.
 
 ### 3.2 MAIL_MAILER + SPF/DKIM
 
@@ -354,19 +374,48 @@ php artisan tinker --execute="echo \App\Models\AvailabilityRule::count(), ' rege
 
 Weekdagen zijn ISO: 1 is maandag, 7 is zondag.
 
-Aanvullend, uit `config/scheduling.php`: controleer `organizer_email`
-(`info@betergeregeld.com`) en de tijdzone (`Europe/Amsterdam`).
+Aanvullend, uit `config/scheduling.php`: controleer de tijdzone (`Europe/Amsterdam`),
+`organizer_email` (het Reply-To dat de klant terugmailt, `SCHEDULING_ORGANIZER_EMAIL`) en
+`notify_email` (waar de afspraakmelding en de storingsalarmen heen gaan,
+`SCHEDULING_NOTIFY_EMAIL`).
 
-### 3.10 Agenda-koppeling (bewuste keuze)
+`organizer_email` bepaalt **niet** in welke agenda de afspraak landt — dat doet uitsluitend
+het Google-account waarmee je koppelt (zie 3.10). Verwar die twee niet: eerder suggereerde
+dit runbook dat `organizer_email` de bestemming was, terwijl de waarde toen door geen enkele
+regel code werd gelezen.
 
-`GOOGLE_CALENDAR_ENABLED` staat op `false`. De binding in `AppServiceProvider` valt dan
-terug op `StubCalendarGateway`: afspraken worden bevestigd naar de klant maar landen in
-géén enkele agenda. Dat is te overzien zolang je het wéét.
+### 3.10 Agenda-koppeling
+
+`GOOGLE_CALENDAR_ENABLED` staat standaard op `false`. De binding in `AppServiceProvider`
+valt dan terug op `StubCalendarGateway`: afspraken worden bevestigd naar de klant maar
+landen in géén enkele agenda, en de site meldt gewoon "je afspraak staat". Dat is te
+overzien zolang je het wéét.
 
 Zet je hem aan, dan moet de koppeling ook echt staan. `GoogleCalendarGateway::isConnected()`
 eist een `client_id`, een opgeslagen tokenbestand én een `refresh_token` daarin. Is dat
 niet compleet, dan valt de provider **stil** terug op de stub: `enabled=true` is dus geen
 garantie.
+
+**Koppelen met het juiste account.** De afspraken horen in de agenda van
+`GOOGLE_CALENDAR_ACCOUNT` (standaard `info@bouwsteenwinkel.nl`). Ga naar
+`/admin/google-agenda`, klik verbinden en log in met **dat** account. Koppel je per ongeluk
+met een ander Google-account, dan weigert `exchangeCode()` de koppeling en draait hij 'm
+terug: zonder die controle stonden alle afspraken in een privé-agenda en merkte je dat pas
+als er iemand voor een lege kamer zat.
+
+**Laat `GOOGLE_CALENDAR_ID` op `primary` staan.** Dat is de hoofdagenda van het gekoppelde
+account, en dus al de agenda van `info@bouwsteenwinkel.nl`. Vul hem alleen in voor een
+bewust gedeelde, niet-primaire agenda.
+
+```powershell
+php artisan channels:preflight --channel=bedrijfswebsite
+```
+
+De agenda-check toont nu het **echt gekoppelde account** en faalt als dat afwijkt van
+`GOOGLE_CALENDAR_ACCOUNT`. Eerder toonde hij alleen `calendar_id` (`primary`), en dat is
+dezelfde tekst of je nu met de zakelijke of met een privé-agenda gekoppeld bent.
+
+Wil je alleen weten welke provider actief is:
 
 ```powershell
 php artisan tinker --execute="echo get_class(app(\App\Services\Scheduling\Contracts\CalendarGateway::class));"
@@ -374,6 +423,36 @@ php artisan tinker --execute="echo get_class(app(\App\Services\Scheduling\Contra
 
 Verwacht `GoogleCalendarGateway` als je gekoppeld bent, `StubCalendarGateway` als je dat
 bewust niet bent.
+
+**Fail-closed.** Kan de agenda niet gelezen worden (token ingetrokken, Google traag, storing),
+dan geeft `/afspraak/beschikbaarheid` een 503 en weigert `/afspraak/boeken`. Dat is bewust:
+zacht terugvallen betekende hier "de agenda lijkt leeg", en dan boekt een bezoeker dwars
+over een bestaande afspraak heen. Een tijdelijk onboekbare widget is minder erg dan een
+dubbele boeking. De widgets tonen in dat geval "we kunnen de agenda nu even niet uitlezen",
+niet "geen momenten beschikbaar".
+
+**Het tokenbestand.** Het refresh-token staat in `storage/app/private/google-agenda.json`.
+Dat is geen onderdeel van de git-pull, maar het overleeft een release-swap of een schone
+checkout **niet** vanzelf: neem `storage/` mee in je rollback-plan, anders val je na een
+rollback stil terug op de stub-agenda.
+
+### 3.10b Afspraak-herinneringen
+
+De cadans is **2 dagen vooraf** en **de ochtend van de afspraak zelf** (standaard 08:00),
+in te stellen met `SCHEDULING_REMINDER_LEAD_DAYS` en `SCHEDULING_REMINDER_DAY_OF_HOUR`.
+
+Het command `appointments:send-reminders` draait elk kwartier via de scheduler. Zonder een
+werkende `schedule:run`-cron (zie DEPLOY.md §6) gaat er **geen enkele** herinnering uit, en
+dat is van buitenaf onzichtbaar: je ziet het pas aan de no-shows. Het staat daarom sinds
+deze release onder de cron-monitor (`config/monitor.php` → `internal_crons`), die alarm
+slaat als het stilvalt.
+
+```powershell
+php artisan appointments:send-reminders   # veilig: idempotent, stuurt alleen wat toe is
+```
+
+Wie binnen beide verzendmomenten boekt (vanochtend geboekt voor vanmiddag) krijgt géén
+herinnering meer. Dat is opzet: de bevestigingsmail is dan nog vers.
 
 ### 3.11 AI-sleutels
 
@@ -470,10 +549,35 @@ php artisan tinker --execute="echo \App\Models\WebsiteLead::latest()->first()?->
 2. Er staan slots. Geen enkel slot betekent dat `min_notice_hours` (4) of `horizon_days` (21) je blokkeert, of dat de beschikbaarheid niet klopt (stap 3.9).
 3. Controleer dat de getoonde tijden kloppen met je werkelijke beschikbaarheid. Zie je precies ma-vr 09:00-17:00, dan draait de config-fallback en niet jouw regels.
 4. Boek een afspraak op je eigen adres.
-5. De bevestigingsmail komt aan en staat **niet** in spam (stap 3.2).
-6. De interne melding komt aan op `MAIL_FROM_ADDRESS`.
-7. Staat de afspraak in de agenda? Alleen als je 3.10 hebt aangezet. Zo niet, dan is dit verwacht gedrag en geen bug.
-8. Ruim de testafspraak daarna op.
+5. De bevestigingsmail komt aan en staat **niet** in spam (stap 3.2). Antwoord er één keer op: het antwoord hoort op `SCHEDULING_ORGANIZER_EMAIL` te landen, niet op de no-reply-afzender.
+6. De interne melding komt aan op `SCHEDULING_NOTIFY_EMAIL`, mét tijdstip en Meet-link in de tekst.
+7. De afspraak staat in de agenda van `GOOGLE_CALENDAR_ACCOUNT`, met een Meet-link. Staat hij er niet, dan draait 3.10 nog op de stub — controleer met `channels:preflight`, die toont nu het echt gekoppelde account.
+8. De klant (jij) heeft óók een Google-uitnodiging gekregen; dat is `GOOGLE_CALENDAR_SEND_UPDATES=all`.
+9. Controleer de kolommen `calendar_synced_at` (gevuld) en `calendar_error` (leeg) op de afspraak. Staat er een fout, dan hoort er ook een alarmmail op `SCHEDULING_NOTIFY_EMAIL` te liggen:
+
+```powershell
+php artisan tinker --execute="\$a=\App\Models\Appointment::latest('id')->first(); echo \$a->calendar_synced_at, ' | ', \$a->calendar_error ?: 'geen fout', ' | ', \$a->meet_url;"
+```
+
+10. Annuleer de testafspraak via de link uit de mail. Het agenda-item verdwijnt uit je agenda **en** de klant krijgt een afzegging van Google.
+11. Ruim de testafspraak daarna op.
+
+### 4.5b Herinneringen
+
+De cadans is niet in één sessie na te spelen (2 dagen vooruit), dus controleer hem
+gericht. Zet een testafspraak precies op het verzendmoment en draai het command:
+
+```powershell
+php artisan appointments:send-reminders
+```
+
+Verwacht: "Afspraak-herinneringen verstuurd: 1". Draai hem daarna nog eens; dan hoort er
+0 uit te komen (idempotent). Controleer ook dat de cron-monitor de nieuwe entry heeft:
+
+```powershell
+php artisan cron:provision-internal
+php artisan tinker --execute="echo \App\Models\Monitor\CronMonitor::where('source_key','appointments:send-reminders')->exists() ? 'bewaakt' : 'ONBEWAAKT';"
+```
 
 ### 4.6 Cookiebanner
 
@@ -492,7 +596,7 @@ Is `domain_id` leeg, dan ontbreekt het domein in `cmp_domains` (stap 3.4).
 ### 4.7 Preflight opnieuw
 
 ```powershell
-php artisan channels:preflight bedrijfswebsite
+php artisan channels:preflight --channel=bedrijfswebsite
 ```
 
 Na alle stappen hoort dit schoon te zijn. Blijven er waarschuwingen staan, noteer dan

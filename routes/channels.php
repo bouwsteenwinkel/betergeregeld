@@ -111,7 +111,15 @@ $channelRoutes = function () use ($facetKeys) {
     // op een channel-domein at de catch-all ze op en laadde de widget nooit z'n
     // momenten. Alleen de SUBpaden vallen door; '/afspraak' zelf is hierboven een
     // echte channel-pagina.
-    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '(?!_site/|afspraak/).*');
+    //
+    // Uitzondering 3: 'cmp/...' (de cookiebanner uit web.php: loader.js, scripts.js en
+    // POST consent). Exact hetzelfde probleem, met zwaardere gevolgen: layout.blade.php
+    // laadt <script src="{{ url('/cmp/loader.js') }}"> op de HUIDIGE host, dus op een
+    // channel-domein at de catch-all dat op en gaf een 302 naar de homepage. De browser
+    // kreeg 70 KB HTML als JavaScript aangeboden, de banner verscheen nooit en POST
+    // /cmp/consent kon de toestemming nooit vastleggen. Op betergeregeld.com zelf werkte
+    // het wel, dus dit viel bij testen niet op.
+    Route::any('{any}', [ChannelSiteController::class, 'notFound'])->where('any', '(?!_site/|afspraak/|cmp/).*');
 };
 
 // 1) Live kanalen op hun eigen domein.

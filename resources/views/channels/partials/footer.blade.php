@@ -14,10 +14,43 @@
 		@media(min-width:760px){.foot-grid-demo{grid-template-columns:2fr 1fr 1.4fr;gap:2.4rem}}
 		.foot-grid-demo h3{margin-bottom:.8rem}
 		.foot-grid-demo .foot-menu a{display:block;padding:.28rem 0}
+
+		/* Directe ingang naar de afspraakplanner, op élke pagina. /afspraak bestond al
+		   als route maar er linkte nergens iets naartoe: de pagina was alleen te vinden
+		   via de preview-CTA. Vandaar hier, en niet als zoveelste tekstlink in de
+		   Contact-kolom: dit is de enige plek waar de bezoeker vanaf een blog- of
+		   plaatspagina rechtstreeks een gesprek kan inplannen. */
+		.foot-cta{display:flex;align-items:center;justify-content:space-between;gap:1.2rem 2rem;flex-wrap:wrap;
+			background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:calc(var(--radius) + 4px);
+			padding:1.15rem 1.3rem;margin-bottom:2.2rem}
+		.foot-cta-txt strong{display:block;font-size:1.05rem;line-height:1.3}
+		.foot-cta-txt span{color:rgba(255,255,255,.75);font-size:.9rem}
+		.foot-cta-btn{display:inline-flex;align-items:center;gap:.5rem;flex:0 0 auto;
+			background:var(--c-cta);color:var(--c-on-cta);font-weight:700;text-decoration:none;
+			padding:.8rem 1.25rem;border-radius:10px;min-height:44px;white-space:nowrap}
+		.foot-cta-btn:hover{color:var(--c-on-cta);filter:brightness(1.06)}
+		.foot-cta-btn svg{width:18px;height:18px;flex:0 0 auto}
+		@media(max-width:560px){.foot-cta{flex-direction:column;align-items:stretch;text-align:left}
+			.foot-cta-btn{justify-content:center}}
 	</style>
 	{{-- Identiteit is context-afhankelijk: op /voorbeeld de demo-mockup (klant),
 	     elders óns aanbod. Logo-partial + metaDescription() regelen dat zelf. --}}
 	<div class="wrap">
+		@unless ($site->isDemoContext())
+			<div class="foot-cta">
+				<div class="foot-cta-txt">
+					<strong>Even sparren over jouw website?</strong>
+					<span>Plan een videogesprek van {{ (int) config('scheduling.meeting_minutes', 60) }} minuten. Gratis en vrijblijvend, je kiest zelf het moment.</span>
+				</div>
+				<a href="{{ $site->url('afspraak') }}" class="foot-cta-btn">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>
+					</svg>
+					Plan een gesprek
+				</a>
+			</div>
+		@endunless
+
 		<div class="foot-grid {{ $site->isDemoContext() ? 'foot-grid-demo' : '' }}">
 			<div>
 				<div class="foot-brand">

@@ -44,12 +44,14 @@ class GoogleAgendaController extends Controller
         if (! $request->filled('code') || $request->query('state') !== Session::pull('google_agenda_state')) {
             return redirect()->route('google-agenda.status')->with('error', 'Ongeldige of verlopen koppel-poging. Probeer opnieuw.');
         }
-        $ok = $this->gateway->exchangeCode((string) $request->query('code'), $this->redirectUri());
+        $result = $this->gateway->exchangeCode((string) $request->query('code'), $this->redirectUri());
+
+        if (! $result['ok']) {
+            return redirect()->route('google-agenda.status')->with('error', 'Koppelen mislukt. ' . $result['error']);
+        }
 
         return redirect()->route('google-agenda.status')
-            ->with($ok ? 'success' : 'error', $ok
-                ? 'Google-agenda gekoppeld. Afspraken maken nu automatisch een agenda-event met Meet-link.'
-                : 'Koppelen mislukt. Kreeg geen refresh-token terug (probeer opnieuw met "toestemming opnieuw geven").');
+            ->with('success', 'Google-agenda gekoppeld. Afspraken maken nu automatisch een agenda-event met Meet-link.');
     }
 
     public function disconnect(): RedirectResponse

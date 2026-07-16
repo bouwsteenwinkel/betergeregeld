@@ -6,9 +6,12 @@ use App\Mail\AppointmentConfirmation;
 use App\Models\Appointment;
 use App\Models\WebsiteLead;
 use App\Services\Scheduling\BookingService;
+use App\Services\Scheduling\CalendarSyncException;
+use App\Services\Scheduling\CalendarUnavailableException;
 use App\Services\Scheduling\Contracts\CalendarGateway;
 use App\Services\Scheduling\SlotTakenException;
 use App\Services\Scheduling\StubCalendarGateway;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Scheduling\SchedulingTestCase;
@@ -145,6 +148,73 @@ class BookingServiceTest extends SchedulingTestCase
         $this->assertNull($appt->meet_url);
         $this->assertNull($appt->google_event_id);
         $this->assertSame('booked', $appt->status);
+        // Geen agenda gekoppeld is verwacht gedrag, geen storing: dit mag geen fout
+        // vastleggen en de eigenaar niet wakker maken.
+        $this->assertNull($appt->fresh()->calendar_error);
+    }
+
+    #[Test]
+    public function een_mislukt_agenda_event_laat_de_afspraak_staan_maar_legt_de_fout_vast(): void
+    {
+        // De klant heeft zijn moment; dat nemen we niet terug omdat Google hapert. Maar
+        // eerder verdween zo'n fout volledig: de afspraak stond in de administratie, in
+        // geen enkele agenda, en niemand wist het tot de klant voor een lege kamer zat.
+        Log::spy();
+
+        $this->app->bind(CalendarGateway::class, fn () => new class extends StubCalendarGateway
+        {
+            public function createMeetEvent(Appointment $appointment): array
+            {
+                throw new CalendarSyncException('Google weigerde het event');
+            }
+        });
+
+        $appt = $this->boek();
+
+        $this->assertSame('booked', $appt->fresh()->status);
+        $this->assertStringContainsString('Google weigerde het event', (string) $appt->fresh()->calendar_error);
+        $this->assertNull($appt->fresh()->calendar_synced_at);
+        Log::shouldHaveReceived('error')->withArgs(fn ($m) => str_contains($m, 'appointment_calendar_sync'))->once();
+    }
+
+    #[Test]
+    public function een_geslaagd_agenda_event_stempelt_de_sync_en_wist_een_oude_fout(): void
+    {
+        $this->app->bind(CalendarGateway::class, fn () => new class extends StubCalendarGateway
+        {
+            public function createMeetEvent(Appointment $appointment): array
+            {
+                return ['event_id' => 'evt-1', 'meet_url' => null];
+            }
+        });
+
+        $appt = $this->boek();
+
+        $this->assertNotNull($appt->fresh()->calendar_synced_at);
+        $this->assertNull($appt->fresh()->calendar_error);
+    }
+
+    #[Test]
+    public function een_onleesbare_agenda_boekt_niet_door(): void
+    {
+        // Fail-closed: we weten niet of dit uur vrij is, dus we zetten er niemand op.
+        // Zacht terugvallen betekende hier "de agenda lijkt leeg" en dus dubbel boeken
+        // over een bestaande afspraak heen.
+        $this->app->bind(CalendarGateway::class, fn () => new class extends StubCalendarGateway
+        {
+            public function busyPeriods(\Carbon\CarbonInterface $from, \Carbon\CarbonInterface $to): array
+            {
+                throw new CalendarUnavailableException('Google onbereikbaar');
+            }
+        });
+
+        $this->expectException(CalendarUnavailableException::class);
+
+        try {
+            $this->boek();
+        } finally {
+            $this->assertSame(0, Appointment::count(), 'er mag geen halve afspraak achterblijven');
+        }
     }
 
     // ── Annuleren ────────────────────────────────────────────────────────
@@ -198,7 +268,7 @@ class BookingServiceTest extends SchedulingTestCase
             'email'              => 'jan@example.nl',
             'status'             => 'appointment',
             'appointment_at'     => $appt->starts_at,
-            'appointment_status' => 'booked',
+            'appointment_status' => 'confirmed',
             'meet_link'          => 'https://meet.google.com/abc-defg-hij',
         ]);
 
@@ -268,7 +338,7 @@ class BookingServiceTest extends SchedulingTestCase
         // De lead moet meeverhuizen: anders staat er een afspraak zonder lead die erbij hoort.
         $lead->refresh();
         $this->assertSame('appointment', $lead->status);
-        $this->assertSame('booked', $lead->appointment_status);
+        $this->assertSame('confirmed', $lead->appointment_status);
         $this->assertSame($nieuw->starts_at->toDateTimeString(), $lead->appointment_at->toDateTimeString());
     }
 

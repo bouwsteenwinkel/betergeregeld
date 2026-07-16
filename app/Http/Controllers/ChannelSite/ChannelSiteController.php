@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ChannelSite;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Blog\BlogPost;
 use App\Models\WebsiteLead;
 use App\Support\ChannelSite;
@@ -307,8 +308,11 @@ class ChannelSiteController extends Controller
 
         // Vaste content-pagina's: home, de Groeidiamant-facetlandingen (belangrijkste
         // SEO-pagina's), en alle informatieve pagina's.
+        // 'afspraak' hoort hier thuis: het is een echte, indexeerbare pagina en op dit
+        // kanaal het einddoel van de trechter, maar hij stond in geen enkele sitemap.
+        // (/voorbeeld-maken staat er bewust NIET in: die is noindex,nofollow.)
         $paths = ['', 'over-ons', 'contact', 'diensten', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
-            'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog'];
+            'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog', 'afspraak'];
         foreach (array_keys((array) config('groeidiamant.facets', [])) as $facet) {
             $paths[] = $facet;
         }
@@ -486,7 +490,7 @@ class ChannelSiteController extends Controller
                 // Zonder appointment_at vindt annuleren/verzetten deze lead nooit en
                 // blijft hij op 'booked' staan terwijl de afspraak al weg is.
                 $lead->update([
-                    'appointment_status' => 'booked',
+                    'appointment_status' => $appointment->leadAppointmentStatus(),
                     'appointment_at'     => $appointment->starts_at,
                     'meet_link'          => $appointment->meet_url,
                     'google_event_id'    => $appointment->google_event_id,
@@ -507,7 +511,7 @@ class ChannelSiteController extends Controller
             }
         }
 
-        $this->notifyInternal($lead, $site);
+        $this->notifyInternal($lead, $site, $appointment);
 
         // De bedankpagina zweeg over de afspraak, waardoor geslaagd en mislukt er
         // identiek uitzagen. Beide gevallen krijgen nu hun eigen boodschap mee.
@@ -541,16 +545,34 @@ class ChannelSiteController extends Controller
         return response()->view('channels.not-found', ['site' => $site], 404);
     }
 
-    private function notifyInternal(WebsiteLead $lead, ChannelSite $site): void
+    private function notifyInternal(WebsiteLead $lead, ChannelSite $site, ?Appointment $appointment = null): void
     {
         try {
-            $to = config('mail.from.address');
-            if (! $to) {
+            // scheduling.notify_email en niet mail.from.address: dat laatste is een
+            // afzender, geen postbus. Op de voorbeeldwaarde verdween deze melding stil.
+            $to = (string) config('scheduling.notify_email');
+            if ($to === '') {
                 return;
             }
             $branche = WebsiteLead::BRANCHES[$lead->branche] ?? $lead->branche;
+
+            // Stond er een afspraak in? Dan is dát het nieuws, niet "er is een lead".
+            // Zonder tijdstip en Meet-link moest je de admin in om te zien of je
+            // vanmiddag ergens verwacht werd.
+            $afspraak = '';
+            if ($appointment) {
+                $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
+                $afspraak = "AFSPRAAK: " . $appointment->starts_at->copy()->setTimezone($tz)->format('d-m-Y H:i') . "\n"
+                    . 'Meet: ' . ($appointment->meet_url ?: '— (nog geen link!)') . "\n\n";
+            }
+
+            $onderwerp = $appointment
+                ? "Nieuwe afspraak ({$site->key}): " . ($lead->company ?: $lead->contact_name)
+                : "Nieuwe lead ({$site->key}): " . ($lead->company ?: $lead->contact_name);
+
             Mail::raw(
-                "Nieuwe lead via channel-site.\n\n"
+                ($appointment ? "Nieuwe afspraak via channel-site.\n\n" : "Nieuwe lead via channel-site.\n\n")
+                . $afspraak
                 . "Site: {$site->name()} ({$site->key})\n"
                 . "Branche: {$branche}\n"
                 . "Naam: {$lead->contact_name}\n"
@@ -559,7 +581,7 @@ class ChannelSiteController extends Controller
                 . "Plaats: " . ($lead->city ?: '—') . "\n"
                 . "Bericht: " . ($lead->message ?: '—') . "\n\n"
                 . "Opvolgen in de admin → Website-leads.",
-                fn ($m) => $m->to($to)->subject("Nieuwe lead ({$site->key}): " . ($lead->company ?: $lead->contact_name))
+                fn ($m) => $m->to($to)->subject($onderwerp)
             );
         } catch (\Throwable $e) {
             Log::warning('channel_lead_mail: ' . $e->getMessage());

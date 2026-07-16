@@ -10,12 +10,14 @@
 <body style="margin:0;background:#f4f7fa;font-family:Arial,Helvetica,sans-serif;color:#1c2530">
     <div style="max-width:560px;margin:0 auto;padding:28px 20px">
         <div style="background:#fff;border-radius:14px;padding:28px 26px;box-shadow:0 10px 30px -18px rgba(0,0,0,.3)">
-            @if ($kind === '1h')
-                <h1 style="font-size:20px;margin:0 0 6px">Je afspraak begint zo</h1>
-                <p style="margin:0 0 18px;color:#5b6b78">Hoi {{ $appt->name }}, over ongeveer een uur spreken we elkaar. Tot zo!</p>
+            @if ($kind === 'day_of')
+                <h1 style="font-size:20px;margin:0 0 6px">Vandaag spreken we elkaar</h1>
+                <p style="margin:0 0 18px;color:#5b6b78">Hoi {{ $appt->name }}, je gesprek staat vandaag om {{ $start->format('H:i') }} uur. Tot straks!</p>
             @else
                 <h1 style="font-size:20px;margin:0 0 6px">Herinnering aan je afspraak</h1>
-                <p style="margin:0 0 18px;color:#5b6b78">Hoi {{ $appt->name }}, even een seintje dat we binnenkort een gesprek hebben staan.</p>
+                {{-- Geen "over twee dagen": lead_days is instelbaar en na scheduler-uitval
+                     kan deze mail later vertrekken dan bedoeld. De datum liegt nooit. --}}
+                <p style="margin:0 0 18px;color:#5b6b78">Hoi {{ $appt->name }}, we spreken elkaar {{ $start->translatedFormat('l j F') }}. Even een seintje, zodat het je niet overvalt.</p>
             @endif
 
             <table style="width:100%;border-collapse:collapse;font-size:15px">

@@ -127,16 +127,16 @@
                     <button type="button" class="lwz-opt" data-value="onsite"><span class="lwz-opt-ic">@include('channels.partials.icon', ['name' => 'coffee'])</span>Liever langskomen <small>(omgeving Bussum)</small></button>
                 </div>
 
-                {{-- Bij "online via Meet": meteen een moment prikken (echte afspraak + Meet-link). --}}
+                {{-- Bij "online via Meet": meteen een moment prikken (echte afspraak + Meet-link).
+                     Zelfde kalender als de boekwidget en de verzetpagina. --}}
                 <div class="lwz-plan" data-lwz-plan hidden>
                     <p class="lwz-help" style="margin-top:16px">Prik meteen een moment, gratis en vrijblijvend:</p>
-                    <div class="lwz-plan-loading">Beschikbare momenten laden…</div>
-                    <div class="lwz-plan-body" hidden>
-                        <div class="lwz-plan-days"></div>
-                        <div class="lwz-plan-times"></div>
-                    </div>
+                    @include('partials.slot-calendar', [
+                        'soonest'   => false,
+                        'metaTekst' => false,
+                        'emptyText' => 'Geen vrije momenten gevonden. Laat hieronder weten wanneer het uitkomt, dan plannen we samen iets in.',
+                    ])
                     <p class="lwz-plan-chosen" hidden></p>
-                    <div class="lwz-plan-empty" hidden>Geen vrije momenten gevonden. Laat hieronder weten wanneer het uitkomt, dan plannen we samen iets in.</div>
                 </div>
 
                 <p class="lwz-help" style="margin-top:14px">Liever een ander moment of langskomen? Laat het weten <span class="lwz-opt-note">(optioneel)</span></p>
@@ -223,20 +223,22 @@
     .lwz-errors{max-width:840px;margin:0 auto 18px;padding:14px 18px;border-radius:var(--radius,14px);
         background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.4);color:#b91c1c;font-size:14px}
 
-    /* Slotkiezer binnen de wizard (bij "online via Meet"). */
-    .lwz-plan-days{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.4rem;margin-top:.6rem}
-    .lwz-pday{flex:0 0 auto;min-width:78px;text-align:center;cursor:pointer;font:inherit;line-height:1.2;color:inherit;
-        border:1.5px solid color-mix(in srgb,currentColor 18%,transparent);background:transparent;border-radius:12px;padding:.55rem .5rem}
-    .lwz-pday small{display:block;text-transform:uppercase;font-size:.7rem;color:color-mix(in srgb,currentColor 55%,transparent)}
-    .lwz-pday b{display:block;font-size:1.1rem;margin-top:.1rem}
-    .lwz-pday.is-sel{border-color:var(--lwz-accent);background:color-mix(in srgb,var(--lwz-accent) 14%,transparent)}
-    .lwz-plan-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem;margin-top:.8rem}
-    .lwz-ptime{cursor:pointer;font:inherit;font-weight:700;color:inherit;border:1.5px solid color-mix(in srgb,currentColor 18%,transparent);
-        background:transparent;border-radius:10px;padding:.6rem .3rem}
-    .lwz-ptime:hover{border-color:var(--lwz-accent)}
-    .lwz-ptime.is-sel{border-color:var(--lwz-accent);background:color-mix(in srgb,var(--lwz-accent) 16%,transparent)}
+    /* Slotkiezer binnen de wizard (bij "online via Meet"): de gedeelde kalender uit
+       partials/slot-calendar, gezet in de kleuren van de wizard.
+
+       currentColor en niet --c-ink: --lwz-surface komt uit het host-thema en is op een
+       donkere demo-site zwart, waar --c-ink (ook donker) onleesbaar zou zijn. De wizard
+       mengt overal met currentColor om precies die reden. */
+    .lwz-plan{
+        --c-primary:var(--lwz-accent);
+        --c-on-primary:var(--c-on-cta,#fff);
+        --c-accent:var(--lwz-accent);
+        --c-ink:currentColor;
+        --c-muted:color-mix(in srgb,currentColor 60%,transparent);
+        --c-bg:transparent;
+        margin-top:.6rem}
+    .lwz-plan .slotcal-loading,.lwz-plan .slotcal-empty{font-size:14px;margin-top:.6rem}
     .lwz-plan-chosen{font-weight:700;margin:.9rem 0 0}
-    .lwz-plan-loading,.lwz-plan-empty{color:color-mix(in srgb,currentColor 60%,transparent);font-size:14px;margin-top:.6rem}
 
     /* Mobiel: compacter zodat je na het klikken op de CTA niet in veel witruimte
        landt en het formulier meteen in beeld staat. */
@@ -329,57 +331,30 @@
     });
 
     // Slotkiezer: bij "online via Meet" meteen een moment prikken (echte afspraak + Meet-link).
+    // Zelfde kalender als de boekwidget en de verzetpagina.
     (function () {
         var plan = form.querySelector('[data-lwz-plan]');
         var atField = form.querySelector('input[name="appointment_at"]');
         if (!plan || !atField) return;
-        var elLoad = plan.querySelector('.lwz-plan-loading'), elBody = plan.querySelector('.lwz-plan-body'),
-            elDays = plan.querySelector('.lwz-plan-days'), elTimes = plan.querySelector('.lwz-plan-times'),
-            elChosen = plan.querySelector('.lwz-plan-chosen'), elEmpty = plan.querySelector('.lwz-plan-empty');
-        var loaded = false, days = {};
-        var WD = ['zo','ma','di','wo','do','vr','za'], MO = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
-        function lab(d) { var p = d.split('-'), x = new Date(+p[0], +p[1] - 1, +p[2]); return { wd: WD[x.getDay()], dm: x.getDate() + ' ' + MO[x.getMonth()] }; }
+        var elChosen = plan.querySelector('.lwz-plan-chosen');
+
+        // autoload uit: de kalender hangt achter een keuze die de meeste bezoekers nooit
+        // maken, dus pas ophalen als "online via Meet" gekozen is.
+        var cal = window.bgSlotCalendar(plan.querySelector('[data-slotcal]'), {
+            autoload: false,
+            onPick: function (keuze) {
+                atField.value = keuze.waarde;
+                elChosen.hidden = false;
+                elChosen.textContent = 'Gekozen: ' + keuze.kort + ' om ' + keuze.time + ' uur (online via Google Meet)';
+            }
+        });
 
         form.querySelectorAll('.lwz-opts[data-choice="appointment_type"] .lwz-opt').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (btn.dataset.value === 'meet') { plan.hidden = false; load(); }
+                if (btn.dataset.value === 'meet') { plan.hidden = false; cal.load(); }
                 else { plan.hidden = true; atField.value = ''; elChosen.hidden = true; }
             });
         });
-
-        function load() {
-            if (loaded) return; loaded = true;
-            fetch('/afspraak/beschikbaarheid', { headers: { 'Accept': 'application/json' } })
-                .then(function (r) { return r.json(); })
-                .then(function (j) {
-                    days = j.days || {}; elLoad.hidden = true;
-                    var keys = Object.keys(days);
-                    if (!keys.length) { elEmpty.hidden = false; return; }
-                    elBody.hidden = false;
-                    keys.forEach(function (date, i) {
-                        var l = lab(date), b = document.createElement('button');
-                        b.type = 'button'; b.className = 'lwz-pday'; b.dataset.date = date;
-                        b.innerHTML = '<small>' + l.wd + '</small><b>' + l.dm.split(' ')[0] + '</b>' + l.dm.split(' ')[1];
-                        b.addEventListener('click', function () { selDay(date, b); });
-                        elDays.appendChild(b); if (i === 0) selDay(date, b);
-                    });
-                }).catch(function () { elLoad.textContent = 'Kon de momenten niet laden.'; });
-        }
-        function selDay(date, btn) {
-            elDays.querySelectorAll('.lwz-pday').forEach(function (d) { d.classList.remove('is-sel'); });
-            btn.classList.add('is-sel'); elTimes.innerHTML = '';
-            (days[date] || []).forEach(function (time) {
-                var t = document.createElement('button'); t.type = 'button'; t.className = 'lwz-ptime'; t.textContent = time;
-                t.addEventListener('click', function () { pick(date, time, t); });
-                elTimes.appendChild(t);
-            });
-        }
-        function pick(date, time, btn) {
-            elTimes.querySelectorAll('.lwz-ptime').forEach(function (t) { t.classList.remove('is-sel'); });
-            btn.classList.add('is-sel'); atField.value = date + ' ' + time;
-            var l = lab(date);
-            elChosen.hidden = false; elChosen.textContent = 'Gekozen: ' + l.wd + ' ' + l.dm + ' om ' + time + ' uur (online via Google Meet)';
-        }
     })();
 
     show(0);

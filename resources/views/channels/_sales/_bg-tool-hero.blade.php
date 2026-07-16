@@ -19,7 +19,7 @@
         @endif
         <div style="max-width: 560px;">
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input id="bg-th-input" placeholder="Typ je bedrijfsnaam…" style="flex: 1 1 240px; height: 60px; padding: 0 18px; font-size: 17px; font-weight: 500; background: #fff; border: 1.5px solid #D8D5D0; border-radius: 6px; outline: none; color: #1A1A1A;">
+                <input id="bg-th-input" placeholder="Typ je bedrijfsnaam…" style="flex: 1 1 240px; height: 60px; padding: 0 18px; font-size: 17px; font-weight: 500; background: #fff; border: 1.5px solid #D8D5D0; border-radius: 6px; color: #1A1A1A;">
                 <button id="bg-th-btn" type="button" style="height: 60px; padding: 0 30px; background: #12386B; color: #fff; border: none; border-radius: 6px; font-size: 17px; font-weight: 700; cursor: pointer; white-space: nowrap;">Bekijk mijn voorbeeld &rarr;</button>
             </div>
             <p style="font-size: 13px; color: #8A8681; margin: 12px 2px 0; font-weight: 500;">{{ $heroNote }}</p>

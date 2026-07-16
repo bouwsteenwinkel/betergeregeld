@@ -484,8 +484,28 @@
 		@include('channels.partials.footer')
 	@endif
 
-	{{-- Sticky mobiele CTA: verschijnt na het scrollen voorbij de hero. --}}
-	<a href="#contact" class="sticky-cta">{{ $site->get('meta.preview.is_preview') ? 'Maak een afspraak' : 'Gratis voorbeeld aanvragen' }}</a>
+	{{-- Sticky mobiele CTA: verschijnt na het scrollen voorbij de hero.
+
+	     De bestemming is kanaal-afhankelijk. Op de meeste kanalen is #contact het
+	     lead-formulier in de footer en klopt het anker. Op 'bedrijfswebsite' bestaat
+	     dat formulier niet: daar is #contact letterlijk de footer, dus beloofde de knop
+	     "Gratis voorbeeld aanvragen" en leverde hij een adresblok. Daar wijst hij nu
+	     naar de tool zelf.
+
+	     En hij verdwijnt op de twee pagina's die zélf de bestemming zijn: op /afspraak
+	     trok hij de bezoeker midden in het boeken weg naar iets anders, en op
+	     /voorbeeld-maken stond hij boven het formulier waar hij naartoe zou sturen. --}}
+	@php
+		$ctaIsTool = $site->key === 'bedrijfswebsite' && ! $site->get('meta.preview.is_preview');
+		$ctaHref   = $ctaIsTool ? $site->url('voorbeeld-maken') : '#contact';
+		// Zelfde padnormalisatie als de canonical hierboven: op een channel-domein is
+		// het pad 'afspraak', maar in de lokale preview '_site/{key}/afspraak'.
+		$ctaPad     = ltrim(str_replace('_site/' . $site->key, '', request()->path()), '/');
+		$ctaVerberg = in_array(explode('/', $ctaPad)[0] ?? '', ['afspraak', 'voorbeeld-maken'], true);
+	@endphp
+	@unless ($ctaVerberg)
+		<a href="{{ $ctaHref }}" class="sticky-cta">{{ $site->get('meta.preview.is_preview') ? 'Maak een afspraak' : 'Gratis voorbeeld aanvragen' }}</a>
+	@endunless
 	<script>
 	(function () {
 		var el = document.querySelector('.sticky-cta');

@@ -31,11 +31,65 @@
 <title>Website laten maken voor ondernemers | betergeregeld</title>
 <meta name="description" content="Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.">
 <link rel="icon" href="/channel-media/bedrijfswebsite/logo.webp">
+@endverbatim
+
+{{-- Deze pagina staat buiten channels.layout en miste daardoor het complete
+     SEO-blok dat élke andere pagina van dit kanaal wél uitstuurt: geen canonical,
+     geen og/twitter, geen Organization-graph. Juist op de pagina waar de advertenties
+     landen (dus met ?gclid= en ?utm_*) betekende dat: geen enkel consolidatie-signaal
+     voor Google, en een gedeelde link op WhatsApp/LinkedIn zonder titel of beeld.
+     Zelfde bronnen als layout.blade.php, zodat de twee niet uit elkaar lopen. --}}
+@php
+    $bwUrl   = $site->url('');
+    $bwTitle = 'Website laten maken voor ondernemers | betergeregeld';
+    $bwDesc  = 'Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.';
+    $bwOg    = $site->ogImage();
+@endphp
+<link rel="canonical" href="{{ $bwUrl }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ $site->displayName() }}">
+<meta property="og:title" content="{{ $bwTitle }}">
+<meta property="og:description" content="{{ $bwDesc }}">
+<meta property="og:url" content="{{ $bwUrl }}">
+<meta property="og:locale" content="nl_NL">
+@if ($bwOg)
+    <meta property="og:image" content="{{ $bwOg }}">
+    @if ($site->hasSocialCard())
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:type" content="image/png">
+    @endif
+    <meta property="og:image:alt" content="{{ $site->displayName() }}">
+    <meta name="twitter:image" content="{{ $bwOg }}">
+    <meta name="twitter:image:alt" content="{{ $site->displayName() }}">
+@endif
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $bwTitle }}">
+<meta name="twitter:description" content="{{ $bwDesc }}">
+
+{{-- De merk-entiteit (ProfessionalService/Organization/WebSite). Stond op elke
+     plaatspagina, maar juist niet op de pagina die het merk moet dragen. --}}
+{!! $site->jsonLd() !!}
+@verbatim
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body { font-family: 'Archivo', system-ui, sans-serif; background: #FAF9F7; color: #1A1A1A; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   a { color: #12386B; text-decoration: none; }
+
+  /* Zichtbare focus. De invoervelden van de trechter stonden op outline:none zonder
+     iets ervoor in de plaats, dus wie met het toetsenbord navigeerde zag nergens waar
+     hij stond. Alleen :focus-visible, zodat een muisklik geen ring geeft. */
+  :focus-visible { outline: 3px solid #12386B; outline-offset: 2px; border-radius: 4px; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 3px solid #12386B; outline-offset: 1px; border-color: #12386B;
+  }
+
+  /* Skip-link: eerste tabstop, springt over de nav heen naar de inhoud. Ontbrak,
+     net als het <main>-landmark waar hij naartoe wijst. */
+  .bg-skip { position: absolute; left: 12px; top: -60px; z-index: 200; background: #12386B; color: #fff;
+    padding: 12px 18px; border-radius: 6px; font-weight: 700; transition: top .15s; }
+  .bg-skip:focus { top: 12px; color: #fff; }
   a:hover { color: #0C2A50; }
   ::selection { background: #1D5DA0; color: #fff; }
   input { font-family: inherit; }
@@ -70,11 +124,17 @@
 </head>
 <body>
 
+<a href="#main" class="bg-skip">Naar de inhoud</a>
+
 <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
 
 @endverbatim
   @include('channels._sales._bg-nav')
 @verbatim
+
+<!-- <main> ontbrak volledig op deze pagina: er was geen landmark om naartoe te
+     springen en schermlezers konden de nav niet overslaan. -->
+<main id="main">
 
   <!-- ===================== HERO / GENERATOR ===================== -->
   <!-- H1 + intro staan statisch in de HTML (crawler-/AI-zichtbaar voor SEO/GEO);
@@ -87,7 +147,12 @@
         <div id="gen-form"></div>
       </div>
       <div class="anim-float" style="flex: 1 1 360px; animation: bg-float 6s ease-in-out infinite;">
-        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8A8681; margin-bottom: 12px;">Zojuist gegenereerd</div>
+        <!-- "Zojuist gegenereerd" suggereerde dat andere bezoekers deze zes voorbeelden
+             net hadden aangemaakt; het zijn hardgecodeerde voorbeelden uit de
+             companies-array. Zo'n suggestie is precies het soort schijn-drukte waar de
+             ACM op handhaaft, en ze is hier niet eens nodig: dat de tool het écht doet
+             bewijst de bezoeker zelf met zijn eigen bedrijfsnaam. -->
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6864; margin-bottom: 12px;">Zo ziet het eruit</div>
         <div id="gen-preview"></div>
       </div>
     </div>
@@ -168,12 +233,17 @@
     <h2 style="font-size: clamp(30px, 4.4vw, 48px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 20px; max-width: 20ch;">Waarom kiezen ondernemers voor betergeregeld?</h2>
     <p style="font-size: 18px; line-height: 1.5; color: #4A4844; margin: 0 0 36px; max-width: 52ch;">Wij werken voor ondernemers in heel Nederland. Alles gaat telefonisch en online.</p>
     <div style="display: flex; gap: 28px; align-items: center; margin: 0 0 40px; flex-wrap: wrap;">
-      <img src="/channel-media/bedrijfswebsite/joshua.png" alt="Joshua de Vos" style="width: 148px; height: 148px; border-radius: 50%; object-fit: cover; object-position: center 12%; background: #fff; flex-shrink: 0;">
+      <!-- .webp van 296px (2x de weergavemaat) i.p.v. de PNG van 1080x1080: die was
+           917 KB voor een plaatje dat op 148x148 wordt getekend. Nu 9 KB. width/height
+           erbij zodat de regel niet verspringt terwijl het laadt. -->
+      <img src="/channel-media/bedrijfswebsite/joshua.webp" alt="Joshua de Vos, eigenaar van Betergeregeld" width="148" height="148" loading="lazy" decoding="async" style="width: 148px; height: 148px; border-radius: 50%; object-fit: cover; object-position: center 12%; background: #fff; flex-shrink: 0;">
       <div style="max-width: 46ch;">
         <p style="font-size: 20px; line-height: 1.5; color: #2E2C29; margin: 0 0 10px; font-weight: 600;">"Bel je? Dan neem ik zelf op."</p>
         <div style="font-size: 15px; color: #6B6864; font-weight: 700;">Joshua de Vos, eigenaar</div>
-        {{-- Bellen én zelf plannen: niet iedereen belt liever, en /afspraak was
-             tot nu toe nergens vanaf gelinkt. --}}
+        <!-- Bellen en zelf plannen naast elkaar: niet iedereen belt liever.
+             Let op: dit blok staat binnen @verbatim. Een Blade-commentaar wordt hier
+             dus NIET gestript en belandt als leesbare tekst op de pagina; gebruik
+             hierbinnen alleen HTML-commentaar zoals dit. -->
         <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 12px;">
           <a href="tel:+31882545101" style="font-size: 16px; font-weight: 700; color: #12386B;">Bel 088 2545101</a>
           <span style="color: #C4C1BC;">of</span>
@@ -255,7 +325,12 @@
   <!-- ===================== PRIJZEN ===================== -->
   <section id="prijzen" style="padding: 72px calc(50vw - 50%); margin: 0 calc(50% - 50vw); width: 100vw; background: #F1EFEB; border-top: 1px solid #E5E3DF;">
     <h2 style="font-size: clamp(30px, 4.4vw, 48px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 12px;">Wat kost een website laten maken?</h2>
-    <p style="font-size: 18px; color: #6B6864; margin: 0 0 32px;">Een website laten maken begint bij 799 euro eenmalig of 69 euro per maand. Je weet het bedrag vooraf, en het verandert niet. Kies wat past, je kunt altijd een stap opschuiven in de Groeidiamant.</p>
+    <!-- De volledige som staat er nu bij: het eenmalige bedrag verzweeg de doorlopende
+         39 euro hosting en de maandprijs verzweeg de looptijd van 24 maanden. Beide
+         staan wél in de prijskaarten die JS inlaadt, dus wie doorklikte kwam iets anders
+         tegen dan hier beloofd was. Een prijs die "niet verandert" terwijl er maandelijks
+         iets bij komt, is een misleidende prijsvermelding. -->
+    <p style="font-size: 18px; color: #6B6864; margin: 0 0 32px;">Een website laten maken begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf, en het verandert niet. Kies wat past, je kunt altijd een stap opschuiven in de Groeidiamant.</p>
     <div id="price-toggle"></div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; align-items: stretch;">
       <div style="background: #fff; border: 1.5px solid #E5E3DF; border-radius: 8px; padding: 32px; display: flex; flex-direction: column;">
@@ -316,7 +391,7 @@
     <div style="max-width: 820px; margin: 0 auto; padding: 0 24px;">
       <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1D5DA0; margin-bottom: 12px;">Veelgestelde vragen</div>
       <h2 style="font-size: clamp(30px, 4.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 28px; color: #1A1A1A;">Antwoord op je vragen</h2>
-      <details><summary>Wat kost het om een website te laten maken?</summary><p class="faq-a">Een website begint bij 799 euro eenmalig of 69 euro per maand. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro of 119 euro per maand.</p></details>
+      <details><summary>Wat kost het om een website te laten maken?</summary><p class="faq-a">Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand.</p></details>
       <details><summary>Hoe snel staat mijn website online?</summary><p class="faq-a">Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online.</p></details>
       <details><summary>Voor wie maakt betergeregeld websites?</summary><p class="faq-a">Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs.</p></details>
       <details><summary>Moet ik zelf teksten en foto's aanleveren?</summary><p class="faq-a">Nee. Wij schrijven de teksten en richten je Google-profiel in. In een telefoongesprek van tien minuten zetten we je teksten, foto's en kleuren samen goed.</p></details>
@@ -326,7 +401,7 @@
       <details><summary>Wat is de gratis voorbeeld-tool?</summary><p class="faq-a">Typ je bedrijfsnaam en je ziet binnen een minuut een compleet voorbeeld van je eigen website, zonder verplichtingen.</p></details>
     </div>
   </section>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wat kost het om een website te laten maken?","acceptedAnswer":{"@type":"Answer","text":"Een website begint bij 799 euro eenmalig of 69 euro per maand. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro of 119 euro per maand."}},{"@type":"Question","name":"Hoe snel staat mijn website online?","acceptedAnswer":{"@type":"Answer","text":"Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online."}},{"@type":"Question","name":"Voor wie maakt betergeregeld websites?","acceptedAnswer":{"@type":"Answer","text":"Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs."}},{"@type":"Question","name":"Moet ik zelf teksten en foto's aanleveren?","acceptedAnswer":{"@type":"Answer","text":"Nee. Wij schrijven de teksten en richten je Google-profiel in. In een telefoongesprek van tien minuten zetten we je teksten, foto's en kleuren samen goed."}},{"@type":"Question","name":"Zit ik ergens aan vast?","acceptedAnswer":{"@type":"Answer","text":"Het voorbeeld is gratis en vrijblijvend. Kies je voor de eenmalige prijs, dan betaal je de helft bij akkoord en de rest pas als je website live staat."}},{"@type":"Question","name":"Werken jullie ook bij mij in de buurt?","acceptedAnswer":{"@type":"Answer","text":"Ja, we werken door heel Nederland. Alles gaat telefonisch en online, dus je hoeft nergens naartoe."}},{"@type":"Question","name":"Kan ik ook een webshop laten maken?","acceptedAnswer":{"@type":"Answer","text":"Ja. Naast websites maken we ook webshops en klantenportalen. Je kunt je website later altijd uitbreiden."}},{"@type":"Question","name":"Wat is de gratis voorbeeld-tool?","acceptedAnswer":{"@type":"Answer","text":"Typ je bedrijfsnaam en je ziet binnen een minuut een compleet voorbeeld van je eigen website, zonder verplichtingen."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wat kost het om een website te laten maken?","acceptedAnswer":{"@type":"Answer","text":"Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand."}},{"@type":"Question","name":"Hoe snel staat mijn website online?","acceptedAnswer":{"@type":"Answer","text":"Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online."}},{"@type":"Question","name":"Voor wie maakt betergeregeld websites?","acceptedAnswer":{"@type":"Answer","text":"Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs."}},{"@type":"Question","name":"Moet ik zelf teksten en foto's aanleveren?","acceptedAnswer":{"@type":"Answer","text":"Nee. Wij schrijven de teksten en richten je Google-profiel in. In een telefoongesprek van tien minuten zetten we je teksten, foto's en kleuren samen goed."}},{"@type":"Question","name":"Zit ik ergens aan vast?","acceptedAnswer":{"@type":"Answer","text":"Het voorbeeld is gratis en vrijblijvend. Kies je voor de eenmalige prijs, dan betaal je de helft bij akkoord en de rest pas als je website live staat; daarna loopt alleen het maandbedrag voor hosting en onderhoud door. Kies je voor de maandprijs, dan geldt een looptijd van 24 maanden."}},{"@type":"Question","name":"Werken jullie ook bij mij in de buurt?","acceptedAnswer":{"@type":"Answer","text":"Ja, we werken door heel Nederland. Alles gaat telefonisch en online, dus je hoeft nergens naartoe."}},{"@type":"Question","name":"Kan ik ook een webshop laten maken?","acceptedAnswer":{"@type":"Answer","text":"Ja. Naast websites maken we ook webshops en klantenportalen. Je kunt je website later altijd uitbreiden."}},{"@type":"Question","name":"Wat is de gratis voorbeeld-tool?","acceptedAnswer":{"@type":"Answer","text":"Typ je bedrijfsnaam en je ziet binnen een minuut een compleet voorbeeld van je eigen website, zonder verplichtingen."}}]}</script>
 
   <!-- ===================== SLOT-CTA ===================== -->
   <section style="padding: 60px calc(50vw - 50%); margin: 0 calc(50% - 50vw) -40px; width: 100vw; background: #FAF9F7; color: #1A1A1A; border-top: 1px solid #E5E3DF;">
@@ -337,7 +412,7 @@
         <div style="position: relative; max-width: 600px;">
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
             <div style="position: relative; flex: 1 1 240px;">
-              <input id="slot-input" placeholder="Typ je bedrijfsnaam…" style="width: 100%; height: 68px; padding: 0 20px; font-size: 18px; font-weight: 500; background: #fff; border: 1.5px solid #D8D5D0; border-radius: 6px; outline: none; color: #1A1A1A;">
+              <input id="slot-input" placeholder="Typ je bedrijfsnaam…" style="width: 100%; height: 68px; padding: 0 20px; font-size: 18px; font-weight: 500; background: #fff; border: 1.5px solid #D8D5D0; border-radius: 6px; color: #1A1A1A;">
               <div id="slot-suggest" style="display:none; position: absolute; top: 76px; left: 0; right: 0; background: #fff; border: 1px solid #E5E3DF; border-radius: 6px; box-shadow: 0 16px 40px rgba(0,0,0,0.28); overflow: hidden; z-index: 20; text-align: left;"></div>
             </div>
             <button id="slot-btn" class="btn-primary" style="height: 68px; padding: 0 34px; background: #12386B; color: #fff; border: none; border-radius: 6px; font-size: 18px; font-weight: 800; cursor: pointer; white-space: nowrap;">Bekijk mijn voorbeeld →</button>
@@ -351,6 +426,8 @@
       </div>
     </div>
   </section>
+
+</main>
 
   <!-- ===================== FOOTER ===================== -->
 @endverbatim
@@ -368,20 +445,27 @@
 
   var PHOTO = '/channel-media/bedrijfswebsite/preview/';
   var companies = [
-    { name: 'Van der Meer Dakwerken', place: 'Zwolle', branche: 'Dakdekker', color: '#1F3A5F', headline: 'Uw dak weer in orde in Zwolle', sub: 'Plat en hellend dak, reparatie en volledige vervanging.', cta: 'Vraag een offerte', services: ['Dakbedekking', 'Lekkage verholpen', 'Zink en lood'], photos: [PHOTO + 'dakdekker-1.jpg', PHOTO + 'dakdekker-2.jpg', PHOTO + 'dakdekker-3.jpg'] },
-    { name: 'Bakkerij ’t Stoepje', place: 'Groningen', branche: 'Bakkerij', color: '#A8521C', headline: 'Elke ochtend vers uit de oven in Groningen', sub: 'Ambachtelijk brood, banket en taarten op bestelling.', cta: 'Bekijk het assortiment', services: ['Vers brood', 'Taarten op maat', 'Koffie en gebak'], photos: [PHOTO + 'bakkerij-1.jpg', PHOTO + 'bakkerij-2.jpg', PHOTO + 'bakkerij-3.jpg'] },
-    { name: 'Installatiebedrijf De Vries', place: 'Eindhoven', branche: 'Installateur', color: '#0E6E64', headline: 'Cv en water zonder gedoe in Eindhoven', sub: 'Onderhoud, storingen en complete installaties.', cta: 'Plan een monteur', services: ['CV-onderhoud', 'Storing verholpen', 'Badkamer'], photos: [PHOTO + 'installateur-1.jpg', PHOTO + 'installateur-2.jpg', PHOTO + 'installateur-3.jpg'] },
-    { name: 'Hoveniersbedrijf Groenrijk', place: 'Breda', branche: 'Hovenier', color: '#35633F', headline: 'Een tuin om trots op te zijn in Breda', sub: 'Aanleg, onderhoud en bestrating, het hele jaar door.', cta: 'Vraag tuinadvies', services: ['Tuinaanleg', 'Onderhoud', 'Bestrating'], photos: [PHOTO + 'hovenier-1.jpg', PHOTO + 'hovenier-2.jpg', PHOTO + 'hovenier-3.jpg'] },
-    { name: 'Autobedrijf Jansen', place: 'Rotterdam', branche: 'Garage', color: '#B0202E', headline: 'Uw auto veilig de weg op in Rotterdam', sub: 'Onderhoud, APK en reparatie van alle merken.', cta: 'Maak een APK-afspraak', services: ['APK-keuring', 'Onderhoudsbeurt', 'Banden'], photos: [PHOTO + 'garage-1.jpg', PHOTO + 'garage-2.jpg', PHOTO + 'garage-3.jpg'] },
-    { name: 'Kapsalon Knip & Zo', place: 'Den Haag', branche: 'Kapper', color: '#5E2A50', headline: 'Goed geknipt de deur uit in Den Haag', sub: 'Knippen, kleuren en styling voor dames en heren.', cta: 'Boek online', services: ['Knippen', 'Kleuren', 'Styling'], photos: [PHOTO + 'kapper-1.jpg', PHOTO + 'kapper-2.jpg', PHOTO + 'kapper-3.jpg'] }
+    { name: 'Van der Meer Dakwerken', place: 'Zwolle', branche: 'Dakdekker', color: '#1F3A5F', headline: 'Uw dak weer in orde in Zwolle', sub: 'Plat en hellend dak, reparatie en volledige vervanging.', cta: 'Vraag een offerte', services: ['Dakbedekking', 'Lekkage verholpen', 'Zink en lood'], photos: [PHOTO + 'dakdekker-1.webp', PHOTO + 'dakdekker-2.webp', PHOTO + 'dakdekker-3.webp'] },
+    { name: 'Bakkerij ’t Stoepje', place: 'Groningen', branche: 'Bakkerij', color: '#A8521C', headline: 'Elke ochtend vers uit de oven in Groningen', sub: 'Ambachtelijk brood, banket en taarten op bestelling.', cta: 'Bekijk het assortiment', services: ['Vers brood', 'Taarten op maat', 'Koffie en gebak'], photos: [PHOTO + 'bakkerij-1.webp', PHOTO + 'bakkerij-2.webp', PHOTO + 'bakkerij-3.webp'] },
+    { name: 'Installatiebedrijf De Vries', place: 'Eindhoven', branche: 'Installateur', color: '#0E6E64', headline: 'Cv en water zonder gedoe in Eindhoven', sub: 'Onderhoud, storingen en complete installaties.', cta: 'Plan een monteur', services: ['CV-onderhoud', 'Storing verholpen', 'Badkamer'], photos: [PHOTO + 'installateur-1.webp', PHOTO + 'installateur-2.webp', PHOTO + 'installateur-3.webp'] },
+    { name: 'Hoveniersbedrijf Groenrijk', place: 'Breda', branche: 'Hovenier', color: '#35633F', headline: 'Een tuin om trots op te zijn in Breda', sub: 'Aanleg, onderhoud en bestrating, het hele jaar door.', cta: 'Vraag tuinadvies', services: ['Tuinaanleg', 'Onderhoud', 'Bestrating'], photos: [PHOTO + 'hovenier-1.webp', PHOTO + 'hovenier-2.webp', PHOTO + 'hovenier-3.webp'] },
+    { name: 'Autobedrijf Jansen', place: 'Rotterdam', branche: 'Garage', color: '#B0202E', headline: 'Uw auto veilig de weg op in Rotterdam', sub: 'Onderhoud, APK en reparatie van alle merken.', cta: 'Maak een APK-afspraak', services: ['APK-keuring', 'Onderhoudsbeurt', 'Banden'], photos: [PHOTO + 'garage-1.webp', PHOTO + 'garage-2.webp', PHOTO + 'garage-3.webp'] },
+    { name: 'Kapsalon Knip & Zo', place: 'Den Haag', branche: 'Kapper', color: '#5E2A50', headline: 'Goed geknipt de deur uit in Den Haag', sub: 'Knippen, kleuren en styling voor dames en heren.', cta: 'Boek online', services: ['Knippen', 'Kleuren', 'Styling'], photos: [PHOTO + 'kapper-1.webp', PHOTO + 'kapper-2.webp', PHOTO + 'kapper-3.webp'] }
   ];
 
+  // De 'example'-regels beschrijven wat de stap OPLEVERT, niet wat een klant zou hebben
+  // bereikt. Hier stonden verzonnen resultaten op naam van een niet-bestaand bedrijf
+  // ("Van der Meer Dakwerken ... werd de eerste week al drie keer gebeld", "van 4 naar 87
+  // reviews"), onder het kopje "Voorbeeld uit de praktijk". Dat leest als bewijs, is het
+  // niet, en een concreet resultaat dat je niet kunt waarmaken is een misleidende
+  // handelspraktijk. De Marco-regel blijft: die komt van een echte klant en is als
+  // uitspraak gemarkeerd.
   var diamondDefs = [
-    { n: 1, title: 'Je website', body: 'De basis. Een strakke, snelle site met je diensten, je werk en je contactgegevens. Vindbaar en van jou.', example: 'Van der Meer Dakwerken staat sinds dag één online en werd de eerste week al drie keer gebeld via de site.' },
-    { n: 2, title: 'Vindbaarheid', body: 'We zetten je bovenaan in je eigen regio. Mensen die "dakdekker Zwolle" zoeken, vinden jou, niet je concurrent.', example: 'Binnen zes weken van pagina 3 naar de top-3 voor "dakdekker Zwolle". Zonder één advertentie.' },
-    { n: 3, title: 'Reviews & reputatie', body: 'Na elke klus vragen we automatisch om een review. Je reputatie groeit vanzelf mee, zichtbaar op je site en op Google.', example: 'Van 4 naar 87 Google-reviews in een jaar. Nieuwe klanten bellen nu met "ik zag je goede beoordelingen".' },
+    { n: 1, title: 'Je website', body: 'De basis. Een strakke, snelle site met je diensten, je werk en je contactgegevens. Vindbaar en van jou.', example: 'Je staat online met een site die je zelf begrijpt: je diensten, je werk, je nummer. Bellen kan vanaf dag één.' },
+    { n: 2, title: 'Vindbaarheid', body: 'We zetten je bovenaan in je eigen regio. Mensen die "dakdekker Zwolle" zoeken, vinden jou, niet je concurrent.', example: 'Je pagina is gebouwd op je vak plus je plaats, zodat je meedoet op de zoekopdrachten uit je eigen regio.' },
+    { n: 3, title: 'Reviews & reputatie', body: 'Na elke klus vragen we automatisch om een review. Je reputatie groeit vanzelf mee, zichtbaar op je site en op Google.', example: 'Na elke klus gaat de vraag om een review automatisch de deur uit. Wat binnenkomt staat op je site en op Google.' },
     { n: 4, title: 'Automatisering', body: 'Offertes, planning en herinneringen lopen automatisch. De klant vraagt aan, jij drukt op akkoord. Geen avonduren meer.', example: 'Marco bespaart naar eigen zeggen zo’n zes uur per week aan administratie. Dat is een hele werkdag terug.' },
-    { n: 5, title: 'Groei & schaal', body: 'Meer aanvragen dan je aankunt? We helpen je opschalen: extra mensen inwerken, meerdere vestigingen, nieuwe diensten.', example: 'Van der Meer ging van twee naar vijf man en opende een tweede standplaats. De site groeide gewoon mee.' }
+    { n: 5, title: 'Groei & schaal', body: 'Meer aanvragen dan je aankunt? We helpen je opschalen: extra mensen inwerken, meerdere vestigingen, nieuwe diensten.', example: 'Groeit de zaak, dan groeit de site mee: extra diensten, een tweede vestiging of een nieuwe plaats erbij.' }
   ];
 
   // ECHTE Google-reviews, overgenomen uit het Google Business Profile.
@@ -537,7 +621,7 @@
     var c0 = companies[0];
     $('gen-form').innerHTML = '<div style="position:relative;max-width:520px"><div style="display:flex;gap:10px;flex-wrap:wrap">'
       + '<div style="position:relative;flex:1 1 240px">'
-      + '<input id="hero-input" value="' + esc(state.query) + '" placeholder="Typ je bedrijfsnaam…" style="width:100%;height:60px;padding:0 18px;font-size:17px;font-weight:500;background:#fff;border:1.5px solid #D8D5D0;border-radius:6px;outline:none;color:#1A1A1A">'
+      + '<input id="hero-input" value="' + esc(state.query) + '" placeholder="Typ je bedrijfsnaam…" style="width:100%;height:60px;padding:0 18px;font-size:17px;font-weight:500;background:#fff;border:1.5px solid #D8D5D0;border-radius:6px;color:#1A1A1A">'
       + '<div id="hero-suggest" style="display:none;position:absolute;top:68px;left:0;right:0;background:#fff;border:1.5px solid #E5E3DF;border-radius:6px;box-shadow:0 12px 34px rgba(26,26,26,0.12);overflow:hidden;z-index:20"></div></div>'
       + '<button id="hero-btn" class="btn-primary" style="height:60px;padding:0 30px;background:#12386B;color:#fff;border:none;border-radius:6px;font-size:17px;font-weight:700;cursor:pointer;white-space:nowrap">Bekijk mijn voorbeeld →</button>'
       + '</div><p style="font-size:13px;color:#8A8681;margin:12px 2px 0;font-weight:500">Gratis. Je zit nergens aan vast.</p></div>';
@@ -643,7 +727,7 @@
       + '<div style="width:40px;height:40px;border-radius:6px;background:#1D5DA0;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;flex-shrink:0">' + dm.n + '</div>'
       + '<h3 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0;color:#fff">' + esc(dm.title) + '</h3></div>'
       + '<p style="font-size:18px;line-height:1.55;color:#DCE4F0;margin:0 0 22px">' + esc(dm.body) + '</p>'
-      + '<div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9DBCE4;margin-bottom:6px">Voorbeeld uit de praktijk</div>'
+      + '<div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9DBCE4;margin-bottom:6px">Wat dit oplevert</div>'
       + '<p style="font-size:16px;line-height:1.5;margin:0;color:#B9C6DE">' + esc(dm.example) + '</p></div>';
   }
   document.addEventListener('click', function (e) {

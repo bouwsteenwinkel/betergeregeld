@@ -57,5 +57,8 @@ return [
 		['key' => 'accessguard:scan-risks',                  'name' => 'AccessGuard · risico-scan',           'period' => 1440, 'grace' => 180],
 		['key' => 'radar:scan',                              'name' => 'Vulnerability Radar · scan',          'period' => 1440, 'grace' => 180],
 		['key' => 'blog:generate-daily',                     'name' => 'Blog · dagelijkse generatie',         'period' => 1440, 'grace' => 180],
+		// Draait elk kwartier; 45 min coulance vangt een deploy of een gemiste tik op
+		// zonder vals alarm, en slaat aan ruim voordat de eerste dag-van-mail wegvalt.
+		['key' => 'appointments:send-reminders',            'name' => 'Afspraken · herinneringen',           'period' => 15,   'grace' => 45],
 	],
 ];
