@@ -5,8 +5,6 @@
     // scrollt weg en daarna is er niets meer dat naar ons terugleidt.
     // Bewust GEEN schermvullende modal: de preview moet als de eigen site van de
     // ondernemer blijven voelen (zie de one-pager-keuze in de tool).
-    $srcCh   = (string) ($site->get('meta.preview.source_channel') ?: '');
-    $talkUrl = $srcCh !== '' ? url('/_site/' . $srcCh . '/afspraak') : null;
 @endphp
 
 <div class="pv-prompt" id="pv-prompt" hidden role="dialog" aria-label="Plan een gesprek over je website">
@@ -16,9 +14,7 @@
     <p class="pv-prompt-title">Blij met wat je ziet?</p>
     <p class="pv-prompt-body">Dit is nog maar een voorbeeld. In tien minuten aan de telefoon maken we hem samen af.</p>
     <div class="pv-prompt-actions">
-        @if ($talkUrl)
-            <a href="{{ $talkUrl }}" class="pv-prompt-cta">Plan een gesprek</a>
-        @endif
+        <button type="button" class="pv-prompt-cta" data-pv-appt-open>Plan een gesprek</button>
         <button type="button" class="pv-prompt-alt" data-pv-save-open>Bewaar dit voorbeeld</button>
     </div>
 </div>
@@ -94,9 +90,11 @@
 
     el.addEventListener('click', function (e) {
         if (e.target.closest('[data-pv-prompt-close]')) { hide(true); return; }
-        // Reageert de bezoeker, dan is de prompt klaar: niet terug laten komen.
-        if (e.target.closest('.pv-prompt-cta')) { markSeen(); return; }
-        if (e.target.closest('[data-pv-save-open]')) { hide(true); }
+        // Bij een keuze (afspraak of bewaren) opent de bijbehorende modal eroverheen;
+        // de prompt blijft eronder staan, zodat de andere keuze bereikbaar blijft als
+        // de bezoeker de modal sluit. We onthouden alleen dat de prompt z'n werk deed,
+        // zodat hij niet bij elke pagina opnieuw opduikt.
+        if (e.target.closest('[data-pv-appt-open]') || e.target.closest('[data-pv-save-open]')) { markSeen(); }
     });
 })();
 </script>

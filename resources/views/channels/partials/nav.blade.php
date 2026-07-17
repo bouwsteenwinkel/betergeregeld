@@ -2,6 +2,10 @@
     /** @var \App\Support\ChannelSite $site */
     $tel = preg_replace('/\s+/', '', (string) $site->brand('phone'));
     $cta = $site->navCta();
+    // Op een preview is de bezoeker de ondernemer zelf: de hoofd-CTA opent onze
+    // afspraak-modal (kennismaking met Betergeregeld) i.p.v. naar een sectie in
+    // zijn eigen voorbeeldsite te scrollen. Zie channels.partials.preview-appointment.
+    $ctaPreview = (bool) $site->get('meta.preview.is_preview');
 @endphp
 {{-- Pitch-strip: waarom deze niche-website, geënt op de branche (mobiel + desktop).
      Vervangt de oude trust-/contactbalk (keurmerk + telefoon staan in de footer
@@ -27,7 +31,11 @@
 			@endforeach
 		</nav>
 		<div class="nav-actions">
-			<a href="{{ $site->navHref($cta['href']) }}" class="btn">{{ $cta['label'] }}</a>
+			@if ($ctaPreview)
+				<button type="button" class="btn" data-pv-appt-open>{{ $cta['label'] }}</button>
+			@else
+				<a href="{{ $site->navHref($cta['href']) }}" class="btn">{{ $cta['label'] }}</a>
+			@endif
 			<button type="button" class="nav-toggle" aria-expanded="false" aria-label="Menu openen" aria-controls="nav-drawer">
 				<span class="nav-toggle-bars"><span></span><span></span><span></span></span>
 			</button>
@@ -47,7 +55,13 @@
 				<a href="mailto:{{ $site->brand('email') }}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>{{ $site->brand('email') }}</a>
 			@endif
 		</div>
-		<div class="nav-drawer-cta"><a href="{{ $site->navHref($cta['href']) }}" class="btn" style="width:100%">{{ $cta['label'] }}</a></div>
+		<div class="nav-drawer-cta">
+			@if ($ctaPreview)
+				<button type="button" class="btn" style="width:100%" data-pv-appt-open>{{ $cta['label'] }}</button>
+			@else
+				<a href="{{ $site->navHref($cta['href']) }}" class="btn" style="width:100%">{{ $cta['label'] }}</a>
+			@endif
+		</div>
 		{{-- Cookievoorkeuren onderaan het mobiele menu (opent CMP-venster via
 		     data-cmp-open-prefs); de zwevende cookie-knop is op mobiel verborgen. --}}
 		<button type="button" class="nav-drawer-cookies" data-cmp-open-prefs>

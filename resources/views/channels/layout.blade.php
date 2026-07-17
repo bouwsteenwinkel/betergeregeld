@@ -502,7 +502,13 @@
 		$ctaVerberg = in_array(explode('/', $ctaPad)[0] ?? '', ['afspraak', 'voorbeeld-maken'], true);
 	@endphp
 	@unless ($ctaVerberg)
-		<a href="{{ $ctaHref }}" class="sticky-cta">{{ $site->get('meta.preview.is_preview') ? 'Maak een afspraak' : 'Gratis voorbeeld aanvragen' }}</a>
+		@if ($site->get('meta.preview.is_preview'))
+			{{-- Op een preview opent de sticky-CTA onze afspraak-modal (kennismaking),
+			     net als de nav-CTA en de voorbeeld-balk — niet naar #contact scrollen. --}}
+			<button type="button" class="sticky-cta" data-pv-appt-open>Maak een afspraak</button>
+		@else
+			<a href="{{ $ctaHref }}" class="sticky-cta">Gratis voorbeeld aanvragen</a>
+		@endif
 	@endunless
 	<script>
 	(function () {

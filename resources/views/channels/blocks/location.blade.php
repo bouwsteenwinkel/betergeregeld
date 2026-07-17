@@ -39,7 +39,12 @@
             @endif
 
             <div class="loc-cta">
-                <a href="{{ $site->navHref('#gratis-voorbeeld') }}" class="btn">Plan een afspraak</a>
+                @if ($site->get('meta.preview.is_preview'))
+                    {{-- Op een preview opent elke afspraak-CTA onze kennismakings-modal. --}}
+                    <button type="button" class="btn" data-pv-appt-open>Plan een afspraak</button>
+                @else
+                    <a href="{{ $site->navHref('#gratis-voorbeeld') }}" class="btn">Plan een afspraak</a>
+                @endif
             </div>
         </div>
     </div>
