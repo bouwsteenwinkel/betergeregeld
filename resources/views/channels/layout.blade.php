@@ -453,12 +453,10 @@
 		<div style="background:#0f172a;color:#e2e8f0;font-size:.82rem;padding:.5rem 1rem;display:flex;gap:.8rem;align-items:center;justify-content:center;flex-wrap:wrap">
 			<span>Dit is een voorbeeld van hoe de website van <strong style="color:#fff">{{ $site->name() }}</strong> eruit kan zien.</span>
 			<button type="button" data-pv-save-open style="background:var(--c-cta,#1685c4);color:#fff;font-weight:700;border:0;border-radius:6px;padding:.32rem .8rem;font-size:.82rem;cursor:pointer;white-space:nowrap">Bewaar dit voorbeeld</button>
-			@php $srcCh = $site->get('meta.preview.source_channel'); @endphp
-			@if ($srcCh)
-				<a href="{{ url('/_site/' . $srcCh) }}" style="color:#fff;font-weight:700;text-decoration:underline;white-space:nowrap">Wil je zo'n website? →</a>
-			@endif
+			<button type="button" data-pv-appt-open style="background:none;color:#fff;font-weight:700;border:0;text-decoration:underline;font-size:.82rem;cursor:pointer;white-space:nowrap">Wil je zo'n website? →</button>
 		</div>
 		@include('channels.partials.preview-save')
+		@include('channels.partials.preview-appointment')
 		@include('channels.partials.preview-prompt')
 	@elseif (! $site->isLive())
 		<div style="background:#1c1917;color:#fbbf24;text-align:center;font-size:.8rem;padding:.4rem">

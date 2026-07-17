@@ -81,7 +81,21 @@
     var stepDone = modal.querySelector('[data-pv-step="done"]');
     var revisit = document.getElementById('pv-save-revisit');
 
-    function open() { modal.hidden = false; document.body.style.overflow = 'hidden'; }
+    // Gedeelde contactgegevens met de afspraak-modal: wat de bezoeker hier of daar al invulde,
+    // staat de volgende keer voor. contact_name <-> de gedeelde 'name'-sleutel.
+    function prefill() {
+        try {
+            var c = JSON.parse(localStorage.getItem('bg_contact') || '{}');
+            if (c.name && !form.contact_name.value) { form.contact_name.value = c.name; }
+            if (c.email && !form.email.value) { form.email.value = c.email; }
+            if (c.phone && !form.phone.value) { form.phone.value = c.phone; }
+        } catch (e) {}
+    }
+    function remember() {
+        try { localStorage.setItem('bg_contact', JSON.stringify({ name: form.contact_name.value, email: form.email.value, phone: form.phone.value })); } catch (e) {}
+    }
+
+    function open() { modal.hidden = false; document.body.style.overflow = 'hidden'; prefill(); }
     function close() { modal.hidden = true; document.body.style.overflow = ''; }
 
     document.addEventListener('click', function (e) {
@@ -96,6 +110,7 @@
         errorEl.hidden = true;
         var submit = form.querySelector('.pv-submit');
         submit.disabled = true; submit.textContent = 'Bezig...';
+        remember();
 
         var meta = document.querySelector('meta[name="csrf-token"]');
         fetch(form.action, {
