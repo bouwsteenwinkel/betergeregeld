@@ -36,7 +36,7 @@
     <div class="bgf-plan">
         <div>
             <div class="bgf-plan-t">Even sparren over jouw website?</div>
-            <div class="bgf-plan-s">Plan een videogesprek van {{ (int) config('scheduling.meeting_minutes', 60) }} minuten. Gratis en vrijblijvend, je kiest zelf het moment.</div>
+            <div class="bgf-plan-s">Plan met mij een gesprek, online of telefonisch. Gratis en vrijblijvend, je kiest zelf het moment.</div>
         </div>
         <a href="{{ $site->url('afspraak') }}" class="bgf-plan-b">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -51,13 +51,13 @@
             <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
                     <div style="width: 30px; height: 30px; background: #fff; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #12386B; font-weight: 900; font-size: 17px;">B</div>
-                    <span style="font-weight: 800; font-size: 18px; letter-spacing: -0.02em; color: #fff;">betergeregeld</span>
+                    <span style="font-weight: 800; font-size: 18px; letter-spacing: -0.02em; color: #fff;">Jouw Bedrijfswebsite</span>
                 </div>
                 <div style="font-size: 14px; line-height: 1.7; color: #B9C6DE;">
                     <div style="color: #fff; font-weight: 700;">Betergeregeld ICT</div>
                     <div>KvK 88321703</div>
                     <div>TB Huurmanlaan 3, 1403 SL Bussum</div>
-                    <div><a href="mailto:info@betergeregeld.com" style="color: #fff; font-weight: 700; text-decoration: none;">info@betergeregeld.com</a></div>
+                    <div><a href="mailto:info@jouw-bedrijfswebsite.nl" style="color: #fff; font-weight: 700; text-decoration: none;">info@jouw-bedrijfswebsite.nl</a></div>
                 </div>
             </div>
 
@@ -97,13 +97,21 @@
              592 KB en laadde eager in de footer van álle 622 pagina's van dit kanaal,
              goed voor het leeuwendeel van het paginagewicht. Nu 26 KB, en lazy: hij
              staat onderaan, dus niemand heeft hem nodig bij het eerste scherm. --}}
-        <a href="tel:+31882545101" style="flex: 0 1 300px; max-width: 340px; display: flex; align-items: stretch;">
-            <img src="/channel-media/bedrijfswebsite/joshua-blue-3.webp" alt="Liever even bellen? Bel 088 2545101" width="303" height="303" loading="lazy" decoding="async" style="width: 100%; max-width: 303px; height: auto; object-fit: contain; object-position: center bottom; display: block; margin-bottom: -32px">
-        </a>
+        {{-- Geen link en niet aan te klikken of te slepen: het is sfeerbeeld, geen knop.
+             Bellen kan via de sticky nav, die drie tel:-ingangen heeft (ook op mobiel).
+             margin-bottom is -28px en niet -32px: de balk hieronder begint op 28px, dus
+             bij -32px stak de foto er 4px voorbij. Nu sluit hij exact op de streep aan. --}}
+        <div style="flex: 0 1 300px; max-width: 340px; display: flex; align-items: stretch;">
+            <img src="/channel-media/bedrijfswebsite/joshua-blue-3.webp" alt="Liever even bellen? Bel 088 2545101" width="303" height="303" loading="lazy" decoding="async" draggable="false" style="width: 100%; max-width: 303px; height: auto; object-fit: contain; object-position: center bottom; display: block; margin-bottom: -28px; pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;">
+        </div>
     </div>
 
-    <div style="max-width: 1280px; margin: 28px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; font-size: 14px; color: #9DB0D0;">
-        <div>&copy; 2026 Betergeregeld ICT. Alle prijzen zijn exclusief btw.</div>
+    {{-- position/z-index: de foto hierboven heeft margin-bottom:-32px en steekt over deze
+         balk heen. Een <img> is inline-content en wordt volgens de schilderregels ná de
+         randen van blokken getekend, dus zonder eigen stapelcontext verdween de streep
+         precies achter de foto. --}}
+    <div style="position: relative; z-index: 1; max-width: 1280px; margin: 28px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; font-size: 14px; color: #9DB0D0;">
+        <div>&copy; 2026 Jouw Bedrijfswebsite. Alle prijzen zijn exclusief btw.</div>
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
             <a href="{{ $site->url('privacybeleid') }}" style="color: #9DB0D0; text-decoration: none;">Privacybeleid</a>
             <a href="{{ $site->url('cookiebeleid') }}" style="color: #9DB0D0; text-decoration: none;">Cookiebeleid</a>

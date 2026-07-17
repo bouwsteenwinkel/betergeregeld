@@ -14,6 +14,15 @@
     .vm-hint{color:var(--c-muted);font-size:.85rem;margin:.15rem 0 .6rem}
     .vm-input{width:100%;padding:.85rem 1rem;border:1px solid #cbd5e1;border-radius:10px;font:inherit;color:var(--c-ink);background:#fff}
     .vm-input:focus{outline:2px solid var(--c-accent);outline-offset:1px;border-color:var(--c-accent)}
+    /* Voorwaarden: kleine lettertjes, geen veld. Bewust zonder kader of vlak, het is
+       een akkoord en geen vraag die om aandacht vraagt.
+       Selector moet `.vm-field > label` (0,1,1) verslaan, anders wint diens
+       display:block + font-weight:700 en staat het vinkje op een eigen regel. */
+    .vm-field > label.vm-consent{display:flex;gap:.55rem;align-items:flex-start;font-weight:400;
+        cursor:pointer;color:var(--c-muted);font-size:.78rem;line-height:1.5;margin:0}
+    .vm-consent input{flex:0 0 auto;width:14px;height:14px;margin-top:.15rem;accent-color:var(--c-accent);cursor:pointer}
+    .vm-consent a{color:var(--c-muted);text-decoration:underline;text-underline-offset:2px}
+    .vm-consent a:hover{color:var(--c-ink)}
     /* Kleurkiezer */
     .vm-colors{display:flex;flex-wrap:wrap;gap:.55rem;align-items:center}
     .vm-swatch{width:38px;height:38px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1;cursor:pointer;padding:0}
@@ -63,7 +72,7 @@
     <div class="wrap vm-wrap">
         <span class="kicker"><span class="kicker-line"></span> Gratis voorbeeld, klaar in een halve minuut</span>
         <h1>Zie hoe jouw website eruit kan zien</h1>
-        <p class="lead">Vul vier dingen in. Wij zetten direct een voorbeeld van je eigen website neer, met jouw naam, jouw vak en jouw kleur. Geen account, geen verplichtingen.</p>
+        <p class="lead">Vul je gegevens in en vertel wat je doet. Wij zetten direct een voorbeeld van je eigen website neer, met jouw naam, jouw vak en jouw kleur. Geen account nodig, je zit nergens aan vast.</p>
     </div>
 </section>
 
@@ -168,6 +177,35 @@
                 </div>
             </details>
 
+            <div class="vm-field">
+                <label for="vm-name">Hoe heet je?</label>
+                <input class="vm-input" type="text" id="vm-name" name="contact_name" maxlength="120" required
+                       value="{{ old('contact_name') }}"
+                       placeholder="Bijvoorbeeld: Sanne van Dijk" autocomplete="name">
+            </div>
+
+            <div class="vm-field">
+                <label for="vm-email">Wat is je e-mailadres?</label>
+                <p class="vm-hint">Hiermee nemen we contact met je op over je voorbeeld.</p>
+                <input class="vm-input" type="email" id="vm-email" name="email" maxlength="190" required
+                       value="{{ old('email') }}"
+                       placeholder="Bijvoorbeeld: sanne@vandijk.nl" autocomplete="email">
+            </div>
+
+            <div class="vm-field">
+                <label for="vm-phone">Op welk nummer kunnen we je bereiken?</label>
+                <input class="vm-input" type="tel" id="vm-phone" name="phone" maxlength="60" required
+                       value="{{ old('phone') }}"
+                       placeholder="Bijvoorbeeld: 06 12 34 56 78" autocomplete="tel">
+            </div>
+
+            <div class="vm-field">
+                <label class="vm-consent" for="vm-consent">
+                    <input type="checkbox" id="vm-consent" name="consent" value="1" required>
+                    <span>Jouw Bedrijfswebsite mag contact met mij opnemen over mijn voorbeeld, per e-mail of telefoon. Je gegevens gaan niet naar anderen en je kunt je altijd afmelden. Zie de <a href="{{ $site->url('algemene-voorwaarden') }}" target="_blank" rel="noopener">algemene voorwaarden</a> en het <a href="{{ $site->url('privacybeleid') }}" target="_blank" rel="noopener">privacybeleid</a>.</span>
+                </label>
+            </div>
+
             <div class="vm-hp" aria-hidden="true">
                 <label>Laat dit veld leeg<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
             </div>
@@ -175,7 +213,7 @@
             <button type="submit" class="btn" style="width:100%;justify-content:center;font-size:1.05rem;padding:.95rem">
                 Maak mijn voorbeeld
             </button>
-            <p class="vm-hint" style="text-align:center;margin-top:.7rem">Klaar in ongeveer 30 seconden. Je hoeft niets in te vullen dat je niet wilt.</p>
+            <p class="vm-hint" style="text-align:center;margin-top:.7rem">Klaar in ongeveer 30 seconden. Je zit nergens aan vast en je kunt je altijd afmelden.</p>
             <div class="vm-error" id="vm-error"></div>
         </form>
     </div>

@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<title>Website laten maken voor ondernemers | betergeregeld</title>
+<title>Website laten maken voor ondernemers | Jouw Bedrijfswebsite</title>
 <meta name="description" content="Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.">
 <link rel="icon" href="/channel-media/bedrijfswebsite/logo.webp">
 @endverbatim
@@ -41,7 +41,7 @@
      Zelfde bronnen als layout.blade.php, zodat de twee niet uit elkaar lopen. --}}
 @php
     $bwUrl   = $site->url('');
-    $bwTitle = 'Website laten maken voor ondernemers | betergeregeld';
+    $bwTitle = 'Website laten maken voor ondernemers | Jouw Bedrijfswebsite';
     $bwDesc  = 'Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.';
     $bwOg    = $site->ogImage();
 @endphp
@@ -76,6 +76,16 @@
   html, body { margin: 0; padding: 0; }
   body { font-family: 'Archivo', system-ui, sans-serif; background: #FAF9F7; color: #1A1A1A; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   a { color: #12386B; text-decoration: none; }
+
+  /* De nav is sticky (71px op desktop, ~62px mobiel zonder knop). Zonder scroll-margin
+     scrollt een #anker de sectietop naar y=0, dus precies ACHTER de nav: de kop van
+     #prijzen kwam op 2px onder de nav uit en die van #automatisering viel er zelfs
+     achter. Met deze marge landt de bovenrand van de sectie exact op de onderkant van
+     de nav, waarna de eigen 72px sectiepadding de kop netjes vrijzet. */
+  #top, #werkwijze, #automatisering, #prijzen, #faq, #contact { scroll-margin-top: 72px; }
+  @media (max-width: 759px) {
+    #top, #werkwijze, #automatisering, #prijzen, #faq, #contact { scroll-margin-top: 63px; }
+  }
 
   /* Zichtbare focus. De invoervelden van de trechter stonden op outline:none zonder
      iets ervoor in de plaats, dus wie met het toetsenbord navigeerde zag nergens waar
@@ -213,33 +223,33 @@
       <div>
         <div style="font-size: 15px; font-weight: 800; color: #12386B; margin-bottom: 12px;">01</div>
         <h3 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px;">Binnen een minuut</h3>
-        <p style="font-size: 17px; line-height: 1.5; color: #4A4844; margin: 0;">Typ je bedrijfsnaam en zie meteen een compleet concept van je eigen site.</p>
+        <p style="font-size: 17px; line-height: 1.5; color: #4A4844; margin: 0;">Vul je gegevens in en vertel wat je doet. Kies een uitstraling en een kleur die bij je passen. Binnen een minuut staat er een uniek concept van jouw website.</p>
       </div>
       <div>
         <div style="font-size: 15px; font-weight: 800; color: #12386B; margin-bottom: 12px;">02</div>
-        <h3 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px;">Eén telefoontje</h3>
-        <p style="font-size: 17px; line-height: 1.5; color: #4A4844; margin: 0;">In tien minuten aan de telefoon zetten we je teksten, foto's en kleuren goed. Je hoeft nergens naartoe.</p>
+        <h3 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px;">Samen de richting bepalen</h3>
+        <p style="font-size: 17px; line-height: 1.5; color: #4A4844; margin: 0;">Het concept is een startpunt, geen vaststaande richting. In een gesprek kijken we samen welke kant jouw website opgaat en wat er anders moet. Je hoeft nergens naartoe.</p>
       </div>
       <div>
         <div style="font-size: 15px; font-weight: 800; color: #12386B; margin-bottom: 12px;">03</div>
-        <h3 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px;">Live en vindbaar</h3>
-        <p style="font-size: 17px; line-height: 1.5; color: #4A4844; margin: 0;">Wij zorgen dat je website online staat en gevonden wordt in jouw eigen plaats. Daarna word je gebeld door nieuwe klanten.</p>
+        <h3 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px;">Live en klaar om te groeien</h3>
+        <p style="font-size: 17px; line-height: 1.5; color: #4A4844; margin: 0;">Wij zorgen voor een nette website die gewoon goed werkt en online staat. Daarna bouwen we er samen op door, in jouw tempo.</p>
       </div>
     </div>
   </section>
 
   <!-- ===================== WAAROM BETERGEREGELD ===================== -->
   <section style="padding: 72px calc(50vw - 50%); margin: 0 calc(50% - 50vw); width: 100vw; background: #F1EFEB; border-top: 1px solid #E5E3DF;">
-    <h2 style="font-size: clamp(30px, 4.4vw, 48px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 20px; max-width: 20ch;">Waarom kiezen ondernemers voor betergeregeld?</h2>
-    <p style="font-size: 18px; line-height: 1.5; color: #4A4844; margin: 0 0 36px; max-width: 52ch;">Wij werken voor ondernemers in heel Nederland. Alles gaat telefonisch en online.</p>
+    <h2 style="font-size: clamp(30px, 4.4vw, 48px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 20px; max-width: 20ch;">Waarom kiezen ondernemers voor Jouw Bedrijfswebsite?</h2>
+    <p style="font-size: 18px; line-height: 1.5; color: #4A4844; margin: 0 0 36px; max-width: 52ch;">Jij bent goed in je vak. Wij zorgen dat je website dat eindelijk laat zien.</p>
     <div style="display: flex; gap: 28px; align-items: center; margin: 0 0 40px; flex-wrap: wrap;">
       <!-- .webp van 296px (2x de weergavemaat) i.p.v. de PNG van 1080x1080: die was
            917 KB voor een plaatje dat op 148x148 wordt getekend. Nu 9 KB. width/height
            erbij zodat de regel niet verspringt terwijl het laadt. -->
-      <img src="/channel-media/bedrijfswebsite/joshua.webp" alt="Joshua de Vos, eigenaar van Betergeregeld" width="148" height="148" loading="lazy" decoding="async" style="width: 148px; height: 148px; border-radius: 50%; object-fit: cover; object-position: center 12%; background: #fff; flex-shrink: 0;">
+      <img src="/channel-media/bedrijfswebsite/joshua.webp" alt="Joshua de Vos" width="148" height="148" loading="lazy" decoding="async" style="width: 148px; height: 148px; border-radius: 50%; object-fit: cover; object-position: center 12%; background: #fff; flex-shrink: 0;">
       <div style="max-width: 46ch;">
-        <p style="font-size: 20px; line-height: 1.5; color: #2E2C29; margin: 0 0 10px; font-weight: 600;">"Bel je? Dan neem ik zelf op."</p>
-        <div style="font-size: 15px; color: #6B6864; font-weight: 700;">Joshua de Vos, eigenaar</div>
+        <p style="font-size: 20px; line-height: 1.5; color: #2E2C29; margin: 0 0 10px; font-weight: 600;">"Bij mij krijg je altijd snel antwoord en een prettig gesprek."</p>
+        <div style="font-size: 15px; color: #6B6864; font-weight: 700;">Joshua de Vos</div>
         <!-- Bellen en zelf plannen naast elkaar: niet iedereen belt liever.
              Let op: dit blok staat binnen @verbatim. Een Blade-commentaar wordt hier
              dus NIET gestript en belandt als leesbare tekst op de pagina; gebruik
@@ -255,16 +265,16 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px;">
       <div>
-        <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #1A1A1A;">Vaste prijs vooraf</h3>
-        <p style="font-size: 16px; line-height: 1.5; color: #4A4844; margin: 0;">Je weet vooraf wat je betaalt, en dat bedrag verandert niet.</p>
+        <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #1A1A1A;">Doorgroeien op elk niveau</h3>
+        <p style="font-size: 16px; line-height: 1.5; color: #4A4844; margin: 0;">Begin klein of pak meteen groots uit. Wat je nu kiest, groeit gewoon mee met je bedrijf.</p>
       </div>
       <div>
         <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #1A1A1A;">Eén vast aanspreekpunt</h3>
         <p style="font-size: 16px; line-height: 1.5; color: #4A4844; margin: 0;">Je houdt dezelfde persoon, dus je hoeft je verhaal nooit opnieuw te doen.</p>
       </div>
       <div>
-        <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #1A1A1A;">Betalen in twee delen</h3>
-        <p style="font-size: 16px; line-height: 1.5; color: #4A4844; margin: 0;">De helft bij akkoord, de rest pas als je site live staat. Tot die tijd passen we aan tot het klopt.</p>
+        <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #1A1A1A;">Snel live, geen slepend traject</h3>
+        <p style="font-size: 16px; line-height: 1.5; color: #4A4844; margin: 0;">Geen maanden wachten op een bureau. Je eenpaginawebsite staat meestal binnen een week online.</p>
       </div>
     </div>
   </section>
@@ -393,15 +403,15 @@
       <h2 style="font-size: clamp(30px, 4.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 28px; color: #1A1A1A;">Antwoord op je vragen</h2>
       <details><summary>Wat kost het om een website te laten maken?</summary><p class="faq-a">Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand.</p></details>
       <details><summary>Hoe snel staat mijn website online?</summary><p class="faq-a">Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online.</p></details>
-      <details><summary>Voor wie maakt betergeregeld websites?</summary><p class="faq-a">Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs.</p></details>
-      <details><summary>Moet ik zelf teksten en foto's aanleveren?</summary><p class="faq-a">Nee. Wij schrijven de teksten en richten je Google-profiel in. In een telefoongesprek van tien minuten zetten we je teksten, foto's en kleuren samen goed.</p></details>
-      <details><summary>Zit ik ergens aan vast?</summary><p class="faq-a">Het voorbeeld is gratis en vrijblijvend. Kies je voor de eenmalige prijs, dan betaal je de helft bij akkoord en de rest pas als je website live staat.</p></details>
-      <details><summary>Werken jullie ook bij mij in de buurt?</summary><p class="faq-a">Ja, we werken door heel Nederland. Alles gaat telefonisch en online, dus je hoeft nergens naartoe.</p></details>
+      <details><summary>Voor wie werkt Jouw Bedrijfswebsite?</summary><p class="faq-a">Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs.</p></details>
+      <details><summary>Moet ik zelf teksten en foto's aanleveren?</summary><p class="faq-a">Nee, dat hoeft niet. Wij schrijven de teksten en richten je Google-profiel in. Heb je wel eigen foto's of teksten, dan gebruiken we die het liefst: echte beelden van je eigen bedrijf en je eigen woorden werken beter bij bezoekers en in Google. In een gesprek bepalen we samen wat het wordt.</p></details>
+      <details><summary>Zit ik ergens aan vast?</summary><p class="faq-a">Het voorbeeld is gratis en vrijblijvend. Betaal je in één keer, dan betaal je de helft bij akkoord en de rest zodra je website live staat. Kies je voor de maandprijs, dan geldt een looptijd van 24 maanden.</p></details>
+      <details><summary>Werken jullie ook bij mij in de buurt?</summary><p class="faq-a">Ja, we werken door heel Nederland. Je hoeft nergens naartoe: we regelen het gewoon telefonisch en online.</p></details>
       <details><summary>Kan ik ook een webshop laten maken?</summary><p class="faq-a">Ja. Naast websites maken we ook webshops en klantenportalen. Je kunt je website later altijd uitbreiden.</p></details>
-      <details><summary>Wat is de gratis voorbeeld-tool?</summary><p class="faq-a">Typ je bedrijfsnaam en je ziet binnen een minuut een compleet voorbeeld van je eigen website, zonder verplichtingen.</p></details>
+      <details><summary>Wat is de gratis voorbeeld-tool?</summary><p class="faq-a">Vul je gegevens in en vertel wat je doet. Binnen een minuut zie je een uniek concept van je eigen website. Je zit nergens aan vast.</p></details>
     </div>
   </section>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wat kost het om een website te laten maken?","acceptedAnswer":{"@type":"Answer","text":"Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand."}},{"@type":"Question","name":"Hoe snel staat mijn website online?","acceptedAnswer":{"@type":"Answer","text":"Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online."}},{"@type":"Question","name":"Voor wie maakt betergeregeld websites?","acceptedAnswer":{"@type":"Answer","text":"Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs."}},{"@type":"Question","name":"Moet ik zelf teksten en foto's aanleveren?","acceptedAnswer":{"@type":"Answer","text":"Nee. Wij schrijven de teksten en richten je Google-profiel in. In een telefoongesprek van tien minuten zetten we je teksten, foto's en kleuren samen goed."}},{"@type":"Question","name":"Zit ik ergens aan vast?","acceptedAnswer":{"@type":"Answer","text":"Het voorbeeld is gratis en vrijblijvend. Kies je voor de eenmalige prijs, dan betaal je de helft bij akkoord en de rest pas als je website live staat; daarna loopt alleen het maandbedrag voor hosting en onderhoud door. Kies je voor de maandprijs, dan geldt een looptijd van 24 maanden."}},{"@type":"Question","name":"Werken jullie ook bij mij in de buurt?","acceptedAnswer":{"@type":"Answer","text":"Ja, we werken door heel Nederland. Alles gaat telefonisch en online, dus je hoeft nergens naartoe."}},{"@type":"Question","name":"Kan ik ook een webshop laten maken?","acceptedAnswer":{"@type":"Answer","text":"Ja. Naast websites maken we ook webshops en klantenportalen. Je kunt je website later altijd uitbreiden."}},{"@type":"Question","name":"Wat is de gratis voorbeeld-tool?","acceptedAnswer":{"@type":"Answer","text":"Typ je bedrijfsnaam en je ziet binnen een minuut een compleet voorbeeld van je eigen website, zonder verplichtingen."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wat kost het om een website te laten maken?","acceptedAnswer":{"@type":"Answer","text":"Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand."}},{"@type":"Question","name":"Hoe snel staat mijn website online?","acceptedAnswer":{"@type":"Answer","text":"Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online."}},{"@type":"Question","name":"Voor wie werkt Jouw Bedrijfswebsite?","acceptedAnswer":{"@type":"Answer","text":"Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs."}},{"@type":"Question","name":"Moet ik zelf teksten en foto's aanleveren?","acceptedAnswer":{"@type":"Answer","text":"Nee, dat hoeft niet. Wij schrijven de teksten en richten je Google-profiel in. Heb je wel eigen foto's of teksten, dan gebruiken we die het liefst: echte beelden van je eigen bedrijf en je eigen woorden werken beter bij bezoekers en in Google. In een gesprek bepalen we samen wat het wordt."}},{"@type":"Question","name":"Zit ik ergens aan vast?","acceptedAnswer":{"@type":"Answer","text":"Het voorbeeld is gratis en vrijblijvend. Betaal je in één keer, dan betaal je de helft bij akkoord en de rest zodra je website live staat. Kies je voor de maandprijs, dan geldt een looptijd van 24 maanden."}},{"@type":"Question","name":"Werken jullie ook bij mij in de buurt?","acceptedAnswer":{"@type":"Answer","text":"Ja, we werken door heel Nederland. Je hoeft nergens naartoe: we regelen het gewoon telefonisch en online."}},{"@type":"Question","name":"Kan ik ook een webshop laten maken?","acceptedAnswer":{"@type":"Answer","text":"Ja. Naast websites maken we ook webshops en klantenportalen. Je kunt je website later altijd uitbreiden."}},{"@type":"Question","name":"Wat is de gratis voorbeeld-tool?","acceptedAnswer":{"@type":"Answer","text":"Vul je gegevens in en vertel wat je doet. Binnen een minuut zie je een uniek concept van je eigen website. Je zit nergens aan vast."}}]}</script>
 
   <!-- ===================== SLOT-CTA ===================== -->
   <section style="padding: 60px calc(50vw - 50%); margin: 0 calc(50% - 50vw) -40px; width: 100vw; background: #FAF9F7; color: #1A1A1A; border-top: 1px solid #E5E3DF;">

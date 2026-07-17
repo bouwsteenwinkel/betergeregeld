@@ -35,7 +35,7 @@
     <div style="max-width: 1280px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
         <a href="{{ $site->url('') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
             <div style="width: 30px; height: 30px; background: #12386B; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 17px;">B</div>
-            <span class="bgn-wordmark" style="font-weight: 800; font-size: 18px; letter-spacing: -0.02em; color: #1A1A1A;">betergeregeld</span>
+            <span class="bgn-wordmark" style="font-weight: 800; font-size: 18px; letter-spacing: -0.02em; color: #1A1A1A;">Jouw Bedrijfswebsite</span>
         </a>
         <div class="bgn-actions" style="display: flex; align-items: center; gap: 28px;">
             {{-- Links naar secties óp de homepage (de losse pagina's zijn verwijderd).
