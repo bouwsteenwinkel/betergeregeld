@@ -91,6 +91,24 @@ Route::post('/mijn-voorbeelden/{token}/favoriet', [\App\Http\Controllers\SavedPr
 Route::get('/mijn-voorbeelden/{token}/afmelden', [\App\Http\Controllers\SavedPreviewsController::class, 'unsubscribe'])
     ->where('token', '[A-Za-z0-9]+')->name('saved-previews.unsubscribe');
 
+// Google Ads OAuth-callback. Bewust publiek en buiten de Filament-admin-auth,
+// zodat de Google-redirect hier landt zonder loginmuur. De state-check ('ads')
+// is een lichte bescherming; de code is verder alleen bruikbaar met onze eigen
+// client_secret. Wisselt de code in voor een refresh-token (google-ads.json).
+Route::get('/admin/ads/oauth/callback', function (\Illuminate\Http\Request $request, \App\Services\Ads\GoogleAdsClient $ads) {
+    if ($request->query('state') !== 'ads' || ! $request->filled('code')) {
+        return response('Ongeldige Google Ads-callback.', 400);
+    }
+    $res = $ads->exchangeCode((string) $request->query('code'));
+
+    return response(
+        $res['ok']
+            ? 'Google Ads gekoppeld. Je kunt dit tabblad sluiten en terug naar de terminal (php artisan ads:status).'
+            : ('Koppelen mislukt: ' . $res['error']),
+        $res['ok'] ? 200 : 400
+    );
+})->name('ads.oauth.callback');
+
 // Google-agenda koppelen (afsprakenplanner, fase 1b). Alleen ingelogde admin.
 Route::middleware(['web', 'auth'])->prefix('admin/google-agenda')->group(function () {
     Route::get('/', [\App\Http\Controllers\GoogleAgendaController::class, 'status'])->name('google-agenda.status');

@@ -19,7 +19,8 @@ return [
     'redirect_uri' => env('GOOGLE_ADS_REDIRECT_URI', rtrim((string) env('APP_URL', ''), '/') . '/admin/ads/oauth/callback'),
 
     // Bump wanneer Google een versie uitfaseert (zie de Ads API release-notes).
-    'api_version' => env('GOOGLE_ADS_API_VERSION', 'v18'),
+    // v18 en ouder geven inmiddels HTTP 404; v21/v22 zijn live (medio 2026).
+    'api_version' => env('GOOGLE_ADS_API_VERSION', 'v21'),
 
     'token_file' => 'google-ads.json',
 ];
