@@ -16,16 +16,19 @@
        bereikbaar via de preview-CTA. Naast de bel-CTA hiernaast is dit de tweede manier
        om contact te leggen, voor wie liever plant dan belt.
 
-       Witte knop op de navy footer: de huisstijl-CTA (#12386B op wit) valt hier weg
-       tegen de achtergrond, dus omgekeerd. */
+       Groene CTA op de navy footer (#12386B): een huisstijl-witte of navy knop valt hier
+       weg. Fel groen #22C55E geeft ~5:1 contrast met de achtergrond, dus hij springt eruit.
+       Tekst bewust donkergroen i.p.v. wit: om op navy te knallen moet het groen zo licht
+       zijn dat witte tekst onder 4,5:1 zakt, dus fel-groen-met-donkere-tekst is de enige
+       combinatie die zowel opvalt als leesbaar blijft. */
     .bgf-plan { display: flex; align-items: center; justify-content: space-between; gap: 16px 28px; flex-wrap: wrap;
         max-width: 1280px; margin: 0 auto 36px; padding: 18px 22px; border-radius: 10px;
         background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.16); }
     .bgf-plan-t { font-weight: 800; font-size: 18px; color: #fff; letter-spacing: -0.01em; }
     .bgf-plan-s { font-size: 14.5px; color: #B9C6DE; margin-top: 2px; }
-    .bgf-plan-b { display: inline-flex; align-items: center; gap: 9px; flex: 0 0 auto; background: #fff; color: #12386B !important;
+    .bgf-plan-b { display: inline-flex; align-items: center; gap: 9px; flex: 0 0 auto; background: #22C55E; color: #052E13 !important;
         padding: 13px 22px; border-radius: 6px; font-size: 16px; font-weight: 700; text-decoration: none; min-height: 44px; }
-    .bgf-plan-b:hover { background: #EAF1FA; color: #12386B !important; }
+    .bgf-plan-b:hover { background: #16A34A; color: #052E13 !important; }
     .bgf-plan-b svg { width: 18px; height: 18px; flex: 0 0 auto; }
     @media (max-width: 560px) {
         .bgf-plan { flex-direction: column; align-items: stretch; }
