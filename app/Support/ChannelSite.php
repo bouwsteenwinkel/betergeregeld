@@ -320,6 +320,7 @@ class ChannelSite
             'font'    => "system-ui, -apple-system, sans-serif",
             'font_display' => null,   // display-font voor koppen/wordmark; valt terug op 'font'
             'font_url'=> null,
+            'font_face'=> null,       // self-hosted-font: partial-naam met @font-face (i.p.v. font_url); AVG/CWV
             'radius'  => '14px',
             // Tekstkleur op de accentkleur. Standaard de donkere ink, want de
             // meeste accenten zijn warm/licht; per thema te overschrijven.

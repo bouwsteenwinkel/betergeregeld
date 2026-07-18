@@ -24,10 +24,8 @@
      rest van de <head>. --}}
 @include('channels.partials.analytics-head')
 <script src="{{ url('/cmp/loader.js') }}?tenant=channels&lang=nl" async></script>
+@include('channels.partials.font-archivo')
 @verbatim
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <title>Website laten maken voor ondernemers | Jouw Bedrijfswebsite</title>
 <meta name="description" content="Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.">
 @endverbatim

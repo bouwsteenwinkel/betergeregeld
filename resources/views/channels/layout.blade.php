@@ -96,7 +96,11 @@
 	     analytics), anders draaien ze buiten de consent om. --}}
 	<script src="{{ url('/cmp/loader.js') }}?tenant=channels&lang={{ $site->locale() }}" async></script>
 
-	@if ($site->theme()['font_url'])
+	@if (! empty($site->theme()['font_face']))
+		{{-- Self-hosted font (AVG + CWV): een eigen partial met @font-face i.p.v.
+		     de Google-Fonts-hotlink. Opt-in per thema via 'font_face'. --}}
+		@include($site->theme()['font_face'])
+	@elseif ($site->theme()['font_url'])
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="{{ $site->theme()['font_url'] }}" rel="stylesheet">
