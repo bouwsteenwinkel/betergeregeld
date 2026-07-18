@@ -175,9 +175,10 @@
         // lopende tekst. Nu 44x44 en standaard weggeklapt: hij verschijnt pas
         // onderaan de pagina (zie toggleReopenVisibility), waar de footer al
         // ruimte reserveert. Werkt op elke pagina, niet alleen de homepage.
-        '#cmp-reopen{left:12px;bottom:calc(12px + env(safe-area-inset-bottom));width:44px;height:44px;font-size:18px}' +
-        '#cmp-reopen.cmp-reopen-tucked{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(10px)}' +
-        '#cmp-reopen{transition:transform .18s,box-shadow .15s,opacity .18s,visibility .18s}' +
+        // Zwevende knop uit op mobiel: de ingang zit onderaan het hamburger-menu.
+        // Een vaste knop zweeft altijd over iets heen; in het menu staat hij in de
+        // normale tekststroom en dekt hij niets af.
+        '#cmp-reopen{display:none}' +
         '#cmp-banner{padding:14px 16px;gap:10px;max-height:70vh;overflow-y:auto}' +
         // Grid i.p.v. wrap: 2 secundaire knoppen naast elkaar, primair vol over de
         // breedte. DOM-volgorde blijft gelijk en de rij wrapt niet meer rafelig.
@@ -299,35 +300,15 @@
       '</svg>';
     btn.addEventListener('click', function() { openPrefs(); });
     document.documentElement.appendChild(btn);
-    setupReopenTucking(btn);
   }
 
-  // Op mobiel (zelfde 520px-breakpoint als de rest van de CMP-styles) blijft de
-  // zwevende knop weggeklapt zolang de bezoeker leest, en komt hij pas tevoorschijn
-  // in de laatste schermhoogte van de pagina. Daar staat de footer, die al
-  // padding-bottom reserveert, dus dekt hij geen leestekst meer af.
-  function setupReopenTucking(btn) {
-    var mq = window.matchMedia ? window.matchMedia('(max-width:520px)') : null;
-    var ticking = false;
-    function update() {
-      ticking = false;
-      if (!mq || !mq.matches) { btn.classList.remove('cmp-reopen-tucked'); return; }
-      var doc = document.documentElement;
-      var scrolled = window.pageYOffset || doc.scrollTop || 0;
-      var viewport = window.innerHeight || doc.clientHeight || 0;
-      var total = Math.max(doc.scrollHeight, document.body ? document.body.scrollHeight : 0);
-      var nearBottom = (scrolled + viewport) >= (total - Math.max(160, viewport * 0.5));
-      btn.classList.toggle('cmp-reopen-tucked', !nearBottom);
-    }
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      (window.requestAnimationFrame || setTimeout)(update, 16);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    update();
-  }
+  // Op mobiel is de zwevende knop overbodig én schadelijk: hij zweeft per definitie
+  // over de inhoud en dekte lopende tekst af. De ingang zit daar nu onderaan het
+  // hamburger-menu (data-cmp-open-prefs), dat op elke pagina bereikbaar is. Op desktop
+  // blijft de knop wél staan, daar is geen menu-ingang en is er ruimte in de marge.
+  // Eerder stond hier een scroll-truc die de knop wegklapte tijdens het lezen; die is
+  // vervallen. Een middel om toestemming in te trekken hoort niet afhankelijk te zijn
+  // van hoe ver je gescrold hebt.
 
   // Public API for footer "cookie-voorkeuren"-link
   window.cmpOpenPrefs = openPrefs;

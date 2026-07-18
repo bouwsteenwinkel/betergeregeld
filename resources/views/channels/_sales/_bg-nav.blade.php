@@ -26,6 +26,9 @@
         .bgn-drawer a { display: block; padding: 14px 24px; font-size: 16px; font-weight: 600; color: #1A1A1A; text-decoration: none; border-top: 1px solid #E5E3DF; }
         .bgn-drawer a.bgn-drawer-cta { color: #fff; background: #12386B; font-weight: 700; }
         .bgn-drawer a.bgn-drawer-phone { color: #12386B; font-weight: 800; }
+        /* Cookievoorkeuren: bewust ingetogen, het is een beheerlink en geen aanbod.
+           Wel een volwaardig tikdoel (14px padding boven en onder = 45px hoog). */
+        .bgn-drawer a.bgn-drawer-cookies { font-size: 14px; font-weight: 600; color: #6B6864; }
         /* Scrim vangt de tik naast het menu op, zodat de pagina eronder niet
            per ongeluk wegnavigeert, en dient meteen als klik-buiten. */
         .bgn-scrim.is-open { display: block; position: fixed; inset: 0; background: rgba(26,26,26,0.38); z-index: 0; }
@@ -93,6 +96,12 @@
         <a href="{{ $site->url('') . '#contact' }}">Contact</a>
         <a href="tel:+31882545101" class="bgn-drawer-phone">Bel 088 2545101</a>
         <a href="{{ $site->url('voorbeeld-maken') }}" class="bgn-drawer-cta">Bekijk mijn voorbeeld</a>
+        {{-- Cookievoorkeuren onderaan het menu. Dit is op mobiel de enige plek waar een
+             bezoeker zijn toestemming kan herzien: de zwevende CMP-knop staat op alle
+             niet-homepaginas uit. Intrekken hoort net zo makkelijk te zijn als geven.
+             data-cmp-open-prefs laat de CMP het voorkeuren-venster openen; het href is
+             de terugval als de CMP niet laadt, dan land je alsnog op het cookiebeleid. --}}
+        <a href="{{ $site->url('cookiebeleid') }}" class="bgn-drawer-cookies" data-cmp-open-prefs>Cookievoorkeuren</a>
     </div>
     {{-- Scrim: vangt de tik naast het open menu op. --}}
     <div id="bgn-scrim" class="bgn-scrim" aria-hidden="true"></div>
