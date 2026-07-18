@@ -352,11 +352,21 @@
             stopProgress();
             progressEl.style.width = '100%';
             stepEl.textContent = 'Klaar. Je voorbeeld staat klaar.';
-            // Het moment dat telt: de bezoeker krijgt echt een site te zien.
-            if (window.bgTrack) {
-                window.bgTrack('preview_ready', { seconds: Math.round((Date.now() - t0) / 1000) });
-            }
-            window.location.href = url;
+            // Het moment dat telt: de bezoeker krijgt echt een site te zien. We sturen
+            // pas door NADAT de meting (GTM/Google Ads-conversie) verstuurd is; anders
+            // raakt de conversie-ping verloren bij de directe navigatie. eventCallback
+            // vuurt zodra de tags klaar zijn; de setTimeout is het vangnet als GTM niet
+            // (op tijd) laadt, zodat de bezoeker nooit op deze pagina blijft hangen.
+            var navigated = false;
+            var go = function () { if (navigated) { return; } navigated = true; window.location.href = url; };
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                event: 'preview_ready',
+                seconds: Math.round((Date.now() - t0) / 1000),
+                eventCallback: go,
+                eventTimeout: 1500
+            });
+            setTimeout(go, 1600);
         }).catch(function (err) {
             if (window.bgTrack) {
                 window.bgTrack('preview_failed', { reason: (err && err.message) || 'onbekend' });

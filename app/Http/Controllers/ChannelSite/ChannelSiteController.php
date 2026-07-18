@@ -133,6 +133,15 @@ class ChannelSiteController extends Controller
     {
         return view('channels.afspraak', ['site' => $this->site()]);
     }
+    public function appointmentConfirmed(): View
+    {
+        // 'confirmed' = kwam hier na een echte boeking (server-flash uit AppointmentController::book),
+        // niet via refresh of direct bezoek. Zo telt de widget de conversie precies één keer.
+        return view('channels.afspraak-bevestigd', [
+            'site'      => $this->site(),
+            'confirmed' => (bool) session('appointment_confirmed'),
+        ]);
+    }
 
     public function services(): View
     {

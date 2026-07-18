@@ -103,6 +103,8 @@
 
     function open(){
         modal.hidden=false; document.body.style.overflow='hidden';
+        // Planner geopend = contact-intentie (mapt naar Meta 'Contact', consent-gated).
+        if (window.bgTrack) window.bgTrack('planner_opened', { site: site });
         // De gedeelde kalender pas bij openen laden (autoload:false), niet bij page-load.
         if (!cal) {
             cal = window.bgSlotCalendar(modal.querySelector('[data-slotcal]'), {

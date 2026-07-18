@@ -13,6 +13,7 @@
  * hebben bewust geen namen (zou botsen bij meerdere domeinen).
  */
 
+use App\Http\Controllers\ChannelSite\ChannelEventController;
 use App\Http\Controllers\ChannelSite\ChannelSiteController;
 use App\Http\Controllers\ChannelSite\PreviewToolController;
 use App\Http\Controllers\ChannelSite\SavePreviewController;
@@ -26,6 +27,10 @@ $facetKeys = implode('|', array_keys((array) config('groeidiamant.facets', [])))
 
 $channelRoutes = function () use ($facetKeys) {
     Route::get('/', [ChannelSiteController::class, 'home']);
+
+    // First-party event-beacon (funnel-triggers → eigen DB, zie ChannelEventController).
+    // Ruime throttle: sendBeacon vuurt per funnel-stap, niet per klik.
+    Route::post('/_ev', [ChannelEventController::class, 'store'])->middleware('throttle:120,1');
 
     // Voorbeeld-/demolaag: "zo zou jouw site eruitzien". Aparte pagina zodat de
     // hoofd-URL de verkooppitch aan de ondernemer kan zijn (twee-lagen-model).
@@ -55,6 +60,9 @@ $channelRoutes = function () use ($facetKeys) {
     // '/afspraak/boeken' staan in web.php en vallen via de catch-all-uitzondering
     // hieronder door.
     Route::get('/afspraak', [ChannelSiteController::class, 'appointment']);
+    // Aparte bevestigings-URL na een geslaagde boeking (aparte pageview voor ads-
+    // conversiemeting). De booking-widget redirect hierheen; zie partials/booking.
+    Route::get('/afspraak-bevestigd', [ChannelSiteController::class, 'appointmentConfirmed']);
     Route::get('/diensten', [ChannelSiteController::class, 'services']);
     Route::get('/groeidiamant', [ChannelSiteController::class, 'groeidiamant']);
     Route::get('/prijzen', [ChannelSiteController::class, 'pricing']);
