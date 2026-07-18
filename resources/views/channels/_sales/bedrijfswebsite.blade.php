@@ -480,6 +480,33 @@
   </section>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wat kost het om een website te laten maken?","acceptedAnswer":{"@type":"Answer","text":"Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand."}},{"@type":"Question","name":"Hoe snel staat mijn website online?","acceptedAnswer":{"@type":"Answer","text":"Een eenpaginawebsite staat meestal binnen een week live. Een uitgebreidere website met een pagina per dienst staat binnen twee tot drie weken online."}},{"@type":"Question","name":"Voor wie werkt Jouw Bedrijfswebsite?","acceptedAnswer":{"@type":"Answer","text":"Voor mkb-ondernemers en vakmensen in heel Nederland, van dakdekkers en installateurs tot kappers, bakkers, garages en adviseurs."}},{"@type":"Question","name":"Moet ik zelf teksten en foto's aanleveren?","acceptedAnswer":{"@type":"Answer","text":"Nee, dat hoeft niet. Wij schrijven de teksten en richten je Google-profiel in. Heb je wel eigen foto's of teksten, dan gebruiken we die het liefst: echte beelden van je eigen bedrijf en je eigen woorden werken beter bij bezoekers en in Google. In een gesprek bepalen we samen wat het wordt."}},{"@type":"Question","name":"Zit ik ergens aan vast?","acceptedAnswer":{"@type":"Answer","text":"Het voorbeeld is gratis en vrijblijvend. Betaal je in één keer, dan betaal je de helft bij akkoord en de rest zodra je website live staat. Kies je voor de maandprijs, dan geldt een looptijd van 24 maanden."}},{"@type":"Question","name":"Werken jullie ook bij mij in de buurt?","acceptedAnswer":{"@type":"Answer","text":"Ja, we werken door heel Nederland. Je hoeft nergens naartoe: we regelen het gewoon telefonisch en online."}},{"@type":"Question","name":"Kan ik ook een webshop laten maken?","acceptedAnswer":{"@type":"Answer","text":"Ja. Naast websites maken we ook webshops en klantenportalen. Je kunt je website later altijd uitbreiden."}},{"@type":"Question","name":"Wat is de gratis voorbeeld-tool?","acceptedAnswer":{"@type":"Answer","text":"Vul je gegevens in en vertel wat je doet. Binnen een minuut zie je een uniek concept van je eigen website. Je zit nergens aan vast."}}]}</script>
 
+@endverbatim
+  {{-- ===================== GROEIDIAMANT (kaartjes) =====================
+       Voorlaatste sectie: de Groeidiamant als klikbare kaartjes. Nodigt
+       duidelijker uit tot doorklikken dan de donkere diamant hierboven, en
+       levert server-gerenderde (crawlbare) interne links naar de facet-
+       landingspagina's — de donkere diamant linkt alleen via JS. --}}
+  <section style="padding: 72px calc(50vw - 50%); margin: 0 calc(50% - 50vw); width: 100vw; background: #F1EFEB; border-top: 1px solid #E5E3DF;">
+    <div style="max-width: 1120px; margin: 0 auto;">
+      <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #C2410C; margin-bottom: 12px;">De Groeidiamant</div>
+      <h2 style="font-size: clamp(26px, 3.4vw, 40px); line-height: 1.08; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 12px; color: #1A1A1A;">Je site groeit met je mee</h2>
+      <p style="font-size: 17px; color: #4A4844; margin: 0 0 32px; max-width: 62ch; line-height: 1.5;">Begin waar je nu staat. Elke stap bouwt voort op de vorige. Kies wat past en klik door om te zien wat het je oplevert.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(184px, 1fr)); gap: 16px;">
+        @foreach (config('groeidiamant.facets', []) as $fKey => $fVal)
+          <a href="{{ $site->url($fKey) }}" style="display: flex; flex-direction: column; gap: 10px; background: #fff; border: 1.5px solid #E5E3DF; border-radius: 12px; padding: 22px 20px; text-decoration: none; color: #1A1A1A; box-shadow: 0 10px 24px -18px rgba(18,56,107,0.35);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 26px; line-height: 1;">{{ $fVal['icon'] ?? '' }}</span>
+              <span style="font-size: 12px; font-weight: 700; color: #9A968F; text-transform: uppercase; letter-spacing: 0.04em;">Stap {{ $fVal['nr'] ?? $loop->iteration }}</span>
+            </div>
+            <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.01em;">{{ $fVal['label'] ?? $fKey }}</div>
+            <div style="font-size: 14px; line-height: 1.45; color: #4A4844; flex: 1 1 auto;">{{ $fVal['tagline'] ?? '' }}</div>
+            <span style="font-size: 14px; font-weight: 700; color: #12386B;">Bekijk &rarr;</span>
+          </a>
+        @endforeach
+      </div>
+    </div>
+  </section>
+@verbatim
   <!-- ===================== SLOT-CTA ===================== -->
   <section style="padding: 60px calc(50vw - 50%); margin: 0 calc(50% - 50vw) -40px; width: 100vw; background: #FAF9F7; color: #1A1A1A; border-top: 1px solid #E5E3DF;">
     <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 56px; align-items: center;">

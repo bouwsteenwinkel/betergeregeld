@@ -62,6 +62,16 @@
         /* !important omdat de max-width een inline-stijl op de <img> is. */
         .bgf-photo img { max-width: 240px !important; margin-left: auto; margin-right: auto; }
     }
+
+    /* Mobiel/tablet: de 3-koloms auto-fit-grid viel terug naar 1 kolom (2x160px + 44px
+       gap paste niet), waardoor logo, Pagina's en Voor-jouw-vak vol onder elkaar
+       stonden = lange, rommelige footer. Nu bewust 2 koloms: het merk-/adresblok
+       vol-breed bovenaan, daaronder Pagina's naast Voor-jouw-vak (korte woorden, dus
+       ze passen prima naast elkaar). !important verslaat de inline grid-stijl op .bgf-cols. */
+    @media (max-width: 640px) {
+        .bgf-cols { grid-template-columns: 1fr 1fr !important; gap: 26px 20px !important; }
+        .bgf-brand { grid-column: 1 / -1; }
+    }
 </style>
 <footer id="contact" class="bgf" style="padding: 48px calc(50vw - 50%) 32px; margin: 40px calc(50% - 50vw) 0; width: 100vw; background: #12386B; color: #DCE4F0; font-family: 'Archivo', system-ui, sans-serif;">
     <div class="bgf-plan">
@@ -78,8 +88,8 @@
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 44px; align-items: stretch; max-width: 1280px; margin: 0 auto;">
-        <div style="flex: 1 1 520px; display: grid; gap: 44px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
-            <div>
+        <div class="bgf-cols" style="flex: 1 1 520px; display: grid; gap: 44px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+            <div class="bgf-brand">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
                     <div style="width: 30px; height: 30px; background: #fff; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #12386B; font-weight: 900; font-size: 17px;">B</div>
                     <span style="font-weight: 800; font-size: 18px; letter-spacing: -0.02em; color: #fff;">Jouw Bedrijfswebsite</span>
