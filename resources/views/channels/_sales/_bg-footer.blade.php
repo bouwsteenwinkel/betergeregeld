@@ -56,6 +56,9 @@
         .bgf-mail { display: inline-block; padding-top: 11px; padding-bottom: 11px; }
         .bgf-legal { flex-direction: column; gap: 2px !important; }
         .bgf-legal a { display: inline-block; padding-top: 7px; padding-bottom: 7px; }
+        /* De 44px-gap tussen de link-kolommen en de sfeerfoto oogde op mobiel als een
+           grote lege zone (de foto stapelt eronder). Kleiner op mobiel. */
+        .bgf-body { gap: 18px !important; }
     }
 
     /* De fotokolom is 300px breed en liep op 360 tot vlak tegen de schermrand,
@@ -90,7 +93,7 @@
         </a>
     </div>
 
-    <div style="display: flex; flex-wrap: wrap; gap: 44px; align-items: stretch; max-width: 1280px; margin: 0 auto;">
+    <div class="bgf-body" style="display: flex; flex-wrap: wrap; gap: 44px; align-items: stretch; max-width: 1280px; margin: 0 auto;">
         <div class="bgf-cols" style="flex: 1 1 520px; display: grid; gap: 44px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
             <div class="bgf-brand">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
