@@ -46,6 +46,25 @@
     $bwTitle = 'Website laten maken voor ondernemers | Jouw Bedrijfswebsite';
     $bwDesc  = 'Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.';
     $bwOg    = $site->ogImage();
+
+    // Groeidiamant-stappen = de 5 officiële facets (Website, Webshop, Klantenportaal,
+    // Automatisering, AI), elk doorlinkend naar zijn eigen indexeerbare head-term-
+    // landingspagina. Content uit config/bedrijfswebsite_landings.php zodat de home
+    // en de facet-pagina's niet uit elkaar lopen.
+    $diamondFacets = [];
+    $__n = 0;
+    foreach ((array) config('groeidiamant.facets', []) as $__k => $__f) {
+        $__n++;
+        $__hero = (array) config('bedrijfswebsite_landings.' . $__k . '.hero', []);
+        $diamondFacets[] = [
+            'n'       => $__n,
+            'title'   => $__f['label'] ?? $__k,
+            'body'    => $__hero['sub'] ?? ($__f['tagline'] ?? ''),
+            'example' => $__hero['title'] ?? '',
+            'cta'     => $__hero['eyebrow'] ?? ('Bekijk ' . ($__f['label'] ?? $__k)),
+            'url'     => $site->url($__k),
+        ];
+    }
 @endphp
 <link rel="canonical" href="{{ $bwUrl }}">
 <meta property="og:type" content="website">
@@ -494,7 +513,8 @@
 
 </div>
 @endverbatim
-<script>window.__bgTool = { url: @json($site->url('voorbeeld-maken')) };</script>
+<script>window.__bgTool = { url: @json($site->url('voorbeeld-maken')) };
+window.__bgDiamond = @json($diamondFacets);</script>
 @verbatim
 <script>
 (function () {
@@ -518,7 +538,10 @@
   // niet, en een concreet resultaat dat je niet kunt waarmaken is een misleidende
   // handelspraktijk. De Marco-regel blijft: die komt van een echte klant en is als
   // uitspraak gemarkeerd.
-  var diamondDefs = [
+  // Bij voorkeur de server-gerenderde facet-stappen (elk met een eigen
+  // landingspagina-URL, zie window.__bgDiamond). De array hieronder is de
+  // fallback als de injectie ontbreekt.
+  var diamondDefs = (window.__bgDiamond && window.__bgDiamond.length) ? window.__bgDiamond : [
     { n: 1, title: 'Je website', body: 'De basis. Een strakke, snelle site met je diensten, je werk en je contactgegevens. Vindbaar en van jou.', example: 'Je staat online met een site die je zelf begrijpt: je diensten, je werk, je nummer. Bellen kan vanaf dag één.' },
     { n: 2, title: 'Vindbaarheid', body: 'We zetten je bovenaan in je eigen regio. Mensen die "dakdekker Zwolle" zoeken, vinden jou, niet je concurrent.', example: 'Je pagina is gebouwd op je vak plus je plaats, zodat je meedoet op de zoekopdrachten uit je eigen regio.' },
     { n: 3, title: 'Reviews & reputatie', body: 'Na elke klus vragen we automatisch om een review. Je reputatie groeit vanzelf mee, zichtbaar op je site en op Google.', example: 'Na elke klus gaat de vraag om een review automatisch de deur uit. Wat binnenkomt staat op je site en op Google.' },
@@ -785,8 +808,10 @@
       + '<div style="width:40px;height:40px;border-radius:6px;background:#1D5DA0;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;flex-shrink:0">' + dm.n + '</div>'
       + '<h3 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0;color:#fff">' + esc(dm.title) + '</h3></div>'
       + '<p style="font-size:18px;line-height:1.55;color:#DCE4F0;margin:0 0 22px">' + esc(dm.body) + '</p>'
-      + '<div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9DBCE4;margin-bottom:6px">Wat dit oplevert</div>'
-      + '<p style="font-size:16px;line-height:1.5;margin:0;color:#B9C6DE">' + esc(dm.example) + '</p></div>';
+      + (dm.example ? '<div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9DBCE4;margin-bottom:6px">Wat dit oplevert</div>'
+      + '<p style="font-size:16px;line-height:1.5;margin:0 0 24px;color:#B9C6DE">' + esc(dm.example) + '</p>' : '')
+      + (dm.url ? '<a href="' + dm.url + '" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#12386B;font-weight:800;font-size:15px;padding:12px 22px;border-radius:6px;text-decoration:none">' + esc(dm.cta || ('Bekijk ' + dm.title)) + ' →</a>' : '')
+      + '</div>';
   }
   document.addEventListener('click', function (e) {
     var el = e.target.closest ? e.target.closest('.dstep') : null;
