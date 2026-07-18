@@ -13,6 +13,7 @@
  * hebben bewust geen namen (zou botsen bij meerdere domeinen).
  */
 
+use App\Http\Controllers\ChannelSite\ChannelEventController;
 use App\Http\Controllers\ChannelSite\ChannelSiteController;
 use App\Http\Controllers\ChannelSite\PreviewToolController;
 use App\Http\Controllers\ChannelSite\SavePreviewController;
@@ -26,6 +27,10 @@ $facetKeys = implode('|', array_keys((array) config('groeidiamant.facets', [])))
 
 $channelRoutes = function () use ($facetKeys) {
     Route::get('/', [ChannelSiteController::class, 'home']);
+
+    // First-party event-beacon (funnel-triggers → eigen DB, zie ChannelEventController).
+    // Ruime throttle: sendBeacon vuurt per funnel-stap, niet per klik.
+    Route::post('/_ev', [ChannelEventController::class, 'store'])->middleware('throttle:120,1');
 
     // Voorbeeld-/demolaag: "zo zou jouw site eruitzien". Aparte pagina zodat de
     // hoofd-URL de verkooppitch aan de ondernemer kan zijn (twee-lagen-model).

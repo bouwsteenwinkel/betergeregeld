@@ -52,8 +52,28 @@
     // gated. De pixel wordt async geïnjecteerd, dus we wachten er kort op en vuren één
     // keer per aanroep. Zonder container/pixel loopt niets stuk.
     var FB_MAP = { appointment_booked: 'Lead', preview_ready: 'ViewContent', planner_opened: 'Contact' };
+    // Sleutel-funnel-events die we óók in onze eigen DB loggen (first-party, consent-vrij,
+    // dataminimaal — zie ChannelEventController). Micro-events (section_view/cta_click)
+    // bewust niet, om schrijfvolume en ruis te beperken.
+    var LOG_EVENTS = { preview_start:1, preview_ready:1, preview_failed:1, preview_saved:1,
+                       planner_opened:1, lead_submit:1, appointment_booked:1 };
     window.bgTrack = window.bgTrack || function (name, data) {
         try { window.dataLayer.push(Object.assign({ event: name }, data || {})); } catch (e) {}
+
+        // First-party beacon naar onze eigen event-log (geen consent nodig: server-side,
+        // geen IP/UA, geen nieuwe cookie). Fire-and-forget, blokkeert de pagina nooit.
+        if (LOG_EVENTS[name]) {
+            try {
+                var payload = JSON.stringify({ e: name, p: location.pathname, d: data || {} });
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/_ev', new Blob([payload], { type: 'application/json' }));
+                } else {
+                    fetch('/_ev', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(function () {});
+                }
+            } catch (e) {}
+        }
+
+        // Meta-pixel forward (consent-gated: fbq bestaat alleen na marketing-consent).
         var ev = FB_MAP[name];
         if (!ev) return;
         var tries = 0;
