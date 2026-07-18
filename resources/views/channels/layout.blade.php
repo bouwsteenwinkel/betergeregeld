@@ -46,13 +46,17 @@
 	<meta name="twitter:title" content="@yield('title', $site->homeTitle())">
 	<meta name="twitter:description" content="@yield('description', $site->metaDescription())">
 
-	{{-- Themed favicon (data-URI): primary-badge met de eerste monogram-letter in het accent. --}}
+	{{-- Favicon. Op de bedrijfswebsite-funnel (niet-preview) het Betergeregeld-merk-icoon;
+	     op previews en andere channels de monogram-badge van de site zelf (bij een preview
+	     is dat de klant z'n eigen site, dus hun letter — niet onze B). --}}
 	@php
 		$ft = $site->theme();
 		$favSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="' . $ft['primary'] . '"/><text x="16" y="23" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="800" text-anchor="middle" fill="' . $ft['accent'] . '">' . e(mb_substr($site->monogram(), 0, 1)) . '</text></svg>';
+		$brandFav = $site->key === 'bedrijfswebsite' && ! $site->get('meta.preview.is_preview');
+		$favHref  = $brandFav ? '/favicon.svg' : 'data:image/svg+xml,' . rawurlencode($favSvg);
 	@endphp
-	<link rel="icon" href="data:image/svg+xml,{{ rawurlencode($favSvg) }}">
-	<link rel="apple-touch-icon" href="data:image/svg+xml,{{ rawurlencode($favSvg) }}">
+	<link rel="icon" type="image/svg+xml" href="{{ $favHref }}">
+	<link rel="apple-touch-icon" href="{{ $favHref }}">
 
 	{{-- Provider-agnostische event-laag: pusht naar dataLayer (GA4/GTM pikken het
 	     op zodra gekoppeld). Meet CTA-kliks en formulier-submits funnel-breed. --}}

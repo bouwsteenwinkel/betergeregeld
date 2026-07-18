@@ -30,7 +30,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <title>Website laten maken voor ondernemers | Jouw Bedrijfswebsite</title>
 <meta name="description" content="Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.">
-<link rel="icon" href="/channel-media/bedrijfswebsite/logo.webp">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
 @endverbatim
 
 {{-- Deze pagina staat buiten channels.layout en miste daardoor het complete
