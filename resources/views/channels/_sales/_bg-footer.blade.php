@@ -49,10 +49,13 @@
        grootte en tekst blijven gelijk. De juridische rij stapelt op mobiel, want
        naast elkaar brak hij op 360/390 als 2 + 1 met een gat rechts. */
     @media (max-width: 760px) {
-        .bgf-navlink, .bgf-vaklink, .bgf-mail { display: inline-block; padding-top: 8px; padding-bottom: 8px; }
-        .bgf-mail { padding-top: 11px; padding-bottom: 11px; }
-        .bgf-legal { flex-direction: column; gap: 4px; }
-        .bgf-legal a { display: inline-block; padding-top: 15px; padding-bottom: 15px; }
+        /* line-height 1.9 (voor de desktop-kolommen) maakte de rijen op mobiel ~44px:
+           te sparse. Op mobiel een strak regelhoogte + compacte tik-padding, gelijk
+           voor beide kolommen. !important verslaat de inline/geërfde line-height. */
+        .bgf-navlink, .bgf-vaklink { display: inline-block; line-height: 1.3 !important; padding-top: 7px; padding-bottom: 7px; }
+        .bgf-mail { display: inline-block; padding-top: 11px; padding-bottom: 11px; }
+        .bgf-legal { flex-direction: column; gap: 2px !important; }
+        .bgf-legal a { display: inline-block; padding-top: 7px; padding-bottom: 7px; }
     }
 
     /* De fotokolom is 300px breed en liep op 360 tot vlak tegen de schermrand,
