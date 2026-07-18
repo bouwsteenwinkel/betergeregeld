@@ -55,6 +55,9 @@ $channelRoutes = function () use ($facetKeys) {
     // '/afspraak/boeken' staan in web.php en vallen via de catch-all-uitzondering
     // hieronder door.
     Route::get('/afspraak', [ChannelSiteController::class, 'appointment']);
+    // Aparte bevestigings-URL na een geslaagde boeking (aparte pageview voor ads-
+    // conversiemeting). De booking-widget redirect hierheen; zie partials/booking.
+    Route::get('/afspraak-bevestigd', [ChannelSiteController::class, 'appointmentConfirmed']);
     Route::get('/diensten', [ChannelSiteController::class, 'services']);
     Route::get('/groeidiamant', [ChannelSiteController::class, 'groeidiamant']);
     Route::get('/prijzen', [ChannelSiteController::class, 'pricing']);

@@ -117,10 +117,10 @@
                 }
                 return;
             }
-            elForm.hidden = true;
-            elDone.hidden = false;
-            elDone.textContent = res.j.message;
-            if (window.bgTrack) window.bgTrack('appointment_booked', { site: site });
+            // Naar een aparte bevestigings-URL i.p.v. een inline melding: een echte pageview op
+            // /afspraak-bevestigd is meetbaar als ads-conversie. De details staan in de mail; de
+            // conversie-tracking + eenmalig-tellen zit op die pagina (server-flash).
+            window.location.href = '/afspraak-bevestigd';
         }).catch(function () {
             btn.disabled = false; btn.textContent = 'Afspraak bevestigen';
             toonFout('Er ging iets mis. Probeer het later opnieuw.');

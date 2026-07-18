@@ -88,6 +88,11 @@ class AppointmentController extends Controller
         // de landingspagina staan niet in deze URL.
         $this->recordLead($appt, $data, CaptureAdAttribution::fromRequest($request));
 
+        // De widget redirect na dit JSON-antwoord naar /afspraak-bevestigd (aparte pageview voor
+        // ads-conversie). Deze flash laat die pagina de conversie precies één keer tellen — dezelfde
+        // sessiecookie draagt over van deze POST naar de volgende GET. Refresh/direct bezoek mist 'm.
+        session()->flash('appointment_confirmed', true);
+
         $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
 
         return response()->json([
