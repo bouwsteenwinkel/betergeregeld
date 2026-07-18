@@ -47,6 +47,24 @@ class BlogMissingPostTest extends TestCase
             ->assertRedirect('/en/blog/offertes-sneller-maken-en');
     }
 
+    public function test_en_dubbele_slug_301_naar_schone_versie(): void
+    {
+        // Beide EN-versies gepubliceerd: de schone slug + de '-en'-duplicaat.
+        // De '-en'-variant moet 301'en naar de schone (dedup duplicate content).
+        BlogPost::create([
+            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+        BlogPost::create([
+            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken-en',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/en/blog/offertes-sneller-maken-en')
+            ->assertStatus(301)
+            ->assertRedirect('/en/blog/offertes-sneller-maken');
+    }
+
     public function test_verwijderde_post_geeft_410(): void
     {
         $this->get('/nl/blog/bestaat-echt-niet')->assertStatus(410);

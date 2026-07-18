@@ -61,6 +61,19 @@ class BlogController extends Controller
 
 	public function show(Request $request, string $locale, string $slug): View|RedirectResponse
 	{
+		// Dedup EN-content: een deel van de EN-posts bestaat dubbel — de schone slug én
+		// dezelfde met een '-en'-suffix (historische import-cruft), allebei 200. Dat is
+		// duplicate content. 301 de '-en'-variant naar de schone slug zodat Google de
+		// ranking consolideert op één URL. Alleen als de schone tweeling echt bestaat.
+		if ($locale === 'en' && str_ends_with($slug, '-en')) {
+			$base = substr($slug, 0, -3);
+			$hasTwin = BlogPost::query()->published()->forChannel(null)
+				->where('locale', 'en')->where('slug', $base)->exists();
+			if ($hasTwin) {
+				return redirect()->route('blog.show', ['locale' => 'en', 'slug' => $base], 301);
+			}
+		}
+
 		$post = BlogPost::query()->published()
 			->where('locale', $locale)
 			->where('slug', $slug)

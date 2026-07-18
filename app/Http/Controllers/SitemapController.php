@@ -92,7 +92,16 @@ class SitemapController extends Controller
 		// dailyAt 09:00 'blog:generate-daily' command schrijft direct
 		// een NL- en EN-versie; oudere posts hebben alleen NL en zijn
 		// daarom alleen onder /nl/ vindbaar.
-		foreach (BlogPost::query()->published()->whereIn('locale', $locales)->get(['slug', 'locale', 'updated_at', 'is_pillar']) as $post) {
+		$posts = BlogPost::query()->published()->whereIn('locale', $locales)->get(['slug', 'locale', 'updated_at', 'is_pillar']);
+		// Set van gepubliceerde EN-slugs, om '-en'-duplicaten te herkennen: sommige EN-posts
+		// bestaan dubbel (schone slug + '-en'-variant). De '-en'-variant 301't naar de schone,
+		// dus die hoort NIET in de sitemap (anders stuur je Google naar een redirect).
+		$enSlugs = $posts->where('locale', 'en')->pluck('slug')->flip();
+		foreach ($posts as $post) {
+			if ($post->locale === 'en' && str_ends_with($post->slug, '-en')
+				&& isset($enSlugs[substr($post->slug, 0, -3)])) {
+				continue;
+			}
 			$xml .= $this->url(
 				url("/{$post->locale}/blog/{$post->slug}"),
 				$post->is_pillar ? '0.8' : '0.6',
