@@ -29,6 +29,22 @@
     // Conversie-event, alleen na een echte boeking (server-flash) — dus niet bij een
     // refresh of direct bezoek van deze URL. Zo telt de conversie precies één keer.
     if (window.bgTrack) window.bgTrack('appointment_booked', {});
+
+    // Meta (Facebook) Lead-event. fbq bestaat ALLEEN als de CMP de pixel heeft geladen
+    // (= bezoeker akkoord op marketing-cookies), dus dit is automatisch consent-gated.
+    // De pixel wordt async door de CMP geïnjecteerd, dus we wachten er kort op en vuren
+    // precies één keer.
+    (function () {
+        var fired = false, tries = 0;
+        function fire() {
+            if (fired || typeof window.fbq !== 'function') return;
+            fired = true;
+            window.fbq('track', 'Lead');
+            clearInterval(iv);
+        }
+        var iv = setInterval(function () { if (++tries > 40) { clearInterval(iv); return; } fire(); }, 250);
+        fire();
+    })();
 </script>
 @endif
 @endsection
