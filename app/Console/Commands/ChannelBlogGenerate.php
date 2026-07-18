@@ -92,7 +92,7 @@ class ChannelBlogGenerate extends Command
                     'meta_title'       => $d['title'],
                     'excerpt'          => $d['excerpt'],
                     'body'             => $body,
-                    'reading_time_min' => max(1, (int) round(str_word_count(strip_tags($body)) / 200)),
+                    'reading_time_min' => max(1, (int) ceil(str_word_count(strip_tags($body)) / 200)),
                     'published_at'     => null,               // concept — publiceren in admin
                     'ai_generated'     => true,
                     'ai_model'         => $d['model'],

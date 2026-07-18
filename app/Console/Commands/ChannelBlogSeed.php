@@ -65,7 +65,7 @@ class ChannelBlogSeed extends Command
                 'meta_title'       => (string) ($a['title'] ?? $slug),
                 'excerpt'          => (string) ($a['excerpt'] ?? ''),
                 'body'             => $body,
-                'reading_time_min' => max(1, (int) round(str_word_count(strip_tags($body)) / 200)),
+                'reading_time_min' => max(1, (int) ceil(str_word_count(strip_tags($body)) / 200)),
                 'featured'         => $i === 0,
                 'ai_generated'     => false,
                 'published_at'     => now()->subDays($daysAgo),
