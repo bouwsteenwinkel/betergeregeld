@@ -75,6 +75,7 @@
             <div class="bgn-links">
                 <a href="{{ $site->url('') . '#werkwijze' }}" style="font-size: 15px; font-weight: 600; color: #6B6864; text-decoration: none;">Werkwijze</a>
                 <a href="{{ $site->url('') . '#prijzen' }}" style="font-size: 15px; font-weight: 600; color: #6B6864; text-decoration: none;">Prijzen</a>
+                <a href="{{ $site->url('blog') }}" style="font-size: 15px; font-weight: 600; color: #6B6864; text-decoration: none;">Blog</a>
                 <a href="{{ $site->url('') . '#contact' }}" style="font-size: 15px; font-weight: 600; color: #6B6864; text-decoration: none;">Contact</a>
             </div>
             <a href="tel:+31882545101" class="bgn-phone" style="font-size: 18px; font-weight: 800; letter-spacing: -0.01em; color: #12386B; text-decoration: none;">088 2545101</a>
@@ -93,6 +94,7 @@
     <div id="bgn-drawer" class="bgn-drawer">
         <a href="{{ $site->url('') . '#werkwijze' }}">Werkwijze</a>
         <a href="{{ $site->url('') . '#prijzen' }}">Prijzen</a>
+        <a href="{{ $site->url('blog') }}">Blog</a>
         <a href="{{ $site->url('') . '#contact' }}">Contact</a>
         <a href="tel:+31882545101" class="bgn-drawer-phone">Bel 088 2545101</a>
         <a href="{{ $site->url('voorbeeld-maken') }}" class="bgn-drawer-cta">Bekijk mijn voorbeeld</a>
