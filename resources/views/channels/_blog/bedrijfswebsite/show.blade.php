@@ -41,6 +41,15 @@
         .bg-prose table { display: block; max-width: 100%; overflow-x: auto; }
         .bg-prose iframe, .bg-prose video, .bg-prose embed { max-width: 100%; }
         .bg-prose { overflow-wrap: anywhere; }
+
+        /* Mobiel: terug-link krijgt een tikvlak van 44px zonder de positie te verschuiven */
+        @media (max-width: 640px) {
+            .bg-alink {
+                display: inline-block;
+                padding: 14px 0;
+                margin: -14px 0;
+            }
+        }
     </style>
     @endpush
 

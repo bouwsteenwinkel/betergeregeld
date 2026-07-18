@@ -8,6 +8,11 @@
     $heroNote    = $heroNote ?? 'Gratis. Je zit nergens aan vast.';
     $toolUrl     = $site->url('voorbeeld-maken');
 @endphp
+<style>
+@media (max-width: 560px) {
+    #bg-th-btn { width: 100%; }
+}
+</style>
 <section style="padding: 56px calc(50vw - 50%) 40px; margin: 0 calc(50% - 50vw); width: 100vw; background: #FAF9F7; font-family: 'Archivo', system-ui, sans-serif;">
     <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
         @if ($heroEyebrow)

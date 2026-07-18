@@ -82,7 +82,16 @@
        tot 75px en waaierde het raster uit tot een leeg veld. */
     .slotcal-grid{display:grid;grid-template-columns:minmax(320px,368px) minmax(0,1fr);gap:clamp(1rem,3vw,2.2rem);align-items:start}
     .slotcal-cal{width:100%}
-    @media(max-width:720px){.slotcal-grid{grid-template-columns:1fr;gap:1.2rem}}
+    /* Eén kolom op mobiel. minmax(0,1fr) plus min-width:0 op de kinderen is hier geen
+       franje: op 1fr krimpt de kolom niet onder zijn min-content (7 datumcellen van 42px),
+       waardoor het raster en de tijdsloten ~36px buiten de kaart staken. Body heeft
+       overflow-x:clip, dus dat viel niet op als paginabrede overflow, het werd stilletjes
+       afgesneden: de zondagkolom, de volgende-maand-knop en de rechterkolom tijden. */
+    @media(max-width:720px){
+        .slotcal-grid{grid-template-columns:minmax(0,1fr);gap:1.2rem}
+        .slotcal-grid > *{min-width:0}
+        .slotcal-times{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+    }
 
     .slotcal-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.9rem}
     .slotcal-month{font-size:1.05rem;text-transform:capitalize;color:var(--c-ink)}
@@ -139,6 +148,15 @@
 
     .slotcal-meta{margin:1.1rem 0 0;padding-top:.9rem;border-top:1px solid color-mix(in srgb,var(--c-ink) 8%,transparent);
         font-size:.8rem;color:var(--c-muted)}
+
+    /* Mobiele bijstellingen die ná de basisregels moeten staan, anders wint op gelijke
+       specificiteit gewoon de laatste regel in het bestand. */
+    @media(max-width:720px){
+        /* De enige manier om van maand te wisselen, en alleen een pijl als houvast:
+           minstens 44px tikdoel. Het icoon blijft 18px. */
+        .slotcal-nav{width:44px;height:44px}
+        .slotcal-dagdeel{font-size:.8rem}
+    }
 </style>
 
 <script>

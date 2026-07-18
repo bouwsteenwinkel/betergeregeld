@@ -133,6 +133,52 @@
       padding: 0 14px !important;
     }
   }
+
+  /* ---- Mobiele opmaak-correcties (alleen layout, desktop blijft ongewijzigd) ---- */
+  @media (max-width: 759px) {
+    /* De Groeidiamant-stappen krijgen hun trapbreedte inline uit renderDiamond()
+       (40% + 13% per stap). Op een smal scherm is stap 1 daardoor nog geen 130px
+       breed en breken "Je website" en "Reviews & reputatie" in tweeën, met een
+       rafelige rechterrand. Inline style, dus !important; de JS blijft ongemoeid
+       zodat de trap op desktop blijft staan. */
+    #diamond-steps .dstep { width: 100% !important; }
+
+    /* De FAQ-sectie heeft zelf al 24px zijpadding via calc(50vw - 50%); de
+       binnenwrapper legde daar nog eens 24px bovenop, dus stond de inhoud op 48px
+       terwijl de rest van de pagina 24px aanhoudt. */
+    #faq .faq-wrap { padding: 0 !important; }
+
+    /* Bellen en zelf plannen pasten niet op één regel: het losse "of" bleef achter
+       en de links waren 17 en 21px hoog. Onder elkaar, met tikbare hoogte. */
+    .contact-row { flex-direction: column; align-items: flex-start !important; gap: 0; }
+    .contact-row a { display: inline-block; padding: 12px 0; }
+
+    /* De prijs-schakelaar was 36px hoog en is het enige bedieningselement van de
+       prijssectie. Padding staat inline, dus !important. De 3px-onderstreping van
+       de actieve tab verandert niet. */
+    .ptog { padding: 12px 2px !important; min-height: 44px; }
+
+    /* De stroom-keten wrapte na twee chips, waardoor een regel op een zwevende
+       pijl eindigde. Verticaal, met de pijl een kwartslag gedraaid. */
+    .flow-chain { flex-direction: column; align-items: flex-start !important; gap: 6px; }
+    .flow-arrow { display: inline-block; transform: rotate(90deg); margin-left: 20px; }
+
+    /* De strook zelf loopt al gelijk met de pagina-marge (24px links en rechts).
+       De eerdere spacer van 16px plus de flex-gap zette daar nog 32px bovenop,
+       waardoor de laatste kaart aan het einde van de scroll op 56px van de rand
+       bleef staan terwijl links 24px is. Zonder spacer sluit de strook rechts
+       op dezelfde marge af als de rest van de pagina-inhoud. */
+    #proof-cards { scroll-padding-right: 0; }
+
+    /* De afsluitende prijs-CTA wikkelde midden in de grijze btw-alinea. Eigen regel
+       en een tikhoogte van 44px. */
+    .price-cta { display: block; margin-top: 14px; padding: 12px 0; }
+  }
+  /* De CTA-knop stond na het wrappen naast een veld van volle breedte, dus met een
+     ~85px kortere rechterrand. Alleen de breedte, tekst en padding blijven gelijk. */
+  @media (max-width: 560px) {
+    #hero-btn, #slot-btn { width: 100%; min-width: 0; }
+  }
   @media (prefers-reduced-motion: reduce) { .anim-float { animation: none !important; } }
 </style>
 </head>
@@ -258,7 +304,7 @@
              Let op: dit blok staat binnen @verbatim. Een Blade-commentaar wordt hier
              dus NIET gestript en belandt als leesbare tekst op de pagina; gebruik
              hierbinnen alleen HTML-commentaar zoals dit. -->
-        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 12px;">
+        <div class="contact-row" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 12px;">
           <a href="tel:+31882545101" style="font-size: 16px; font-weight: 700; color: #12386B;">Bel 088 2545101</a>
           <span style="color: #C4C1BC;">of</span>
 @endverbatim
@@ -324,13 +370,13 @@
         <h2 style="font-size: clamp(22px, 2.6vw, 30px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 8px;">Later ook je offertes en planning automatisch</h2>
         <p style="font-size: 16px; line-height: 1.5; color: #C9C6C1; margin: 0; max-width: 52ch;">Aanvraag binnen, offerte er automatisch uit, afspraak plant zichzelf in. Een stap voor als je zover bent, geen must.</p>
       </div>
-      <div style="flex: 0 1 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+      <div class="flow-chain" style="flex: 0 1 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
         <span style="background: rgba(29,93,160,0.22); color: #DCE4F0; border: 1px solid rgba(127,176,222,0.35); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 700; white-space: nowrap;">Aanvraag</span>
-        <span style="color: #7FB0DE; font-weight: 800;">→</span>
+        <span class="flow-arrow" style="color: #7FB0DE; font-weight: 800;">→</span>
         <span style="background: rgba(29,93,160,0.22); color: #DCE4F0; border: 1px solid rgba(127,176,222,0.35); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 700; white-space: nowrap;">Offerte</span>
-        <span style="color: #7FB0DE; font-weight: 800;">→</span>
+        <span class="flow-arrow" style="color: #7FB0DE; font-weight: 800;">→</span>
         <span style="background: rgba(29,93,160,0.22); color: #DCE4F0; border: 1px solid rgba(127,176,222,0.35); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 700; white-space: nowrap;">Akkoord</span>
-        <span style="color: #7FB0DE; font-weight: 800;">→</span>
+        <span class="flow-arrow" style="color: #7FB0DE; font-weight: 800;">→</span>
         <span style="background: rgba(29,93,160,0.22); color: #DCE4F0; border: 1px solid rgba(127,176,222,0.35); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 700; white-space: nowrap;">Agenda</span>
       </div>
     </div>
@@ -388,7 +434,7 @@
         <a href="#top" class="js-tool" style="margin-top: auto; text-align: center; border: 1.5px solid #1A1A1A; color: #1A1A1A; padding: 14px; border-radius: 6px; font-weight: 700; font-size: 16px;">Bekijk mijn voorbeeld</a>
       </div>
     </div>
-    <p style="font-size: 16px; margin: 28px 0 0; color: #6B6864;"><span id="btw-text"></span> <a href="#top" style="font-weight: 700;">Bekijk je gratis voorbeeld →</a></p>
+    <p style="font-size: 16px; margin: 28px 0 0; color: #6B6864;"><span id="btw-text"></span> <a href="#top" class="price-cta" style="font-weight: 700;">Bekijk je gratis voorbeeld →</a></p>
   </section>
 
   <!-- ===================== VEELGESTELDE VRAGEN ===================== -->
@@ -402,7 +448,7 @@
       #faq details[open] summary::after { content: '\2212'; }
       #faq .faq-a { padding: 0 0 20px; font-size: 17px; line-height: 1.6; color: #4A4844; max-width: 62ch; margin: 0; }
     </style>
-    <div style="max-width: 820px; margin: 0 auto; padding: 0 24px;">
+    <div class="faq-wrap" style="max-width: 820px; margin: 0 auto; padding: 0 24px;">
       <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1D5DA0; margin-bottom: 12px;">Veelgestelde vragen</div>
       <h2 style="font-size: clamp(30px, 4.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; margin: 0 0 28px; color: #1A1A1A;">Antwoord op je vragen</h2>
       <details><summary>Wat kost het om een website te laten maken?</summary><p class="faq-a">Een website begint bij 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of bij 69 euro per maand met een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet. Een complete website met een pagina per dienst en lokale vindbaarheid start bij 1.999 euro eenmalig plus 49 euro per maand, of bij 119 euro per maand.</p></details>

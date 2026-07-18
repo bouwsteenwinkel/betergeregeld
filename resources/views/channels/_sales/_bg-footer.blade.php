@@ -34,6 +34,34 @@
         .bgf-plan { flex-direction: column; align-items: stretch; }
         .bgf-plan-b { justify-content: center; }
     }
+
+    /* Onderaan zweeft op mobiel altijd iets: op /blog en /plaatsen de 59px hoge
+       .sticky-cta uit de layout, op de homepage de ronde #cmp-reopen. De inline
+       padding op .bgf verslaat de footer{padding-bottom:84px} uit layout.blade.php,
+       dus lag de laatste juridische link permanent onder dat vaste element.
+       !important omdat het om een inline-stijl gaat. */
+    @media (max-width: 860px) {
+        .bgf { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+    }
+
+    /* Tikdoelen: de kolomlinks (29px), het mailadres (15px) en de juridische links
+       (15 tot 22px) bleven ruim onder de 44px. Alleen het raakvlak groeit, kleur,
+       grootte en tekst blijven gelijk. De juridische rij stapelt op mobiel, want
+       naast elkaar brak hij op 360/390 als 2 + 1 met een gat rechts. */
+    @media (max-width: 760px) {
+        .bgf-navlink, .bgf-mail { display: inline-block; padding-top: 8px; padding-bottom: 8px; }
+        .bgf-mail { padding-top: 11px; padding-bottom: 11px; }
+        .bgf-legal { flex-direction: column; gap: 4px; }
+        .bgf-legal a { display: inline-block; padding-top: 15px; padding-bottom: 15px; }
+    }
+
+    /* De fotokolom is 300px breed en liep op 360 tot vlak tegen de schermrand,
+       terwijl de footertekst 20px marge houdt. Kleiner en gecentreerd. */
+    @media (max-width: 560px) {
+        .bgf-photo { flex: 1 1 auto; justify-content: center; margin: 0 auto; }
+        /* !important omdat de max-width een inline-stijl op de <img> is. */
+        .bgf-photo img { max-width: 240px !important; margin-left: auto; margin-right: auto; }
+    }
 </style>
 <footer id="contact" class="bgf" style="padding: 48px calc(50vw - 50%) 32px; margin: 40px calc(50% - 50vw) 0; width: 100vw; background: #12386B; color: #DCE4F0; font-family: 'Archivo', system-ui, sans-serif;">
     <div class="bgf-plan">
@@ -60,7 +88,7 @@
                     <div style="color: #fff; font-weight: 700;">Betergeregeld ICT</div>
                     <div>KvK 88321703</div>
                     <div>TB Huurmanlaan 3, 1403 SL Bussum</div>
-                    <div><a href="mailto:info@jouw-bedrijfswebsite.nl" style="color: #fff; font-weight: 700; text-decoration: none;">info@jouw-bedrijfswebsite.nl</a></div>
+                    <div><a href="mailto:info@jouw-bedrijfswebsite.nl" class="bgf-mail" style="color: #fff; font-weight: 700; text-decoration: none;">info@jouw-bedrijfswebsite.nl</a></div>
                 </div>
             </div>
 
@@ -72,13 +100,13 @@
                      weespagina's, alleen te vinden via de sitemap. Google leidt daar geen
                      enkele autoriteit naartoe, en een bezoeker kwam er nooit. --}}
                 <div style="display: flex; flex-direction: column;">
-                    <a href="{{ $site->url('') }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Home</a>
-                    <a href="{{ $site->url('') . '#prijzen' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Prijzen</a>
-                    <a href="{{ $site->url('') . '#werkwijze' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Werkwijze</a>
-                    <a href="{{ $site->url('') . '#automatisering' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Automatisering</a>
-                    <a href="{{ $site->url('blog') }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Blog</a>
-                    <a href="{{ $site->url('plaatsen') }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Werkgebied</a>
-                    <a href="{{ $site->url('') . '#contact' }}" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Contact</a>
+                    <a href="{{ $site->url('') }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Home</a>
+                    <a href="{{ $site->url('') . '#prijzen' }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Prijzen</a>
+                    <a href="{{ $site->url('') . '#werkwijze' }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Werkwijze</a>
+                    <a href="{{ $site->url('') . '#automatisering' }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Automatisering</a>
+                    <a href="{{ $site->url('blog') }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Blog</a>
+                    <a href="{{ $site->url('plaatsen') }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Werkgebied</a>
+                    <a href="{{ $site->url('') . '#contact' }}" class="bgf-navlink" style="color: #AEC6E6; font-size: 15px; line-height: 1.9; text-decoration: none;">Contact</a>
                 </div>
             </div>
 
@@ -104,7 +132,7 @@
              Bellen kan via de sticky nav, die drie tel:-ingangen heeft (ook op mobiel).
              margin-bottom is -28px en niet -32px: de balk hieronder begint op 28px, dus
              bij -32px stak de foto er 4px voorbij. Nu sluit hij exact op de streep aan. --}}
-        <div style="flex: 0 1 300px; max-width: 340px; display: flex; align-items: stretch;">
+        <div class="bgf-photo" style="flex: 0 1 300px; max-width: 340px; display: flex; align-items: stretch;">
             <img src="/channel-media/bedrijfswebsite/joshua-blue-3.webp" alt="Liever even bellen? Bel 088 2545101" width="303" height="303" loading="lazy" decoding="async" draggable="false" style="width: 100%; max-width: 303px; height: auto; object-fit: contain; object-position: center bottom; display: block; margin-bottom: -28px; pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;">
         </div>
     </div>
@@ -115,7 +143,7 @@
          precies achter de foto. --}}
     <div style="position: relative; z-index: 1; max-width: 1280px; margin: 28px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; font-size: 14px; color: #9DB0D0;">
         <div>&copy; 2026 Jouw Bedrijfswebsite. Alle prijzen zijn exclusief btw.</div>
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div class="bgf-legal" style="display: flex; gap: 20px; flex-wrap: wrap;">
             <a href="{{ $site->url('privacybeleid') }}" style="color: #9DB0D0; text-decoration: none;">Privacybeleid</a>
             <a href="{{ $site->url('cookiebeleid') }}" style="color: #9DB0D0; text-decoration: none;">Cookiebeleid</a>
             <a href="{{ $site->url('algemene-voorwaarden') }}" style="color: #9DB0D0; text-decoration: none;">Algemene voorwaarden</a>

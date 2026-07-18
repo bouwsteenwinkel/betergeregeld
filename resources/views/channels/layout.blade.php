@@ -127,6 +127,7 @@
 		/* sectie-kicker met lijntje */
 		.kicker{display:inline-flex;align-items:center;gap:.6rem;font-size:.78rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--c-cta);margin-bottom:.85rem}
 		.kicker-line{display:block;width:30px;height:2px;border-radius:2px;background:var(--c-cta)}
+		@media(max-width:859px){.kicker{font-size:.82rem;letter-spacing:.14em}}
 		.section-lead{margin-bottom:2.4rem;font-size:1.05rem;max-width:54ch}
 		/* feature-cards met lijn-accenten */
 		.feature-grid{gap:1.4rem}
@@ -432,6 +433,9 @@
 		.hp{position:absolute;left:-9999px}
 		.errors{background:#fef2f2;color:#b91c1c;border-radius:10px;padding:.8rem 1rem;margin-bottom:1rem;font-size:.9rem}
 		.prose p{margin:0 0 1rem}.prose h2{margin:1.6rem 0 .6rem}.prose h3{margin:1.2rem 0 .4rem}.prose ul{margin:0 0 1rem 1.2rem}
+		.prose a:not(.btn){color:var(--c-cta);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+		.prose a:not(.btn):hover{text-decoration-thickness:2px}
+		@media(max-width:859px){.prose a:not(.btn){padding-block:.35rem}}
 	</style>
 	{!! $site->jsonLd() !!}
 	@stack('head')
