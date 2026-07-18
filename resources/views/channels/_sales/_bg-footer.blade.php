@@ -49,7 +49,7 @@
        grootte en tekst blijven gelijk. De juridische rij stapelt op mobiel, want
        naast elkaar brak hij op 360/390 als 2 + 1 met een gat rechts. */
     @media (max-width: 760px) {
-        .bgf-navlink, .bgf-mail { display: inline-block; padding-top: 8px; padding-bottom: 8px; }
+        .bgf-navlink, .bgf-vaklink, .bgf-mail { display: inline-block; padding-top: 8px; padding-bottom: 8px; }
         .bgf-mail { padding-top: 11px; padding-bottom: 11px; }
         .bgf-legal { flex-direction: column; gap: 4px; }
         .bgf-legal a { display: inline-block; padding-top: 15px; padding-bottom: 15px; }
@@ -123,13 +123,13 @@
             <div>
                 <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #7FB0DE; margin-bottom: 12px;">Voor jouw vak</div>
                 <div style="display: flex; flex-direction: column; font-size: 15px; line-height: 1.9; color: #B9C6DE;">
-                    <span>Dakdekker</span>
-                    <span>Installateur</span>
-                    <span>Hovenier</span>
-                    <span>Kapper</span>
-                    <span>Garage</span>
-                    <span>Bakkerij</span>
-                    <span style="margin-top: 6px;">En veel meer vakken.</span>
+                    <span class="bgf-vaklink">Dakdekker</span>
+                    <span class="bgf-vaklink">Installateur</span>
+                    <span class="bgf-vaklink">Hovenier</span>
+                    <span class="bgf-vaklink">Kapper</span>
+                    <span class="bgf-vaklink">Garage</span>
+                    <span class="bgf-vaklink">Bakkerij</span>
+                    <span class="bgf-vaklink">En veel meer vakken.</span>
                 </div>
             </div>
         </div>
