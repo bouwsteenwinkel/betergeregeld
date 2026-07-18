@@ -382,6 +382,50 @@ class ChannelSiteController extends Controller
         return response(implode("\n", $lines) . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }
 
+    /**
+     * Per-kanaal llms.txt (llmstxt.org): een curated markdown-samenvatting speciaal
+     * voor AI-antwoordmachines (ChatGPT, Perplexity, Google AI Overviews) — GEO.
+     * Bevat de kern, de diensten (facets) met links, en contactgegevens.
+     */
+    public function llmsTxt(): \Illuminate\Http\Response
+    {
+        $site = $this->site();
+        if (! $site->isLive()) {
+            return response("# {$site->displayName()}\n\n> Nog niet live.\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+        }
+
+        $base   = rtrim($site->baseUrl(), '/');
+        $facets = (array) config('groeidiamant.facets', []);
+
+        $md   = [];
+        $md[] = "# {$site->displayName()}";
+        $md[] = '';
+        $md[] = '> ' . $site->metaDescription();
+        $md[] = '';
+        $md[] = 'Beter Geregeld ICT bouwt websites, webshops, klantenportalen, automatisering en AI voor mkb-ondernemers en vakmensen in heel Nederland. Vaste prijs vooraf, een vast aanspreekpunt, alles telefonisch en online geregeld. Typ je bedrijfsnaam voor een gratis voorbeeld.';
+        $md[] = '';
+        $md[] = '## Diensten';
+        foreach ($facets as $key => $f) {
+            $md[] = "- [{$f['label']}]({$base}/{$key}): " . ($f['tagline'] ?? '');
+        }
+        $md[] = '';
+        $md[] = '## Meer informatie';
+        $md[] = "- [Blog]({$base}/blog): praktische artikelen over online gevonden worden, meer klanten krijgen en slim automatiseren";
+        $md[] = "- [Werkgebied]({$base}/plaatsen): actief in heel Nederland, met een pagina per plaats";
+        $md[] = "- [Gratis voorbeeld]({$base}/voorbeeld-maken): typ je bedrijfsnaam en zie binnen een minuut een concept";
+        $md[] = "- [Afspraak plannen]({$base}/afspraak): online of telefonisch, gratis en vrijblijvend";
+        $md[] = '';
+        $md[] = '## Contact';
+        if ($p = $site->brand('phone')) { $md[] = "- Telefoon: {$p}"; }
+        if ($e = $site->brand('email')) { $md[] = "- E-mail: {$e}"; }
+        if ($addr = (array) $site->brand('address')) {
+            $md[] = '- Adres: ' . trim(($addr['street'] ?? '') . ', ' . ($addr['postal'] ?? '') . ' ' . ($addr['city'] ?? ''), ', ');
+        }
+        $md[] = '';
+
+        return response(implode("\n", $md), 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+    }
+
     /* ─────────────────────────────── Lead ────────────────────────────────── */
 
     public function leadStore(Request $request): RedirectResponse

@@ -15,12 +15,30 @@
     $facetSlot = 'facet-' . $facet;
     $heroImg = $site->image($facetSlot) ?: $site->image('hero');
     $heroSet = $site->image($facetSlot) ? $site->imageSrcset($facetSlot) : $site->imageSrcset('hero');
+
+    // FAQ per facet (zichtbaar + FAQPage-schema): goed voor rich results en GEO.
+    $facetFaq = (array) config('bedrijfswebsite_facet_faq.' . $facet, []);
+    $faqLd = $facetFaq ? [
+        '@context'   => 'https://schema.org',
+        '@type'      => 'FAQPage',
+        'mainEntity' => array_values(array_map(fn ($f) => [
+            '@type'          => 'Question',
+            'name'           => $f['q'],
+            'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
+        ], $facetFaq)),
+    ] : null;
 @endphp
 @extends('channels.layout')
 
 {{-- Head-term voorop in de title (eyebrow = "Webshop laten maken" e.d.). --}}
 @section('title', ($hero['eyebrow'] ?? $fLabel) . ' voor jouw bedrijf')
 @section('description', $hero['sub'] ?? ($hero['title'] ?? ''))
+
+@if ($faqLd)
+    @push('head')
+        <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @endpush
+@endif
 
 @section('content')
 
@@ -85,6 +103,21 @@
         'title'   => 'Je site groeit met je mee',
         'lead'    => 'Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. Elke stap bouwt voort op de vorige, in je eigen tempo.',
     ])
+
+    @if ($facetFaq)
+        <section data-section="faq">
+            <div class="wrap" style="max-width:760px">
+                <span class="kicker"><span class="kicker-line"></span> Veelgestelde vragen</span>
+                <h2 style="margin:.3rem 0 1.2rem">Vragen over {{ mb_strtolower($fLabel) }}</h2>
+                @foreach ($facetFaq as $f)
+                    <details style="border-top:1px solid var(--c-line,#E5E3DF);padding:.1rem 0">
+                        <summary style="cursor:pointer;font-weight:700;padding:.95rem 0;list-style:none">{{ $f['q'] }}</summary>
+                        <p class="muted" style="padding:0 0 1.1rem;margin:0">{{ $f['a'] }}</p>
+                    </details>
+                @endforeach
+            </div>
+        </section>
+    @endif
 
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe dit voor jou zou werken?'])
 

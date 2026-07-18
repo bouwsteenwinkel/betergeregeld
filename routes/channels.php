@@ -84,6 +84,8 @@ $channelRoutes = function () use ($facetKeys) {
     // SEO: per-kanaal sitemap + robots (zodat Google elke site apart indexeert).
     Route::get('/sitemap.xml', [ChannelSiteController::class, 'sitemap']);
     Route::get('/robots.txt', [ChannelSiteController::class, 'robots']);
+    // GEO: curated markdown-samenvatting voor AI-antwoordmachines (llmstxt.org).
+    Route::get('/llms.txt', [ChannelSiteController::class, 'llmsTxt']);
 
     Route::post('/contact', [ChannelSiteController::class, 'leadStore'])->middleware('throttle:10,1');
     Route::get('/bedankt', [ChannelSiteController::class, 'leadSent']);

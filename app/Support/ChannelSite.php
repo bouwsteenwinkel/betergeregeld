@@ -601,18 +601,39 @@ class ChannelSite
                 : $logoUrl;
         }
 
+        // Adres (PostalAddress) uit brand.address, als geconfigureerd.
+        $addr    = (array) $this->brand('address');
+        $address = $addr ? array_filter([
+            '@type'           => 'PostalAddress',
+            'streetAddress'   => $addr['street']  ?? null,
+            'postalCode'      => $addr['postal']  ?? null,
+            'addressLocality' => $addr['city']    ?? null,
+            'addressCountry'  => $addr['country'] ?? 'NL',
+        ]) : null;
+
+        // AggregateRating: ALLEEN met echte, verifieerbare review-data (brand.rating).
+        // Nooit met een verzonnen score — dat is een Google-richtlijnschending.
+        $rating    = (array) $this->brand('rating');
+        $aggRating = (! empty($rating['value']) && ! empty($rating['count'])) ? [
+            '@type'       => 'AggregateRating',
+            'ratingValue' => (string) $rating['value'],
+            'reviewCount' => (int) $rating['count'],
+        ] : null;
+
         $service = array_filter([
-            '@type'       => 'ProfessionalService',
-            '@id'         => $this->baseUrl() . '#org',
-            'name'        => $this->displayName(),
-            'url'         => $this->baseUrl(),
-            'logo'        => $logo,
-            'telephone'   => $this->brand('phone'),
-            'email'       => $this->brand('email'),
-            'image'       => $this->image('hero') ?: $logoUrl,
-            'areaServed'  => ['@type' => 'Country', 'name' => 'Nederland'],
-            'description' => $this->metaDescription() ?: null,
-            'sameAs'      => $this->brand('sameas') ?: null,   // array van socials/GBP, indien geconfigureerd
+            '@type'           => 'ProfessionalService',
+            '@id'             => $this->baseUrl() . '#org',
+            'name'            => $this->displayName(),
+            'url'             => $this->baseUrl(),
+            'logo'            => $logo,
+            'telephone'       => $this->brand('phone'),
+            'email'           => $this->brand('email'),
+            'image'           => $this->image('hero') ?: $logoUrl,
+            'address'         => $address,
+            'areaServed'      => ['@type' => 'Country', 'name' => 'Nederland'],
+            'description'     => $this->metaDescription() ?: null,
+            'aggregateRating' => $aggRating,
+            'sameAs'          => $this->brand('sameas') ?: null,   // array van socials/GBP, indien geconfigureerd
         ]);
 
         $website = array_filter([
