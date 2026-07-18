@@ -99,7 +99,10 @@
     document.head.appendChild(s);
   }
   function txt(key, fallback) {
-    return (CFG.texts && CFG.texts[key]) || fallback || '';
+    var s = (CFG.texts && CFG.texts[key]) || fallback || '';
+    // Huisstijl: em-dashes zijn in Nederlandse copy niet toegestaan. De brontekst
+    // staat in de CMP-teksten (DB/seeder), dus normaliseren we bij het renderen.
+    return String(s).replace(/\s*—\s*/g, ', ');
   }
   function escapeHtml(s) {
     return String(s == null ? '' : s)
@@ -141,7 +144,10 @@
       '#cmp-banner button{font:inherit;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:opacity .15s}' +
       '#cmp-banner button:hover{opacity:.85}' +
       '.cmp-btn-primary{background:' + (col.btn_primary_bg || '#D85A30') + ';color:' + (col.btn_primary_text || '#fff') + '}' +
-      '.cmp-btn-secondary{background:' + (col.btn_secondary_bg || 'transparent') + ';color:' + (col.btn_secondary_text || '#F5F1E6') + ';border-color:' + (col.btn_secondary_border || 'rgba(255,255,255,.25)') + '}' +
+      '.cmp-btn-secondary{background:' + (col.btn_secondary_bg || 'transparent') + ';color:' + (col.btn_secondary_text || '#F5F1E6') + ';border-color:' + (col.btn_secondary_border || 'rgba(255,255,255,.45)') + '}' +
+      // Specifieker dan '#cmp-banner button' (id+element), anders wint de
+      // transparante border-shorthand daar en heeft de knop geen zichtbare rand.
+      '#cmp-banner .cmp-btn-secondary{background:' + (col.btn_secondary_bg || 'rgba(255,255,255,.06)') + ';color:' + (col.btn_secondary_text || '#F5F1E6') + ';border-color:' + (col.btn_secondary_border || 'rgba(255,255,255,.45)') + '}' +
       '@keyframes cmpFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}' +
       '#cmp-prefs{position:fixed!important;inset:0!important;background:rgba(0,0,0,.6)!important;z-index:2147483001!important;display:none;align-items:center;justify-content:center;padding:16px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif!important;-webkit-font-smoothing:antialiased;box-sizing:border-box}' +
       '#cmp-prefs.is-open{display:flex!important}' +
@@ -164,7 +170,21 @@
       '#cmp-reopen{position:fixed;left:14px;bottom:14px;width:42px;height:42px;border-radius:50%;background:' + (col.banner_bg || '#1F1F1D') + ';color:' + (col.banner_text || '#F5F1E6') + ';border:1px solid ' + (col.banner_border || 'rgba(255,255,255,.15)') + ';box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;z-index:2147482999;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;padding:0;transition:transform .15s,box-shadow .15s;font-family:inherit}' +
       '#cmp-reopen:hover{transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,.25)}' +
       '#cmp-reopen:focus-visible{outline:2px solid ' + (col.btn_primary_bg || '#D85A30') + ';outline-offset:2px}' +
-      '@media (max-width:520px){#cmp-reopen{left:10px;bottom:10px;width:38px;height:38px;font-size:18px}}';
+      '@media (max-width:520px){' +
+        // 38x38 was onder de 44px-tiknorm en de knop stond permanent bovenop de
+        // lopende tekst. Nu 44x44 en standaard weggeklapt: hij verschijnt pas
+        // onderaan de pagina (zie toggleReopenVisibility), waar de footer al
+        // ruimte reserveert. Werkt op elke pagina, niet alleen de homepage.
+        '#cmp-reopen{left:12px;bottom:calc(12px + env(safe-area-inset-bottom));width:44px;height:44px;font-size:18px}' +
+        '#cmp-reopen.cmp-reopen-tucked{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(10px)}' +
+        '#cmp-reopen{transition:transform .18s,box-shadow .15s,opacity .18s,visibility .18s}' +
+        '#cmp-banner{padding:14px 16px;gap:10px;max-height:70vh;overflow-y:auto}' +
+        // Grid i.p.v. wrap: 2 secundaire knoppen naast elkaar, primair vol over de
+        // breedte. DOM-volgorde blijft gelijk en de rij wrapt niet meer rafelig.
+        '#cmp-banner-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}' +
+        '#cmp-banner-actions .cmp-btn-primary{grid-column:1/-1}' +
+        '#cmp-banner button{width:100%;padding:12px 12px;min-height:44px}' +
+      '}';
     document.head.appendChild(style);
   }
 
@@ -272,9 +292,41 @@
     btn.type = 'button';
     btn.setAttribute('aria-label', txt('footer.cookie_settings', 'Cookievoorkeuren'));
     btn.title = txt('footer.cookie_settings', 'Cookievoorkeuren');
-    btn.textContent = '🍪';
+    // Inline Heroicon-stijl SVG (geen emoji): volgt de bannerkleur via currentColor.
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+      '<path d="M21.8 14.2a9.8 9.8 0 0 1-9.8 7.8 10 10 0 1 1 0-20 7.6 7.6 0 0 0 7.6 7.6 7.6 7.6 0 0 0 2.2 4.6Z"/>' +
+      '<path d="M8.5 9.5h.01"/><path d="M12.5 14.5h.01"/><path d="M7.5 15.5h.01"/><path d="M15.5 17.5h.01"/>' +
+      '</svg>';
     btn.addEventListener('click', function() { openPrefs(); });
     document.documentElement.appendChild(btn);
+    setupReopenTucking(btn);
+  }
+
+  // Op mobiel (zelfde 520px-breakpoint als de rest van de CMP-styles) blijft de
+  // zwevende knop weggeklapt zolang de bezoeker leest, en komt hij pas tevoorschijn
+  // in de laatste schermhoogte van de pagina. Daar staat de footer, die al
+  // padding-bottom reserveert, dus dekt hij geen leestekst meer af.
+  function setupReopenTucking(btn) {
+    var mq = window.matchMedia ? window.matchMedia('(max-width:520px)') : null;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      if (!mq || !mq.matches) { btn.classList.remove('cmp-reopen-tucked'); return; }
+      var doc = document.documentElement;
+      var scrolled = window.pageYOffset || doc.scrollTop || 0;
+      var viewport = window.innerHeight || doc.clientHeight || 0;
+      var total = Math.max(doc.scrollHeight, document.body ? document.body.scrollHeight : 0);
+      var nearBottom = (scrolled + viewport) >= (total - Math.max(160, viewport * 0.5));
+      btn.classList.toggle('cmp-reopen-tucked', !nearBottom);
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      (window.requestAnimationFrame || setTimeout)(update, 16);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
   }
 
   // Public API for footer "cookie-voorkeuren"-link
