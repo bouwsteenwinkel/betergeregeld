@@ -24,10 +24,19 @@ class AppointmentConfirmedTest extends TestCase
         $res->assertSee('noindex,nofollow', false);
     }
 
+    /**
+     * De aanroep zelf, niet de kale naam. Sinds de funnel-events-laag staat
+     * 'appointment_booked' óók in de FB_MAP van analytics-head, en die partial zit op
+     * élke pagina. Zoeken op de kale naam gaf daardoor vals alarm bij het directe
+     * bezoek, en zou omgekeerd bij een echte boeking blijven slagen als het event
+     * helemaal niet meer vuurde. Deze marker komt alleen voor op de plek die telt.
+     */
+    private const EVENT_CALL = "bgTrack('appointment_booked'";
+
     public function test_no_conversion_event_on_direct_visit(): void
     {
         // Geen server-flash → geen conversie-event (voorkomt dubbeltellen bij refresh/direct bezoek).
-        $this->get($this->url)->assertDontSee('appointment_booked');
+        $this->get($this->url)->assertDontSee(self::EVENT_CALL, false);
     }
 
     public function test_conversion_event_fires_after_a_real_booking(): void
@@ -36,6 +45,6 @@ class AppointmentConfirmedTest extends TestCase
         $res = $this->withSession(['appointment_confirmed' => true])->get($this->url);
 
         $res->assertOk();
-        $res->assertSee('appointment_booked');
+        $res->assertSee(self::EVENT_CALL, false);
     }
 }
