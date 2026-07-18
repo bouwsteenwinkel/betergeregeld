@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Jouw Website">
+  <!-- Vierkant merkteken, afgeleid van het wordmark-logo (globe + baan).
+       Bewust teruggebracht tot drie vormen: navy tegel, lichte bol, blauwe baan.
+       Het volledige wordmark (brede logo.webp mét tekst) werd op 16px een vlek;
+       deze versie blijft leesbaar in een browsertab. Geen meridiaan en geen baan
+       áchter de bol: beide zorgden op 16px voor een grijze brij (getest). -->
+  <defs>
+    <linearGradient id="jw-bol" x1="8" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DCE8F7"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="32" height="32" rx="6" fill="#12386B"/>
+  <circle cx="16" cy="16" r="9.4" fill="url(#jw-bol)"/>
+  <g transform="rotate(-27 16 16)">
+    <path d="M2.4 16 A13.6 5.2 0 0 0 29.6 16" fill="none" stroke="#4E8FD0" stroke-width="3.2" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -34,6 +34,10 @@ Thumbs.db
 /public/channel-media/**/*.png
 # ... behalve de deterministische OG-/social-kaarten (klein, via channel:og herbouwbaar)
 !/public/channel-media/**/og.png
+# ... en de favicon-set van een kanaal (klein, merkgebonden). Deze moet wél mee
+# deployen: zonder deze regel valt de tab op productie terug op een leeg icoon.
+!/public/channel-media/**/apple-touch-icon.png
+!/public/channel-media/**/icon-*.png
 # Wegwerp-media van self-service voorbeeldsites (preview-<token>): runtime-gegenereerd,
 # opgeruimd door channel:previews-cleanup. Nooit committen.
 /public/channel-media/preview-*/

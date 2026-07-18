@@ -30,8 +30,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <title>Website laten maken voor ondernemers | Jouw Bedrijfswebsite</title>
 <meta name="description" content="Website laten maken zonder gedoe. Typ je bedrijfsnaam, zie meteen een voorbeeld. Vaste prijs en een vaste contactpersoon. Overal in Nederland, telefonisch geregeld.">
-<link rel="icon" href="/channel-media/bedrijfswebsite/logo.webp">
 @endverbatim
+
+{{-- Favicon via het gedeelde partial. Stond hier als <link rel="icon"> naar
+     logo.webp: dat is het brede wordmark (3:1, mét tekst), wat in een tab van
+     16px een vlek werd, en het week af van de rest van het kanaal. --}}
+@include('channels.partials.favicon')
 
 {{-- Deze pagina staat buiten channels.layout en miste daardoor het complete
      SEO-blok dat élke andere pagina van dit kanaal wél uitstuurt: geen canonical,

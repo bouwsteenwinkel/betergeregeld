@@ -132,6 +132,23 @@ class ChannelSite
     }
 
     /**
+     * Heeft dit kanaal een eigen, op maat gemaakte favicon-set in
+     * public/channel-media/<key>/ (favicon.svg + favicon.ico + apple-touch-icon)?
+     * Zo niet, dan valt channels.partials.favicon terug op het gegenereerde
+     * monogram. favicon.svg is de kanarie: die maken we altijd als eerste.
+     */
+    public function hasIconSet(): bool
+    {
+        return is_file(public_path('channel-media/' . $this->key . '/favicon.svg'));
+    }
+
+    /** URL-pad naar een bestand in de channel-media-map van dit kanaal. */
+    public function mediaUrl(string $file): string
+    {
+        return '/channel-media/' . $this->key . '/' . ltrim($file, '/');
+    }
+
+    /**
      * OG-/social-afbeelding, in volgorde van voorkeur:
      * 1) dedicated 1200x630 social-kaart (og.png), 2) site-logo, 3) hero-beeld.
      */
