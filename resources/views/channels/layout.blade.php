@@ -52,11 +52,19 @@
 	@include('channels.partials.favicon')
 
 	{{-- Provider-agnostische event-laag: pusht naar dataLayer (GA4/GTM pikken het
-	     op zodra gekoppeld). Meet CTA-kliks en formulier-submits funnel-breed. --}}
+	     op zodra gekoppeld). Meet CTA-kliks en formulier-submits funnel-breed.
+
+	     LET OP de toewijzing hieronder: die MOET met || blijven. analytics-head (hierboven
+	     ingeladen) zet een rijkere bgTrack neer die naast de dataLayer óók de Meta-pixel
+	     voedt en sleutel-events naar onze eigen /_ev-log stuurt. Een kale toewijzing hier
+	     overschrijft die stilletjes, en dan verliezen álle pagina's die deze layout
+	     gebruiken hun Lead-event en hun first-party logging, inclusief de
+	     conversiepagina /afspraak-bevestigd. Deze regel is de terugval voor het geval
+	     analytics-head niet geladen is. --}}
 	<script>
 	(function () {
 		window.dataLayer = window.dataLayer || [];
-		window.bgTrack = function (name, data) { window.dataLayer.push(Object.assign({ event: name }, data || {})); };
+		window.bgTrack = window.bgTrack || function (name, data) { window.dataLayer.push(Object.assign({ event: name }, data || {})); };
 		document.addEventListener('click', function (e) {
 			var a = e.target.closest('a.btn, .sticky-cta, .nav-drawer-cta');
 			if (a) window.bgTrack('cta_click', { label: (a.textContent || '').trim().slice(0, 40), href: a.getAttribute('href') || '' });
