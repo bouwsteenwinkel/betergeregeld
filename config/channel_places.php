@@ -23,7 +23,13 @@ return [
     // SEO-gating: een plaats-pagina wordt pas geïndexeerd (en in de sitemap gezet)
     // als er minstens zoveel echte lokale bedrijven in cache staan. Dunne plaatsen
     // krijgen noindex, zodat er geen doorway-/thin-content-pagina's ontstaan.
-    'index_min_businesses' => 3,
+    //
+    // Verhoogd van 3 → 5 (2026-07): jonge channel-sites boden Google honderden
+    // plaatspagina's tegelijk aan (badkamer ~909 bij drempel 3), waardoor die in
+    // "Gevonden, niet geïndexeerd" bleven hangen. Met drempel 5 concentreren we
+    // het crawl-budget op de plaatsen met genoeg echte bedrijven (dus substantiële
+    // pagina's) en zakt badkamer naar ~692 sterkere URL's.
+    'index_min_businesses' => 5,
 
     // Fallback-tokens als een branche (nog) geen eigen waarden heeft.
     'defaults' => [
