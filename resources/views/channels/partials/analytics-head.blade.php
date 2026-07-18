@@ -46,10 +46,21 @@
         }
     } catch (e) {}
 
-    // Eén plek waar de site z'n events naartoe duwt. Bestaat altijd, ook zonder
-    // container, zodat een aanroep nooit stukloopt.
+    // Eén plek waar de site z'n events naartoe duwt: naar de dataLayer (GTM) én, voor
+    // een paar sleutel-events, naar de Meta-pixel. fbq bestaat ALLEEN als de CMP de
+    // pixel heeft geladen (= marketing-consent), dus die tak is automatisch consent-
+    // gated. De pixel wordt async geïnjecteerd, dus we wachten er kort op en vuren één
+    // keer per aanroep. Zonder container/pixel loopt niets stuk.
+    var FB_MAP = { appointment_booked: 'Lead', preview_ready: 'ViewContent', planner_opened: 'Contact' };
     window.bgTrack = window.bgTrack || function (name, data) {
         try { window.dataLayer.push(Object.assign({ event: name }, data || {})); } catch (e) {}
+        var ev = FB_MAP[name];
+        if (!ev) return;
+        var tries = 0;
+        (function fire() {
+            if (typeof window.fbq === 'function') { try { window.fbq('track', ev, data || {}); } catch (e) {} return; }
+            if (++tries <= 40) { setTimeout(fire, 250); }
+        })();
     };
 })();
 </script>
