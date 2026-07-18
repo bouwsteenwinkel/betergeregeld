@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Blog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\SetLocale;
 use App\Models\Blog\BlogCategory;
 use App\Models\Blog\BlogPost;
 use App\Models\Blog\BlogTag;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -57,13 +59,17 @@ class BlogController extends Controller
 		return view('blog.category', compact('category', 'pillar', 'posts', 'otherCategories'));
 	}
 
-	public function show(Request $request, string $locale, string $slug): View
+	public function show(Request $request, string $locale, string $slug): View|RedirectResponse
 	{
 		$post = BlogPost::query()->published()
 			->where('locale', $locale)
 			->where('slug', $slug)
 			->with('category', 'tags')
-			->firstOrFail();
+			->first();
+
+		if (! $post) {
+			return $this->resolveMissingPost($locale, $slug);
+		}
 
 		$related = $post->relatedPosts(6);
 
@@ -73,6 +79,31 @@ class BlogController extends Controller
 		}
 
 		return view('blog.show', compact('post', 'related', 'categoryPillar'));
+	}
+
+	/**
+	 * Een niet-gevonden blog-URL netjes afhandelen i.p.v. een kale 404:
+	 *  - bestaat de slug (gepubliceerd) in een ANDERE ondersteunde locale, dan is dit een
+	 *    wrong-locale-URL (bv. /nl/blog/<slug>-en waar de EN-post op /en/blog/<slug>-en leeft,
+	 *    zoals Google die verkeerd indexeerde) → 301 naar de juiste locale, zodat indexering
+	 *    en link-equity meeverhuizen;
+	 *  - bestaat 'ie nergens meer gepubliceerd (post verwijderd/gedepubliceerd), dan 410 Gone:
+	 *    Google dropt die sneller dan een 404 en blijft 'm niet eindeloos herproberen.
+	 */
+	private function resolveMissingPost(string $locale, string $slug): RedirectResponse
+	{
+		$elsewhere = BlogPost::query()->published()
+			->forChannel(null) // alleen hoofdsite-posts; niet per ongeluk naar een channel-site
+			->where('slug', $slug)
+			->whereIn('locale', SetLocale::SUPPORTED)
+			->orderByDesc('published_at')
+			->first();
+
+		if ($elsewhere) {
+			return redirect()->route('blog.show', ['locale' => $elsewhere->locale, 'slug' => $slug], 301);
+		}
+
+		abort(410);
 	}
 
 	public function tag(Request $request, string $locale, string $tagSlug): View
