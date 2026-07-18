@@ -15,6 +15,15 @@
     if (! empty($post->image)) {
         $ld['image'] = $post->image;
     }
+    $breadcrumbLd = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => $site->url('')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => $site->url('blog')],
+            ['@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $site->url('blog/' . $post->slug)],
+        ],
+    ];
 @endphp
 @extends('channels.layout')
 
@@ -28,6 +37,7 @@
 
 @push('head')
     <script type="application/ld+json">{!! json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    <script type="application/ld+json">{!! json_encode($breadcrumbLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')

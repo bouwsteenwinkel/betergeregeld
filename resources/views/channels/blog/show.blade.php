@@ -22,28 +22,24 @@
             'author'        => ['@type' => 'Organization', 'name' => $site->displayName()],
             'publisher'     => ['@type' => 'Organization', 'name' => $site->displayName()],
         ]);
+        $breadcrumbLd = [
+            '@context' => 'https://schema.org',
+            '@type'    => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => $site->url('')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => $site->url('blog')],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $site->url('blog/' . $post->slug)],
+            ],
+        ];
     @endphp
     <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
     @if ($post->published_at)<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">@endif
     <meta property="article:modified_time" content="{{ optional($post->updated_at ?? $post->published_at)->toIso8601String() }}">
     <meta property="article:section" content="{{ $site->branche() }}">
     <meta property="article:author" content="{{ $site->displayName() }}">
-@endpush
-
-@push('head')
-	{{-- BreadcrumbList: Home › Blog › {titel} (blogposts misten dit; plaatspagina's
-	    hadden 't al). Vervangt het vroegere dubbele Article-schema — de BlogPosting
-	    hierboven dekt het artikel al, en de article:published/modified-metatags
-	    stonden dubbel. \x40 = @ (Blade-directive-escape). --}}
-	<script type="application/ld+json">{!! json_encode([
-		"\x40context" => 'https://schema.org',
-		"\x40type"    => 'BreadcrumbList',
-		'itemListElement' => [
-			["\x40type" => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => $site->url('')],
-			["\x40type" => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => $site->url('blog')],
-			["\x40type" => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $site->url('blog/' . $post->slug)],
-		],
-	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    {{-- BreadcrumbList (Home › Blog › titel): via de @php-variabele hierboven. Een
+        inline multi-line array in {!! !!} kwam niet uit de Blade-echo (bleef leeg). --}}
+    <script type="application/ld+json">{!! json_encode($breadcrumbLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')
