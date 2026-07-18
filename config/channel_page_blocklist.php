@@ -36,8 +36,10 @@ return [
         // bedankpagina van het lead-formulier: op dit kanaal ongebruikt (alle CTA's
         // gaan naar de voorbeeld-tool, die direct een concept toont).
         'bedankt',
-        // facet-landings (renderen anders de homepage; hier hard op 404)
-        'website', 'webshop', 'klantenportaal', 'automatisering', 'ai',
+        // NB: de facet-landings 'website', 'webshop', 'klantenportaal',
+        // 'automatisering' en 'ai' zijn BEWUST NIET geblokkeerd — ze zijn echte,
+        // indexeerbare head-term-landingspagina's (channels/_landing/bedrijfswebsite
+        // + config/bedrijfswebsite_landings.php).
         // losse content-pagina's (bestaan als secties op de homepage)
         'diensten', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
         'veelgestelde-vragen', 'vergelijken', 'over-ons',

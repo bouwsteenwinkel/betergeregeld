@@ -31,22 +31,19 @@
 @endpush
 
 @push('head')
-	@if ($post->published_at)<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">@endif
-	@if ($post->updated_at)<meta property="article:modified_time" content="{{ $post->updated_at->toIso8601String() }}">@endif
-	{{-- Article-schema. \x40 = @ (Blade-directive-escape). --}}
-	<script type="application/ld+json">
-	{!! json_encode(array_filter([
-		"\x40context"      => 'https://schema.org',
-		"\x40type"         => 'Article',
-		'headline'         => $post->title,
-		'description'      => $post->excerpt,
-		'inLanguage'       => $site->locale(),
-		'datePublished'    => optional($post->published_at)->toIso8601String(),
-		'dateModified'     => optional($post->updated_at)->toIso8601String(),
-		'mainEntityOfPage' => ["\x40type" => 'WebPage', "\x40id" => $site->url('blog/' . $post->slug)],
-		'publisher'        => ["\x40id" => $site->url('') . '#org'],
-	], fn ($v) => $v !== null && $v !== '')) !!}
-	</script>
+	{{-- BreadcrumbList: Home › Blog › {titel} (blogposts misten dit; plaatspagina's
+	    hadden 't al). Vervangt het vroegere dubbele Article-schema — de BlogPosting
+	    hierboven dekt het artikel al, en de article:published/modified-metatags
+	    stonden dubbel. \x40 = @ (Blade-directive-escape). --}}
+	<script type="application/ld+json">{!! json_encode([
+		"\x40context" => 'https://schema.org',
+		"\x40type"    => 'BreadcrumbList',
+		'itemListElement' => [
+			["\x40type" => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => $site->url('')],
+			["\x40type" => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => $site->url('blog')],
+			["\x40type" => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $site->url('blog/' . $post->slug)],
+		],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')
@@ -88,7 +85,7 @@
 					</a>
 				@endforeach
 			</div>
-			<p style="margin-top:1rem"><a href="{{ $site->url('diensten') }}" style="font-weight:600">Bekijk alle diensten →</a></p>
+			<p style="margin-top:1rem"><a href="{{ $site->url('voorbeeld-maken') }}" style="font-weight:600">Maak je gratis voorbeeld →</a></p>
 		</div>
 	</section>
 

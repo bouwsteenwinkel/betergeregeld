@@ -46,7 +46,9 @@
 	<meta name="twitter:title" content="@yield('title', $site->homeTitle())">
 	<meta name="twitter:description" content="@yield('description', $site->metaDescription())">
 
-	{{-- Favicon: eigen set uit channel-media, anders het themed monogram. --}}
+	{{-- Favicon: eigen set uit channel-media, anders het themed monogram. Een preview
+	     heeft geen eigen set en houdt dus de monogram-badge van de klant zelf: dat is
+	     hún site, dus hun letter en niet onze B. Zie channels/partials/favicon.blade.php. --}}
 	@include('channels.partials.favicon')
 
 	{{-- Provider-agnostische event-laag: pusht naar dataLayer (GA4/GTM pikken het
