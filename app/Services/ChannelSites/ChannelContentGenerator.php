@@ -135,17 +135,19 @@ class ChannelContentGenerator
      */
     public function blogDraft(ChannelSite $site): array
     {
-        $system = 'Je schrijft korte, nuttige blogartikelen voor specialist-websites die diensten aan ondernemers verkopen. '
-            . 'Toon: helder, praktisch, vertrouwenwekkend. Regels: Nederlands, GEEN em-dashes, geen holle marketingtaal, concreet en jij-vorm. '
-            . 'Geef ALLEEN geldige JSON terug met de velden "title", "excerpt" (1 zin) en "body" (geldige HTML met <h2> en <p>, ongeveer 300 tot 400 woorden).';
+        $system = 'Je schrijft grondige, praktische blogartikelen voor specialist-websites die diensten aan ondernemers verkopen. '
+            . 'Toon: helder, praktisch, vertrouwenwekkend, jij-vorm. '
+            . 'Regels: Nederlands. GEEN em-dashes. Geen holle marketingtaal (vermijd ontzorgen, naadloos, op-maat). Vermijd clichématige openers ("Ontdek hoe", "niet alleen ... maar ook") en varieer je zinsopeningen. Concreet met echte voorbeelden, getallen en stappen. '
+            . 'Structuur: een korte inleiding met het probleem van de ondernemer, daarna 4 tot 5 <h2>-secties met praktische inhoud, en een korte afsluiting. '
+            . 'Geef ALLEEN geldige JSON terug met de velden "title", "excerpt" (1 pakkende zin) en "body" (geldige HTML met <h2> en <p>, 600 tot 800 woorden).';
         $user = "Branche: {$site->branche()}. Sitenaam: {$site->name()}. "
-            . 'Schrijf een blogartikel dat een ondernemer in deze branche concreet helpt, bijvoorbeeld over online gevonden worden, meer klanten krijgen, of een veelgemaakte fout. Geen verkooppraatje, wel praktische tips.';
+            . 'Schrijf een grondig blogartikel dat een ondernemer in deze branche echt verder helpt, bijvoorbeeld over online gevonden worden, meer klanten krijgen, of een veelgemaakte fout. Geen verkooppraatje, wel diepgang en concrete tips.';
 
         $model = 'fake';
         $json = null;
         try {
             $model = app(AnthropicClient::class)->writerModel();
-            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600]);
+            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 3500]);
             if ($raw) {
                 $json = json_decode($this->stripFences($raw), true);
             }
@@ -188,17 +190,28 @@ class ChannelContentGenerator
         $angle = strtr((string) ($topic['angle'] ?? ''), $map);
         $trade = $map[':trade'];
 
-        $system = 'Je schrijft korte, nuttige blogartikelen voor specialist-websites die websites, webshops, klantenportalen, automatisering en AI verkopen aan ondernemers. '
-            . 'Toon: helder, praktisch, vertrouwenwekkend, jij-vorm. Regels: Nederlands, GEEN em-dashes, geen holle marketingtaal (vermijd ontzorgen, naadloos, op-maat), concreet en specifiek voor de branche. '
-            . 'Geef ALLEEN geldige JSON terug met "title", "excerpt" (1 zin) en "body" (geldige HTML met <h2> en <p>, 250 tot 350 woorden). Eindig met een zin die uitnodigt tot een gratis voorbeeld.';
+        // Pillar (cornerstone) = langer, diepgaander artikel op een head-term.
+        $isPillar  = ! empty($topic['pillar']);
+        $product   = (string) ($topic['product'] ?? '');
+        $facetUrl  = $product !== '' ? $site->url($product) : '';
+        $words     = $isPillar ? '900 tot 1300 woorden' : '600 tot 850 woorden';
+        $sections  = $isPillar ? '5 tot 7' : '4 tot 5';
+        $tokensMax = $isPillar ? 5000 : 3500;
+
+        $system = 'Je schrijft grondige, praktische blogartikelen voor specialist-websites die websites, webshops, klantenportalen, automatisering en AI verkopen aan ondernemers. '
+            . 'Toon: helder, praktisch, vertrouwenwekkend, jij-vorm. '
+            . 'Regels: Nederlands. GEEN em-dashes. Geen holle marketingtaal (vermijd ontzorgen, naadloos, op-maat, "in de wereld van"). Vermijd clichématige openers ("Ontdek hoe", "niet alleen ... maar ook") en varieer je zinsopeningen. Wees concreet en branche-specifiek met echte voorbeelden, getallen en stappen. '
+            . "Structuur: een korte inleiding die het probleem van de ondernemer benoemt, daarna {$sections} <h2>-secties met praktische inhoud (stappen, voorbeelden, wat het kost of oplevert), en een korte afsluiting. "
+            . "Geef ALLEEN geldige JSON terug met \"title\", \"excerpt\" (1 pakkende zin) en \"body\" (geldige HTML met <h2> en <p>, {$words}). Eindig met een zin die uitnodigt tot een gratis voorbeeld.";
         $user = "Branche: {$site->branche()} (een {$trade}). Onderwerp: \"{$title}\". Invalshoek: {$angle}. "
-            . 'Schrijf hierover een concreet, branche-specifiek artikel dat deze ondernemer helpt en subtiel het bijbehorende product laat zien. Geen verkooppraatje, wel praktische tips.';
+            . 'Schrijf hierover een grondig, branche-specifiek artikel dat deze ondernemer echt verder helpt en subtiel het bijbehorende product laat zien. Geen verkooppraatje, wel diepgang en concrete tips.'
+            . ($facetUrl !== '' ? " Verwijs precies één keer, op een natuurlijke plek in de body, naar de productpagina met een link: <a href=\"{$facetUrl}\">passende ankertekst</a>." : '');
 
         $model = 'fake';
         $json = null;
         try {
             $model = app(AnthropicClient::class)->writerModel();
-            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => 1600]);
+            $raw = app(AnthropicClient::class)->chat(['user' => $user, 'system' => $system, 'max_tokens' => $tokensMax]);
             if ($raw) {
                 $json = json_decode($this->stripFences($raw), true);
             }
