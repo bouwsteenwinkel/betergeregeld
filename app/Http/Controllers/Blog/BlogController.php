@@ -64,14 +64,10 @@ class BlogController extends Controller
 		// Dedup EN-content: een deel van de EN-posts bestaat dubbel — de schone slug én
 		// dezelfde met een '-en'-suffix (historische import-cruft), allebei 200. Dat is
 		// duplicate content. 301 de '-en'-variant naar de schone slug zodat Google de
-		// ranking consolideert op één URL. Alleen als de schone tweeling echt bestaat.
-		if ($locale === 'en' && str_ends_with($slug, '-en')) {
-			$base = substr($slug, 0, -3);
-			$hasTwin = BlogPost::query()->published()->forChannel(null)
-				->where('locale', 'en')->where('slug', $base)->exists();
-			if ($hasTwin) {
-				return redirect()->route('blog.show', ['locale' => 'en', 'slug' => $base], 301);
-			}
+		// ranking consolideert op één URL.
+		$canonical = $this->enCanonicalSlug($locale, $slug);
+		if ($canonical !== $slug) {
+			return redirect()->route('blog.show', ['locale' => 'en', 'slug' => $canonical], 301);
 		}
 
 		$post = BlogPost::query()->published()
@@ -113,10 +109,31 @@ class BlogController extends Controller
 			->first();
 
 		if ($elsewhere) {
-			return redirect()->route('blog.show', ['locale' => $elsewhere->locale, 'slug' => $slug], 301);
+			// Als het doel zelf een EN-'-en'-duplicaat is, meteen naar de schone slug —
+			// zo blijft het één redirect (/nl/blog/X-en → /en/blog/X) i.p.v. een keten.
+			$targetSlug = $this->enCanonicalSlug($elsewhere->locale, $slug);
+
+			return redirect()->route('blog.show', ['locale' => $elsewhere->locale, 'slug' => $targetSlug], 301);
 		}
 
 		abort(410);
+	}
+
+	/**
+	 * De canonieke slug voor een EN-post: is $slug een '-en'-duplicaat (import-cruft) met
+	 * een gepubliceerde schone tweeling, dan de schone slug; anders $slug ongewijzigd.
+	 * Alleen voor EN — bij andere locales verandert er niets.
+	 */
+	private function enCanonicalSlug(string $locale, string $slug): string
+	{
+		if ($locale !== 'en' || ! str_ends_with($slug, '-en')) {
+			return $slug;
+		}
+		$base = substr($slug, 0, -3);
+		$hasTwin = BlogPost::query()->published()->forChannel(null)
+			->where('locale', 'en')->where('slug', $base)->exists();
+
+		return $hasTwin ? $base : $slug;
 	}
 
 	public function tag(Request $request, string $locale, string $tagSlug): View

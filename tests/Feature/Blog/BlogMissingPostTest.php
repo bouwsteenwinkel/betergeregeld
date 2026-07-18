@@ -47,6 +47,24 @@ class BlogMissingPostTest extends TestCase
             ->assertRedirect('/en/blog/offertes-sneller-maken-en');
     }
 
+    public function test_wrong_locale_en_duplicaat_redirect_in_een_hop_naar_schone_slug(): void
+    {
+        // /nl/blog/<slug>-en waar de EN-post een '-en'-duplicaat is mét schone tweeling:
+        // moet in ÉÉN hop naar /en/blog/<slug> (niet eerst naar /en/blog/<slug>-en).
+        BlogPost::create([
+            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+        BlogPost::create([
+            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken-en',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/nl/blog/offertes-sneller-maken-en')
+            ->assertStatus(301)
+            ->assertRedirect('/en/blog/offertes-sneller-maken');
+    }
+
     public function test_en_dubbele_slug_301_naar_schone_versie(): void
     {
         // Beide EN-versies gepubliceerd: de schone slug + de '-en'-duplicaat.
