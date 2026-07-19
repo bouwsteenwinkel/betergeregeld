@@ -40,13 +40,14 @@ class GoogleAdsManager
         'betekenis', 'download',
     ];
 
-    /** RSA: max 15 koppen (≤30 tekens); kop 1 vast op positie 1. */
+    /** RSA: max 15 koppen (≤30 tekens); kop 1 vast op positie 1. Bewust gevarieerd
+     *  (haak, zoekwoord, USP's, voordeel, bezwaar) i.p.v. herhaald "gratis". */
     public const HEADLINES = [
         'Gratis voorbeeld in 1 minuut', 'Zie nu jouw nieuwe website', 'Website laten maken?',
-        'Direct een gratis voorbeeld', 'Jouw bedrijfswebsite online', 'Professioneel & betaalbaar',
-        'Eerst zien, dan beslissen', 'Klaar terwijl je kijkt', 'Voor ondernemers & zzp',
-        'Website in jouw eigen stijl', 'Gratis & vrijblijvend', 'Bekijk je voorbeeld gratis',
-        'Geen technische kennis nodig', 'Meer klanten via je website', 'Start nu, gratis',
+        'Vaste prijs, geen verrassingen', 'Eén vaste contactpersoon', 'Professioneel & betaalbaar',
+        'In heel Nederland geregeld', 'Telefonisch snel geregeld', 'Voor ondernemers & zzp',
+        'Website in jouw eigen stijl', 'Eerst zien, dan beslissen', 'Klaar terwijl je kijkt',
+        'Geen technische kennis nodig', 'Meer klanten via je website', 'Snel online, zonder gedoe',
     ];
 
     /** RSA: max 4 beschrijvingen (≤90 tekens). */
