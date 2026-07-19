@@ -3,10 +3,11 @@
 namespace App\Services\Ads;
 
 /**
- * Hoog-niveau campagnebeheer bovenop GoogleAdsClient: campagnes aanmaken vanuit
- * een vast Search-template, en bestaande campagnes uitlezen, pauzeren/activeren
- * en van budget wijzigen. Eén bron van waarheid voor de CLI-commando's én het
- * admin-paneel.
+ * Hoog-niveau campagnebeheer bovenop GoogleAdsClient. Campagnes worden gebouwd uit
+ * een profiel (config/ads_campaigns.php) — één per bedrijf/aanbod — zodat de admin
+ * én de CLI met hetzelfde recept een complete Search-campagne aanmaken. Daarnaast:
+ * campagnes uitlezen (met prestaties + vertoningsaandeel), pauzeren/activeren, en
+ * dagbudget/CPC-plafond wijzigen. Eén bron van waarheid voor CLI + admin.
  */
 class GoogleAdsManager
 {
@@ -15,70 +16,6 @@ class GoogleAdsManager
     /** Nederland + Nederlands (vaste Google-constanten). */
     private const GEO_NL  = 'geoTargetConstants/2528';
     private const LANG_NL = 'languageConstants/1010';
-
-    /** Advertentiegroepen met hun phrase/exact-zoekwoorden. */
-    public const AD_GROUPS = [
-        'Website laten maken' => [
-            ['website laten maken', 'PHRASE'],
-            ['bedrijfswebsite laten maken', 'PHRASE'],
-            ['website voor mijn bedrijf', 'PHRASE'],
-            ['zzp website laten maken', 'PHRASE'],
-            ['website laten maken', 'EXACT'],
-        ],
-        'Betaalbare website' => [
-            ['goedkope website laten maken', 'PHRASE'],
-            ['betaalbare website', 'PHRASE'],
-            ['simpele website laten maken', 'PHRASE'],
-            ['website voor ondernemers', 'PHRASE'],
-        ],
-    ];
-
-    /** Campagne-brede uitsluitingen (BROAD). */
-    public const NEGATIVES = [
-        'gratis website maken', 'zelf website maken', 'wordpress', 'wix', 'squarespace',
-        'shopify', 'template', 'cursus', 'opleiding', 'vacature', 'baan', 'stage',
-        'betekenis', 'download',
-    ];
-
-    /** RSA: max 15 koppen (≤30 tekens); kop 1 vast op positie 1. Bewust gevarieerd
-     *  (haak, zoekwoord, USP's, voordeel, bezwaar) i.p.v. herhaald "gratis". */
-    public const HEADLINES = [
-        'Gratis voorbeeld in 1 minuut', 'Zie nu jouw nieuwe website', 'Website laten maken?',
-        'Vaste prijs, geen verrassingen', 'Eén vaste contactpersoon', 'Professioneel & betaalbaar',
-        'In heel Nederland geregeld', 'Telefonisch snel geregeld', 'Voor ondernemers & zzp',
-        'Website in jouw eigen stijl', 'Eerst zien, dan beslissen', 'Klaar terwijl je kijkt',
-        'Geen technische kennis nodig', 'Meer klanten via je website', 'Snel online, zonder gedoe',
-    ];
-
-    /** RSA: max 4 beschrijvingen (≤90 tekens). */
-    public const DESCRIPTIONS = [
-        'Vul kort je gegevens in en zie in 1 minuut een gratis voorbeeld van jouw website.',
-        'Professionele site voor ondernemers. Gratis voorbeeld, daarna pas beslissen.',
-        "Geen gedoe: we maken 'm samen af in een korte, vrijblijvende videoafspraak.",
-        'Bekijk vrijblijvend hoe jouw bedrijfswebsite eruit kan zien. Start nu gratis.',
-    ];
-
-    /** Sitelinks: [linktekst ≤25, pad/anker, beschrijving1 ≤35, beschrijving2 ≤35]. */
-    public const SITELINKS = [
-        ['Direct een voorbeeld', '/voorbeeld-maken', 'Zie in 1 minuut je site', 'Gratis en vrijblijvend'],
-        ['Plan een gesprek', '/afspraak', 'Online of telefonisch', 'Vrijblijvend advies'],
-        ['Zo werkt het', '#werkwijze', 'In een paar stappen online', 'Met een vaste contactpersoon'],
-        ['Prijzen', '#prijzen', 'Duidelijke vaste prijs', 'Geen verrassingen achteraf'],
-    ];
-
-    /** Highlights/callouts (≤25 tekens). */
-    public const CALLOUTS = [
-        'Gratis voorbeeld', 'In 1 minuut klaar', 'Vaste prijs', 'Vaste contactpersoon',
-        'Voor zzp & mkb', 'Heel Nederland',
-    ];
-
-    /** Gestructureerd fragment: kop uit Google's vaste lijst + waarden (≤25 tekens). */
-    public const SNIPPET_HEADER = 'Types';
-
-    public const SNIPPET_VALUES = ['Bedrijfswebsite', 'Webshop', 'Onderhoud', 'Vindbaar in Google'];
-
-    /** Bel-asset. */
-    public const CALL_PHONE = '088 2545101';
 
     public function customerId(): string
     {
@@ -90,16 +27,34 @@ class GoogleAdsManager
         return $this->client->connected();
     }
 
+    /* ─────────────────────────── Profielen ─────────────────────────── */
+
+    /** @return array<string,array<string,mixed>> */
+    public function profiles(): array
+    {
+        return (array) config('ads_campaigns', []);
+    }
+
+    /** @return array<string,mixed>|null */
+    public function profile(string $key): ?array
+    {
+        return config('ads_campaigns.' . $key);
+    }
+
     /* ─────────────────────────── Aanmaken ─────────────────────────── */
 
     /**
-     * Bouwt de atomische operatielijst voor een complete Search-campagne
-     * (budget → campagne → geo/taal/uitsluitingen → advertentiegroepen →
-     * zoekwoorden → responsive search ad) met tijdelijke resource-namen.
+     * Bouwt de atomische operatielijst voor een complete Search-campagne uit een
+     * profiel: budget → campagne → geo/taal/uitsluitingen → advertentiegroepen →
+     * zoekwoorden → RSA → extensies (sitelinks/callouts/fragment/telefoon).
+     *
+     * @param array<string,mixed> $p
      */
-    public function campaignOperations(string $name, string $url, int $budgetMic, int $ceilMic): array
+    public function campaignOperations(array $p, string $name, int $budgetMic, int $ceilMic): array
     {
         $cid    = $this->customerId();
+        $url    = (string) $p['final_url'];
+        $root   = $this->domainRoot($url);
         $budget = "customers/{$cid}/campaignBudgets/-1";
         $camp   = "customers/{$cid}/campaigns/-2";
         $ops    = [];
@@ -119,7 +74,6 @@ class GoogleAdsManager
             'advertisingChannelType'         => 'SEARCH',
             'campaignBudget'                 => $budget,
             'targetSpend'                    => ['cpcBidCeilingMicros' => (string) $ceilMic],
-            // Verplicht sinds de EU-regel rond politieke advertenties.
             'containsEuPoliticalAdvertising' => 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING',
             'networkSettings'                => [
                 'targetGoogleSearch'         => true,
@@ -132,79 +86,108 @@ class GoogleAdsManager
         $ops[] = ['campaignCriterionOperation' => ['create' => ['campaign' => $camp, 'location' => ['geoTargetConstant' => self::GEO_NL]]]];
         $ops[] = ['campaignCriterionOperation' => ['create' => ['campaign' => $camp, 'language' => ['languageConstant' => self::LANG_NL]]]];
 
-        foreach (self::NEGATIVES as $neg) {
-            $ops[] = ['campaignCriterionOperation' => ['create' => [
-                'campaign' => $camp, 'negative' => true, 'keyword' => ['text' => $neg, 'matchType' => 'BROAD'],
-            ]]];
+        foreach ($p['negatives'] ?? [] as $neg) {
+            $ops[] = ['campaignCriterionOperation' => ['create' => ['campaign' => $camp, 'negative' => true, 'keyword' => ['text' => $neg, 'matchType' => 'BROAD']]]];
         }
 
+        $paths   = array_values(array_filter((array) ($p['paths'] ?? []), fn ($x) => $x !== ''));
         $agIndex = -3;
-        foreach (self::AD_GROUPS as $agName => $keywords) {
+        foreach ($p['ad_groups'] as $agName => $keywords) {
             $ag = "customers/{$cid}/adGroups/{$agIndex}";
             $agIndex--;
 
-            $ops[] = ['adGroupOperation' => ['create' => [
-                'resourceName' => $ag, 'campaign' => $camp, 'name' => $agName, 'type' => 'SEARCH_STANDARD', 'status' => 'ENABLED',
-            ]]];
+            $ops[] = ['adGroupOperation' => ['create' => ['resourceName' => $ag, 'campaign' => $camp, 'name' => $agName, 'type' => 'SEARCH_STANDARD', 'status' => 'ENABLED']]];
 
             foreach ($keywords as [$text, $match]) {
-                $ops[] = ['adGroupCriterionOperation' => ['create' => [
-                    'adGroup' => $ag, 'status' => 'ENABLED', 'keyword' => ['text' => $text, 'matchType' => $match],
-                ]]];
+                $ops[] = ['adGroupCriterionOperation' => ['create' => ['adGroup' => $ag, 'status' => 'ENABLED', 'keyword' => ['text' => $text, 'matchType' => $match]]]];
             }
 
-            $ops[] = ['adGroupAdOperation' => ['create' => [
-                'adGroup' => $ag, 'status' => 'ENABLED', 'ad' => [
-                    'finalUrls'          => [$url],
-                    'responsiveSearchAd' => [
-                        'headlines'    => $this->headlines(),
-                        'descriptions' => array_map(fn ($d) => ['text' => $d], self::DESCRIPTIONS),
-                        'path1'        => 'voorbeeld',
-                        'path2'        => 'gratis',
-                    ],
-                ],
-            ]]];
+            $rsa = ['finalUrls' => [$url], 'responsiveSearchAd' => [
+                'headlines'    => $this->headlines((array) $p['headlines']),
+                'descriptions' => array_map(fn ($d) => ['text' => $d], (array) $p['descriptions']),
+            ]];
+            if (isset($paths[0])) {
+                $rsa['responsiveSearchAd']['path1'] = $paths[0];
+            }
+            if (isset($paths[1])) {
+                $rsa['responsiveSearchAd']['path2'] = $paths[1];
+            }
+            $ops[] = ['adGroupAdOperation' => ['create' => ['adGroup' => $ag, 'status' => 'ENABLED', 'ad' => $rsa]]];
         }
 
-        // Extensies (assets) op campagne-niveau: sitelinks, highlights, een
-        // gestructureerd fragment en een bel-asset. Elk als asset aangemaakt met een
-        // tijdelijke resource-naam en via campaignAsset aan de campagne gekoppeld.
+        // Extensies (campagne-breed). Sitelink-URL's gaan t.o.v. het domein-root,
+        // niet achter de landingspagina-URL (final_url kan zelf een pad hebben).
         $aid = -101;
-        foreach (self::SITELINKS as [$text, $path, $d1, $d2]) {
+        foreach ($p['sitelinks'] ?? [] as [$text, $spath, $d1, $d2]) {
             $asset = "customers/{$cid}/assets/{$aid}";
             $aid--;
             $ops[] = ['assetOperation' => ['create' => [
                 'resourceName'  => $asset,
-                'finalUrls'     => [rtrim($url, '/') . $path],
+                'finalUrls'     => [$root . $spath],
                 'sitelinkAsset' => ['linkText' => $text, 'description1' => $d1, 'description2' => $d2],
             ]]];
             $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'SITELINK']]];
         }
 
-        foreach (self::CALLOUTS as $text) {
+        foreach ($p['callouts'] ?? [] as $text) {
             $asset = "customers/{$cid}/assets/{$aid}";
             $aid--;
             $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'calloutAsset' => ['calloutText' => $text]]]];
             $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'CALLOUT']]];
         }
 
-        $asset = "customers/{$cid}/assets/{$aid}";
-        $aid--;
-        $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'structuredSnippetAsset' => ['header' => self::SNIPPET_HEADER, 'values' => self::SNIPPET_VALUES]]]];
-        $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'STRUCTURED_SNIPPET']]];
+        if (! empty($p['snippet']['values'])) {
+            $asset = "customers/{$cid}/assets/{$aid}";
+            $aid--;
+            $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'structuredSnippetAsset' => ['header' => $p['snippet']['header'], 'values' => $p['snippet']['values']]]]];
+            $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'STRUCTURED_SNIPPET']]];
+        }
 
-        $asset = "customers/{$cid}/assets/{$aid}";
-        $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'callAsset' => ['countryCode' => 'NL', 'phoneNumber' => self::CALL_PHONE]]]];
-        $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'CALL']]];
+        if (! empty($p['call_phone'])) {
+            $asset = "customers/{$cid}/assets/{$aid}";
+            $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'callAsset' => ['countryCode' => 'NL', 'phoneNumber' => $p['call_phone']]]]];
+            $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'CALL']]];
+        }
 
         return $ops;
     }
 
-    /** @return array{ok:bool,error:?string,campaign:?string} */
-    public function createSearchCampaign(string $name, string $url, float $budgetEuro, float $maxCpcEuro): array
+    /**
+     * Maakt een Search-campagne aan uit een profiel (gepauzeerd). Naam/budget/CPC
+     * vallen terug op de profiel-defaults als ze niet meegegeven zijn.
+     *
+     * @return array{ok:bool,error:?string,campaign:?string}
+     */
+    public function createSearchCampaign(string $profileKey, ?string $name = null, ?float $budgetEuro = null, ?float $maxCpcEuro = null): array
     {
-        $ops = $this->campaignOperations($name, $url, $this->micros($budgetEuro), $this->micros($maxCpcEuro));
-        $res = $this->client->mutate($ops);
+        return $this->sendCampaign($profileKey, $name, $budgetEuro, $maxCpcEuro, false);
+    }
+
+    /**
+     * Toetst het profiel bij Google (validateOnly) zonder iets aan te maken —
+     * zo verifieer je vooraf dat alle koppen/extensies/telefoon geldig zijn.
+     *
+     * @return array{ok:bool,error:?string,campaign:?string}
+     */
+    public function validateSearchCampaign(string $profileKey, ?string $name = null, ?float $budgetEuro = null, ?float $maxCpcEuro = null): array
+    {
+        return $this->sendCampaign($profileKey, $name, $budgetEuro, $maxCpcEuro, true);
+    }
+
+    /** @return array{ok:bool,error:?string,campaign:?string} */
+    private function sendCampaign(string $profileKey, ?string $name, ?float $budgetEuro, ?float $maxCpcEuro, bool $validateOnly): array
+    {
+        $p = $this->profile($profileKey);
+        if (! $p) {
+            return ['ok' => false, 'error' => "Onbekend campagne-profiel: {$profileKey}", 'campaign' => null];
+        }
+
+        $name   = $name ?: (($p['name'] ?? $profileKey) . ' · Search');
+        $budget = $budgetEuro ?? (float) ($p['budget'] ?? 25);
+        $cpc    = $maxCpcEuro ?? (float) ($p['max_cpc'] ?? 1.5);
+
+        $ops = $this->campaignOperations($p, $name, $this->micros($budget), $this->micros($cpc));
+        $res = $this->client->mutate($ops, null, $validateOnly);
 
         return [
             'ok'       => $res['ok'],
@@ -213,10 +196,10 @@ class GoogleAdsManager
         ];
     }
 
-    private function headlines(): array
+    private function headlines(array $texts): array
     {
         $out = [];
-        foreach (self::HEADLINES as $i => $text) {
+        foreach ($texts as $i => $text) {
             $h = ['text' => $text];
             if ($i === 0) {
                 $h['pinnedField'] = 'HEADLINE_1';
@@ -227,12 +210,21 @@ class GoogleAdsManager
         return $out;
     }
 
+    private function domainRoot(string $url): string
+    {
+        $scheme = parse_url($url, PHP_URL_SCHEME) ?: 'https';
+        $host   = parse_url($url, PHP_URL_HOST) ?: '';
+
+        return $scheme . '://' . $host;
+    }
+
     /* ─────────────────────────── Uitlezen ─────────────────────────── */
 
     /**
-     * Alle campagnes met status, dagbudget en (all-time) prestaties.
+     * Alle campagnes met status, dagbudget, biedstrategie, CPC-plafond en (all-time)
+     * prestaties + vertoningsaandeel-verlies (budget vs rang).
      *
-     * @return array<int,array{id:string,name:string,status:string,budget:float,impressions:int,clicks:int,cost:float,conversions:float}>
+     * @return array<int,array<string,mixed>>
      */
     public function listCampaigns(): array
     {
@@ -261,12 +253,9 @@ class GoogleAdsManager
                 'clicks'      => (int) ($m['clicks'] ?? 0),
                 'cost'        => ((int) ($m['costMicros'] ?? 0)) / 1_000_000,
                 'conversions' => (float) ($m['conversions'] ?? 0),
-                // Vertoningsaandeel (fractie 0-1): hoeveel van de mogelijke vertoningen je
-                // pakte, en waardoor je de rest misliep — budget te laag of bod/kwaliteit.
                 'imprShare'   => (float) ($m['searchImpressionShare'] ?? 0),
                 'lostBudget'  => (float) ($m['searchBudgetLostImpressionShare'] ?? 0),
                 'lostRank'    => (float) ($m['searchRankLostImpressionShare'] ?? 0),
-                // Biedstrategie + (bij "Klikken maximaliseren") het CPC-plafond in euro.
                 'biddingType' => (string) data_get($r, 'campaign.biddingStrategyType', ''),
                 'maxCpc'      => ((int) data_get($r, 'campaign.targetSpend.cpcBidCeilingMicros', 0)) / 1_000_000,
             ];
@@ -303,8 +292,7 @@ class GoogleAdsManager
     }
 
     /**
-     * Zet het CPC-plafond (max. kosten per klik) van een "Klikken maximaliseren"-campagne.
-     * Alleen zinvol bij biedstrategie TARGET_SPEND.
+     * Zet het CPC-plafond van een "Klikken maximaliseren"-campagne (TARGET_SPEND).
      *
      * @return array{ok:bool,error:?string}
      */

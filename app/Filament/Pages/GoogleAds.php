@@ -36,12 +36,43 @@ class GoogleAds extends Page
     /** Per campagne-ID het (bewerkbare) CPC-plafond als string. @var array<string,string> */
     public array $maxcpcs = [];
 
-    /** Nieuwe-campagne-formulier. */
-    public string $newUrl = 'https://jouw-bedrijfswebsite.nl';
+    /** Nieuwe-campagne-formulier: gekozen profiel + (overschrijfbaar) budget/CPC. */
+    public string $newProfile = 'bedrijfswebsite';
 
-    public string $newBudget = '20';
+    public string $newBudget = '25';
 
     public string $newMaxCpc = '1.5';
+
+    /** @return array<string,string> profiel-key => label */
+    public function profileOptions(): array
+    {
+        $out = [];
+        foreach (app(GoogleAdsManager::class)->profiles() as $key => $p) {
+            $out[$key] = $p['label'] ?? $key;
+        }
+
+        return $out;
+    }
+
+    /** @return array<string,mixed>|null het gekozen profiel (voor de formulier-toelichting) */
+    public function currentProfile(): ?array
+    {
+        return app(GoogleAdsManager::class)->profile($this->newProfile);
+    }
+
+    public function updatedNewProfile(): void
+    {
+        $this->applyProfileDefaults();
+    }
+
+    private function applyProfileDefaults(): void
+    {
+        $p = app(GoogleAdsManager::class)->profile($this->newProfile);
+        if ($p) {
+            $this->newBudget = (string) ($p['budget'] ?? 25);
+            $this->newMaxCpc = (string) ($p['max_cpc'] ?? 1.5);
+        }
+    }
 
     public function getTitle(): string
     {
@@ -60,6 +91,8 @@ class GoogleAds extends Page
 
     public function mount(): void
     {
+        $this->applyProfileDefaults();
+
         // Nooit een 500 op deze pagina: een koppeling-/API-fout degradeert netjes
         // naar het "niet gekoppeld"-scherm i.p.v. de admin om te leggen.
         try {
@@ -100,14 +133,13 @@ class GoogleAds extends Page
         $budget = (float) str_replace(',', '.', $this->newBudget);
         $cpc    = (float) str_replace(',', '.', $this->newMaxCpc);
 
-        if ($budget < 1 || $cpc < 0.1 || ! filter_var($this->newUrl, FILTER_VALIDATE_URL)) {
-            Notification::make()->title('Controleer de URL, het budget (≥ €1) en de max. CPC (≥ €0,10).')->danger()->send();
+        if ($budget < 1 || $cpc < 0.1 || ! app(GoogleAdsManager::class)->profile($this->newProfile)) {
+            Notification::make()->title('Controleer het profiel, het budget (≥ €1) en de max. CPC (≥ €0,10).')->danger()->send();
 
             return;
         }
 
-        $name = 'bedrijfswebsite · Search · ' . now()->format('Y-m-d H:i');
-        $res  = app(GoogleAdsManager::class)->createSearchCampaign($name, $this->newUrl, $budget, $cpc);
+        $res = app(GoogleAdsManager::class)->createSearchCampaign($this->newProfile, null, $budget, $cpc);
 
         if (! $res['ok']) {
             Notification::make()->title('Aanmaken mislukt')->body($res['error'])->danger()->send();

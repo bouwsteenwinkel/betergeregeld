@@ -193,12 +193,15 @@ class GoogleAdsClient
      *
      * @return array{ok:bool,error:?string,results:array}
      */
-    public function mutate(array $mutateOperations, ?string $customerId = null): array
+    public function mutate(array $mutateOperations, ?string $customerId = null, bool $validateOnly = false): array
     {
+        $payload = ['mutateOperations' => $mutateOperations];
+        if ($validateOnly) {
+            $payload['validateOnly'] = true;
+        }
+
         $resp = $this->request($this->accessToken())
-            ->post($this->base() . '/customers/' . $this->customer($customerId) . '/googleAds:mutate', [
-                'mutateOperations' => $mutateOperations,
-            ]);
+            ->post($this->base() . '/customers/' . $this->customer($customerId) . '/googleAds:mutate', $payload);
 
         if (! $resp->successful()) {
             return ['ok' => false, 'error' => $resp->json('error.message') ?: ('HTTP ' . $resp->status()), 'results' => []];

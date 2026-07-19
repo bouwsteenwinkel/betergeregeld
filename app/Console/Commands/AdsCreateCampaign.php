@@ -7,23 +7,21 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Bouwt één complete Search-campagne voor een channel-landingspagina en zet 'm
- * (gepauzeerd) in het gekoppelde Google Ads-account. Het template zelf staat in
- * GoogleAdsManager, gedeeld met het admin-paneel.
+ * Maakt een gepauzeerde Search-campagne aan uit een profiel (config/ads_campaigns.php).
  *
- *   php artisan ads:create-campaign --dry-run      (toont alles, stuurt niets)
- *   php artisan ads:create-campaign                (maakt de campagne, GEPAUZEERD)
+ *   php artisan ads:create-campaign --profile=bouwsteenwinkel --dry-run
+ *   php artisan ads:create-campaign --profile=bedrijfswebsite
  */
 class AdsCreateCampaign extends Command
 {
     protected $signature = 'ads:create-campaign
-        {--channel=bedrijfswebsite : channel-key, voor de naamgeving}
-        {--url=https://jouw-bedrijfswebsite.nl : eind-URL van de advertenties}
-        {--budget=20 : dagbudget in euro}
-        {--max-cpc=1.5 : max. CPC-plafond in euro (Klikken maximaliseren)}
-        {--dry-run : toon de campagne zonder iets naar Google te sturen}';
+        {--profile=bedrijfswebsite : campagne-profiel (config/ads_campaigns.php)}
+        {--budget= : dagbudget in euro (leeg = profiel-standaard)}
+        {--max-cpc= : max. CPC-plafond in euro (leeg = profiel-standaard)}
+        {--dry-run : toon de campagne zonder iets naar Google te sturen}
+        {--validate : toets de campagne bij Google (validateOnly) zonder aan te maken}';
 
-    protected $description = 'Bouwt een gepauzeerde Search-campagne (template) voor een channel; --dry-run stuurt niets.';
+    protected $description = 'Bouwt een gepauzeerde Search-campagne uit een profiel; --dry-run stuurt niets.';
 
     public function handle(GoogleAdsManager $mgr): int
     {
@@ -33,15 +31,21 @@ class AdsCreateCampaign extends Command
             return self::FAILURE;
         }
 
-        $dryRun     = (bool) $this->option('dry-run');
-        $channel    = (string) $this->option('channel');
-        $url        = (string) $this->option('url');
-        $budgetEuro = (float) $this->option('budget');
-        $cpcEuro    = (float) $this->option('max-cpc');
-        $name       = "{$channel} · Search · " . now()->format('Y-m-d');
+        $profileKey = (string) $this->option('profile');
+        $p = $mgr->profile($profileKey);
+        if (! $p) {
+            $this->error("Onbekend profiel '{$profileKey}'. Beschikbaar: " . implode(', ', array_keys($mgr->profiles())) . '.');
 
-        $ops = $mgr->campaignOperations($name, $url, (int) round($budgetEuro * 1_000_000), (int) round($cpcEuro * 1_000_000));
-        $this->overzicht($name, $url, $budgetEuro, $cpcEuro, count($ops));
+            return self::FAILURE;
+        }
+
+        $dryRun = (bool) $this->option('dry-run');
+        $budget = $this->option('budget') !== null ? (float) $this->option('budget') : (float) ($p['budget'] ?? 25);
+        $cpc    = $this->option('max-cpc') !== null ? (float) $this->option('max-cpc') : (float) ($p['max_cpc'] ?? 1.5);
+        $name   = ($p['name'] ?? $profileKey) . ' · Search · ' . now()->format('Y-m-d');
+
+        $ops = $mgr->campaignOperations($p, $name, (int) round($budget * 1_000_000), (int) round($cpc * 1_000_000));
+        $this->overzicht($p, $name, $budget, $cpc, count($ops));
 
         if ($dryRun) {
             $path = 'ads/preview-' . now()->format('Ymd-His') . '.json';
@@ -49,7 +53,6 @@ class AdsCreateCampaign extends Command
             $this->line('');
             $this->info('DRY-RUN: er is niets naar Google gestuurd.');
             $this->line('  Volledige payload: ' . Storage::path($path));
-            $this->line('  Live zetten (gepauzeerd): dezelfde opdracht zónder --dry-run.');
 
             return self::SUCCESS;
         }
@@ -60,9 +63,25 @@ class AdsCreateCampaign extends Command
             return self::FAILURE;
         }
 
+        if ((bool) $this->option('validate')) {
+            $this->line('');
+            $this->line('Toetsen bij Google (validateOnly, er wordt niets aangemaakt) …');
+            $res = $mgr->validateSearchCampaign($profileKey, $name, $budget, $cpc);
+
+            if (! $res['ok']) {
+                $this->error('Afgekeurd: ' . $res['error']);
+
+                return self::FAILURE;
+            }
+
+            $this->info('Geldig: Google keurt deze campagne goed. Er is niets aangemaakt.');
+
+            return self::SUCCESS;
+        }
+
         $this->line('');
         $this->line('Campagne aanmaken (GEPAUZEERD) …');
-        $res = $mgr->createSearchCampaign($name, $url, $budgetEuro, $cpcEuro);
+        $res = $mgr->createSearchCampaign($profileKey, $name, $budget, $cpc);
 
         if (! $res['ok']) {
             $this->error('Mislukt: ' . $res['error']);
@@ -76,23 +95,25 @@ class AdsCreateCampaign extends Command
         return self::SUCCESS;
     }
 
-    private function overzicht(string $name, string $url, float $budgetEuro, float $cpcEuro, int $opCount): void
+    /** @param array<string,mixed> $p */
+    private function overzicht(array $p, string $name, float $budget, float $cpc, int $opCount): void
     {
-        $kwCount = array_sum(array_map('count', GoogleAdsManager::AD_GROUPS));
+        $kwCount = array_sum(array_map('count', (array) $p['ad_groups']));
+        $ext     = count($p['sitelinks'] ?? []) . ' sitelinks, ' . count($p['callouts'] ?? []) . ' highlights'
+            . (! empty($p['snippet']['values']) ? ', 1 fragment' : '') . (! empty($p['call_phone']) ? ', 1 bel-asset' : '');
+
         $this->line('');
         $this->line('  <fg=cyan>Nieuwe Search-campagne (concept)</>');
         $this->line('  ────────────────────────────────────────────');
         $this->line("  Naam            : {$name}");
-        $this->line("  Eind-URL        : {$url}");
-        $this->line('  Dagbudget       : € ' . number_format($budgetEuro, 2, ',', '.'));
-        $this->line('  Biedstrategie   : Klikken maximaliseren, max. CPC € ' . number_format($cpcEuro, 2, ',', '.'));
+        $this->line('  Eind-URL        : ' . $p['final_url']);
+        $this->line('  Dagbudget       : € ' . number_format($budget, 2, ',', '.'));
+        $this->line('  Biedstrategie   : Klikken maximaliseren, max. CPC € ' . number_format($cpc, 2, ',', '.'));
         $this->line('  Doelgebied/taal : Nederland / Nederlands');
-        $this->line('  Netwerk         : alleen Google-zoeknetwerk (geen partners/display)');
-        $this->line('  Status          : PAUSED');
-        $this->line('  Advertentiegroepen : ' . count(GoogleAdsManager::AD_GROUPS) . ' (' . implode(', ', array_keys(GoogleAdsManager::AD_GROUPS)) . ')');
-        $this->line("  Zoekwoorden     : {$kwCount}   ·   Uitsluitingen: " . count(GoogleAdsManager::NEGATIVES));
-        $this->line('  Advertentie     : 1 RSA per groep — ' . count(GoogleAdsManager::HEADLINES) . ' koppen, ' . count(GoogleAdsManager::DESCRIPTIONS) . ' beschrijvingen');
-        $this->line('  Extensies       : ' . count(GoogleAdsManager::SITELINKS) . ' sitelinks, ' . count(GoogleAdsManager::CALLOUTS) . ' highlights, 1 fragment, 1 bel-asset');
+        $this->line('  Advertentiegroepen : ' . count((array) $p['ad_groups']) . ' (' . implode(', ', array_keys((array) $p['ad_groups'])) . ')');
+        $this->line("  Zoekwoorden     : {$kwCount}   ·   Uitsluitingen: " . count($p['negatives'] ?? []));
+        $this->line('  Advertentie     : 1 RSA per groep — ' . count((array) $p['headlines']) . ' koppen, ' . count((array) $p['descriptions']) . ' beschrijvingen');
+        $this->line("  Extensies       : {$ext}");
         $this->line("  API-operaties   : {$opCount}");
     }
 }

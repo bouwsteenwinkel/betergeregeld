@@ -29,8 +29,8 @@
         .gads-field { display: block; }
         .gads-field > span { display: block; font-size: .82rem; font-weight: 500; color: #374151; margin-bottom: .3rem; }
         .dark .gads-field > span { color: #d1d5db; }
-        .gads-field input { width: 100%; border: 1px solid #d1d5db; border-radius: .5rem; padding: .5rem .7rem; font-size: .875rem; background: #fff; color: #111827; }
-        .dark .gads-field input { border-color: #4b5563; background: rgba(255,255,255,.04); color: #fff; }
+        .gads-field input, .gads-field select { width: 100%; border: 1px solid #d1d5db; border-radius: .5rem; padding: .5rem .7rem; font-size: .875rem; background: #fff; color: #111827; }
+        .dark .gads-field input, .dark .gads-field select { border-color: #4b5563; background: rgba(255,255,255,.04); color: #fff; }
         .gads-hint { margin-top: .75rem; font-size: .78rem; color: #6b7280; }
         .dark .gads-hint { color: #9ca3af; }
     </style>
@@ -73,15 +73,20 @@
             <x-slot name="description">Maakt een Search-campagne vanuit het vaste template — altijd gepauzeerd, niets gaat direct live.</x-slot>
 
             <div class="gads-form">
-                <label class="gads-field"><span>Eind-URL</span>
-                    <input type="url" wire:model="newUrl"></label>
+                <label class="gads-field"><span>Bedrijf / profiel</span>
+                    <select wire:model.live="newProfile">
+                        @foreach ($this->profileOptions() as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select></label>
                 <label class="gads-field"><span>Dagbudget (€)</span>
                     <input type="number" step="1" min="1" wire:model="newBudget"></label>
                 <label class="gads-field"><span>Max. CPC (€)</span>
                     <input type="number" step="0.10" min="0.1" wire:model="newMaxCpc"></label>
             </div>
 
-            <p class="gads-hint">Heel Nederland · Nederlands · alleen Google Zoeken · 2 advertentiegroepen (9 zoekwoorden), 14 uitsluitingen, 1 RSA per groep, plus extensies (4 sitelinks, 6 highlights, fragment, bel-asset).</p>
+            @php $selP = $this->currentProfile(); @endphp
+            <p class="gads-hint">Landt op <b>{{ $selP['final_url'] ?? '—' }}</b> · heel Nederland · Nederlands · alleen Google Zoeken · met de zoekwoorden, uitsluitingen, RSA en extensies uit het gekozen profiel. Budget/CPC hierboven overschrijven de profiel-standaard.</p>
 
             <div style="margin-top: 1rem;">
                 <x-filament::button wire:click="createCampaign" wire:loading.attr="disabled" wire:target="createCampaign" icon="heroicon-o-plus">
