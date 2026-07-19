@@ -186,7 +186,7 @@ return [
         'headlines' => [
             'Elke maand LEGO op de mat', 'LEGO-abonnement vanaf €31,25', 'Elke maand een nieuwe set',
             'Kies gewoon op leeftijd', 'Verzenden én retour gratis', 'Compleet & schoongemaakt',
-            'Geen dure LEGO-aankoop meer', 'Maandelijks opzegbaar', 'Setwaarde €200 tot €350',
+            'Geen dure LEGO-aankoop meer', 'Steeds een nieuwe verrassing', 'Setwaarde €200 tot €350',
             'Bouwplezier zonder rommel', 'LEGO voor elke leeftijd', 'Nieuwe set, elke maand weer',
             'Vast bedrag per maand', 'Klaar? Kies je volgende set', 'Dé LEGO-verrassing per maand',
         ],
@@ -194,7 +194,7 @@ return [
         'descriptions' => [
             'Elke maand een complete LEGO-set op de mat. Verzenden en retour gratis, vanaf €31,25.',
             'Kies op leeftijd, wij verrassen met een set t.w.v. €200-350. Geen dure aankoop meer.',
-            'Klaar met bouwen? Stuur retour en ontvang de volgende set. Maandelijks opzegbaar.',
+            'Klaar met bouwen? Stuur retour en ontvang de volgende set — zo vaak je wilt.',
             'Bouwplezier zonder rommel, voor elke leeftijd. Start je LEGO-abonnement vandaag.',
         ],
 
@@ -208,7 +208,7 @@ return [
 
         'callouts' => [
             'Elke maand een set', 'Verzending gratis', 'Retour gratis',
-            'Maandelijks opzegbaar', 'Voor elke leeftijd', 'Geen dure aankoop',
+            'Steeds een nieuwe set', 'Voor elke leeftijd', 'Geen dure aankoop',
         ],
 
         'snippet' => ['header' => 'Types', 'values' => ['Voor kleuters', 'Voor kinderen', 'Voor tieners', 'Voor volwassenen']],
