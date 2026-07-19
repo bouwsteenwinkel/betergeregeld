@@ -132,7 +132,7 @@
 <section class="py-20 border-b border-[color:var(--color-line)]">
 	<div class="max-w-[1400px] mx-auto px-6">
 		<div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-			<div class="lg:col-span-7">
+			<div class="lg:col-span-12">
 				<span class="pill pill-teal mb-3">{{ $isEn ? 'Websites & webshops' : 'Websites & webshops' }}</span>
 				<h2 class="display-2 max-w-xl">{{ $isEn ? 'A professional website for every industry.' : 'Een professionele website voor élke branche.' }}</h2>
 				<p class="text-[color:var(--color-ink-muted)] max-w-lg mt-4 leading-relaxed">
@@ -154,11 +154,12 @@
 					<a href="https://jouw-bedrijfswebsite.nl" class="btn-outline">jouw-bedrijfswebsite.nl</a>
 				</div>
 			</div>
-			<div class="lg:col-span-5">
+			<div class="lg:col-span-12 mt-2">
 				<div class="card">
 					<div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-4">{{ $isEn ? 'Grows with you' : 'Groeit met je mee' }}</div>
+						<div class="flex flex-wrap gap-x-8 gap-y-5">
 					@foreach ([['icon' => '🌐', 'nl' => 'Website', 'en' => 'Website', 'nld' => 'Vindbaar en professioneel', 'end' => 'Findable and professional'], ['icon' => '🛍️', 'nl' => 'Webshop', 'en' => 'Webshop', 'nld' => 'Online verkopen', 'end' => 'Sell online'], ['icon' => '🔐', 'nl' => 'Klantenportaal', 'en' => 'Client portal', 'nld' => 'Klanten regelen het zelf', 'end' => 'Clients self-serve'], ['icon' => '⚙️', 'nl' => 'Automatisering', 'en' => 'Automation', 'nld' => 'Processen die zichzelf doen', 'end' => 'Processes that run themselves'], ['icon' => '✨', 'nl' => 'AI', 'en' => 'AI', 'nld' => 'Slimme assistentie', 'end' => 'Smart assistance']] as $i => $step)
-						<div class="flex items-center gap-3 {{ $i > 0 ? 'mt-3 pt-3 border-t border-[color:var(--color-line)]' : '' }}">
+						<div class="flex items-center gap-3" style="flex:1 1 160px">
 							<div class="w-9 h-9 rounded-lg bg-[color:var(--color-accent-soft)] flex items-center justify-center text-base shrink-0">{{ $step['icon'] }}</div>
 							<div>
 								<div class="font-bold text-sm">{{ $isEn ? $step['en'] : $step['nl'] }}</div>
@@ -166,6 +167,7 @@
 							</div>
 						</div>
 					@endforeach
+						</div>
 				</div>
 			</div>
 		</div>

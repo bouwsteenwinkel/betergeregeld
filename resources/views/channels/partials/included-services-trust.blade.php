@@ -15,6 +15,7 @@
         <div class="grid cols-4 feature-grid" style="margin-top:1.4rem">
             @foreach ($__inc['items'] as $__it)
                 <div class="feature-card">
+                    <div style="color:var(--c-accent);margin-bottom:.5rem">@include('channels.partials.included-icon', ['icon' => $__it['icon'] ?? 'default'])</div>
                     <h3>{{ $__it['title'] }}</h3>
                     <span class="feature-rule"></span>
                     <p>{{ $__it['text'] }}</p>

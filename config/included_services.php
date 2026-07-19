@@ -20,52 +20,52 @@ return [
 
     'items' => [
         [
-            'icon'  => '🖥️',
+            'icon'  => 'server',
             'title' => 'Hosting',
             'text'  => 'Snelle, Nederlandse hosting die we zelf beheren en bewaken. Je site is snel en blijft in de lucht.',
         ],
         [
-            'icon'  => '✉️',
+            'icon'  => 'mail',
             'title' => 'E-mailhosting',
             'text'  => 'Professionele e-mail op je eigen domein, netjes ingesteld en betrouwbaar bezorgd.',
         ],
         [
-            'icon'  => '🔒',
+            'icon'  => 'shield',
             'title' => 'SSL en beveiliging',
             'text'  => 'Een geldig slotje en actieve beveiliging tegen misbruik. Bezoekers en Google zien dat je site veilig is.',
         ],
         [
-            'icon'  => '💾',
+            'icon'  => 'save',
             'title' => 'Back-ups en herstel',
             'text'  => 'Automatische back-ups, zodat er nooit iets verloren gaat. Mocht er iets misgaan, dan zetten we het snel terug.',
         ],
         [
-            'icon'  => '🔧',
+            'icon'  => 'wrench',
             'title' => 'Updates en onderhoud',
             'text'  => 'Wij houden alles up-to-date en draaiend op de achtergrond. Jij hebt er geen omkijken naar.',
         ],
         [
-            'icon'  => '🔍',
+            'icon'  => 'search',
             'title' => 'SEO-optimalisatie',
             'text'  => 'Je site is technisch op orde en vindbaar in Google, met de juiste structuur, snelheid en teksten.',
         ],
         [
-            'icon'  => '🌐',
+            'icon'  => 'globe',
             'title' => 'Domeinbeheer',
             'text'  => 'We regelen en beheren je domeinnaam en alle instellingen. Eén aanspreekpunt, geen gedoe met losse partijen.',
         ],
         [
-            'icon'  => '🔗',
+            'icon'  => 'link',
             'title' => 'Koppelingen en integraties',
             'text'  => 'Koppelingen met je agenda, boekhouding of betaalprovider, zodat je systemen met elkaar praten.',
         ],
         [
-            'icon'  => '⚡',
+            'icon'  => 'bolt',
             'title' => 'Performance en snelheid',
             'text'  => 'We houden laadtijd en mobiel gebruik scherp. Een snelle site houdt bezoekers vast en scoort beter.',
         ],
         [
-            'icon'  => '🌍',
+            'icon'  => 'language',
             'title' => 'Meertaligheid en toegankelijkheid',
             'text'  => 'Meertalig waar nodig en toegankelijk voor iedereen, ook op mobiel en met een screenreader.',
         ],

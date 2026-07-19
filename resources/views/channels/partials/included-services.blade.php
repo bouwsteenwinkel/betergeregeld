@@ -16,7 +16,7 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px 40px;">
         @foreach ($__inc['items'] as $__it)
           <div>
-            <div aria-hidden="true" style="font-size: 26px; line-height: 1; margin: 0 0 12px;">{{ $__it['icon'] ?? '' }}</div>
+            <div style="color: #12386B; margin: 0 0 12px;">@include('channels.partials.included-icon', ['icon' => $__it['icon'] ?? 'default'])</div>
             <h3 style="font-size: 19px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; color: #1A1A1A;">{{ $__it['title'] }}</h3>
             <p style="font-size: 15.5px; line-height: 1.5; color: #4A4844; margin: 0;">{{ $__it['text'] }}</p>
           </div>
