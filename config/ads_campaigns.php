@@ -146,4 +146,74 @@ return [
         'call_phone' => '035 201 1720',
     ],
 
+    // Directe tegenhanger van Bouwersbende (maandelijkse LEGO-box per leeftijd,
+    // €35/mnd). Wij ondercutten met €31,25 en flexibel opzeggen. LET OP: de copy
+    // ("Maandelijks opzegbaar") vereist dat het 12-maanden-commitment eruit gaat,
+    // én dat de fulfilment (verzending) werkt vóór activatie. Merknaam "Bouwersbende"
+    // NOOIT in de advertentietekst (merkrecht) — wel als zoekwoord toegestaan.
+    'bouwverrassing' => [
+        'label'      => 'Bouwverrassing — LEGO-abonnement',
+        'name'       => 'bouwverrassing',
+        'final_url'  => 'https://bouwverrassing.nl',
+        'budget'     => 20,
+        'max_cpc'    => 1.5,
+        'paths'      => ['lego-abonnement'],
+
+        'ad_groups'  => [
+            'LEGO-abonnement' => [
+                ['lego abonnement', 'PHRASE'],
+                ['lego maandbox', 'PHRASE'],
+                ['lego box abonnement', 'PHRASE'],
+                ['lego abonnement kind', 'PHRASE'],
+                ['lego elke maand', 'PHRASE'],
+                ['lego abonnement', 'EXACT'],
+            ],
+            'LEGO huren per maand' => [
+                ['lego huren abonnement', 'PHRASE'],
+                ['lego sets huren abonnement', 'PHRASE'],
+                ['bouwersbende', 'PHRASE'],
+                ['bouwersbende alternatief', 'PHRASE'],
+            ],
+        ],
+
+        'negatives' => [
+            'gratis', 'tweedehands', 'marktplaats', 'kopen', 'vacature', 'baan',
+            'stage', 'minifiguren', 'bouwtekening',
+        ],
+
+        // pin_h1 = 0: ongepind voor de beste Advertentiekwaliteit.
+        'pin_h1'    => 0,
+        'headlines' => [
+            'Elke maand LEGO op de mat', 'LEGO-abonnement vanaf €31,25', 'Elke maand een nieuwe set',
+            'Kies gewoon op leeftijd', 'Verzenden én retour gratis', 'Compleet & schoongemaakt',
+            'Geen dure LEGO-aankoop meer', 'Maandelijks opzegbaar', 'Setwaarde €200 tot €350',
+            'Bouwplezier zonder rommel', 'LEGO voor elke leeftijd', 'Nieuwe set, elke maand weer',
+            'Vast bedrag per maand', 'Klaar? Kies je volgende set', 'Dé LEGO-verrassing per maand',
+        ],
+
+        'descriptions' => [
+            'Elke maand een complete LEGO-set op de mat. Verzenden en retour gratis, vanaf €31,25.',
+            'Kies op leeftijd, wij verrassen met een set t.w.v. €200-350. Geen dure aankoop meer.',
+            'Klaar met bouwen? Stuur retour en ontvang de volgende set. Maandelijks opzegbaar.',
+            'Bouwplezier zonder rommel, voor elke leeftijd. Start je LEGO-abonnement vandaag.',
+        ],
+
+        // Echte bouwverrassing-slugs (schone paden, geverifieerd in de theme-nav).
+        'sitelinks' => [
+            ['Hoe werkt het?', '/hoe-werkt-het', 'In een paar stappen', 'Elke maand een set'],
+            ['Bekijk de pakketten', '/pakketten', 'Kies op leeftijd', 'Vast bedrag per maand'],
+            ['Veelgestelde vragen', '/veelgestelde-vragen', 'Alles over het abonnement', 'Opzeggen, retour en meer'],
+            ['Word lid', '/word-lid', 'Start je abonnement', 'Zo bij je op de mat'],
+        ],
+
+        'callouts' => [
+            'Elke maand een set', 'Verzending gratis', 'Retour gratis',
+            'Maandelijks opzegbaar', 'Voor elke leeftijd', 'Geen dure aankoop',
+        ],
+
+        'snippet' => ['header' => 'Types', 'values' => ['Voor kleuters', 'Voor kinderen', 'Voor tieners', 'Voor volwassenen']],
+
+        'call_phone' => '035 201 1720',
+    ],
+
 ];
