@@ -154,6 +154,9 @@ class AdsCreateCampaign extends Command
             'advertisingChannelType' => 'SEARCH',
             'campaignBudget'        => $budget,
             'targetSpend'           => ['cpcBidCeilingMicros' => (string) $ceilMic],
+            // Verplicht sinds de EU-regel rond politieke advertenties; een
+            // bedrijfswebsite-campagne bevat dat niet.
+            'containsEuPoliticalAdvertising' => 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING',
             'networkSettings'       => [
                 'targetGoogleSearch'         => true,
                 'targetSearchNetwork'        => false,
