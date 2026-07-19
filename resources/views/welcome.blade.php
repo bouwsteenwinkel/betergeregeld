@@ -128,6 +128,50 @@
 	</div>
 </section>
 
+{{-- ============ WEBSITES VOOR ELKE BRANCHE (jouw-bedrijfswebsite.nl) ============ --}}
+<section class="py-20 border-b border-[color:var(--color-line)]">
+	<div class="max-w-[1400px] mx-auto px-6">
+		<div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+			<div class="lg:col-span-7">
+				<span class="pill pill-teal mb-3">{{ $isEn ? 'Websites & webshops' : 'Websites & webshops' }}</span>
+				<h2 class="display-2 max-w-xl">{{ $isEn ? 'A professional website for every industry.' : 'Een professionele website voor élke branche.' }}</h2>
+				<p class="text-[color:var(--color-ink-muted)] max-w-lg mt-4 leading-relaxed">
+					{{ $isEn
+						? 'From roofers to hairdressers: we build sharp websites, webshops and client portals, tailored to your trade and your region. Fixed price, one point of contact, arranged by phone and online.'
+						: 'Van dakdekker tot kapper: wij bouwen strakke websites, webshops en klantportalen, afgestemd op jouw vak en jouw regio. Vaste prijs, één vast aanspreekpunt, en alles telefonisch en online geregeld.' }}
+				</p>
+				<div class="flex flex-wrap gap-2 mt-6">
+					@foreach ([['nl' => 'Dakdekker', 'en' => 'Roofer'], ['nl' => 'Installateur', 'en' => 'Installer'], ['nl' => 'Kapper', 'en' => 'Hairdresser'], ['nl' => 'Hovenier', 'en' => 'Gardener'], ['nl' => 'Garage', 'en' => 'Garage'], ['nl' => 'Bakkerij', 'en' => 'Bakery'], ['nl' => 'Advocaat', 'en' => 'Lawyer'], ['nl' => 'Fysiotherapeut', 'en' => 'Physio']] as $br)
+						<span class="pill pill-ink">{{ $isEn ? $br['en'] : $br['nl'] }}</span>
+					@endforeach
+					<span class="pill">{{ $isEn ? '+ many more' : '+ veel meer' }}</span>
+				</div>
+				<div class="flex flex-wrap gap-3 mt-8">
+					<a href="https://jouw-bedrijfswebsite.nl/voorbeeld-maken" class="btn-accent">
+						{{ $isEn ? 'See a free example' : 'Maak een gratis voorbeeld' }}
+						<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</a>
+					<a href="https://jouw-bedrijfswebsite.nl" class="btn-outline">jouw-bedrijfswebsite.nl</a>
+				</div>
+			</div>
+			<div class="lg:col-span-5">
+				<div class="card">
+					<div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-4">{{ $isEn ? 'Grows with you' : 'Groeit met je mee' }}</div>
+					@foreach ([['icon' => '🌐', 'nl' => 'Website', 'en' => 'Website', 'nld' => 'Vindbaar en professioneel', 'end' => 'Findable and professional'], ['icon' => '🛍️', 'nl' => 'Webshop', 'en' => 'Webshop', 'nld' => 'Online verkopen', 'end' => 'Sell online'], ['icon' => '🔐', 'nl' => 'Klantenportaal', 'en' => 'Client portal', 'nld' => 'Klanten regelen het zelf', 'end' => 'Clients self-serve'], ['icon' => '⚙️', 'nl' => 'Automatisering', 'en' => 'Automation', 'nld' => 'Processen die zichzelf doen', 'end' => 'Processes that run themselves'], ['icon' => '✨', 'nl' => 'AI', 'en' => 'AI', 'nld' => 'Slimme assistentie', 'end' => 'Smart assistance']] as $i => $step)
+						<div class="flex items-center gap-3 {{ $i > 0 ? 'mt-3 pt-3 border-t border-[color:var(--color-line)]' : '' }}">
+							<div class="w-9 h-9 rounded-lg bg-[color:var(--color-accent-soft)] flex items-center justify-center text-base shrink-0">{{ $step['icon'] }}</div>
+							<div>
+								<div class="font-bold text-sm">{{ $isEn ? $step['en'] : $step['nl'] }}</div>
+								<div class="text-xs text-[color:var(--color-ink-muted)]">{{ $isEn ? $step['end'] : $step['nld'] }}</div>
+							</div>
+						</div>
+					@endforeach
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
 {{-- ============ FEATURED PRODUCTS ============ --}}
 <section class="bg-[color:var(--color-surface)] py-20">
 	<div class="max-w-[1400px] mx-auto px-6">
