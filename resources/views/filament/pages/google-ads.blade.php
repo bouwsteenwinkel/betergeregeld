@@ -9,29 +9,30 @@
             </p>
         </x-filament::section>
     @else
-        @php($t = $this->totals())
+        @php
+            $t = $this->totals();
+            $kaarten = [
+                ['Vertoningen', number_format($t['impressions'], 0, ',', '.')],
+                ['Klikken', number_format($t['clicks'], 0, ',', '.')],
+                ['Kosten', '€ ' . number_format($t['cost'], 2, ',', '.')],
+                ['Conversies', rtrim(rtrim(number_format($t['conversions'], 1, ',', '.'), '0'), ',')],
+            ];
+        @endphp
 
-        {{-- Kerncijfers over alle campagnes --}}
         <x-filament::section>
             <x-slot name="heading">Prestaties — alle campagnes (sinds start)</x-slot>
             <x-slot name="description">Live uit het gekoppelde Google Ads-account.</x-slot>
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                @foreach ([
-                    ['Vertoningen', number_format($t['impressions'], 0, ',', '.')],
-                    ['Klikken', number_format($t['clicks'], 0, ',', '.')],
-                    ['Kosten', '€ ' . number_format($t['cost'], 2, ',', '.')],
-                    ['Conversies', rtrim(rtrim(number_format($t['conversions'], 1, ',', '.'), '0'), ',')],
-                ] as [$label, $waarde])
+                @foreach ($kaarten as $kaart)
                     <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700 dark:bg-white/5">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $label }}</div>
-                        <div class="mt-1 text-2xl font-bold tabular-nums text-gray-950 dark:text-white">{{ $waarde }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $kaart[0] }}</div>
+                        <div class="mt-1 text-2xl font-bold tabular-nums text-gray-950 dark:text-white">{{ $kaart[1] }}</div>
                     </div>
                 @endforeach
             </div>
         </x-filament::section>
 
-        {{-- Nieuwe campagne --}}
         <x-filament::section collapsible collapsed>
             <x-slot name="heading">Nieuwe campagne aanmaken</x-slot>
             <x-slot name="description">Maakt een Search-campagne vanuit het vaste template — altijd gepauzeerd, niets gaat direct live.</x-slot>
@@ -57,17 +58,15 @@
 
             <div class="mt-4">
                 <x-filament::button wire:click="createCampaign" wire:loading.attr="disabled" wire:target="createCampaign" icon="heroicon-o-plus">
-                    <span wire:loading.remove wire:target="createCampaign">Campagne aanmaken (gepauzeerd)</span>
-                    <span wire:loading wire:target="createCampaign">Bezig…</span>
+                    Campagne aanmaken (gepauzeerd)
                 </x-filament::button>
             </div>
         </x-filament::section>
 
-        {{-- Campagne-overzicht + beheer --}}
         <x-filament::section>
             <x-slot name="heading">Campagnes</x-slot>
             <x-slot name="headerEnd">
-                <x-filament::button size="sm" color="gray" wire:click="laden" wire:loading.attr="disabled" wire:target="laden" icon="heroicon-o-arrow-path">Vernieuwen</x-filament::button>
+                <x-filament::button size="sm" color="gray" wire:click="laden" icon="heroicon-o-arrow-path">Vernieuwen</x-filament::button>
             </x-slot>
 
             <div class="overflow-x-auto">
@@ -85,25 +84,28 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                        @forelse ($campaigns as $c)
-                            @php
-                                $removed = $c['status'] === 'REMOVED';
-                                $labels  = ['ENABLED' => ['Actief', 'success'], 'PAUSED' => ['Gepauzeerd', 'warning'], 'REMOVED' => ['Verwijderd', 'danger']];
-                                [$stLabel, $stColor] = $labels[$c['status']] ?? [$c['status'], 'gray'];
-                            @endphp
-                            <tr class="@if ($removed) opacity-50 @endif align-middle">
+                        @if (empty($campaigns))
+                            <tr><td colspan="8" class="py-6 text-center text-gray-500 dark:text-gray-400">Nog geen campagnes in dit account.</td></tr>
+                        @endif
+
+                        @foreach ($campaigns as $c)
+                            <tr class="{{ $c['status'] === 'REMOVED' ? 'opacity-50' : '' }} align-middle">
                                 <td class="py-3 pr-3 font-medium text-gray-900 dark:text-white">{{ $c['name'] }}</td>
-                                <td class="py-3 pr-3"><x-filament::badge :color="$stColor">{{ $stLabel }}</x-filament::badge></td>
                                 <td class="py-3 pr-3">
-                                    @unless ($removed)
+                                    <x-filament::badge :color="['ENABLED' => 'success', 'PAUSED' => 'warning', 'REMOVED' => 'danger'][$c['status']] ?? 'gray'">
+                                        {{ ['ENABLED' => 'Actief', 'PAUSED' => 'Gepauzeerd', 'REMOVED' => 'Verwijderd'][$c['status']] ?? $c['status'] }}
+                                    </x-filament::badge>
+                                </td>
+                                <td class="py-3 pr-3">
+                                    @if ($c['status'] !== 'REMOVED')
                                         <div class="flex items-center gap-1">
                                             <span class="text-gray-400">€</span>
                                             <input type="number" step="1" min="1" wire:model="budgets.{{ $c['id'] }}" class="w-20 rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm tabular-nums dark:border-gray-600 dark:bg-white/5 dark:text-white">
-                                            <x-filament::button size="xs" color="gray" wire:click="saveBudget('{{ $c['id'] }}')" wire:target="saveBudget('{{ $c['id'] }}')" wire:loading.attr="disabled">Opslaan</x-filament::button>
+                                            <x-filament::button size="xs" color="gray" wire:click="saveBudget('{{ $c['id'] }}')">Opslaan</x-filament::button>
                                         </div>
                                     @else
                                         <span class="text-gray-400">—</span>
-                                    @endunless
+                                    @endif
                                 </td>
                                 <td class="py-3 pr-3 text-right tabular-nums">{{ number_format($c['impressions'], 0, ',', '.') }}</td>
                                 <td class="py-3 pr-3 text-right tabular-nums">{{ number_format($c['clicks'], 0, ',', '.') }}</td>
@@ -114,14 +116,10 @@
                                         <x-filament::button size="xs" color="warning" wire:click="pause('{{ $c['id'] }}')">Pauzeren</x-filament::button>
                                     @elseif ($c['status'] === 'PAUSED')
                                         <x-filament::button size="xs" color="success" wire:click="enable('{{ $c['id'] }}')" wire:confirm="Weet je het zeker? De campagne gaat live en geeft budget uit.">Activeren</x-filament::button>
-                                    @else
-                                        <span class="text-gray-400">—</span>
                                     @endif
                                 </td>
                             </tr>
-                        @empty
-                            <tr><td colspan="8" class="py-6 text-center text-gray-500 dark:text-gray-400">Nog geen campagnes in dit account.</td></tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>

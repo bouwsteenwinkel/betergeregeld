@@ -57,10 +57,17 @@ class GoogleAds extends Page
 
     public function mount(): void
     {
-        $this->connected = app(GoogleAdsManager::class)->connected();
+        // Nooit een 500 op deze pagina: een koppeling-/API-fout degradeert netjes
+        // naar het "niet gekoppeld"-scherm i.p.v. de admin om te leggen.
+        try {
+            $this->connected = app(GoogleAdsManager::class)->connected();
 
-        if ($this->connected) {
-            $this->laden();
+            if ($this->connected) {
+                $this->laden();
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $this->connected = false;
         }
     }
 
