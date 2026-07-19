@@ -33,6 +33,9 @@ class GoogleAds extends Page
     /** Per campagne-ID het (bewerkbare) dagbudget als string. @var array<string,string> */
     public array $budgets = [];
 
+    /** Per campagne-ID het (bewerkbare) CPC-plafond als string. @var array<string,string> */
+    public array $maxcpcs = [];
+
     /** Nieuwe-campagne-formulier. */
     public string $newUrl = 'https://jouw-bedrijfswebsite.nl';
 
@@ -77,6 +80,7 @@ class GoogleAds extends Page
 
         foreach ($this->campaigns as $c) {
             $this->budgets[$c['id']] = number_format((float) $c['budget'], 2, '.', '');
+            $this->maxcpcs[$c['id']] = $c['maxCpc'] > 0 ? number_format((float) $c['maxCpc'], 2, '.', '') : '';
         }
     }
 
@@ -136,6 +140,19 @@ class GoogleAds extends Page
         }
 
         $this->klaar(app(GoogleAdsManager::class)->setBudget($id, $euro), 'Dagbudget bijgewerkt naar € ' . number_format($euro, 2, ',', '.'));
+    }
+
+    public function saveMaxCpc(string $id): void
+    {
+        $euro = (float) str_replace(',', '.', (string) ($this->maxcpcs[$id] ?? '0'));
+
+        if ($euro < 0.1) {
+            Notification::make()->title('Het CPC-plafond moet minstens €0,10 zijn.')->danger()->send();
+
+            return;
+        }
+
+        $this->klaar(app(GoogleAdsManager::class)->setMaxCpc($id, $euro), 'Max. CPC bijgewerkt naar € ' . number_format($euro, 2, ',', '.'));
     }
 
     /** @param array{ok:bool,error:?string} $res */

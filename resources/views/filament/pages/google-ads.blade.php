@@ -104,6 +104,7 @@
                             <th>Campagne</th>
                             <th>Status</th>
                             <th>Dagbudget</th>
+                            <th>Max. CPC</th>
                             <th class="gads-num">Vertoningen</th>
                             <th class="gads-num">Klikken</th>
                             <th class="gads-num">Kosten</th>
@@ -114,7 +115,7 @@
                     </thead>
                     <tbody>
                         @if (empty($campaigns))
-                            <tr><td colspan="9" style="padding: 1.5rem; text-align: center;" class="gads-muted">Nog geen campagnes in dit account.</td></tr>
+                            <tr><td colspan="10" style="padding: 1.5rem; text-align: center;" class="gads-muted">Nog geen campagnes in dit account.</td></tr>
                         @endif
 
                         @foreach ($campaigns as $c)
@@ -134,6 +135,17 @@
                                         </div>
                                     @else
                                         <span class="gads-muted">—</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($c['biddingType'] === 'TARGET_SPEND' && $c['status'] !== 'REMOVED')
+                                        <div class="gads-budget">
+                                            <span class="gads-muted">€</span>
+                                            <input type="number" step="0.10" min="0.1" wire:model="maxcpcs.{{ $c['id'] }}" placeholder="geen">
+                                            <x-filament::button size="xs" color="gray" wire:click="saveMaxCpc('{{ $c['id'] }}')">Opslaan</x-filament::button>
+                                        </div>
+                                    @else
+                                        <span class="gads-muted">{{ ['TARGET_CPA' => 'Doel-CPA', 'MAXIMIZE_CONVERSIONS' => 'Max. conv.', 'MAXIMIZE_CONVERSION_VALUE' => 'Max. waarde', 'MANUAL_CPC' => 'Handmatig'][$c['biddingType']] ?? '—' }}</span>
                                     @endif
                                 </td>
                                 <td class="gads-num">{{ number_format($c['impressions'], 0, ',', '.') }}</td>

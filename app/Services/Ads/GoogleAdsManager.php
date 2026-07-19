@@ -238,6 +238,7 @@ class GoogleAdsManager
     {
         $res = $this->client->search(
             'SELECT campaign.id, campaign.name, campaign.status, campaign_budget.amount_micros, '
+            . 'campaign.bidding_strategy_type, campaign.target_spend.cpc_bid_ceiling_micros, '
             . 'metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, '
             . 'metrics.search_impression_share, metrics.search_budget_lost_impression_share, '
             . 'metrics.search_rank_lost_impression_share '
@@ -265,6 +266,9 @@ class GoogleAdsManager
                 'imprShare'   => (float) ($m['searchImpressionShare'] ?? 0),
                 'lostBudget'  => (float) ($m['searchBudgetLostImpressionShare'] ?? 0),
                 'lostRank'    => (float) ($m['searchRankLostImpressionShare'] ?? 0),
+                // Biedstrategie + (bij "Klikken maximaliseren") het CPC-plafond in euro.
+                'biddingType' => (string) data_get($r, 'campaign.biddingStrategyType', ''),
+                'maxCpc'      => ((int) data_get($r, 'campaign.targetSpend.cpcBidCeilingMicros', 0)) / 1_000_000,
             ];
         }, $res['results']);
     }
@@ -293,6 +297,25 @@ class GoogleAdsManager
 
         $res = $this->client->mutate([
             ['campaignBudgetOperation' => ['update' => ['resourceName' => $bud, 'amountMicros' => (string) $this->micros($euro)], 'updateMask' => 'amount_micros']],
+        ]);
+
+        return ['ok' => $res['ok'], 'error' => $res['error']];
+    }
+
+    /**
+     * Zet het CPC-plafond (max. kosten per klik) van een "Klikken maximaliseren"-campagne.
+     * Alleen zinvol bij biedstrategie TARGET_SPEND.
+     *
+     * @return array{ok:bool,error:?string}
+     */
+    public function setMaxCpc(string $id, float $euro): array
+    {
+        $camp = 'customers/' . $this->customerId() . '/campaigns/' . $id;
+        $res = $this->client->mutate([
+            ['campaignOperation' => [
+                'update'     => ['resourceName' => $camp, 'targetSpend' => ['cpcBidCeilingMicros' => (string) $this->micros($euro)]],
+                'updateMask' => 'target_spend.cpc_bid_ceiling_micros',
+            ]],
         ]);
 
         return ['ok' => $res['ok'], 'error' => $res['error']];
