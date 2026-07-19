@@ -23,4 +23,9 @@ return [
     'api_version' => env('GOOGLE_ADS_API_VERSION', 'v21'),
 
     'token_file' => 'google-ads.json',
+
+    // Conversie-actie-ID (alleen cijfers) voor "Nieuw abonnement", gebruikt als
+    // productDestinationId bij de Data Manager-import. Gemaakt via
+    // `php artisan ads:conversion-action`.
+    'conversion_abo' => preg_replace('/\D/', '', (string) env('GOOGLE_ADS_CONVERSION_ABO', '7690743819')),
 ];

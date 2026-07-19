@@ -344,4 +344,98 @@ class GoogleAdsManager
     {
         return (int) round($euro * 1_000_000);
     }
+
+    /* ─────────────────────── Conversies (offline import) ─────────────────────── */
+
+    /** Resource-naam van een conversie-actie op naam, of null. */
+    public function findConversionAction(string $name): ?string
+    {
+        $r = $this->client->search(
+            "SELECT conversion_action.resource_name FROM conversion_action WHERE conversion_action.name = '" . addslashes($name) . "'"
+        );
+
+        return $r['ok'] ? data_get($r, 'results.0.conversionAction.resourceName') : null;
+    }
+
+    /**
+     * Maakt (idempotent) een UPLOAD_CLICKS-conversie-actie voor server-side import,
+     * bv. "Nieuw abonnement". Bestaat 'ie al op naam, dan geven we die terug.
+     *
+     * @return array{ok:bool,error:?string,resource:?string,created:bool}
+     */
+    public function ensureConversionAction(string $name, float $defaultValue = 10.0, string $category = 'SIGNUP'): array
+    {
+        if ($existing = $this->findConversionAction($name)) {
+            return ['ok' => true, 'error' => null, 'resource' => $existing, 'created' => false];
+        }
+
+        $res = $this->client->mutate([
+            ['conversionActionOperation' => ['create' => [
+                'name'                           => $name,
+                'type'                           => 'UPLOAD_CLICKS',
+                'category'                       => $category,
+                'status'                         => 'ENABLED',
+                'primaryForGoal'                 => true,
+                'countingType'                   => 'ONE_PER_CLICK',
+                'clickThroughLookbackWindowDays' => 90,
+                'valueSettings'                  => [
+                    'defaultValue'          => $defaultValue,
+                    'defaultCurrencyCode'   => 'EUR',
+                    'alwaysUseDefaultValue' => false,
+                ],
+            ]]],
+        ]);
+
+        return [
+            'ok'       => $res['ok'],
+            'error'    => $res['error'],
+            'resource' => collect($res['results'])->pluck('conversionActionResult.resourceName')->filter()->first(),
+            'created'  => $res['ok'],
+        ];
+    }
+
+    /**
+     * Meldt één nieuw abonnement als conversie via de Data Manager API: koppelt de
+     * gclid aan de "Nieuw abonnement"-conversie-actie met €-waarde. $rfc3339Time in
+     * UTC, bv. 2026-07-19T12:03:00Z. $transactionId (bv. "membership-123") maakt de
+     * import idempotent: dubbel insturen telt niet dubbel.
+     *
+     * @return array{ok:bool,error:?string,results:mixed}
+     */
+    public function ingestSubscriptionConversion(string $gclid, string $rfc3339Time, float $value = 10.0, ?string $transactionId = null, bool $consentGranted = true): array
+    {
+        $login = preg_replace('/\D/', '', (string) config('google_ads.login_customer_id'));
+        $op    = preg_replace('/\D/', '', (string) config('google_ads.customer_id'));
+        $caId  = preg_replace('/\D/', '', (string) config('google_ads.conversion_abo'));
+
+        if ($caId === '') {
+            return ['ok' => false, 'error' => 'google_ads.conversion_abo (conversie-actie-ID) ontbreekt.', 'results' => null];
+        }
+
+        $destinations = [[
+            'reference'            => 'gads_abo',
+            'loginAccount'         => ['accountId' => $login, 'accountType' => 'GOOGLE_ADS'],
+            'operatingAccount'     => ['accountId' => $op, 'accountType' => 'GOOGLE_ADS'],
+            'productDestinationId' => $caId,
+        ]];
+
+        $event = [
+            'destinationReferences' => ['gads_abo'],
+            'adIdentifiers'         => ['gclid' => $gclid],
+            'eventTimestamp'        => $rfc3339Time,
+            'currency'              => 'EUR',
+            'conversionValue'       => $value,
+            'eventSource'           => 'WEB',
+        ];
+        if ($transactionId !== null && $transactionId !== '') {
+            $event['transactionId'] = $transactionId;
+        }
+
+        $consent = [
+            'adUserData'        => $consentGranted ? 'CONSENT_GRANTED' : 'CONSENT_DENIED',
+            'adPersonalization' => $consentGranted ? 'CONSENT_GRANTED' : 'CONSENT_DENIED',
+        ];
+
+        return $this->client->dataManagerIngest($destinations, [$event], $consent);
+    }
 }

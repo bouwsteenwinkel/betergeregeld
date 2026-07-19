@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Storage;
  */
 class GoogleAdsClient
 {
-    public const SCOPE = 'https://www.googleapis.com/auth/adwords';
+    // adwords = campagnebeheer; datamanager = offline conversie-import (events:ingest).
+    // Eén refresh-token dekt beide scopes; na toevoegen moet opnieuw toestemming
+    // gegeven worden (ads:connect) zodat het token de datamanager-scope bevat.
+    public const SCOPE = 'https://www.googleapis.com/auth/adwords https://www.googleapis.com/auth/datamanager';
 
     private function ca(): string
     {
@@ -208,5 +211,68 @@ class GoogleAdsClient
         }
 
         return ['ok' => true, 'error' => null, 'results' => $resp->json('mutateOperationResponses', [])];
+    }
+
+    /**
+     * Offline conversie-import: koppelt betaalde acties (bv. een nieuw abonnement)
+     * terug aan de oorspronkelijke ad-klik via de gclid. partialFailure=true zodat
+     * één foute rij de rest niet blokkeert; per-rij-fouten staan in partialFailureError.
+     *
+     * @param  array<int,array<string,mixed>>  $conversions
+     * @return array{ok:bool,error:?string,results:array}
+     */
+    public function uploadClickConversions(array $conversions, ?string $customerId = null): array
+    {
+        $resp = $this->request($this->accessToken())
+            ->post($this->base() . '/customers/' . $this->customer($customerId) . ':uploadClickConversions', [
+                'conversions'    => $conversions,
+                'partialFailure' => true,
+            ]);
+
+        if (! $resp->successful()) {
+            return ['ok' => false, 'error' => $resp->json('error.message') ?: ('HTTP ' . $resp->status()), 'results' => []];
+        }
+
+        return [
+            'ok'      => true,
+            'error'   => data_get($resp->json(), 'partialFailureError.message'),
+            'results' => $resp->json('results', []),
+        ];
+    }
+
+    /**
+     * Data Manager API — events:ingest. De opvolger van de (voor nieuwe integraties
+     * geblokkeerde) ConversionUploadService. Stuurt offline events (bv. een nieuw
+     * abonnement) met gclid + waarde naar een Google Ads-conversie-actie.
+     *
+     * Vereist de datamanager-scope in het OAuth-token (zie SCOPE) én de Data
+     * Manager API aangezet in het Cloud-project. Géén developer-token nodig.
+     *
+     * @param  array<int,array<string,mixed>>  $destinations
+     * @param  array<int,array<string,mixed>>  $events
+     * @return array{ok:bool,error:?string,results:mixed}
+     */
+    public function dataManagerIngest(array $destinations, array $events, ?array $consent = null): array
+    {
+        $access = $this->accessToken();
+        if (! $access) {
+            return ['ok' => false, 'error' => 'Geen access-token (OAuth nog niet gekoppeld?).', 'results' => null];
+        }
+
+        $body = ['destinations' => $destinations, 'events' => $events];
+        if ($consent) {
+            $body['consent'] = $consent;
+        }
+
+        $resp = Http::withToken($access)
+            ->withOptions(['verify' => $this->ca()])
+            ->timeout(30)
+            ->post('https://datamanager.googleapis.com/v1/events:ingest', $body);
+
+        if (! $resp->successful()) {
+            return ['ok' => false, 'error' => $resp->json('error.message') ?: ('HTTP ' . $resp->status()), 'results' => $resp->json()];
+        }
+
+        return ['ok' => true, 'error' => null, 'results' => $resp->json()];
     }
 }
