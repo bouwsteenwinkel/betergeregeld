@@ -345,6 +345,10 @@
       </div>
     </div>
   </section>
+@endverbatim
+  {{-- Geruststelling: wat er standaard allemaal in zit (hosting, e-mail, SEO…). --}}
+  @include('channels.partials.included-services')
+@verbatim
 
   <!-- ===================== GOOGLE REVIEWS =====================
        Deze sectie presenteert zich als echte Google-reviews (Google-logo, "op

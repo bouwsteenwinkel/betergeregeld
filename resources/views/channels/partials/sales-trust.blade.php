@@ -40,6 +40,9 @@
     </div>
 </section>
 
+{{-- Geruststelling: wat er standaard allemaal in zit (hosting, e-mail, SEO…). --}}
+@include('channels.partials.included-services-trust')
+
 {{-- CTA-band --}}
 <section class="cta-band" data-section="cta">
     <div class="wrap">
