@@ -81,7 +81,7 @@
                     <input type="number" step="0.10" min="0.1" wire:model="newMaxCpc"></label>
             </div>
 
-            <p class="gads-hint">Heel Nederland · Nederlands · alleen Google Zoeken · 2 advertentiegroepen (9 zoekwoorden), 14 uitsluitingen, 1 RSA per groep.</p>
+            <p class="gads-hint">Heel Nederland · Nederlands · alleen Google Zoeken · 2 advertentiegroepen (9 zoekwoorden), 14 uitsluitingen, 1 RSA per groep, plus extensies (4 sitelinks, 6 highlights, fragment, bel-asset).</p>
 
             <div style="margin-top: 1rem;">
                 <x-filament::button wire:click="createCampaign" wire:loading.attr="disabled" wire:target="createCampaign" icon="heroicon-o-plus">

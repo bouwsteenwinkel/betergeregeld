@@ -57,6 +57,28 @@ class GoogleAdsManager
         'Bekijk vrijblijvend hoe jouw bedrijfswebsite eruit kan zien. Start nu gratis.',
     ];
 
+    /** Sitelinks: [linktekst ≤25, pad/anker, beschrijving1 ≤35, beschrijving2 ≤35]. */
+    public const SITELINKS = [
+        ['Direct een voorbeeld', '/voorbeeld-maken', 'Zie in 1 minuut je site', 'Gratis en vrijblijvend'],
+        ['Plan een gesprek', '/afspraak', 'Online of telefonisch', 'Vrijblijvend advies'],
+        ['Zo werkt het', '#werkwijze', 'In een paar stappen online', 'Met een vaste contactpersoon'],
+        ['Prijzen', '#prijzen', 'Duidelijke vaste prijs', 'Geen verrassingen achteraf'],
+    ];
+
+    /** Highlights/callouts (≤25 tekens). */
+    public const CALLOUTS = [
+        'Gratis voorbeeld', 'In 1 minuut klaar', 'Vaste prijs', 'Vaste contactpersoon',
+        'Voor zzp & mkb', 'Heel Nederland',
+    ];
+
+    /** Gestructureerd fragment: kop uit Google's vaste lijst + waarden (≤25 tekens). */
+    public const SNIPPET_HEADER = 'Types';
+
+    public const SNIPPET_VALUES = ['Bedrijfswebsite', 'Webshop', 'Onderhoud', 'Vindbaar in Google'];
+
+    /** Bel-asset. */
+    public const CALL_PHONE = '088 2545101';
+
     public function customerId(): string
     {
         return (string) config('google_ads.customer_id');
@@ -142,6 +164,37 @@ class GoogleAdsManager
                 ],
             ]]];
         }
+
+        // Extensies (assets) op campagne-niveau: sitelinks, highlights, een
+        // gestructureerd fragment en een bel-asset. Elk als asset aangemaakt met een
+        // tijdelijke resource-naam en via campaignAsset aan de campagne gekoppeld.
+        $aid = -101;
+        foreach (self::SITELINKS as [$text, $path, $d1, $d2]) {
+            $asset = "customers/{$cid}/assets/{$aid}";
+            $aid--;
+            $ops[] = ['assetOperation' => ['create' => [
+                'resourceName'  => $asset,
+                'finalUrls'     => [rtrim($url, '/') . $path],
+                'sitelinkAsset' => ['linkText' => $text, 'description1' => $d1, 'description2' => $d2],
+            ]]];
+            $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'SITELINK']]];
+        }
+
+        foreach (self::CALLOUTS as $text) {
+            $asset = "customers/{$cid}/assets/{$aid}";
+            $aid--;
+            $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'calloutAsset' => ['calloutText' => $text]]]];
+            $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'CALLOUT']]];
+        }
+
+        $asset = "customers/{$cid}/assets/{$aid}";
+        $aid--;
+        $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'structuredSnippetAsset' => ['header' => self::SNIPPET_HEADER, 'values' => self::SNIPPET_VALUES]]]];
+        $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'STRUCTURED_SNIPPET']]];
+
+        $asset = "customers/{$cid}/assets/{$aid}";
+        $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'callAsset' => ['countryCode' => 'NL', 'phoneNumber' => self::CALL_PHONE]]]];
+        $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'CALL']]];
 
         return $ops;
     }

@@ -92,6 +92,7 @@ class AdsCreateCampaign extends Command
         $this->line('  Advertentiegroepen : ' . count(GoogleAdsManager::AD_GROUPS) . ' (' . implode(', ', array_keys(GoogleAdsManager::AD_GROUPS)) . ')');
         $this->line("  Zoekwoorden     : {$kwCount}   ·   Uitsluitingen: " . count(GoogleAdsManager::NEGATIVES));
         $this->line('  Advertentie     : 1 RSA per groep — ' . count(GoogleAdsManager::HEADLINES) . ' koppen, ' . count(GoogleAdsManager::DESCRIPTIONS) . ' beschrijvingen');
+        $this->line('  Extensies       : ' . count(GoogleAdsManager::SITELINKS) . ' sitelinks, ' . count(GoogleAdsManager::CALLOUTS) . ' highlights, 1 fragment, 1 bel-asset');
         $this->line("  API-operaties   : {$opCount}");
     }
 }
