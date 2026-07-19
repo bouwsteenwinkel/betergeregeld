@@ -199,13 +199,6 @@
                        placeholder="Bijvoorbeeld: 06 12 34 56 78" autocomplete="tel">
             </div>
 
-            <div class="vm-field">
-                <label class="vm-consent" for="vm-consent">
-                    <input type="checkbox" id="vm-consent" name="consent" value="1" required>
-                    <span>Jouw Bedrijfswebsite mag contact met mij opnemen over mijn voorbeeld, per e-mail of telefoon. Je gegevens gaan niet naar anderen en je kunt je altijd afmelden. Zie de <a href="{{ $site->url('algemene-voorwaarden') }}" target="_blank" rel="noopener">algemene voorwaarden</a> en het <a href="{{ $site->url('privacybeleid') }}" target="_blank" rel="noopener">privacybeleid</a>.</span>
-                </label>
-            </div>
-
             <div class="vm-hp" aria-hidden="true">
                 <label>Laat dit veld leeg<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
             </div>
@@ -213,7 +206,7 @@
             <button type="submit" class="btn" style="width:100%;justify-content:center;font-size:1.05rem;padding:.95rem">
                 Maak mijn voorbeeld
             </button>
-            <p class="vm-hint" style="text-align:center;margin-top:.7rem">Klaar in ongeveer 30 seconden. Je zit nergens aan vast en je kunt je altijd afmelden.</p>
+            <p class="vm-hint" style="text-align:center;margin-top:.7rem">Klaar in ongeveer 30 seconden. We nemen contact met je op over je voorbeeld — je zit nergens aan vast en kunt je altijd afmelden. Zie ons <a href="{{ $site->url('privacybeleid') }}" target="_blank" rel="noopener">privacybeleid</a>.</p>
             <div class="vm-error" id="vm-error"></div>
         </form>
     </div>

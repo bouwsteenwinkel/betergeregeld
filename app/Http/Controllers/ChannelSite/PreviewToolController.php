@@ -55,20 +55,18 @@ class PreviewToolController extends Controller
             'sfeer'         => ['required', 'string', 'in:' . implode(',', array_keys(PreviewSiteGenerator::SFEREN))],
             // Kleur is nu OPTIONEEL (eigen-kleur-override); leeg = het sfeer-palet.
             'color'         => ['nullable', 'string', 'regex:/^#?[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/'],
-            // Contact + toestemming: verplicht, de tool is een lead-formulier geworden.
-            // 'accepted' i.p.v. 'boolean': een niet-aangevinkte checkbox stuurt niets mee
-            // en 'boolean' zou een ontbrekend veld als false doorlaten.
+            // Contact: verplicht, de tool is een lead-formulier. Geen los toestemming-veld
+            // meer: contact over hun eigen aangevraagde voorbeeld is gerechtvaardigd belang,
+            // dus een korte privacy-melding onder de knop volstaat. Een vooraf aangevinkt
+            // vakje zou sowieso geen geldige AVG-toestemming zijn.
             'contact_name'  => ['required', 'string', 'max:120'],
             'email'         => ['required', 'email', 'max:190'],
             'phone'         => ['required', 'string', 'max:60'],
-            'consent'       => ['accepted'],
             // Optionele content-verrijking.
             'key_services'  => ['nullable', 'string', 'max:200'],
             'place'         => ['nullable', 'string', 'max:80'],
             'usp'           => ['nullable', 'string', 'max:160'],
-        ], [
-            'consent.accepted' => 'Vink aan dat we contact met je mogen opnemen over je voorbeeld.',
-        ], [
+        ], [], [
             'company' => 'bedrijfsnaam', 'business_type' => 'type bedrijf', 'goal' => 'doel', 'sfeer' => 'uitstraling',
             'color' => 'kleur', 'key_services' => 'kerndiensten', 'place' => 'plaats', 'usp' => 'onderscheider',
             'contact_name' => 'naam', 'email' => 'e-mailadres', 'phone' => 'telefoonnummer',
