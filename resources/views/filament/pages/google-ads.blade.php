@@ -92,6 +92,7 @@
 
         <x-filament::section>
             <x-slot name="heading">Campagnes</x-slot>
+            <x-slot name="description">"Beperkt door" toont waardoor je vertoningen misloopt: Budget (→ dagbudget verhogen) of Bod/CPC (→ maximale CPC/kwaliteit verhogen). Leeg = te weinig data.</x-slot>
             <x-slot name="headerEnd">
                 <x-filament::button size="sm" color="gray" wire:click="laden" icon="heroicon-o-arrow-path">Vernieuwen</x-filament::button>
             </x-slot>
@@ -107,12 +108,13 @@
                             <th class="gads-num">Klikken</th>
                             <th class="gads-num">Kosten</th>
                             <th class="gads-num">Conv.</th>
+                            <th>Beperkt door</th>
                             <th class="gads-num">Actie</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (empty($campaigns))
-                            <tr><td colspan="8" style="padding: 1.5rem; text-align: center;" class="gads-muted">Nog geen campagnes in dit account.</td></tr>
+                            <tr><td colspan="9" style="padding: 1.5rem; text-align: center;" class="gads-muted">Nog geen campagnes in dit account.</td></tr>
                         @endif
 
                         @foreach ($campaigns as $c)
@@ -138,6 +140,16 @@
                                 <td class="gads-num">{{ number_format($c['clicks'], 0, ',', '.') }}</td>
                                 <td class="gads-num">€ {{ number_format($c['cost'], 2, ',', '.') }}</td>
                                 <td class="gads-num">{{ rtrim(rtrim(number_format($c['conversions'], 1, ',', '.'), '0'), ',') }}</td>
+                                <td>
+                                    @php $lb = round($c['lostBudget'] * 100); $lr = round($c['lostRank'] * 100); @endphp
+                                    @if ($c['impressions'] < 1)
+                                        <span class="gads-muted">—</span>
+                                    @else
+                                        @if ($lb >= 10)<x-filament::badge color="warning">Budget {{ $lb }}%</x-filament::badge>@endif
+                                        @if ($lr >= 10)<x-filament::badge color="danger">Bod/CPC {{ $lr }}%</x-filament::badge>@endif
+                                        @if ($lb < 10 && $lr < 10)<x-filament::badge color="success">Niet beperkt</x-filament::badge>@endif
+                                    @endif
+                                </td>
                                 <td class="gads-num">
                                     @if ($c['status'] === 'ENABLED')
                                         <x-filament::button size="xs" color="warning" wire:click="pause('{{ $c['id'] }}')">Pauzeren</x-filament::button>

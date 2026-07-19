@@ -238,7 +238,9 @@ class GoogleAdsManager
     {
         $res = $this->client->search(
             'SELECT campaign.id, campaign.name, campaign.status, campaign_budget.amount_micros, '
-            . 'metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions '
+            . 'metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, '
+            . 'metrics.search_impression_share, metrics.search_budget_lost_impression_share, '
+            . 'metrics.search_rank_lost_impression_share '
             . 'FROM campaign ORDER BY campaign.id'
         );
 
@@ -258,6 +260,11 @@ class GoogleAdsManager
                 'clicks'      => (int) ($m['clicks'] ?? 0),
                 'cost'        => ((int) ($m['costMicros'] ?? 0)) / 1_000_000,
                 'conversions' => (float) ($m['conversions'] ?? 0),
+                // Vertoningsaandeel (fractie 0-1): hoeveel van de mogelijke vertoningen je
+                // pakte, en waardoor je de rest misliep — budget te laag of bod/kwaliteit.
+                'imprShare'   => (float) ($m['searchImpressionShare'] ?? 0),
+                'lostBudget'  => (float) ($m['searchBudgetLostImpressionShare'] ?? 0),
+                'lostRank'    => (float) ($m['searchRankLostImpressionShare'] ?? 0),
             ];
         }, $res['results']);
     }
