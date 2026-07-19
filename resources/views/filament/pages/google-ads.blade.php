@@ -1,11 +1,46 @@
 <x-filament-panels::page>
+    <style>
+        .gads-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+        @media (min-width: 640px) { .gads-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+        .gads-stat { border: 1px solid #e5e7eb; border-radius: .75rem; padding: 1rem 1.1rem; background: #fff; }
+        .dark .gads-stat { border-color: #374151; background: rgba(255,255,255,.03); }
+        .gads-stat-label { font-size: .8rem; color: #6b7280; }
+        .dark .gads-stat-label { color: #9ca3af; }
+        .gads-stat-value { margin-top: .2rem; font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #111827; letter-spacing: -.01em; }
+        .dark .gads-stat-value { color: #fff; }
+
+        .gads-scroll { overflow-x: auto; }
+        .gads-table { width: 100%; min-width: 860px; border-collapse: collapse; font-size: .875rem; }
+        .gads-table thead th { text-align: left; font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; padding: .55rem .75rem; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+        .dark .gads-table thead th { color: #9ca3af; border-color: #374151; }
+        .gads-table tbody td { padding: .7rem .75rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+        .dark .gads-table tbody td { border-color: #1f2937; }
+        .gads-table tbody tr:last-child td { border-bottom: 0; }
+        .gads-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .gads-name { font-weight: 500; color: #111827; }
+        .dark .gads-name { color: #f9fafb; }
+        .gads-muted { color: #9ca3af; }
+        .gads-removed td { opacity: .5; }
+        .gads-budget { display: inline-flex; align-items: center; gap: .4rem; }
+        .gads-budget input { width: 5rem; border: 1px solid #d1d5db; border-radius: .5rem; padding: .3rem .5rem; font-size: .85rem; text-align: right; font-variant-numeric: tabular-nums; background: #fff; color: #111827; }
+        .dark .gads-budget input { border-color: #4b5563; background: rgba(255,255,255,.04); color: #fff; }
+        .gads-form { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 640px) { .gads-form { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        .gads-field { display: block; }
+        .gads-field > span { display: block; font-size: .82rem; font-weight: 500; color: #374151; margin-bottom: .3rem; }
+        .dark .gads-field > span { color: #d1d5db; }
+        .gads-field input { width: 100%; border: 1px solid #d1d5db; border-radius: .5rem; padding: .5rem .7rem; font-size: .875rem; background: #fff; color: #111827; }
+        .dark .gads-field input { border-color: #4b5563; background: rgba(255,255,255,.04); color: #fff; }
+        .gads-hint { margin-top: .75rem; font-size: .78rem; color: #6b7280; }
+        .dark .gads-hint { color: #9ca3af; }
+    </style>
+
     @if (! $connected)
         <x-filament::section>
             <x-slot name="heading">Google Ads is nog niet gekoppeld</x-slot>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="gads-hint">
                 Er is nog geen actieve API-koppeling in deze omgeving. Koppel via de terminal met
-                <code class="rounded bg-gray-100 px-1 py-0.5 text-xs dark:bg-white/10">php artisan ads:connect</code>
-                en controleer met <code class="rounded bg-gray-100 px-1 py-0.5 text-xs dark:bg-white/10">php artisan ads:status</code>.
+                <code>php artisan ads:connect</code> en controleer met <code>php artisan ads:status</code>.
             </p>
         </x-filament::section>
     @else
@@ -23,11 +58,11 @@
             <x-slot name="heading">Prestaties — alle campagnes (sinds start)</x-slot>
             <x-slot name="description">Live uit het gekoppelde Google Ads-account.</x-slot>
 
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div class="gads-stats">
                 @foreach ($kaarten as $kaart)
-                    <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700 dark:bg-white/5">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $kaart[0] }}</div>
-                        <div class="mt-1 text-2xl font-bold tabular-nums text-gray-950 dark:text-white">{{ $kaart[1] }}</div>
+                    <div class="gads-stat">
+                        <div class="gads-stat-label">{{ $kaart[0] }}</div>
+                        <div class="gads-stat-value">{{ $kaart[1] }}</div>
                     </div>
                 @endforeach
             </div>
@@ -37,26 +72,18 @@
             <x-slot name="heading">Nieuwe campagne aanmaken</x-slot>
             <x-slot name="description">Maakt een Search-campagne vanuit het vaste template — altijd gepauzeerd, niets gaat direct live.</x-slot>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <label class="block">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Eind-URL</span>
-                    <input type="url" wire:model="newUrl" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-white/5 dark:text-white">
-                </label>
-                <label class="block">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Dagbudget (€)</span>
-                    <input type="number" step="1" min="1" wire:model="newBudget" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-white/5 dark:text-white">
-                </label>
-                <label class="block">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Max. CPC (€)</span>
-                    <input type="number" step="0.10" min="0.1" wire:model="newMaxCpc" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-white/5 dark:text-white">
-                </label>
+            <div class="gads-form">
+                <label class="gads-field"><span>Eind-URL</span>
+                    <input type="url" wire:model="newUrl"></label>
+                <label class="gads-field"><span>Dagbudget (€)</span>
+                    <input type="number" step="1" min="1" wire:model="newBudget"></label>
+                <label class="gads-field"><span>Max. CPC (€)</span>
+                    <input type="number" step="0.10" min="0.1" wire:model="newMaxCpc"></label>
             </div>
 
-            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                Heel Nederland · Nederlands · alleen Google Zoeken · 2 advertentiegroepen (9 zoekwoorden), 14 uitsluitingen, 1 RSA per groep.
-            </p>
+            <p class="gads-hint">Heel Nederland · Nederlands · alleen Google Zoeken · 2 advertentiegroepen (9 zoekwoorden), 14 uitsluitingen, 1 RSA per groep.</p>
 
-            <div class="mt-4">
+            <div style="margin-top: 1rem;">
                 <x-filament::button wire:click="createCampaign" wire:loading.attr="disabled" wire:target="createCampaign" icon="heroicon-o-plus">
                     Campagne aanmaken (gepauzeerd)
                 </x-filament::button>
@@ -69,53 +96,55 @@
                 <x-filament::button size="sm" color="gray" wire:click="laden" icon="heroicon-o-arrow-path">Vernieuwen</x-filament::button>
             </x-slot>
 
-            <div class="overflow-x-auto">
-                <table class="w-full min-w-[820px] text-sm">
+            <div class="gads-scroll">
+                <table class="gads-table">
                     <thead>
-                        <tr class="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                            <th class="py-2 pr-3">Campagne</th>
-                            <th class="py-2 pr-3">Status</th>
-                            <th class="py-2 pr-3">Dagbudget</th>
-                            <th class="py-2 pr-3 text-right">Vertoningen</th>
-                            <th class="py-2 pr-3 text-right">Klikken</th>
-                            <th class="py-2 pr-3 text-right">Kosten</th>
-                            <th class="py-2 pr-3 text-right">Conv.</th>
-                            <th class="py-2 pr-3 text-right">Actie</th>
+                        <tr>
+                            <th>Campagne</th>
+                            <th>Status</th>
+                            <th>Dagbudget</th>
+                            <th class="gads-num">Vertoningen</th>
+                            <th class="gads-num">Klikken</th>
+                            <th class="gads-num">Kosten</th>
+                            <th class="gads-num">Conv.</th>
+                            <th class="gads-num">Actie</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody>
                         @if (empty($campaigns))
-                            <tr><td colspan="8" class="py-6 text-center text-gray-500 dark:text-gray-400">Nog geen campagnes in dit account.</td></tr>
+                            <tr><td colspan="8" style="padding: 1.5rem; text-align: center;" class="gads-muted">Nog geen campagnes in dit account.</td></tr>
                         @endif
 
                         @foreach ($campaigns as $c)
-                            <tr class="{{ $c['status'] === 'REMOVED' ? 'opacity-50' : '' }} align-middle">
-                                <td class="py-3 pr-3 font-medium text-gray-900 dark:text-white">{{ $c['name'] }}</td>
-                                <td class="py-3 pr-3">
+                            <tr class="{{ $c['status'] === 'REMOVED' ? 'gads-removed' : '' }}">
+                                <td class="gads-name">{{ $c['name'] }}</td>
+                                <td>
                                     <x-filament::badge :color="['ENABLED' => 'success', 'PAUSED' => 'warning', 'REMOVED' => 'danger'][$c['status']] ?? 'gray'">
                                         {{ ['ENABLED' => 'Actief', 'PAUSED' => 'Gepauzeerd', 'REMOVED' => 'Verwijderd'][$c['status']] ?? $c['status'] }}
                                     </x-filament::badge>
                                 </td>
-                                <td class="py-3 pr-3">
+                                <td>
                                     @if ($c['status'] !== 'REMOVED')
-                                        <div class="flex items-center gap-1">
-                                            <span class="text-gray-400">€</span>
-                                            <input type="number" step="1" min="1" wire:model="budgets.{{ $c['id'] }}" class="w-20 rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm tabular-nums dark:border-gray-600 dark:bg-white/5 dark:text-white">
+                                        <div class="gads-budget">
+                                            <span class="gads-muted">€</span>
+                                            <input type="number" step="1" min="1" wire:model="budgets.{{ $c['id'] }}">
                                             <x-filament::button size="xs" color="gray" wire:click="saveBudget('{{ $c['id'] }}')">Opslaan</x-filament::button>
                                         </div>
                                     @else
-                                        <span class="text-gray-400">—</span>
+                                        <span class="gads-muted">—</span>
                                     @endif
                                 </td>
-                                <td class="py-3 pr-3 text-right tabular-nums">{{ number_format($c['impressions'], 0, ',', '.') }}</td>
-                                <td class="py-3 pr-3 text-right tabular-nums">{{ number_format($c['clicks'], 0, ',', '.') }}</td>
-                                <td class="py-3 pr-3 text-right tabular-nums">€ {{ number_format($c['cost'], 2, ',', '.') }}</td>
-                                <td class="py-3 pr-3 text-right tabular-nums">{{ rtrim(rtrim(number_format($c['conversions'], 1, ',', '.'), '0'), ',') }}</td>
-                                <td class="py-3 pr-3 text-right">
+                                <td class="gads-num">{{ number_format($c['impressions'], 0, ',', '.') }}</td>
+                                <td class="gads-num">{{ number_format($c['clicks'], 0, ',', '.') }}</td>
+                                <td class="gads-num">€ {{ number_format($c['cost'], 2, ',', '.') }}</td>
+                                <td class="gads-num">{{ rtrim(rtrim(number_format($c['conversions'], 1, ',', '.'), '0'), ',') }}</td>
+                                <td class="gads-num">
                                     @if ($c['status'] === 'ENABLED')
                                         <x-filament::button size="xs" color="warning" wire:click="pause('{{ $c['id'] }}')">Pauzeren</x-filament::button>
                                     @elseif ($c['status'] === 'PAUSED')
                                         <x-filament::button size="xs" color="success" wire:click="enable('{{ $c['id'] }}')" wire:confirm="Weet je het zeker? De campagne gaat live en geeft budget uit.">Activeren</x-filament::button>
+                                    @else
+                                        <span class="gads-muted">—</span>
                                     @endif
                                 </td>
                             </tr>
