@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Ads\GoogleAdsClient;
+use App\Services\Ads\GoogleAdsManager;
 use Illuminate\Console\Command;
 
 /**
- * Beheer van bestaande campagnes in het gekoppelde account: pauzeren, activeren
- * en het dagbudget wijzigen. Zonder ID (of met --list) toont het alle campagnes
- * met hun ID en budget.
+ * Beheer van bestaande campagnes: lijst tonen, pauzeren, activeren en het
+ * dagbudget wijzigen. Deelt de logica met het admin-paneel via GoogleAdsManager.
  *
  *   php artisan ads:campaign --list
  *   php artisan ads:campaign 24046650881 --budget=25
@@ -26,46 +25,18 @@ class AdsCampaign extends Command
 
     protected $description = 'Beheer campagnes: lijst tonen, pauzeren, activeren of het dagbudget wijzigen.';
 
-    public function handle(GoogleAdsClient $ads): int
+    public function handle(GoogleAdsManager $mgr): int
     {
-        if (! $ads->connected()) {
+        if (! $mgr->connected()) {
             $this->error('Niet gekoppeld. Zie ads:status.');
 
             return self::FAILURE;
         }
 
-        $cid = (string) config('google_ads.customer_id');
-        $id  = $this->argument('id');
+        $id = $this->argument('id');
 
         if (! $id || $this->option('list')) {
-            return $this->lijst($ads);
-        }
-
-        $camp = "customers/{$cid}/campaigns/{$id}";
-        $ops  = [];
-
-        if ($this->option('pause')) {
-            $ops[] = ['campaignOperation' => ['update' => ['resourceName' => $camp, 'status' => 'PAUSED'], 'updateMask' => 'status']];
-        }
-        if ($this->option('enable')) {
-            $ops[] = ['campaignOperation' => ['update' => ['resourceName' => $camp, 'status' => 'ENABLED'], 'updateMask' => 'status']];
-        }
-        if ($this->option('budget') !== null) {
-            $mic = (int) round(((float) $this->option('budget')) * 1_000_000);
-            $q = $ads->search("SELECT campaign_budget.resource_name FROM campaign WHERE campaign.id = {$id}");
-            $bud = data_get($q, 'results.0.campaignBudget.resourceName');
-            if (! $q['ok'] || ! $bud) {
-                $this->error('Budget-resource niet gevonden voor campagne ' . $id . ($q['error'] ? ' (' . $q['error'] . ')' : ''));
-
-                return self::FAILURE;
-            }
-            $ops[] = ['campaignBudgetOperation' => ['update' => ['resourceName' => $bud, 'amountMicros' => (string) $mic], 'updateMask' => 'amount_micros']];
-        }
-
-        if (! $ops) {
-            $this->warn('Niets te doen. Geef --pause, --enable of --budget=<euro> mee.');
-
-            return self::SUCCESS;
+            return $this->lijst($mgr);
         }
 
         if ($this->option('enable') && ! $this->confirm('Campagne ' . $id . ' ACTIVEREN? Hij gaat dan live en geeft budget uit.', false)) {
@@ -74,36 +45,45 @@ class AdsCampaign extends Command
             return self::SUCCESS;
         }
 
-        $res = $ads->mutate($ops);
-        if (! $res['ok']) {
-            $this->error('Mislukt: ' . $res['error']);
+        $did = false;
 
-            return self::FAILURE;
+        foreach ([
+            $this->option('pause') ? fn () => $mgr->setStatus($id, 'PAUSED') : null,
+            $this->option('enable') ? fn () => $mgr->setStatus($id, 'ENABLED') : null,
+            $this->option('budget') !== null ? fn () => $mgr->setBudget($id, (float) str_replace(',', '.', (string) $this->option('budget'))) : null,
+        ] as $actie) {
+            if (! $actie) {
+                continue;
+            }
+            $res = $actie();
+            if (! $res['ok']) {
+                $this->error('Mislukt: ' . $res['error']);
+
+                return self::FAILURE;
+            }
+            $did = true;
+        }
+
+        if (! $did) {
+            $this->warn('Niets te doen. Geef --pause, --enable of --budget=<euro> mee.');
+
+            return self::SUCCESS;
         }
 
         $this->info('Bijgewerkt: campagne ' . $id . '.');
 
-        return $this->lijst($ads);
+        return $this->lijst($mgr);
     }
 
-    private function lijst(GoogleAdsClient $ads): int
+    private function lijst(GoogleAdsManager $mgr): int
     {
-        $q = $ads->search('SELECT campaign.id, campaign.name, campaign.status, campaign_budget.amount_micros FROM campaign ORDER BY campaign.id');
-        if (! $q['ok']) {
-            $this->error('Ophalen mislukt: ' . $q['error']);
-
-            return self::FAILURE;
-        }
-
         $rows = [];
-        foreach ($q['results'] as $r) {
-            $c = $r['campaign'] ?? [];
-            $mic = (int) data_get($r, 'campaignBudget.amountMicros', 0);
+        foreach ($mgr->listCampaigns() as $c) {
             $rows[] = [
-                $c['id'] ?? '—',
-                mb_strimwidth((string) ($c['name'] ?? '—'), 0, 40, '…'),
-                ucfirst(strtolower((string) ($c['status'] ?? ''))),
-                '€ ' . number_format($mic / 1_000_000, 2, ',', '.'),
+                $c['id'],
+                mb_strimwidth($c['name'], 0, 40, '…'),
+                ucfirst(strtolower($c['status'])),
+                '€ ' . number_format($c['budget'], 2, ',', '.'),
             ];
         }
 
