@@ -107,19 +107,23 @@ return [
             'review', 'betekenis', 'bouwtekening', 'minifiguren',
         ],
 
+        // De eerste 3 koppen zijn zoekwoord-gericht en staan vast op positie 1
+        // (pin_h1 = 3): Google roteert dáárbinnen voor message-match, de overige
+        // 12 koppen — met de prijshaken — vullen positie 2/3.
+        'pin_h1'    => 3,
         'headlines' => [
-            'LEGO huren doe je hier', 'Grote sets, kleine prijs', 'LEGO sets huren & bouwen',
-            'Altijd wat nieuws te bouwen', 'Huren, bouwen, terugsturen', 'Voor jong en oud',
-            'Compleet & schoongemaakt', 'Snel bij je thuis', 'Geen dure aankoop',
-            'Duizenden sets op voorraad', 'Bouwplezier zonder rommel', 'Ruim LEGO-assortiment',
-            'Makkelijk online huren', 'Klaar? Kies een nieuwe set', 'LEGO-verhuurspecialist',
+            'LEGO huren doe je hier', 'LEGO sets huren & bouwen', 'Dé LEGO-verhuurspecialist',
+            'Sets al vanaf €1 per week', 'Abonnement vanaf €10 per jaar', 'Direct online geregeld',
+            'Geen dure aankoop', 'Compleet & schoongemaakt', 'Retour = nieuwe set',
+            'Voor jong en oud', 'Duizenden sets op voorraad', 'Bouwplezier zonder rommel',
+            'Altijd wat nieuws te bouwen', 'Klaar? Kies een nieuwe set', 'Snel bij je thuis',
         ],
 
         'descriptions' => [
-            'Huur complete LEGO-sets, gebouwd en gecontroleerd. Klaar? Retour en kies een nieuwe.',
-            'Duizenden sets voor jong en oud. Geen dure aankoop, geen rommel — puur bouwplezier.',
-            'Makkelijk online huren en snel in huis. Compleet, schoongemaakt en op voorraad.',
-            'Van kleine tot grote sets. Bouwsteenwinkel, dé specialist in LEGO verhuur.',
+            'Huur LEGO-sets al vanaf €1 per week of een abonnement vanaf €10 per jaar.',
+            'Compleet gebouwd en schoongemaakt. Klaar? Stuur retour en kies een nieuwe set.',
+            'Duizenden sets voor jong en oud. Geen dure aankoop en geen rommel, puur bouwplezier.',
+            'Makkelijk online geregeld. Dé specialist in LEGO huren en verhuur in Nederland.',
         ],
 
         // Echte rd01-slugs (themes/bouwsteenwinkel_rd01/page-*.php); paden zijn
@@ -127,13 +131,13 @@ return [
         'sitelinks' => [
             ['Bekijk alle sets', '/sets', 'Duizenden sets', 'Van klein tot groot'],
             ['Hoe werkt huren?', '/hoe-werkt-huren', 'Huren in 3 stappen', 'Simpel en snel'],
-            ['Lidmaatschap', '/lidmaatschap', 'Onbeperkt blijven bouwen', 'Vast bedrag per maand'],
+            ['Lidmaatschap', '/lidmaatschap', 'Al vanaf €10 per jaar', 'Bekijk de voordelen'],
             ['Huren of kopen?', '/huren-vs-kopen', 'Zie wat voordeliger is', 'Reken het zelf uit'],
         ],
 
         'callouts' => [
-            'LEGO huren', 'Compleet & schoon', 'Snel in huis', 'Voor jong en oud',
-            'Geen dure aankoop', 'Retour = nieuwe set',
+            'Sets vanaf €1 per week', 'Abo vanaf €10 per jaar', 'Compleet & schoongemaakt',
+            'Snel in huis', 'Geen dure aankoop', 'Retour = nieuwe set',
         ],
 
         'snippet' => ['header' => 'Types', 'values' => ['Kleine sets', 'Grote sets', 'Themasets', 'Voor bedrijven']],

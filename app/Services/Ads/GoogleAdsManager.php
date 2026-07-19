@@ -103,7 +103,7 @@ class GoogleAdsManager
             }
 
             $rsa = ['finalUrls' => [$url], 'responsiveSearchAd' => [
-                'headlines'    => $this->headlines((array) $p['headlines']),
+                'headlines'    => $this->headlines((array) $p['headlines'], (int) ($p['pin_h1'] ?? 1)),
                 'descriptions' => array_map(fn ($d) => ['text' => $d], (array) $p['descriptions']),
             ]];
             if (isset($paths[0])) {
@@ -196,12 +196,17 @@ class GoogleAdsManager
         ];
     }
 
-    private function headlines(array $texts): array
+    /**
+     * Zet de RSA-koppen om naar API-vorm en pint de eerste $pinH1 koppen op
+     * positie 1. Meerdere koppen op HEADLINE_1 = Google roteert dáárbinnen
+     * (message-match) terwijl de rest positie 2/3 vult — beter dan één harde pin.
+     */
+    private function headlines(array $texts, int $pinH1 = 1): array
     {
         $out = [];
-        foreach ($texts as $i => $text) {
+        foreach (array_values($texts) as $i => $text) {
             $h = ['text' => $text];
-            if ($i === 0) {
+            if ($i < $pinH1) {
                 $h['pinnedField'] = 'HEADLINE_1';
             }
             $out[] = $h;
@@ -264,12 +269,38 @@ class GoogleAdsManager
 
     /* ─────────────────────────── Beheren ─────────────────────────── */
 
-    /** @return array{ok:bool,error:?string} */
+    /**
+     * Zet de campagne op ENABLED of PAUSED. REMOVED kan NIET via een status-update
+     * (Google: INVALID_ENUM_VALUE) — daarvoor is removeCampaign(); daar routen we
+     * het naartoe zodat een verkeerde aanroep niet stilletjes faalt.
+     *
+     * @return array{ok:bool,error:?string}
+     */
     public function setStatus(string $id, string $status): array
     {
+        if ($status === 'REMOVED') {
+            return $this->removeCampaign($id);
+        }
+
         $camp = 'customers/' . $this->customerId() . '/campaigns/' . $id;
         $res = $this->client->mutate([
             ['campaignOperation' => ['update' => ['resourceName' => $camp, 'status' => $status], 'updateMask' => 'status']],
+        ]);
+
+        return ['ok' => $res['ok'], 'error' => $res['error']];
+    }
+
+    /**
+     * Verwijdert een campagne definitief via de aparte remove-operatie
+     * (status → REMOVED kan niet als update).
+     *
+     * @return array{ok:bool,error:?string}
+     */
+    public function removeCampaign(string $id): array
+    {
+        $camp = 'customers/' . $this->customerId() . '/campaigns/' . $id;
+        $res = $this->client->mutate([
+            ['campaignOperation' => ['remove' => $camp]],
         ]);
 
         return ['ok' => $res['ok'], 'error' => $res['error']];

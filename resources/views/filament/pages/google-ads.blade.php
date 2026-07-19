@@ -33,6 +33,10 @@
         .dark .gads-field input, .dark .gads-field select { border-color: #4b5563; background: rgba(255,255,255,.04); color: #fff; }
         .gads-hint { margin-top: .75rem; font-size: .78rem; color: #6b7280; }
         .dark .gads-hint { color: #9ca3af; }
+        .gads-toggle { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; color: #374151; margin-right: .7rem; cursor: pointer; user-select: none; }
+        .dark .gads-toggle { color: #d1d5db; }
+        .gads-toggle input { width: auto; margin: 0; cursor: pointer; }
+        .gads-actions { display: inline-flex; gap: .35rem; justify-content: flex-end; flex-wrap: wrap; }
     </style>
 
     @if (! $connected)
@@ -99,6 +103,10 @@
             <x-slot name="heading">Campagnes</x-slot>
             <x-slot name="description">"Beperkt door" toont waardoor je vertoningen misloopt: Budget (→ dagbudget verhogen) of Bod/CPC (→ maximale CPC/kwaliteit verhogen). Leeg = te weinig data.</x-slot>
             <x-slot name="headerEnd">
+                <label class="gads-toggle">
+                    <input type="checkbox" wire:model.live="showArchived">
+                    <span>Toon gearchiveerde{{ $this->archivedCount() > 0 ? ' (' . $this->archivedCount() . ')' : '' }}</span>
+                </label>
                 <x-filament::button size="sm" color="gray" wire:click="laden" icon="heroicon-o-arrow-path">Vernieuwen</x-filament::button>
             </x-slot>
 
@@ -119,16 +127,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (empty($campaigns))
-                            <tr><td colspan="10" style="padding: 1.5rem; text-align: center;" class="gads-muted">Nog geen campagnes in dit account.</td></tr>
+                        @php $visible = $this->visibleCampaigns(); @endphp
+                        @if (empty($visible))
+                            <tr><td colspan="10" style="padding: 1.5rem; text-align: center;" class="gads-muted">
+                                @if ($this->archivedCount() > 0)
+                                    Alle campagnes zijn gearchiveerd. Zet "Toon gearchiveerde" aan om ze te zien.
+                                @else
+                                    Nog geen campagnes in dit account.
+                                @endif
+                            </td></tr>
                         @endif
 
-                        @foreach ($campaigns as $c)
+                        @foreach ($visible as $c)
                             <tr class="{{ $c['status'] === 'REMOVED' ? 'gads-removed' : '' }}">
                                 <td class="gads-name">{{ $c['name'] }}</td>
                                 <td>
-                                    <x-filament::badge :color="['ENABLED' => 'success', 'PAUSED' => 'warning', 'REMOVED' => 'danger'][$c['status']] ?? 'gray'">
-                                        {{ ['ENABLED' => 'Actief', 'PAUSED' => 'Gepauzeerd', 'REMOVED' => 'Verwijderd'][$c['status']] ?? $c['status'] }}
+                                    <x-filament::badge :color="['ENABLED' => 'success', 'PAUSED' => 'warning', 'REMOVED' => 'gray'][$c['status']] ?? 'gray'">
+                                        {{ ['ENABLED' => 'Actief', 'PAUSED' => 'Gepauzeerd', 'REMOVED' => 'Gearchiveerd'][$c['status']] ?? $c['status'] }}
                                     </x-filament::badge>
                                 </td>
                                 <td>
@@ -168,12 +183,17 @@
                                     @endif
                                 </td>
                                 <td class="gads-num">
-                                    @if ($c['status'] === 'ENABLED')
-                                        <x-filament::button size="xs" color="warning" wire:click="pause('{{ $c['id'] }}')">Pauzeren</x-filament::button>
-                                    @elseif ($c['status'] === 'PAUSED')
-                                        <x-filament::button size="xs" color="success" wire:click="enable('{{ $c['id'] }}')" wire:confirm="Weet je het zeker? De campagne gaat live en geeft budget uit.">Activeren</x-filament::button>
-                                    @else
+                                    @if ($c['status'] === 'REMOVED')
                                         <span class="gads-muted">—</span>
+                                    @else
+                                        <div class="gads-actions">
+                                            @if ($c['status'] === 'ENABLED')
+                                                <x-filament::button size="xs" color="warning" wire:click="pause('{{ $c['id'] }}')">Pauzeren</x-filament::button>
+                                            @else
+                                                <x-filament::button size="xs" color="success" wire:click="enable('{{ $c['id'] }}')" wire:confirm="Weet je het zeker? De campagne gaat live en geeft budget uit.">Activeren</x-filament::button>
+                                            @endif
+                                            <x-filament::button size="xs" color="gray" wire:click="archive('{{ $c['id'] }}')" wire:confirm="Archiveren kan in Google Ads niet ongedaan worden gemaakt. Doorgaan?">Archiveren</x-filament::button>
+                                        </div>
                                     @endif
                                 </td>
                             </tr>

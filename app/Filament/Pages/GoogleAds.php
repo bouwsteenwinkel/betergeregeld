@@ -36,6 +36,9 @@ class GoogleAds extends Page
     /** Per campagne-ID het (bewerkbare) CPC-plafond als string. @var array<string,string> */
     public array $maxcpcs = [];
 
+    /** Toon ook gearchiveerde (verwijderde) campagnes in het overzicht. */
+    public bool $showArchived = false;
+
     /** Nieuwe-campagne-formulier: gekozen profiel + (overschrijfbaar) budget/CPC. */
     public string $newProfile = 'bedrijfswebsite';
 
@@ -117,6 +120,27 @@ class GoogleAds extends Page
         }
     }
 
+    /**
+     * De campagnes die zichtbaar zijn in de tabel. Gearchiveerde (REMOVED)
+     * campagnes worden standaard verborgen; met $showArchived komen ze erbij.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function visibleCampaigns(): array
+    {
+        if ($this->showArchived) {
+            return $this->campaigns;
+        }
+
+        return array_values(array_filter($this->campaigns, fn ($c) => $c['status'] !== 'REMOVED'));
+    }
+
+    /** Aantal gearchiveerde (verwijderde) campagnes — voor het schakel-label. */
+    public function archivedCount(): int
+    {
+        return count(array_filter($this->campaigns, fn ($c) => $c['status'] === 'REMOVED'));
+    }
+
     /** @return array{impressions:int,clicks:int,cost:float,conversions:float} */
     public function totals(): array
     {
@@ -159,6 +183,11 @@ class GoogleAds extends Page
     public function enable(string $id): void
     {
         $this->klaar(app(GoogleAdsManager::class)->setStatus($id, 'ENABLED'), 'Campagne geactiveerd — hij geeft nu budget uit');
+    }
+
+    public function archive(string $id): void
+    {
+        $this->klaar(app(GoogleAdsManager::class)->removeCampaign($id), 'Campagne gearchiveerd');
     }
 
     public function saveBudget(string $id): void
