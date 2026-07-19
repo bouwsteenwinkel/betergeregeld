@@ -15,6 +15,17 @@
 		'Klanten in :city vergelijken snel en beslissen nog sneller. Een verzorgde :service die op elke telefoon werkt, geeft je in :city net dat streepje voor.',
 	];
 	$angle = str_replace([':city', ':service'], [$placeName, $service], $angles[abs(crc32($site->key . '|' . $placeSlug)) % count($angles)]);
+
+	// Compat-shim: deze view is herschreven naar korte var-namen ($c/$biz/$faq/
+	// $facets/$ld) maar ChannelSiteController@place levert nog de lange namen
+	// (content/businesses/…). Zonder dit 500't elke plaatspagina op een undefined
+	// variable. Koppelt de controller-data door; blijft correct als de controller
+	// later zelf de korte namen meegeeft (?? behoudt een meegegeven waarde).
+	$c      = $c      ?? ($content ?? []);
+	$biz    = $biz    ?? ($businesses ?? []);
+	$faq    = $faq    ?? ($c['faq'] ?? []);
+	$facets = $facets ?? (array) config('groeidiamant.facets', []);
+	$ld     = $ld     ?? [];
 @endphp
 @extends('channels.layout')
 
@@ -26,7 +37,10 @@
 @endunless
 
 @push('head')
-	@foreach ($ld as $block)
+	{{-- $ld = optionele extra JSON-LD-blokken vanuit de controller. Default leeg
+	     zodat de plaatspagina niet 500't als de var (nog) niet wordt meegegeven;
+	     het Service-/Breadcrumb-schema hieronder staat er sowieso. --}}
+	@foreach (($ld ?? []) as $block)
 		<script type="application/ld+json">{!! json_encode($block, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 	@endforeach
 @endpush
@@ -82,7 +96,7 @@
 			<div class="wrap">
 				<h2>Wat je krijgt in {{ $placeName }}</h2>
 				<div class="grid cols-4" style="margin-top:1.4rem">
-					@foreach ($h['features'] as $f)
+					@foreach (($h['features'] ?? []) as $f)
 						<div class="card">
 							{{-- Altijd inline-SVG (nooit emoji). --}}
 							<div style="color:var(--c-primary);margin-bottom:.5rem">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
