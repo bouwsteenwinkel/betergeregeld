@@ -103,7 +103,7 @@ class GoogleAdsManager
             }
 
             $rsa = ['finalUrls' => [$url], 'responsiveSearchAd' => [
-                'headlines'    => $this->headlines((array) $p['headlines'], (int) ($p['pin_h1'] ?? 1)),
+                'headlines'    => $this->headlines((array) $p['headlines'], (int) ($p['pin_h1'] ?? 0)),
                 'descriptions' => array_map(fn ($d) => ['text' => $d], (array) $p['descriptions']),
             ]];
             if (isset($paths[0])) {
@@ -197,11 +197,12 @@ class GoogleAdsManager
     }
 
     /**
-     * Zet de RSA-koppen om naar API-vorm en pint de eerste $pinH1 koppen op
-     * positie 1. Meerdere koppen op HEADLINE_1 = Google roteert dáárbinnen
-     * (message-match) terwijl de rest positie 2/3 vult — beter dan één harde pin.
+     * Zet de RSA-koppen om naar API-vorm. Standaard $pinH1 = 0 = NIET pinnen:
+     * dat geeft de beste Advertentiekwaliteit en laat Google alle koppen-
+     * combinaties testen. Alleen bij een expliciete pin_h1 in het profiel worden
+     * de eerste $pinH1 koppen op positie 1 gepind (zelden nodig).
      */
-    private function headlines(array $texts, int $pinH1 = 1): array
+    private function headlines(array $texts, int $pinH1 = 0): array
     {
         $out = [];
         foreach (array_values($texts) as $i => $text) {

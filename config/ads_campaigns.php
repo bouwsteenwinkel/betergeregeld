@@ -107,10 +107,11 @@ return [
             'review', 'betekenis', 'bouwtekening', 'minifiguren',
         ],
 
-        // De eerste 3 koppen zijn zoekwoord-gericht en staan vast op positie 1
-        // (pin_h1 = 3): Google roteert dáárbinnen voor message-match, de overige
-        // 12 koppen — met de prijshaken — vullen positie 2/3.
-        'pin_h1'    => 3,
+        // Niet pinnen (pin_h1 = 0): met 15 sterke, zoekwoord-rijke koppen zet
+        // Google zelf de meest relevante kop vooraan (message-match) en test alle
+        // combinaties. Pinnen zou de Advertentiekwaliteit naar "Slecht" trekken
+        // zonder echte winst. De zoekwoord-koppen staan bewust vooraan in de lijst.
+        'pin_h1'    => 0,
         'headlines' => [
             'LEGO huren doe je hier', 'LEGO sets huren & bouwen', 'Dé LEGO-verhuurspecialist',
             'Sets al vanaf €1 per week', 'Abonnement vanaf €10 per jaar', 'Direct online geregeld',
