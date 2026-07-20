@@ -211,7 +211,7 @@ return [
             'Steeds een nieuwe set', 'Voor elke leeftijd', 'Geen dure aankoop',
         ],
 
-        'snippet' => ['header' => 'Types', 'values' => ['Voor kleuters', 'Voor kinderen', 'Voor tieners', 'Voor volwassenen']],
+        'snippet' => ['header' => 'Types', 'values' => ['Kleine sets', 'Grote sets', 'Themasets', 'Verrassingssets']],
 
         'call_phone' => '035 201 1720',
     ],
