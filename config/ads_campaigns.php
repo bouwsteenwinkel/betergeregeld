@@ -300,8 +300,8 @@ return [
             'LEGO huren per maand' => [
                 'LEGO huren per maand', 'LEGO sets huren en bouwen', 'Elke maand LEGO huren',
                 'LEGO huren met abonnement', 'Huur elke maand een set', 'LEGO huren vanaf €31,25',
-                'LEGO-sets huren, geen kopen', 'Klaar? Huur de volgende set', 'Verzenden en retour gratis',
-                'Compleet en schoongemaakt', 'Geen dure aankoop, wel huren', 'Bouwplezier zonder rommel',
+                'LEGO-sets huren, geen kopen', 'Klaar? Huur de volgende set', 'LEGO sets huren per maand',
+                'LEGO lenen met abonnement', 'Geen dure aankoop, wel huren', 'LEGO-abonnement of los huren',
                 'LEGO huren, elke maand nieuw', 'Maandelijks LEGO huren', 'LEGO huren zonder kopen',
             ],
         ],
@@ -316,9 +316,9 @@ return [
                 'Maandelijks een LEGO-box vol bouwplezier. Klaar? De volgende maandbox staat al klaar.',
             ],
             'LEGO huren per maand' => [
-                'Huur elke maand een complete LEGO-set. Verzenden en retour gratis, al vanaf €31,25.',
-                'LEGO huren per maand: een set t.w.v. €200-350. Geen dure aankoop meer nodig.',
-                'Klaar met bouwen? Stuur de set retour en huur de volgende, zo vaak je wilt.',
+                'LEGO huren met abonnement: elke maand een set. Verzenden en retour gratis, vanaf €31,25.',
+                'LEGO sets huren per maand: een set t.w.v. €200-350. Geen dure aankoop meer nodig.',
+                'Liever LEGO lenen dan kopen? Stuur de set retour en huur maandelijks de volgende.',
                 'Compleet gebouwd en schoongemaakt bij je thuis. LEGO huren zonder rommel of gedoe.',
             ],
         ],
