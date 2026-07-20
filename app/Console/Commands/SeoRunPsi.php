@@ -56,7 +56,7 @@ class SeoRunPsi extends Command
 
 			foreach ($urls as $url) {
 				foreach ($strategies as $strategy) {
-					$m = $psi->fetch($url, $strategy);
+					$m = $this->fetchWithRetry($psi, $url, $strategy);
 					$row = [
 						'property_id'          => $prop->id,
 						'url'                  => $url,
@@ -104,6 +104,36 @@ class SeoRunPsi extends Command
 		// flaky "Lighthouse returned error" of een uitgefaseerde URL — laten de job
 		// niet omvallen; ze staan per meting gelogd. Quota telt sowieso niet als fout.
 		return ($totalOk === 0 && $totalFail > 0) ? self::FAILURE : self::SUCCESS;
+	}
+
+	/**
+	 * PSI-meting met retry. Lighthouse geeft op snelle bursts geregeld transiente
+	 * fouten (NO_FCP, FAILED_DOCUMENT_REQUEST, "Something went wrong"); een korte
+	 * pauze + nieuwe poging slaagt dan meestal, en de wachttijd tempert de burst.
+	 * Een geslaagde eerste poging kost geen vertraging. Een 429/quota wordt NIET
+	 * herhaald (dat lost een retry niet op) — die geven we door aan de
+	 * quota-afhandeling in de aanroeper.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	private function fetchWithRetry($psi, string $url, string $strategy): ?array
+	{
+		for ($poging = 1; $poging <= 3; $poging++) {
+			$m = $psi->fetch($url, $strategy);
+			if ($m !== null) {
+				return $m;
+			}
+
+			$err = (string) $psi->lastError;
+			if (str_contains($err, '429') || stripos($err, 'quota') !== false || stripos($err, 'rate') !== false) {
+				return null; // quota: retry zinloos, door naar de quota-afhandeling
+			}
+			if ($poging < 3) {
+				sleep(4 * $poging); // 4s, dan 8s — de Lighthouse-runner even laten bijkomen
+			}
+		}
+
+		return null; // na retries nog steeds mislukt; $psi->lastError blijft staan
 	}
 
 	/**
