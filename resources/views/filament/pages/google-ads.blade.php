@@ -48,6 +48,11 @@
             </p>
         </x-filament::section>
     @else
+        @if ($autoRefresh)
+            {{-- Onzichtbare poll: ververst elke 60s alleen de cijfers (niet de budget-velden). --}}
+            <div wire:poll.60s="refreshMetrics" wire:key="gads-autopoll" style="display:none"></div>
+        @endif
+
         @php
             $t = $this->totals();
             $kaarten = [
@@ -140,6 +145,13 @@
                     <input type="checkbox" wire:model.live="showArchived">
                     <span>Toon gearchiveerde{{ $this->archivedCount() > 0 ? ' (' . $this->archivedCount() . ')' : '' }}</span>
                 </label>
+                <label class="gads-toggle">
+                    <input type="checkbox" wire:model.live="autoRefresh">
+                    <span>Auto-verversen{{ $autoRefresh ? ' (60s)' : '' }}</span>
+                </label>
+                @if ($lastLoaded)
+                    <span class="gads-muted" style="font-size: .78rem;" wire:loading.class="gads-refreshing" wire:target="refreshMetrics,laden">bijgewerkt {{ $lastLoaded }}</span>
+                @endif
                 <x-filament::button size="sm" color="gray" wire:click="laden" icon="heroicon-o-arrow-path">Vernieuwen</x-filament::button>
             </x-slot>
 
@@ -149,6 +161,7 @@
                         <tr>
                             <th>Campagne</th>
                             <th>Status</th>
+                            <th>Advertentie</th>
                             <th>Dagbudget</th>
                             <th>Max. CPC</th>
                             <th class="gads-num">Vertoningen</th>
@@ -162,7 +175,7 @@
                     <tbody>
                         @php $visible = $this->visibleCampaigns(); @endphp
                         @if (empty($visible))
-                            <tr><td colspan="10" style="padding: 1.5rem; text-align: center;" class="gads-muted">
+                            <tr><td colspan="11" style="padding: 1.5rem; text-align: center;" class="gads-muted">
                                 @if ($this->archivedCount() > 0)
                                     Alle campagnes zijn gearchiveerd. Zet "Toon gearchiveerde" aan om ze te zien.
                                 @else
@@ -178,6 +191,17 @@
                                     <x-filament::badge :color="['ENABLED' => 'success', 'PAUSED' => 'warning', 'REMOVED' => 'gray'][$c['status']] ?? 'gray'">
                                         {{ ['ENABLED' => 'Actief', 'PAUSED' => 'Gepauzeerd', 'REMOVED' => 'Gearchiveerd'][$c['status']] ?? $c['status'] }}
                                     </x-filament::badge>
+                                </td>
+                                <td>
+                                    @php $as = $this->adStatus[$c['id']] ?? null; @endphp
+                                    @if ($as && $c['status'] !== 'REMOVED')
+                                        <div style="display: flex; flex-direction: column; gap: .25rem; align-items: flex-start;">
+                                            <x-filament::badge :color="$as['ad_color']" size="sm">{{ $as['ad_label'] }}</x-filament::badge>
+                                            <x-filament::badge :color="$as['strength_color']" size="sm">{{ $as['strength_label'] }}</x-filament::badge>
+                                        </div>
+                                    @else
+                                        <span class="gads-muted">—</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if ($c['status'] !== 'REMOVED')

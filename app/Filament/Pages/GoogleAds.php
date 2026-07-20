@@ -36,8 +36,17 @@ class GoogleAds extends Page
     /** Per campagne-ID het (bewerkbare) CPC-plafond als string. @var array<string,string> */
     public array $maxcpcs = [];
 
+    /** Per campagne-ID de advertentie-/reviewstatus + kwaliteit. @var array<string,array<string,string>> */
+    public array $adStatus = [];
+
     /** Toon ook gearchiveerde (verwijderde) campagnes in het overzicht. */
     public bool $showArchived = false;
+
+    /** Automatisch verversen (Livewire-poll) terwijl je op de pagina blijft. */
+    public bool $autoRefresh = false;
+
+    /** Tijdstip van de laatste (her)laadactie, voor zichtbare feedback. */
+    public ?string $lastLoaded = null;
 
     /** Nieuwe-campagne-formulier: gekozen profiel + (overschrijfbaar) budget/CPC. */
     public string $newProfile = 'bedrijfswebsite';
@@ -123,6 +132,22 @@ class GoogleAds extends Page
             $this->budgets[$c['id']] = number_format((float) $c['budget'], 2, '.', '');
             $this->maxcpcs[$c['id']] = $c['maxCpc'] > 0 ? number_format((float) $c['maxCpc'], 2, '.', '') : '';
         }
+
+        $this->adStatus   = app(GoogleAdsManager::class)->adStatusByCampaign();
+        $this->lastLoaded = now()->format('H:i:s');
+    }
+
+    /**
+     * Lichte ververs-actie voor de auto-poll: alleen de campagne-cijfers (vertoningen,
+     * klikken, kosten, status) opnieuw ophalen. Raakt bewust NIET de budget-/CPC-
+     * invoervelden ($budgets/$maxcpcs) aan, zodat een poll je niet overschrijft
+     * terwijl je een bedrag aan het typen bent.
+     */
+    public function refreshMetrics(): void
+    {
+        $this->campaigns  = app(GoogleAdsManager::class)->listCampaigns();
+        $this->adStatus   = app(GoogleAdsManager::class)->adStatusByCampaign();
+        $this->lastLoaded = now()->format('H:i:s');
     }
 
     /**

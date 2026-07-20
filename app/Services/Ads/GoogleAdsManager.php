@@ -355,6 +355,86 @@ class GoogleAdsManager
         }, $res['results']);
     }
 
+    /**
+     * Per campagne een display-klare samenvatting van de advertentie-review:
+     * goedkeurings-/reviewstatus én de (laagste) Advertentiekwaliteit over de actieve
+     * RSA's. Zo zie je in de admin of nieuwe/gewijzigde advertenties nog in Google-
+     * review staan en wat hun kwaliteit is — zonder naar de Google-UI te hoeven.
+     *
+     * @return array<string,array{ad_label:string,ad_color:string,strength_label:string,strength_color:string}>
+     */
+    public function adStatusByCampaign(): array
+    {
+        $r = $this->client->search(
+            'SELECT campaign.id, ad_group_ad.ad_strength, ad_group_ad.policy_summary.approval_status, '
+            . 'ad_group_ad.policy_summary.review_status '
+            . "FROM ad_group_ad WHERE ad_group_ad.status = 'ENABLED'"
+        );
+        if (! $r['ok']) {
+            return [];
+        }
+
+        $raw = [];
+        foreach ($r['results'] as $row) {
+            $id = (string) data_get($row, 'campaign.id');
+            if ($id === '') {
+                continue;
+            }
+            $raw[$id]['review'][]   = (string) data_get($row, 'adGroupAd.policySummary.reviewStatus', '');
+            $raw[$id]['approval'][] = (string) data_get($row, 'adGroupAd.policySummary.approvalStatus', '');
+            $raw[$id]['strength'][] = (string) data_get($row, 'adGroupAd.adStrength', '');
+        }
+
+        // Rangorde om de "slechtste" kwaliteit over de advertentiegroepen te tonen.
+        $strengthRank = ['POOR' => 0, 'AVERAGE' => 1, 'GOOD' => 2, 'EXCELLENT' => 3];
+        $strengthMap  = [
+            'POOR'      => ['Slecht', 'danger'],
+            'AVERAGE'   => ['Gemiddeld', 'warning'],
+            'GOOD'      => ['Goed', 'success'],
+            'EXCELLENT' => ['Uitstekend', 'success'],
+        ];
+
+        $out = [];
+        foreach ($raw as $id => $sets) {
+            // Advertentie-status: review gaat vóór; anders de strengste bezwaren tonen.
+            if (in_array('REVIEW_IN_PROGRESS', $sets['review'], true)) {
+                $adLabel = 'In review';
+                $adColor = 'warning';
+            } elseif (in_array('DISAPPROVED', $sets['approval'], true)) {
+                $adLabel = 'Afgekeurd';
+                $adColor = 'danger';
+            } elseif (in_array('APPROVED_LIMITED', $sets['approval'], true)) {
+                $adLabel = 'Beperkt goedgekeurd';
+                $adColor = 'warning';
+            } elseif (in_array('APPROVED', $sets['approval'], true)) {
+                $adLabel = 'Goedgekeurd';
+                $adColor = 'success';
+            } else {
+                $adLabel = '—';
+                $adColor = 'gray';
+            }
+
+            // Kwaliteit: laagste bekende rang; alles onbekend/PENDING → "wordt berekend".
+            $known = array_values(array_filter($sets['strength'], fn ($s) => isset($strengthRank[$s])));
+            if ($known === []) {
+                $strengthLabel = 'Wordt berekend';
+                $strengthColor = 'gray';
+            } else {
+                usort($known, fn ($a, $b) => $strengthRank[$a] <=> $strengthRank[$b]);
+                [$strengthLabel, $strengthColor] = $strengthMap[$known[0]];
+            }
+
+            $out[$id] = [
+                'ad_label'       => $adLabel,
+                'ad_color'       => $adColor,
+                'strength_label' => $strengthLabel,
+                'strength_color' => $strengthColor,
+            ];
+        }
+
+        return $out;
+    }
+
     /* ─────────────────────────── Beheren ─────────────────────────── */
 
     /**
