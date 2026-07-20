@@ -259,9 +259,11 @@ class GoogleAdsManager
         $url   = (string) $p['final_url'];
         $paths = array_values(array_filter((array) ($p['paths'] ?? []), fn ($x) => $x !== ''));
 
+        // REMOVED uitsluiten: al-verwijderde advertenties (van een vorige sync) mogen
+        // niet nóg eens verwijderd worden (CANNOT_OPERATE_ON_REMOVED_ADGROUPAD).
         $q = $this->client->search(
             'SELECT ad_group.name, ad_group.resource_name, ad_group_ad.resource_name, ad_group_ad.ad.type '
-            . "FROM ad_group_ad WHERE campaign.id = {$campaignId}"
+            . "FROM ad_group_ad WHERE campaign.id = {$campaignId} AND ad_group_ad.status != 'REMOVED'"
         );
         if (! $q['ok']) {
             return ['ok' => false, 'error' => $q['error'], 'groups' => 0, 'replaced' => 0];

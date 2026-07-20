@@ -87,12 +87,14 @@ return [
                 'ZZP-website laten maken', 'Website voor jouw bedrijf', 'Gratis voorbeeld in 1 minuut',
                 'Eerst zien, dan beslissen', 'Vaste prijs, geen verrassingen', 'Eén vaste contactpersoon',
                 'Snel online, zonder gedoe', 'Klaar terwijl je kijkt', 'Meer klanten via je site',
+                'In heel Nederland geregeld', 'Website binnen een week', 'Nieuwe website laten maken',
             ],
             'Betaalbare website' => [
                 'Betaalbare website', 'Goedkope website laten maken', 'Simpele website laten maken',
                 'Website voor ondernemers', 'Betaalbaar en professioneel', 'Vaste prijs, geen verrassingen',
                 'Gratis voorbeeld in 1 minuut', 'Website voor zzp en mkb', 'Eerst zien, dan beslissen',
                 'Professioneel en betaalbaar', 'Snel online, zonder gedoe', 'Geen technische kennis nodig',
+                'Betaalbare bedrijfswebsite', 'Website zonder hoge kosten', 'In heel Nederland geregeld',
             ],
         ],
 
@@ -171,12 +173,14 @@ return [
                 'LEGO huren vanaf €1 per week', 'LEGO set huren, geen kopen', 'Duizenden sets om te huren',
                 'Compleet en schoongemaakt', 'Klaar? Kies een nieuwe set', 'Retour is een nieuwe set',
                 'Bouwplezier zonder rommel', 'Snel bij je thuis bezorgd', 'Geen dure LEGO-aankoop',
+                'LEGO huren in heel Nederland', 'Nieuwe set, elke keer weer', 'Voordelig LEGO huren',
             ],
             'LEGO verhuur & abonnement' => [
                 'LEGO verhuur voor iedereen', 'LEGO-abonnement vanaf €10', 'Dé LEGO-verhuurspecialist',
                 'LEGO pakket huren', 'Abonnement of los huren', 'LEGO verhuur en abonnement',
                 'Sets al vanaf €1 per week', 'Abonnement vanaf €10 per jaar', 'Compleet en schoongemaakt',
                 'Duizenden sets op voorraad', 'Bouwplezier zonder rommel', 'Geen dure LEGO-aankoop',
+                'LEGO verhuur in Nederland', 'Onbeperkt LEGO met abo', 'Voordelig LEGO verhuur',
             ],
         ],
 
@@ -291,12 +295,14 @@ return [
                 'LEGO-abonnement als cadeau', 'LEGO-maandbox op de mat', 'Setwaarde €200 tot €350',
                 'Vast bedrag per maand', 'Verzenden en retour gratis', 'Compleet en schoongemaakt',
                 'Geen dure LEGO-aankoop', 'Bouwplezier zonder rommel', 'Klaar? Kies je volgende set',
+                'Maandelijks LEGO-plezier', 'Nieuwe verrassing per maand', 'Elke maand bouwplezier',
             ],
             'LEGO huren per maand' => [
                 'LEGO huren per maand', 'LEGO sets huren en bouwen', 'Elke maand LEGO huren',
                 'LEGO huren met abonnement', 'Huur elke maand een set', 'LEGO huren vanaf €31,25',
                 'LEGO-sets huren, geen kopen', 'Klaar? Huur de volgende set', 'Verzenden en retour gratis',
                 'Compleet en schoongemaakt', 'Geen dure aankoop, wel huren', 'Bouwplezier zonder rommel',
+                'LEGO huren, elke maand nieuw', 'Maandelijks LEGO huren', 'LEGO huren zonder kopen',
             ],
         ],
 
