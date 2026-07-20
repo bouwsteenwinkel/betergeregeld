@@ -102,24 +102,7 @@ class GoogleAdsManager
                 $ops[] = ['adGroupCriterionOperation' => ['create' => ['adGroup' => $ag, 'status' => 'ENABLED', 'keyword' => ['text' => $text, 'matchType' => $match]]]];
             }
 
-            // Koppen/descriptions kunnen per advertentiegroep worden overschreven
-            // (ad_group_headlines/ad_group_descriptions op groepsnaam). Zonder
-            // override valt de groep terug op de gedeelde profiel-set. Zo matchen de
-            // koppen de zoekwoorden van die groep — cruciaal voor de Advertentiekwaliteit.
-            $agHeadlines    = (array) ($p['ad_group_headlines'][$agName] ?? $p['headlines']);
-            $agDescriptions = (array) ($p['ad_group_descriptions'][$agName] ?? $p['descriptions']);
-
-            $rsa = ['finalUrls' => [$url], 'responsiveSearchAd' => [
-                'headlines'    => $this->headlines($agHeadlines, (int) ($p['pin_h1'] ?? 0)),
-                'descriptions' => array_map(fn ($d) => ['text' => $d], $agDescriptions),
-            ]];
-            if (isset($paths[0])) {
-                $rsa['responsiveSearchAd']['path1'] = $paths[0];
-            }
-            if (isset($paths[1])) {
-                $rsa['responsiveSearchAd']['path2'] = $paths[1];
-            }
-            $ops[] = ['adGroupAdOperation' => ['create' => ['adGroup' => $ag, 'status' => 'ENABLED', 'ad' => $rsa]]];
+            $ops[] = ['adGroupAdOperation' => ['create' => ['adGroup' => $ag, 'status' => 'ENABLED', 'ad' => $this->rsaAd($p, $agName, $url, $paths)]]];
         }
 
         // Extensies (campagne-breed). Sitelink-URL's gaan t.o.v. het domein-root,
@@ -221,6 +204,103 @@ class GoogleAdsManager
         }
 
         return $out;
+    }
+
+    /**
+     * Bouwt het RSA-advertentieobject voor één advertentiegroep. Koppen/descriptions
+     * kunnen per groep worden overschreven (ad_group_headlines/ad_group_descriptions
+     * op groepsnaam); zonder override valt de groep terug op de gedeelde profiel-set.
+     * Zo matchen de koppen de zoekwoorden van die groep — bepalend voor de
+     * Advertentiekwaliteit. Gedeeld door aanmaken (campaignOperations) en in-place
+     * bijwerken (syncAdsFromProfile).
+     *
+     * @param array<string,mixed> $p
+     * @param array<int,string>   $paths
+     * @return array<string,mixed>
+     */
+    private function rsaAd(array $p, string $agName, string $url, array $paths): array
+    {
+        $agHeadlines    = (array) ($p['ad_group_headlines'][$agName] ?? $p['headlines']);
+        $agDescriptions = (array) ($p['ad_group_descriptions'][$agName] ?? $p['descriptions']);
+
+        $rsa = ['finalUrls' => [$url], 'responsiveSearchAd' => [
+            'headlines'    => $this->headlines($agHeadlines, (int) ($p['pin_h1'] ?? 0)),
+            'descriptions' => array_map(fn ($d) => ['text' => $d], $agDescriptions),
+        ]];
+        if (isset($paths[0])) {
+            $rsa['responsiveSearchAd']['path1'] = $paths[0];
+        }
+        if (isset($paths[1])) {
+            $rsa['responsiveSearchAd']['path2'] = $paths[1];
+        }
+
+        return $rsa;
+    }
+
+    /**
+     * Werkt de advertenties van een BESTAANDE campagne bij naar het profiel, zónder
+     * de campagne te slopen (status + historie blijven). Per advertentiegroep die het
+     * profiel kent: een nieuwe RSA aanmaken (met de per-groep koppen/descriptions) en
+     * de oude RSA('s) verwijderen. RSA's zijn immutable → create+remove, atomair in
+     * één mutate zodat de groep nooit zonder advertentie zit (mislukt de create, dan
+     * gebeurt de remove ook niet). Advertentiegroepen matchen op NAAM; groepen buiten
+     * het profiel blijven ongemoeid. Zo herstel je een "Slechte" Advertentiekwaliteit
+     * op een live campagne.
+     *
+     * @return array{ok:bool,error:?string,groups:int,replaced:int}
+     */
+    public function syncAdsFromProfile(string $campaignId, string $profileKey, bool $validateOnly = false): array
+    {
+        $p = $this->profile($profileKey);
+        if (! $p) {
+            return ['ok' => false, 'error' => "Onbekend profiel: {$profileKey}", 'groups' => 0, 'replaced' => 0];
+        }
+
+        $url   = (string) $p['final_url'];
+        $paths = array_values(array_filter((array) ($p['paths'] ?? []), fn ($x) => $x !== ''));
+
+        $q = $this->client->search(
+            'SELECT ad_group.name, ad_group.resource_name, ad_group_ad.resource_name, ad_group_ad.ad.type '
+            . "FROM ad_group_ad WHERE campaign.id = {$campaignId}"
+        );
+        if (! $q['ok']) {
+            return ['ok' => false, 'error' => $q['error'], 'groups' => 0, 'replaced' => 0];
+        }
+
+        // Groepeer bestaande RSA's per advertentiegroep-naam.
+        $byGroup = [];
+        foreach ($q['results'] as $r) {
+            $name = (string) data_get($r, 'adGroup.name');
+            $byGroup[$name]['adGroup'] = (string) data_get($r, 'adGroup.resourceName');
+            if (data_get($r, 'adGroupAd.ad.type') === 'RESPONSIVE_SEARCH_AD') {
+                $byGroup[$name]['ads'][] = (string) data_get($r, 'adGroupAd.resourceName');
+            }
+        }
+
+        $ops      = [];
+        $groups   = 0;
+        $replaced = 0;
+        foreach ($byGroup as $name => $info) {
+            if (! isset($p['ad_groups'][$name]) || empty($info['adGroup'])) {
+                continue; // groep die het profiel niet kent → met rust laten
+            }
+            $groups++;
+            $ops[] = ['adGroupAdOperation' => ['create' => [
+                'adGroup' => $info['adGroup'], 'status' => 'ENABLED', 'ad' => $this->rsaAd($p, $name, $url, $paths),
+            ]]];
+            foreach ($info['ads'] ?? [] as $adRes) {
+                $ops[] = ['adGroupAdOperation' => ['remove' => $adRes]];
+                $replaced++;
+            }
+        }
+
+        if ($ops === []) {
+            return ['ok' => false, 'error' => 'Geen overeenkomende advertentiegroepen gevonden.', 'groups' => 0, 'replaced' => 0];
+        }
+
+        $res = $this->client->mutate($ops, null, $validateOnly);
+
+        return ['ok' => $res['ok'], 'error' => $res['error'], 'groups' => $groups, 'replaced' => $replaced];
     }
 
     private function domainRoot(string $url): string
@@ -433,6 +513,68 @@ class GoogleAdsManager
             (string) ($p['snippet']['header'] ?? 'Types'),
             (array) $p['snippet']['values'],
         );
+    }
+
+    /**
+     * Vervangt de sitelinks van een BESTAANDE campagne door die uit het profiel.
+     * Sitelink-assets zijn immutable → bestaande SITELINK-koppelingen ontkoppelen en
+     * nieuwe assets aanmaken + koppelen, atomair in één mutate. Zo vang je een
+     * "voeg sitelinks toe"-aanbeveling af op een live campagne, zonder 'm te slopen.
+     *
+     * @return array{ok:bool,error:?string,removed:int,added:int}
+     */
+    public function syncSitelinksFromProfile(string $campaignId, string $profileKey, bool $validateOnly = false): array
+    {
+        $p = $this->profile($profileKey);
+        if (! $p) {
+            return ['ok' => false, 'error' => "Onbekend profiel: {$profileKey}", 'removed' => 0, 'added' => 0];
+        }
+        $sitelinks = array_values(array_filter((array) ($p['sitelinks'] ?? [])));
+        if ($sitelinks === []) {
+            return ['ok' => false, 'error' => "Profiel '{$profileKey}' heeft geen sitelinks.", 'removed' => 0, 'added' => 0];
+        }
+
+        $cid  = $this->customerId();
+        $camp = "customers/{$cid}/campaigns/{$campaignId}";
+        $root = $this->domainRoot((string) $p['final_url']);
+
+        $q = $this->client->search(
+            'SELECT campaign_asset.resource_name, campaign_asset.field_type '
+            . "FROM campaign_asset WHERE campaign_asset.campaign = '{$camp}'"
+        );
+        if (! $q['ok']) {
+            return ['ok' => false, 'error' => $q['error'], 'removed' => 0, 'added' => 0];
+        }
+
+        $ops     = [];
+        $removed = 0;
+        foreach ($q['results'] as $r) {
+            if ((string) data_get($r, 'campaignAsset.fieldType') !== 'SITELINK') {
+                continue;
+            }
+            if ($link = data_get($r, 'campaignAsset.resourceName')) {
+                $ops[] = ['campaignAssetOperation' => ['remove' => $link]];
+                $removed++;
+            }
+        }
+
+        $aid   = -1;
+        $added = 0;
+        foreach ($sitelinks as [$text, $spath, $d1, $d2]) {
+            $asset = "customers/{$cid}/assets/{$aid}";
+            $aid--;
+            $ops[] = ['assetOperation' => ['create' => [
+                'resourceName'  => $asset,
+                'finalUrls'     => [$root . $spath],
+                'sitelinkAsset' => ['linkText' => $text, 'description1' => $d1, 'description2' => $d2],
+            ]]];
+            $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'SITELINK']]];
+            $added++;
+        }
+
+        $res = $this->client->mutate($ops, null, $validateOnly);
+
+        return ['ok' => $res['ok'], 'error' => $res['error'], 'removed' => $removed, 'added' => $added];
     }
 
     /* ─────────────────────── Conversies (offline import) ─────────────────────── */

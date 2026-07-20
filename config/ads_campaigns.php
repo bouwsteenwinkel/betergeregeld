@@ -13,6 +13,23 @@
  * Grenzen (Google): kop ≤30 tekens, beschrijving ≤90, sitelink-tekst ≤25 +
  * 2 beschrijvingen ≤35, callout ≤25, fragment-waarde ≤25. Fragment-kop moet uit
  * Google's vaste lijst komen ("Types" is universeel geldig).
+ *
+ * RECEPT VOOR EEN NIEUW PROFIEL (goede Advertentiekwaliteit — geleerd 2026-07-20):
+ *  - Koppen PER advertentiegroep via 'ad_group_headlines' (map op groepsnaam), zodat
+ *    elke groep de eigen zoekwoorden in de koppen heeft. Eén gedeelde set voor meerdere
+ *    groepen = "Slecht" voor de groep die het minst matcht. Terugval op 'headlines'.
+ *  - Idem 'ad_group_descriptions' als Google om zoekwoorden in de beschrijvingen vraagt.
+ *  - Geef ~12 UNIEKE koppen per groep; vermijd bijna-dubbele varianten (Google straft
+ *    lage variatie af). Niet pinnen (pin_h1 = 0) tenzij echt nodig.
+ *  - Minstens ~8 sitelinks; verifieer elke slug eerst (curl met VOLLEDIGE user-agent —
+ *    bouwsteenwinkel.nl 403't korte UA's via Cloudflare, wat als "kapot" oogt).
+ *  - Fragment ('snippet'): GEEN oplopende leeftijdsladder (kleuters→tieners→volwassenen);
+ *    Google's classifier vlagt dat als seksueel expliciet. Gebruik product-/set-types.
+ *  - Merknamen van concurrenten NOOIT in de advertentietekst (wel als zoekwoord).
+ *
+ * Live campagne bijwerken naar het profiel (status/historie blijven): `ads:sync
+ * {campagne} --profile=…` (advertenties + sitelinks + fragment; --validate om te toetsen).
+ * Een gepauzeerde campagne met 0 vertoningen mag je gewoon opnieuw opbouwen.
  */
 
 return [
@@ -62,11 +79,30 @@ return [
             'Bekijk vrijblijvend hoe jouw bedrijfswebsite eruit kan zien. Start nu gratis.',
         ],
 
+        // Koppen per advertentiegroep, zodat elke groep de eigen zoekwoorden dekt
+        // (laten-maken vs betaalbaar). Groepen zonder eigen set vallen terug op 'headlines'.
+        'ad_group_headlines' => [
+            'Website laten maken' => [
+                'Website laten maken?', 'Bedrijfswebsite laten maken', 'Professionele bedrijfswebsite',
+                'ZZP-website laten maken', 'Website voor jouw bedrijf', 'Gratis voorbeeld in 1 minuut',
+                'Eerst zien, dan beslissen', 'Vaste prijs, geen verrassingen', 'Eén vaste contactpersoon',
+                'Snel online, zonder gedoe', 'Klaar terwijl je kijkt', 'Meer klanten via je site',
+            ],
+            'Betaalbare website' => [
+                'Betaalbare website', 'Goedkope website laten maken', 'Simpele website laten maken',
+                'Website voor ondernemers', 'Betaalbaar en professioneel', 'Vaste prijs, geen verrassingen',
+                'Gratis voorbeeld in 1 minuut', 'Website voor zzp en mkb', 'Eerst zien, dan beslissen',
+                'Professioneel en betaalbaar', 'Snel online, zonder gedoe', 'Geen technische kennis nodig',
+            ],
+        ],
+
         'sitelinks' => [
             ['Direct een voorbeeld', '/voorbeeld-maken', 'Zie in 1 minuut je site', 'Gratis en vrijblijvend'],
             ['Plan een gesprek', '/afspraak', 'Online of telefonisch', 'Vrijblijvend advies'],
             ['Zo werkt het', '#werkwijze', 'In een paar stappen online', 'Met een vaste contactpersoon'],
             ['Prijzen', '#prijzen', 'Duidelijke vaste prijs', 'Geen verrassingen achteraf'],
+            ['Ook een webshop', '/webshop', 'Verkopen via je site', 'Compleet ingericht'],
+            ['Slim automatiseren', '/automatisering', 'Minder handwerk', 'Koppel je systemen'],
         ],
 
         'callouts' => [
@@ -127,6 +163,40 @@ return [
             'Makkelijk online geregeld. Dé specialist in LEGO huren en verhuur in Nederland.',
         ],
 
+        // Koppen per advertentiegroep (huren vs verhuur/abonnement), zoekwoord-dekkend
+        // en diverser. Groepen zonder eigen set vallen terug op 'headlines'.
+        'ad_group_headlines' => [
+            'LEGO huren' => [
+                'LEGO huren doe je hier', 'LEGO sets huren en bouwen', 'Dé LEGO-verhuurspecialist',
+                'LEGO huren vanaf €1 per week', 'LEGO set huren, geen kopen', 'Duizenden sets om te huren',
+                'Compleet en schoongemaakt', 'Klaar? Kies een nieuwe set', 'Retour is een nieuwe set',
+                'Bouwplezier zonder rommel', 'Snel bij je thuis bezorgd', 'Geen dure LEGO-aankoop',
+            ],
+            'LEGO verhuur & abonnement' => [
+                'LEGO verhuur voor iedereen', 'LEGO-abonnement vanaf €10', 'Dé LEGO-verhuurspecialist',
+                'LEGO pakket huren', 'Abonnement of los huren', 'LEGO verhuur en abonnement',
+                'Sets al vanaf €1 per week', 'Abonnement vanaf €10 per jaar', 'Compleet en schoongemaakt',
+                'Duizenden sets op voorraad', 'Bouwplezier zonder rommel', 'Geen dure LEGO-aankoop',
+            ],
+        ],
+
+        // De huur-groep krijgt eigen descriptions met "huren"; de verhuur/abo-groep met
+        // "verhuur"/"abonnement". Google vroeg om meer zoekwoorden in de beschrijvingen.
+        'ad_group_descriptions' => [
+            'LEGO huren' => [
+                'Huur LEGO-sets al vanaf €1 per week. Compleet en schoongemaakt, snel bij je thuis.',
+                'Dé specialist in LEGO huren in Nederland. Duizenden sets, van klein tot groot.',
+                'Klaar met bouwen? Stuur de set retour en huur de volgende. Geen dure aankoop meer.',
+                'LEGO sets huren is makkelijk online geregeld. Bouwplezier zonder rommel of gedoe.',
+            ],
+            'LEGO verhuur & abonnement' => [
+                'LEGO verhuur met abonnement vanaf €10 per jaar, of huur los per set vanaf €1 per week.',
+                'Kies een LEGO-abonnement en bouw elke keer wat nieuws. Compleet en schoongemaakt.',
+                'Dé specialist in LEGO verhuur in Nederland. Duizenden sets op voorraad.',
+                'Klaar? Stuur retour en kies een nieuwe set. Geen dure aankoop, puur bouwplezier.',
+            ],
+        ],
+
         // Echte rd01-slugs (themes/bouwsteenwinkel_rd01/page-*.php); paden zijn
         // t.o.v. het domein-root. Geverifieerd tegen de clean-path-router in index.php.
         'sitelinks' => [
@@ -134,6 +204,10 @@ return [
             ['Hoe werkt huren?', '/hoe-werkt-huren', 'Huren in 3 stappen', 'Simpel en snel'],
             ['Lidmaatschap', '/lidmaatschap', 'Al vanaf €10 per jaar', 'Bekijk de voordelen'],
             ['Huren of kopen?', '/huren-vs-kopen', 'Zie wat voordeliger is', 'Reken het zelf uit'],
+            ['Klantenservice', '/klantenservice', 'Vragen of hulp nodig?', 'We helpen je snel'],
+            ['Cadeaubon kopen', '/cadeaubonnen', 'Verras een bouwfan', 'Direct te besteden'],
+            ['Contact', '/contact', 'Bel of mail ons', 'Snel een antwoord'],
+            ['In de pers', '/in-de-pers', 'In het nieuws', 'Zo kennen anderen ons'],
         ],
 
         'callouts' => [
