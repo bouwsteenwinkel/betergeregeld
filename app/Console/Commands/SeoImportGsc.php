@@ -93,8 +93,12 @@ class SeoImportGsc extends Command
 			foreach (array_slice($errors, 0, 5) as $e) {
 				$this->line('  - ' . $e);
 			}
-			return self::FAILURE;
 		}
-		return self::SUCCESS;
+
+		// Alleen falen als er fouten zijn én er niets is geïmporteerd (echte
+		// systeemfout). Een geslaagde import met één probleem-property valt niet om;
+		// per-property problemen staan gelogd (last_import_error) en worden apart
+		// per property gealerteerd.
+		return (!empty($errors) && $totalDays === 0) ? self::FAILURE : self::SUCCESS;
 	}
 }

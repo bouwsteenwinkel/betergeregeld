@@ -100,8 +100,10 @@ class SeoRunPsi extends Command
 		$this->newLine();
 		$this->info("Klaar: {$totalOk} OK, {$totalFail} fout, {$totalQuota} quota-overgeslagen.");
 
-		// Alleen échte meetfouten laten de job falen; een opgebruikte dagquota niet.
-		return $totalFail === 0 ? self::SUCCESS : self::FAILURE;
+		// Alleen falen als er niéts meetbaar was (systeemfout). Losse fouten — vaak
+		// flaky "Lighthouse returned error" of een uitgefaseerde URL — laten de job
+		// niet omvallen; ze staan per meting gelogd. Quota telt sowieso niet als fout.
+		return ($totalOk === 0 && $totalFail > 0) ? self::FAILURE : self::SUCCESS;
 	}
 
 	/**
