@@ -277,3 +277,11 @@ Schedule::command('channels:blog --all --write')
     ->dailyAt('07:30')
     ->onOneServer()
     ->withoutOverlapping();
+
+// Waakhond — hartslag van de scheduler zelf. Pingt elke 30 min IN-PROCESS (geen
+// withoutOverlapping/onOneServer, zodat deze heartbeat nooit op een vastgelopen
+// slot kan blijven hangen). Draait de scheduler niet meer of ligt de VPS plat,
+// dan stopt de ping en slaat de dead-man's-switch aan (period 60 + grace 30 min).
+Schedule::call(fn () => CronMonitorPinger::record('bsw:waakhond', 'success'))
+    ->everyThirtyMinutes()
+    ->name('waakhond-heartbeat');

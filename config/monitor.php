@@ -60,5 +60,11 @@ return [
 		// Draait elk kwartier; 45 min coulance vangt een deploy of een gemiste tik op
 		// zonder vals alarm, en slaat aan ruim voordat de eerste dag-van-mail wegvalt.
 		['key' => 'appointments:send-reminders',            'name' => 'Afspraken · herinneringen',           'period' => 15,   'grace' => 45],
+		// Waakhond — hartslag van de scheduler zélf (pingt elke 30 min). Draait de
+		// scheduler niet meer of ligt de VPS plat (bv. slaapstand → "operator refused
+		// the request"), dan stopt de ping en slaat 'ie aan: de dead-man's-switch over
+		// de cron-machinerie als geheel. Ruime marge zodat een deploy/gemiste tik geen
+		// vals alarm geeft. source_key = bsw:waakhond (bestaande, handmatig aangemaakte monitor).
+		['key' => 'bsw:waakhond',                            'name' => 'Waakhond · scheduler-hartslag',       'period' => 60,   'grace' => 30],
 	],
 ];
