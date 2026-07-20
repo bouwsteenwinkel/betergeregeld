@@ -291,11 +291,11 @@ return [
         // Groepen zonder eigen set vallen terug op 'headlines' hierboven.
         'ad_group_headlines' => [
             'LEGO-abonnement' => [
-                'LEGO-abonnement vanaf €31,25', 'Elke maand een LEGO-maandbox', 'Elke maand een nieuwe set',
-                'LEGO-abonnement als cadeau', 'LEGO-maandbox op de mat', 'Setwaarde €200 tot €350',
-                'Vast bedrag per maand', 'Verzenden en retour gratis', 'Compleet en schoongemaakt',
-                'Geen dure LEGO-aankoop', 'Bouwplezier zonder rommel', 'Klaar? Kies je volgende set',
-                'Maandelijks LEGO-plezier', 'Nieuwe verrassing per maand', 'Elke maand bouwplezier',
+                'LEGO-abonnement vanaf €31,25', 'Elke maand een LEGO-maandbox', 'LEGO-verrassingsbox per maand',
+                'LEGO cadeau-abonnement', 'LEGO-maandbox op de mat', 'LEGO surprise box per maand',
+                'Maandelijkse LEGO-box', 'LEGO-abonnement voor thuis', 'Elke maand een nieuwe set',
+                'Setwaarde €200 tot €350', 'Vast bedrag per maand', 'LEGO-abonnement als cadeau',
+                'Nieuwe verrassing elke maand', 'Geen dure LEGO-aankoop', 'Klaar? Kies je volgende set',
             ],
             'LEGO huren per maand' => [
                 'LEGO huren per maand', 'LEGO sets huren en bouwen', 'Elke maand LEGO huren',
@@ -306,9 +306,15 @@ return [
             ],
         ],
 
-        // Alleen de huur-groep krijgt eigen descriptions (met "huren"); de abo-groep
-        // gebruikt de gedeelde 'descriptions' hierboven, die al bij dat thema passen.
+        // Zoekwoord-rijke descriptions per groep (abonnement/maandbox vs huren) —
+        // Google vroeg om meer zoekwoorden in de beschrijvingen van de abo-advertentie.
         'ad_group_descriptions' => [
+            'LEGO-abonnement' => [
+                'Een LEGO-abonnement met elke maand een verrassingsbox op de mat. Vanaf €31,25 per maand.',
+                'Kies je LEGO-maandbox: elke maand een set t.w.v. €200-350. Verzenden en retour gratis.',
+                'LEGO-abonnement als cadeau? Elke maand een verrassing, zonder dure aankoop.',
+                'Maandelijks een LEGO-box vol bouwplezier. Klaar? De volgende maandbox staat al klaar.',
+            ],
             'LEGO huren per maand' => [
                 'Huur elke maand een complete LEGO-set. Verzenden en retour gratis, al vanaf €31,25.',
                 'LEGO huren per maand: een set t.w.v. €200-350. Geen dure aankoop meer nodig.',
@@ -323,6 +329,8 @@ return [
             ['Bekijk de pakketten', '/pakketten', 'Kies op leeftijd', 'Vast bedrag per maand'],
             ['Veelgestelde vragen', '/veelgestelde-vragen', 'Alles over het abonnement', 'Opzeggen, retour en meer'],
             ['Word lid', '/word-lid', 'Start je abonnement', 'Zo bij je op de mat'],
+            ['Bekijk onze sets', '/onze-sets', 'Duizenden LEGO-sets', 'Kies je favoriet'],
+            ['Cadeaubon kopen', '/cadeaubon', 'Verras een bouwfan', 'Direct te besteden'],
         ],
 
         'callouts' => [
