@@ -39,9 +39,6 @@ class GoogleAds extends Page
     /** Per campagne-ID de advertentie-/reviewstatus + kwaliteit. @var array<string,array<string,string>> */
     public array $adStatus = [];
 
-    /** Account-brede totalen over de afgelopen 30 dagen (grote blokken bovenin). @var array<string,int|float> */
-    public array $totals30 = [];
-
     /** Toon ook gearchiveerde (verwijderde) campagnes in het overzicht. */
     public bool $showArchived = false;
 
@@ -137,7 +134,6 @@ class GoogleAds extends Page
         }
 
         $this->adStatus   = app(GoogleAdsManager::class)->adStatusByCampaign();
-        $this->totals30   = app(GoogleAdsManager::class)->totalsLast30Days();
         $this->lastLoaded = now()->format('H:i:s');
     }
 
@@ -151,7 +147,6 @@ class GoogleAds extends Page
     {
         $this->campaigns  = app(GoogleAdsManager::class)->listCampaigns();
         $this->adStatus   = app(GoogleAdsManager::class)->adStatusByCampaign();
-        $this->totals30   = app(GoogleAdsManager::class)->totalsLast30Days();
         $this->lastLoaded = now()->format('H:i:s');
     }
 
