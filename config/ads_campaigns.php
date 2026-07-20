@@ -166,13 +166,23 @@ return [
                 ['lego box abonnement', 'PHRASE'],
                 ['lego abonnement kind', 'PHRASE'],
                 ['lego elke maand', 'PHRASE'],
+                ['lego verrassingsbox', 'PHRASE'],
+                ['lego surprise box', 'PHRASE'],
+                ['lego cadeau abonnement', 'PHRASE'],
+                ['lego abonnement volwassenen', 'PHRASE'],
+                ['lego pakket per maand', 'PHRASE'],
+                ['maandelijkse lego box', 'PHRASE'],
                 ['lego abonnement', 'EXACT'],
             ],
             'LEGO huren per maand' => [
                 ['lego huren abonnement', 'PHRASE'],
                 ['lego sets huren abonnement', 'PHRASE'],
+                ['lego sets huren per maand', 'PHRASE'],
+                ['lego huren maandelijks', 'PHRASE'],
+                ['lego lenen abonnement', 'PHRASE'],
                 ['bouwersbende', 'PHRASE'],
                 ['bouwersbende alternatief', 'PHRASE'],
+                ['bouwersbende abonnement', 'PHRASE'],
             ],
         ],
 
@@ -194,8 +204,37 @@ return [
         'descriptions' => [
             'Elke maand een complete LEGO-set op de mat. Verzenden en retour gratis, vanaf €31,25.',
             'Kies op leeftijd, wij verrassen met een set t.w.v. €200-350. Geen dure aankoop meer.',
-            'Klaar met bouwen? Stuur retour en ontvang de volgende set — zo vaak je wilt.',
+            'Klaar met bouwen? Stuur retour en ontvang de volgende set, zo vaak je wilt.',
             'Bouwplezier zonder rommel, voor elke leeftijd. Start je LEGO-abonnement vandaag.',
+        ],
+
+        // Koppen per advertentiegroep, zodat elke groep de eigen zoekwoorden dekt
+        // (abonnement/maandbox vs huren) — dat tilt de Advertentiekwaliteit naar Goed.
+        // Groepen zonder eigen set vallen terug op 'headlines' hierboven.
+        'ad_group_headlines' => [
+            'LEGO-abonnement' => [
+                'LEGO-abonnement vanaf €31,25', 'Elke maand een LEGO-maandbox', 'Elke maand een nieuwe set',
+                'LEGO-abonnement als cadeau', 'LEGO-maandbox op de mat', 'Setwaarde €200 tot €350',
+                'Vast bedrag per maand', 'Verzenden en retour gratis', 'Compleet en schoongemaakt',
+                'Geen dure LEGO-aankoop', 'Bouwplezier zonder rommel', 'Klaar? Kies je volgende set',
+            ],
+            'LEGO huren per maand' => [
+                'LEGO huren per maand', 'LEGO sets huren en bouwen', 'Elke maand LEGO huren',
+                'LEGO huren met abonnement', 'Huur elke maand een set', 'LEGO huren vanaf €31,25',
+                'LEGO-sets huren, geen kopen', 'Klaar? Huur de volgende set', 'Verzenden en retour gratis',
+                'Compleet en schoongemaakt', 'Geen dure aankoop, wel huren', 'Bouwplezier zonder rommel',
+            ],
+        ],
+
+        // Alleen de huur-groep krijgt eigen descriptions (met "huren"); de abo-groep
+        // gebruikt de gedeelde 'descriptions' hierboven, die al bij dat thema passen.
+        'ad_group_descriptions' => [
+            'LEGO huren per maand' => [
+                'Huur elke maand een complete LEGO-set. Verzenden en retour gratis, al vanaf €31,25.',
+                'LEGO huren per maand: een set t.w.v. €200-350. Geen dure aankoop meer nodig.',
+                'Klaar met bouwen? Stuur de set retour en huur de volgende, zo vaak je wilt.',
+                'Compleet gebouwd en schoongemaakt bij je thuis. LEGO huren zonder rommel of gedoe.',
+            ],
         ],
 
         // Echte bouwverrassing-slugs (schone paden, geverifieerd in de theme-nav).

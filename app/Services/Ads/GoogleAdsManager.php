@@ -102,9 +102,16 @@ class GoogleAdsManager
                 $ops[] = ['adGroupCriterionOperation' => ['create' => ['adGroup' => $ag, 'status' => 'ENABLED', 'keyword' => ['text' => $text, 'matchType' => $match]]]];
             }
 
+            // Koppen/descriptions kunnen per advertentiegroep worden overschreven
+            // (ad_group_headlines/ad_group_descriptions op groepsnaam). Zonder
+            // override valt de groep terug op de gedeelde profiel-set. Zo matchen de
+            // koppen de zoekwoorden van die groep — cruciaal voor de Advertentiekwaliteit.
+            $agHeadlines    = (array) ($p['ad_group_headlines'][$agName] ?? $p['headlines']);
+            $agDescriptions = (array) ($p['ad_group_descriptions'][$agName] ?? $p['descriptions']);
+
             $rsa = ['finalUrls' => [$url], 'responsiveSearchAd' => [
-                'headlines'    => $this->headlines((array) $p['headlines'], (int) ($p['pin_h1'] ?? 0)),
-                'descriptions' => array_map(fn ($d) => ['text' => $d], (array) $p['descriptions']),
+                'headlines'    => $this->headlines($agHeadlines, (int) ($p['pin_h1'] ?? 0)),
+                'descriptions' => array_map(fn ($d) => ['text' => $d], $agDescriptions),
             ]];
             if (isset($paths[0])) {
                 $rsa['responsiveSearchAd']['path1'] = $paths[0];
