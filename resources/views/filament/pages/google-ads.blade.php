@@ -54,7 +54,7 @@
         @endif
 
         @php
-            $t = $this->totals();
+            $t = $this->totals30 + ['impressions' => 0, 'clicks' => 0, 'cost' => 0, 'conversions' => 0];
             $kaarten = [
                 ['Vertoningen', number_format($t['impressions'], 0, ',', '.')],
                 ['Klikken', number_format($t['clicks'], 0, ',', '.')],
@@ -64,8 +64,8 @@
         @endphp
 
         <x-filament::section>
-            <x-slot name="heading">Prestaties — alle campagnes (sinds start)</x-slot>
-            <x-slot name="description">Live uit het gekoppelde Google Ads-account.</x-slot>
+            <x-slot name="heading">Prestaties — alle campagnes (afgelopen 30 dagen)</x-slot>
+            <x-slot name="description">Live uit het gekoppelde Google Ads-account · rollend venster van 30 dagen. (De tabel hieronder toont cijfers sinds de start van elke campagne.)</x-slot>
 
             <div class="gads-stats">
                 @foreach ($kaarten as $kaart)

@@ -437,6 +437,38 @@ class GoogleAdsManager
         return $out;
     }
 
+    /**
+     * Account-brede prestatie-totalen over de AFGELOPEN 30 DAGEN (voor de grote
+     * blokken bovenin de admin). Aparte, lichte aggregatie zodat de campagne-tabel
+     * z'n all-time-cijfers per campagne kan houden. segments.date in de WHERE
+     * beperkt alleen de periode; zonder segments.date in de SELECT blijft het per
+     * campagne geaggregeerd, dus we sommeren de rijen.
+     *
+     * @return array{impressions:int,clicks:int,cost:float,conversions:float}
+     */
+    public function totalsLast30Days(): array
+    {
+        $t = ['impressions' => 0, 'clicks' => 0, 'cost' => 0.0, 'conversions' => 0.0];
+
+        $res = $this->client->search(
+            'SELECT metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions '
+            . 'FROM campaign WHERE segments.date DURING LAST_30_DAYS'
+        );
+        if (! $res['ok']) {
+            return $t;
+        }
+
+        foreach ($res['results'] as $r) {
+            $m = $r['metrics'] ?? [];
+            $t['impressions'] += (int) ($m['impressions'] ?? 0);
+            $t['clicks']      += (int) ($m['clicks'] ?? 0);
+            $t['cost']        += ((int) ($m['costMicros'] ?? 0)) / 1_000_000;
+            $t['conversions'] += (float) ($m['conversions'] ?? 0);
+        }
+
+        return $t;
+    }
+
     /* ─────────────────────────── Beheren ─────────────────────────── */
 
     /**
