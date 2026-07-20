@@ -99,6 +99,39 @@
             </div>
         </x-filament::section>
 
+        <x-filament::section collapsible collapsed>
+            <x-slot name="heading">Fragment (structured snippet) herstellen</x-slot>
+            <x-slot name="description">Vervangt het "Website-informatie"-fragment van een campagne door de goedgekeurde versie uit het profiel. Gebruik dit als Google een fragment heeft afgekeurd.</x-slot>
+
+            <div class="gads-form" style="grid-template-columns: 1fr;">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;" class="sm:!grid-cols-2">
+                    <label class="gads-field"><span>Campagne</span>
+                        <select wire:model="snippetCampaign">
+                            <option value="">— kies een campagne —</option>
+                            @foreach ($this->visibleCampaigns() as $c)
+                                @if ($c['status'] !== 'REMOVED')
+                                    <option value="{{ $c['id'] }}">{{ $c['name'] }}</option>
+                                @endif
+                            @endforeach
+                        </select></label>
+                    <label class="gads-field"><span>Profiel (bron van kop + waarden)</span>
+                        <select wire:model="snippetProfile">
+                            @foreach ($this->profileOptions() as $key => $label)
+                                <option value="{{ $key }}">{{ $label }}</option>
+                            @endforeach
+                        </select></label>
+                </div>
+            </div>
+
+            <p class="gads-hint">Het oude fragment wordt ontkoppeld en een nieuwe asset aangemaakt uit het profiel-fragment (kop + waarden). De nieuwe versie moet Google nog goedkeuren.</p>
+
+            <div style="margin-top: 1rem;">
+                <x-filament::button wire:click="syncSnippet" wire:loading.attr="disabled" wire:target="syncSnippet" icon="heroicon-o-arrow-path">
+                    Fragment bijwerken
+                </x-filament::button>
+            </div>
+        </x-filament::section>
+
         <x-filament::section>
             <x-slot name="heading">Campagnes</x-slot>
             <x-slot name="description">"Beperkt door" toont waardoor je vertoningen misloopt: Budget (→ dagbudget verhogen) of Bod/CPC (→ maximale CPC/kwaliteit verhogen). Leeg = te weinig data.</x-slot>

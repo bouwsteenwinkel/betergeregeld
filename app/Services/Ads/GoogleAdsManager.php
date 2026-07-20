@@ -346,6 +346,88 @@ class GoogleAdsManager
         return (int) round($euro * 1_000_000);
     }
 
+    /* ─────────────────────── Fragmenten (structured snippets) ─────────────────────── */
+
+    /**
+     * Vervangt het structured-snippet-fragment van een bestaande campagne.
+     * Snippet-assets zijn bij Google immutable, dus we ontkoppelen elk bestaand
+     * STRUCTURED_SNIPPET-fragment en maken één nieuwe asset aan die we koppelen —
+     * atomair in één mutate. Zo herstel je een afgekeurd fragment (bv. een
+     * false-positive) zonder de hele campagne opnieuw op te bouwen.
+     *
+     * @param array<int,string> $values 3–10 waarden (Google-grens), elk ≤ 25 tekens
+     * @return array{ok:bool,error:?string,removed:int}
+     */
+    public function syncStructuredSnippet(string $campaignId, string $header, array $values): array
+    {
+        $header = trim($header);
+        $values = array_values(array_filter(array_map(fn ($v) => trim((string) $v), $values), fn ($v) => $v !== ''));
+
+        if ($header === '') {
+            return ['ok' => false, 'error' => 'Fragment-kop is verplicht.', 'removed' => 0];
+        }
+        if (count($values) < 3) {
+            return ['ok' => false, 'error' => 'Een fragment vereist minstens 3 waarden.', 'removed' => 0];
+        }
+
+        $cid  = $this->customerId();
+        $camp = "customers/{$cid}/campaigns/{$campaignId}";
+
+        // Bestaande fragment-koppelingen opzoeken. Filteren op campaign_asset.campaign
+        // (WHERE campaign.id mag niet op deze resource). Het field_type filteren we in
+        // PHP i.p.v. in GAQL — dat scheelt gedoe met enum-quoting in de query.
+        $q = $this->client->search(
+            'SELECT campaign_asset.resource_name, campaign_asset.field_type '
+            . "FROM campaign_asset WHERE campaign_asset.campaign = '{$camp}'"
+        );
+        if (! $q['ok']) {
+            return ['ok' => false, 'error' => $q['error'], 'removed' => 0];
+        }
+
+        $ops     = [];
+        $removed = 0;
+        foreach ($q['results'] as $r) {
+            if ((string) data_get($r, 'campaignAsset.fieldType') !== 'STRUCTURED_SNIPPET') {
+                continue;
+            }
+            if ($link = data_get($r, 'campaignAsset.resourceName')) {
+                $ops[] = ['campaignAssetOperation' => ['remove' => $link]];
+                $removed++;
+            }
+        }
+
+        // Nieuwe asset (temp resource -1) aanmaken en aan de campagne koppelen. De
+        // create moet ná de removes staan zodat de temp-naam eerst gedefinieerd is.
+        $asset = "customers/{$cid}/assets/-1";
+        $ops[] = ['assetOperation' => ['create' => ['resourceName' => $asset, 'structuredSnippetAsset' => ['header' => $header, 'values' => array_slice($values, 0, 10)]]]];
+        $ops[] = ['campaignAssetOperation' => ['create' => ['campaign' => $camp, 'asset' => $asset, 'fieldType' => 'STRUCTURED_SNIPPET']]];
+
+        $res = $this->client->mutate($ops);
+
+        return ['ok' => $res['ok'], 'error' => $res['error'], 'removed' => $removed];
+    }
+
+    /**
+     * Als syncStructuredSnippet, maar leest kop + waarden uit een campagne-profiel
+     * (config/ads_campaigns.php). Zo herstel je een afgekeurd fragment naar de
+     * goedgekeurde config-versie — één bron van waarheid.
+     *
+     * @return array{ok:bool,error:?string,removed:int}
+     */
+    public function syncSnippetFromProfile(string $campaignId, string $profileKey): array
+    {
+        $p = $this->profile($profileKey);
+        if (! $p || empty($p['snippet']['values'])) {
+            return ['ok' => false, 'error' => "Profiel '{$profileKey}' heeft geen fragment.", 'removed' => 0];
+        }
+
+        return $this->syncStructuredSnippet(
+            $campaignId,
+            (string) ($p['snippet']['header'] ?? 'Types'),
+            (array) $p['snippet']['values'],
+        );
+    }
+
     /* ─────────────────────── Conversies (offline import) ─────────────────────── */
 
     /** Resource-naam van een conversie-actie op naam, of null. */

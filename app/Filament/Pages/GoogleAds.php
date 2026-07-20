@@ -46,6 +46,11 @@ class GoogleAds extends Page
 
     public string $newMaxCpc = '1.5';
 
+    /** Fragment-herstel: gekozen campagne-ID + profiel om het fragment uit te lezen. */
+    public string $snippetCampaign = '';
+
+    public string $snippetProfile = 'bouwverrassing';
+
     /** @return array<string,string> profiel-key => label */
     public function profileOptions(): array
     {
@@ -172,6 +177,35 @@ class GoogleAds extends Page
         }
 
         Notification::make()->title('Campagne aangemaakt — gepauzeerd')->body('Controleer alles en zet hem daarna pas op actief.')->success()->send();
+        $this->laden();
+    }
+
+    /**
+     * Vervangt het structured-snippet-fragment van de gekozen campagne door de
+     * (goedgekeurde) versie uit het gekozen profiel. Herstelt een afgekeurd
+     * fragment zonder de campagne opnieuw op te bouwen.
+     */
+    public function syncSnippet(): void
+    {
+        if ($this->snippetCampaign === '' || ! app(GoogleAdsManager::class)->profile($this->snippetProfile)) {
+            Notification::make()->title('Kies een campagne én een profiel.')->danger()->send();
+
+            return;
+        }
+
+        $res = app(GoogleAdsManager::class)->syncSnippetFromProfile($this->snippetCampaign, $this->snippetProfile);
+
+        if (! $res['ok']) {
+            Notification::make()->title('Fragment bijwerken mislukt')->body($res['error'])->danger()->send();
+
+            return;
+        }
+
+        Notification::make()
+            ->title('Fragment bijgewerkt')
+            ->body(($res['removed'] > 0 ? 'Oud fragment ontkoppeld. ' : '') . 'Google moet de nieuwe versie nog goedkeuren (meestal binnen 1 werkdag).')
+            ->success()->send();
+
         $this->laden();
     }
 
