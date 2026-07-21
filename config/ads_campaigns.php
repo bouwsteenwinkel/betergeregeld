@@ -120,7 +120,7 @@ return [
     'bouwsteenwinkel' => [
         'label'      => 'Bouwsteenwinkel — LEGO huren',
         'name'       => 'bouwsteenwinkel',
-        'final_url'  => 'https://bouwsteenwinkel.nl/lego-huren',
+        'final_url'  => 'https://bouwsteenwinkel.nl/lego-verhuur',
         'budget'     => 25,
         // LEGO-verhuur is concurrerend; iets ruimer plafond om mee te doen.
         'max_cpc'    => 2.0,
