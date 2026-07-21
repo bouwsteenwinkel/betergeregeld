@@ -293,8 +293,8 @@ return [
             'LEGO-abonnement' => [
                 'LEGO-abonnement vanaf €31,25', 'Elke maand een LEGO-maandbox', 'LEGO-verrassingsbox per maand',
                 'LEGO cadeau-abonnement', 'LEGO-maandbox op de mat', 'LEGO surprise box per maand',
-                'Maandelijkse LEGO-box', 'LEGO-abonnement voor thuis', 'Elke maand een nieuwe set',
-                'Setwaarde €200 tot €350', 'Vast bedrag per maand', 'LEGO-abonnement als cadeau',
+                'LEGO-pakket per maand', 'LEGO-abonnement voor kinderen', 'Elke maand een nieuwe set',
+                'Setwaarde €200 tot €350', 'Vast bedrag per maand', 'LEGO-abonnement volwassenen',
                 'Nieuwe verrassing elke maand', 'Geen dure LEGO-aankoop', 'Klaar? Kies je volgende set',
             ],
             'LEGO huren per maand' => [
