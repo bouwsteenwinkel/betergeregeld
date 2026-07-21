@@ -46,6 +46,21 @@
 		],
 	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 	</script>
+
+	{{-- Breadcrumb-kruimelpad (Home › Blog › Categorie › Artikel) voor de rich-result
+	     in Google; \x40 omdat Blade een letterlijke @ als directive zou lezen. --}}
+	<script type="application/ld+json">
+	{!! json_encode([
+		"\x40context"     => 'https://schema.org',
+		"\x40type"        => 'BreadcrumbList',
+		'itemListElement' => [
+			["\x40type" => 'ListItem', 'position' => 1, 'name' => 'Home',                'item' => url('/' . $locale)],
+			["\x40type" => 'ListItem', 'position' => 2, 'name' => 'Blog',                'item' => route('blog.index', ['locale' => $locale])],
+			["\x40type" => 'ListItem', 'position' => 3, 'name' => $post->category->name, 'item' => route('blog.category', ['locale' => $locale, 'categorySlug' => $post->category->slug])],
+			["\x40type" => 'ListItem', 'position' => 4, 'name' => $post->title,          'item' => route('blog.show', ['locale' => $locale, 'slug' => $post->slug])],
+		],
+	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+	</script>
 @endpush
 
 @section('content')
