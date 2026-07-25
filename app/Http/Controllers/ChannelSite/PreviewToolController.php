@@ -147,6 +147,36 @@ class PreviewToolController extends Controller
 
         $lead->fillAttributionOnce(CaptureAdAttribution::fromRequest($request));
         $lead->save();
+
+        // Alleen de sleutel (geen e-mail/NAW) in de site-meta, zodat /content straks
+        // weet welke lead op 'ready' mag zodra de generatie klaar is.
+        Site::where('key', $siteKey)->get()->each(function (Site $m) use ($lead) {
+            $meta = (array) $m->meta;
+            $meta['preview']['lead_id'] = $lead->id;
+            $m->update(['meta' => $meta]);
+        });
+    }
+
+    /**
+     * De preview is af: zet de lead van 'generating' naar 'ready'. Zonder dit bleef een
+     * geslaagd voorbeeld in de admin voor altijd op "bezig" staan — alleen het bewaren
+     * ({@see SavePreviewController}) zette de status ooit door, en dat doet lang niet
+     * iedere bezoeker. Best-effort: het antwoord aan de wachtende bezoeker gaat voor.
+     */
+    private function markLeadReady(Site $model): void
+    {
+        try {
+            $leadId = (int) data_get($model->meta, 'preview.lead_id');
+            if ($leadId <= 0) {
+                return;
+            }
+
+            WebsiteLead::where('id', $leadId)
+                ->where('preview_status', 'generating')
+                ->update(['preview_status' => 'ready']);
+        } catch (\Throwable $e) {
+            Log::warning('preview_lead_ready: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -178,6 +208,8 @@ class PreviewToolController extends Controller
 
         if (empty($res['ok'])) {
             Log::warning('preview_content: ' . ($res['error'] ?? 'onbekend'));
+        } else {
+            $this->markLeadReady($model);
         }
 
         return response()->json($res, empty($res['ok']) ? 502 : 200);

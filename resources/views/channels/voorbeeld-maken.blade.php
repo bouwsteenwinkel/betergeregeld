@@ -296,6 +296,10 @@
             });
         }
         var t0 = Date.now();
+        // Buiten de keten gehouden zodat de foutmelding straks kan meesturen hoe vaak
+        // we het geprobeerd hebben — anders zie je in de funnel niet of één poging
+        // stukliep of alle.
+        var contentAttempts = 0;
 
         // De server stuurt bij een limiet (429) een eigen uitleg mee; die is
         // duidelijker dan de algemene melding, dus die tonen we dan.
@@ -333,7 +337,26 @@
             // bezoeker niet eindeloos laat wachten (de preview toont anders een nette
             // kleur-/placeholder-variant). Bij een webshop komt er een productraster bij.
             var cap = function () { return new Promise(function (resolve) { setTimeout(function () { resolve({ capped: true }); }, 75000); }); };
-            var content = post(d.contentUrl);
+
+            // De tekst-call is de enige die MOET slagen, en juist die kan stranden op een
+            // trage of overbelaste AI-call. Eén keer opnieuw proberen scheelt de bezoeker
+            // een foutscherm én het opnieuw invullen van het hele formulier. Herhalen is
+            // veilig: /content is idempotent (staan de blokken er al, dan antwoordt hij
+            // meteen ok), dus een tweede poging is gratis als de eerste serverside tóch
+            // slaagde maar het antwoord onderweg verloren ging. Bij een fout die zich niet
+            // vanzelf herstelt (verlopen of onbekende preview) heeft herhalen geen zin.
+            var HARD_FAILS = ['geen-preview', 'niet-gevonden'];
+            function postContent() {
+                contentAttempts++;
+                return post(d.contentUrl).then(function (c) {
+                    if (c && c.ok) { return c; }
+                    if (contentAttempts >= 2 || (c && HARD_FAILS.indexOf(c.error) !== -1)) { return c; }
+                    stepEl.textContent = 'Dat duurde even te lang. We schrijven de teksten opnieuw.';
+                    return new Promise(function (r) { setTimeout(r, 1500); }).then(postContent);
+                });
+            }
+
+            var content = postContent();
             var hero = Promise.race([post(d.heroUrl), cap()]);
             var products = d.productsUrl ? Promise.race([post(d.productsUrl), cap()]) : Promise.resolve(null);
 
@@ -353,16 +376,27 @@
             var navigated = false;
             var go = function () { if (navigated) { return; } navigated = true; window.location.href = url; };
             window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                event: 'preview_ready',
+            // Via bgTrack, niet rechtstreeks naar de dataLayer: die route logt het event
+            // óók first-party (/_ev) en stuurt de Meta-ViewContent door. Ging het hier
+            // langs, dan bleef de funnel-stap "Voorbeeld getoond" structureel op 0 staan.
+            // eventCallback/eventTimeout reizen gewoon mee in de dataLayer-push.
+            var readyData = {
                 seconds: Math.round((Date.now() - t0) / 1000),
                 eventCallback: go,
                 eventTimeout: 1500
-            });
+            };
+            if (window.bgTrack) {
+                window.bgTrack('preview_ready', readyData);
+            } else {
+                window.dataLayer.push(Object.assign({ event: 'preview_ready' }, readyData));
+            }
             setTimeout(go, 1600);
         }).catch(function (err) {
             if (window.bgTrack) {
-                window.bgTrack('preview_failed', { reason: (err && err.message) || 'onbekend' });
+                window.bgTrack('preview_failed', {
+                    reason: (err && err.message) || 'onbekend',
+                    attempts: contentAttempts
+                });
             }
             fail(err);
         });

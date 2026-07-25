@@ -76,7 +76,13 @@ class AnthropicClient
 	 * gestructureerde input, gegarandeerd valide JSON. Veiliger dan
 	 * de tekst-extract-route bij content met HTML / aanhalingstekens.
 	 *
-	 * @param array{model:string,system?:string,user:string,max_tokens?:int,tool_name:string,tool_input_schema:array} $opts
+	 * Met `timeout` kort een caller de HTTP-timeout in. Dat is nodig zodra de aanroeper
+	 * zelf een hard tijdsbudget heeft (een webrequest waar een bezoeker op wacht): de
+	 * standaard van 180s ligt boven zo'n budget, waardoor niet deze call maar het hele
+	 * PHP-proces sneuvelt — en de bezoeker een afgebroken response krijgt in plaats van
+	 * een nette foutmelding waarop gericht opnieuw geprobeerd kan worden.
+	 *
+	 * @param array{model:string,system?:string,user:string,max_tokens?:int,tool_name:string,tool_input_schema:array,timeout?:int} $opts
 	 * @return array|null  De `input` van de tool_use-block (assoc array), of null bij fout
 	 */
 	public function structuredCall(array $opts): ?array
@@ -104,7 +110,7 @@ class AnthropicClient
 		}
 
 		try {
-			$resp = Http::timeout(180)
+			$resp = Http::timeout((int) ($opts['timeout'] ?? 180))
 				->withHeaders([
 					'x-api-key'         => $this->apiKey(),
 					'anthropic-version' => self::API_VERSION,

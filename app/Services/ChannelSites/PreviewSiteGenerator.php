@@ -27,6 +27,12 @@ class PreviewSiteGenerator
     public const TTL_HOURS = 48;
 
     /**
+     * Tijdslimiet voor de content-call, ruim onder het budget van de webrequest die
+     * erop wacht. Zie de aanroep in {@see fillContent()}.
+     */
+    private const CONTENT_TIMEOUT = 75;
+
+    /**
      * @param  array{company:string,business_type:string,color:string,goal:string}  $input
      * @return array{ok:bool,error?:string,key?:string,site?:Site,usage?:array}
      */
@@ -150,6 +156,11 @@ class PreviewSiteGenerator
             'tool_name'         => 'lever_voorbeeldsite',
             'tool_description'  => 'Lever de voorbeeldsite-content via dit gereedschap. Antwoord niet in chat-tekst.',
             'tool_input_schema' => $this->schema(),
+            // Binnen het budget van de wachtende webrequest (set_time_limit(120) in
+            // PreviewToolController). Een trage call moet hier stranden, niet het hele
+            // PHP-proces: dan krijgt de browser een nette ok:false terug en kan die
+            // gericht opnieuw proberen i.p.v. de bezoeker een foutscherm te tonen.
+            'timeout'           => self::CONTENT_TIMEOUT,
         ]);
 
         if (! is_array($data)) {
