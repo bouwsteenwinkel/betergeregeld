@@ -8,10 +8,12 @@
  * ChannelImageGenerator::optimize() omgezet naar webp-varianten. Ze staan in
  * public/channel-media/bedrijfswebsite/ als werk-<slug>-<n>.png + -480/-800/-1200.webp.
  *
- * Minimaal drie beelden per site: de kaart wisselt ze om de paar seconden af.
+ * Drie beelden per site in vaste volgorde — voorpagina, overzicht, detailpagina — die de kaart om
+ * de twee seconden afwisselt en daarna weer van voren af aan begint.
  *
- * `url` is bewust leeg voor sites die nog op een testomgeving staan — dan toont de kaart geen
- * link. Zet 'm pas als de site op zijn eigen domein live staat.
+ * `url` is bewust leeg voor sites die nog op een testomgeving staan of waar we niet naar willen
+ * doorlinken — dan toont de kaart geen link. Zet 'm pas als de site op zijn eigen domein live staat
+ * én we die bezoeker daar ook naartoe willen sturen.
  */
 return [
     'titel' => 'Dit hebben we gemaakt',
@@ -37,7 +39,7 @@ return [
             'soort' => 'Vacaturebank',
             'tekst' => 'Duizenden vacatures, doorzoekbaar op plaats, vakgebied en dienstverband. '
                 .'Werkgevers plaatsen zelf, kandidaten solliciteren direct.',
-            'url' => 'https://24werk.com/',
+            'url' => '',   // bewust geen link naar 24werk.com; de kaart toont alleen het werk
             'beelden' => [
                 ['slot' => 'werk-24werk-1', 'alt' => 'Startpagina van 24Werk'],
                 ['slot' => 'werk-24werk-2', 'alt' => 'Het vacatureoverzicht met filters op 24Werk'],

@@ -28,7 +28,10 @@
     @foreach ($werk as $item)
       @php $beelden = (array) ($item['beelden'] ?? []); @endphp
       @continue (! $beelden)
-      <article data-werk-kaart style="flex: 0 0 min(86vw, 520px); scroll-snap-align: start; background: #fff; border: 1px solid #E5E3DF; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;">
+      {{-- Kaartbreedte: op de brede rij passen er drieënhalf naast elkaar, zodat je meteen ziet dat
+           er nog meer naast staat. (100% - 3 tussenruimtes) / 3.5. Op smalle schermen zou die som
+           een postzegel opleveren, vandaar de ondergrens van 280px. --}}
+      <article data-werk-kaart style="flex: 0 0 max(280px, min(86vw, calc((100% - 72px) / 3.5))); scroll-snap-align: start; background: #fff; border: 1px solid #E5E3DF; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;">
         {{-- Kader is platter (16:9) dan de afdruk (16:10) en het beeld hangt bovenaan: de onderste
              strook valt weg. Dat scheelt de cookie-icoontjes die op sommige sites vastgeplakt
              onderin blijven staan. --}}
@@ -39,11 +42,11 @@
                  class="{{ $i === 0 ? 'werk-aan' : '' }}"
                  src="{{ $slot }}-800.webp"
                  srcset="{{ $slot }}-480.webp 480w, {{ $slot }}-800.webp 800w, {{ $slot }}-1200.webp 1200w"
-                 sizes="(max-width: 600px) 86vw, 520px"
+                 sizes="(max-width: 600px) 280px, 290px"
                  alt="{{ $beeld['alt'] ?? ($item['naam'] ?? '') }}"
                  width="1280" height="800"
                  loading="lazy" decoding="async"
-                 style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; opacity: {{ $i === 0 ? '1' : '0' }}; transition: opacity .8s ease;">
+                 style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; opacity: {{ $i === 0 ? '1' : '0' }}; transition: opacity .5s ease;">
           @endforeach
           <div aria-hidden="true" style="position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px;">
             @foreach ($beelden as $i => $beeld)
@@ -51,12 +54,12 @@
             @endforeach
           </div>
         </div>
-        <div style="padding: 18px 20px 22px;">
-          <div style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B; margin-bottom: 6px;">{{ $item['soort'] ?? '' }}</div>
-          <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px;">{{ $item['naam'] ?? '' }}</h3>
-          <p style="font-size: 16px; line-height: 1.5; color: #4A4844; margin: 0;">{{ $item['tekst'] ?? '' }}</p>
+        <div style="padding: 14px 16px 18px;">
+          <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B; margin-bottom: 5px;">{{ $item['soort'] ?? '' }}</div>
+          <h3 style="font-size: 19px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 7px;">{{ $item['naam'] ?? '' }}</h3>
+          <p style="font-size: 15px; line-height: 1.5; color: #4A4844; margin: 0;">{{ $item['tekst'] ?? '' }}</p>
           @if (! empty($item['url']))
-            <a href="{{ $item['url'] }}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 12px; font-size: 15px; font-weight: 700; color: #12386B; text-decoration: underline; text-underline-offset: 3px;">Bekijk {{ $item['naam'] ?? 'de site' }} &rarr;</a>
+            <a href="{{ $item['url'] }}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 700; color: #12386B; text-decoration: underline; text-underline-offset: 3px;">Bekijk {{ $item['naam'] ?? 'de site' }} &rarr;</a>
           @endif
         </div>
       </article>
@@ -92,13 +95,14 @@
       if (punten[i]) punten[i].classList.add('werk-aan');
     };
 
-    // Elke kaart een halve seconde later: anders wisselt de hele rij tegelijk en gaat het knipperen.
+    // Om de twee seconden het volgende beeld: startpagina, overzicht, detailpagina, weer van voren.
+    // Elke kaart begint iets later, anders wisselt de hele rij tegelijk en gaat het knipperen.
     setTimeout(function () {
       setInterval(function () {
         if (document.hidden) return;   // niets doen op een tabblad dat niemand ziet
         toon((i + 1) % beelden.length);
-      }, 4000);
-    }, n * 600);
+      }, 2000);
+    }, n * 400);
   });
 })();
 </script>
