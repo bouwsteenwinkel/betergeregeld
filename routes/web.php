@@ -126,6 +126,14 @@ Route::get('/blok-voorbeeld/{type}', [\App\Http\Controllers\ChannelSite\BlockPre
 // Webhooks live outside the locale prefix and must not use CSRF.
 Route::post('/webhooks/mollie', [WebhookController::class, 'mollie'])->name('webhooks.mollie');
 
+// Ops-endpoints: deploy (git pull + caches + OPcache) en één artisan-commando draaien.
+// Server-to-server, beschermd met DEPLOY_TOKEN in DeployController — geen sessie/CSRF.
+// Zonder token in de .env geven ze 404, dus ze staan standaard uit.
+Route::post('/webhooks/deploy', [\App\Http\Controllers\DeployController::class, 'handle'])
+    ->middleware('throttle:6,1')->name('webhooks.deploy');
+Route::post('/webhooks/artisan', [\App\Http\Controllers\DeployController::class, 'command'])
+    ->middleware('throttle:12,1')->name('webhooks.artisan');
+
 // Speedtest data endpoints live outside locale/CSRF — they carry raw bytes
 // and are throttled per IP to protect the server from abuse.
 Route::middleware('throttle:speedtest')->group(function () {

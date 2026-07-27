@@ -241,3 +241,54 @@ On the customer side (Business plan only), they land on `/tools/accessguard/dire
 - **`AADSTS7000215: Invalid client secret`** — secret expired (max 24 months) or wasn't copied correctly. Rotate it in Azure, update `.env`, `config:cache`.
 - **`403 Forbidden` on sync** — delegated scopes missing. Re-grant admin consent; Azure sometimes drops scopes silently after a permission edit.
 - **No users returned** — check the customer's Entra tenant actually has users in `/users` (some read-only guests aren't enumerated). `signInActivity` requires an Entra ID P1 licence; without it, `last_sign_in_at` stays null and the `dormant_account` risk never fires.
+
+## 14. Ops webhook — deploy zonder RDP-sessie
+
+Twee token-beveiligde endpoints draaien de deploy in het webproces zelf (zelfde PHP, zelfde
+open_basedir, zelfde OPcache als de site). Zonder `DEPLOY_TOKEN` in de `.env` bestaan ze niet: elke
+aanroep geeft dan 404.
+
+```ini
+DEPLOY_TOKEN=<lang willekeurig geheim>   # verplicht; leeg = endpoints uit
+DEPLOY_BRANCH=main                       # optioneel, default main
+DEPLOY_GIT_BIN=git                       # vol pad als git niet op de PATH van de app-pool staat
+DEPLOY_ALLOWED_IPS=                      # optionele comma-lijst bovenop de token
+```
+
+**Volledige deploy** (git pull + `optimize:clear` + `config:cache` + `filament:cache-components` +
+OPcache-flush):
+
+```bash
+curl -X POST https://betergeregeld.com/webhooks/deploy -H "X-Deploy-Token: <token>" -H "Content-Type: application/json" -d '{}'
+```
+
+Opties in de body: `{"pull": false}` slaat de git pull over, `{"recycle": false}` laat de php-cgi-
+workers met rust.
+
+**Eén artisan-commando:**
+
+```bash
+curl -X POST https://betergeregeld.com/webhooks/artisan -H "X-Deploy-Token: <token>" -H "Content-Type: application/json" -d '{"command":"seo:import-gsc","parameters":{"--date":"2026-07-20"}}'
+```
+
+Alleen geregistreerde artisan-commando's, geen vrije shell. `migrate:fresh`, `migrate:reset`,
+`migrate:rollback`, `db:wipe`, `tinker` en `serve` worden geweigerd (403) — te overrulen met
+`DEPLOY_BLOCKED_COMMANDS`.
+
+Aandachtspunten:
+
+- **OPcache**: elke `php-cgi.exe` heeft z'n eigen OPcache, dus `opcache_reset()` in het verzoek raakt
+  alleen die ene worker. Het endpoint schiet daarom de overige workers af
+  (`taskkill /F /IM php-cgi.exe /FI "PID ne <eigen pid>"`, instelbaar via `DEPLOY_RECYCLE_COMMAND`) —
+  hetzelfde effect als het handmatige `Stop-Process -Name php-cgi -Force`, maar zonder het proces te
+  slopen dat het antwoord nog moet versturen. IIS respawnt vanzelf; de eerstvolgende bezoeker krijgt
+  een koude start, dus doe daarna een warm-up-request op `/admin/login`.
+- **Geen `route:cache`/`view:cache`** in de standaardvolgorde: `route:cache` breekt op de
+  closure-route `/`. Zie ook §2.
+- **`filament:optimize` werkt hier niet**: dat commando roept intern `icons:cache` aan, en blade-icons
+  registreert dat alleen in een console-run. De webhook draait daarom `filament:cache-components` en
+  slaat `icons:cache` over als het niet bestaat.
+- **Composer**: een gewijzigde `composer.lock` valt buiten dit endpoint (geen shell). Draai
+  `composer install --no-dev --optimize-autoloader` dan gewoon op de VPS.
+- **Looptijd**: IIS/FastCGI kapt lange requests af (~300s). Zwaar werk hoort in de scheduler. Het slot
+  is een `flock` op `storage/framework/deploy.lock`, dus een afgekapt verzoek laat geen slot achter.
