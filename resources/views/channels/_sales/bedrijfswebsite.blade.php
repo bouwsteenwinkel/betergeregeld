@@ -304,6 +304,10 @@
       </div>
     </div>
   </section>
+@endverbatim
+  {{-- Etalage met echte sites die we gebouwd hebben (config/bedrijfswebsite_portfolio.php). --}}
+  @include('channels.partials.bedrijfswebsite-werk')
+@verbatim
 
   <!-- ===================== WAAROM BETERGEREGELD ===================== -->
   <section style="padding: 72px calc(50vw - 50%); margin: 0 calc(50% - 50vw); width: 100vw; background: #F1EFEB; border-top: 1px solid #E5E3DF;">
