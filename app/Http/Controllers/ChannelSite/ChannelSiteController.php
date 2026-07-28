@@ -262,6 +262,7 @@ class ChannelSiteController extends Controller
                     'gemeente'   => $rij->gemeente,
                     'provincie'  => $rij->provincie,
                     'afstand_km' => $rij->afstand_km !== null ? (int) $rij->afstand_km : null,
+                    'inwoners'   => $rij->inwoners !== null ? (int) $rij->inwoners : null,
                     'buren'      => array_values(array_filter(explode(',', (string) $rij->buren))),
                 ];
             }

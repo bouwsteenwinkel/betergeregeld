@@ -153,6 +153,14 @@
                 <p style="font-size: 16px; line-height: 1.6; color: #4A4844; max-width: 62ch; margin: 0 0 22px;">
                     {{ $placeName }} valt onder de gemeente {{ $facts['gemeente'] }}
                     @if (! empty($facts['provincie'])) in {{ $facts['provincie'] }}@endif.
+                    @if (! empty($facts['inwoners']))
+                        Die gemeente telt zo'n {{ number_format($facts['inwoners'], 0, ',', '.') }} inwoners,
+                        {{ $facts['inwoners'] >= 60000
+                            ? 'dus er is hier volop bedrijvigheid — en dus ook volop concurrentie in de zoekresultaten'
+                            : ($facts['inwoners'] >= 20000
+                                ? 'groot genoeg voor een stevige lokale markt en klein genoeg om op te vallen'
+                                : 'een overzichtelijke markt waarin je met een goede website snel bovenaan staat') }}.
+                    @endif
                     @if (! empty($facts['afstand_km']))
                         Vanaf ons kantoor in Bussum is dat zo'n {{ $facts['afstand_km'] }} kilometer —
                         {{ $facts['afstand_km'] <= 35 ? 'we komen hier geregeld langs' : 'we werken hier op afstand, met videobellen wanneer dat handiger is' }}.
@@ -167,6 +175,12 @@
                         <div>
                             <dt style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B;">Provincie</dt>
                             <dd style="margin: 4px 0 0; font-size: 17px; font-weight: 700; color: #1A1A1A;">{{ $facts['provincie'] }}</dd>
+                        </div>
+                    @endif
+                    @if (! empty($facts['inwoners']))
+                        <div>
+                            <dt style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B;">Inwoners gemeente</dt>
+                            <dd style="margin: 4px 0 0; font-size: 17px; font-weight: 700; color: #1A1A1A;">{{ number_format($facts['inwoners'], 0, ',', '.') }}</dd>
                         </div>
                     @endif
                     @if (! empty($facts['afstand_km']))

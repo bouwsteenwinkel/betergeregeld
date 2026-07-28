@@ -45,8 +45,88 @@ class ChannelPlacesEnrich extends Command
             $this->ophalen($plaatsen);
         }
         $this->afstandEnBuren();
+        $this->inwoners();
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Inwonertal per gemeente uit CBS-opendata (StatLine 85984NED, Kerncijfers
+     * wijken en buurten). Eén verzoek voor alle 342 gemeenten, dus geen reden om
+     * dit per plaats te doen. Plaatsen binnen dezelfde gemeente krijgen hetzelfde
+     * getal — dat is ook wat het is: een gemeentecijfer, en zo staat het op de
+     * pagina.
+     */
+    private function inwoners(): void
+    {
+        $opties = [];
+        if (class_exists(\Composer\CaBundle\CaBundle::class)) {
+            $opties['verify'] = \Composer\CaBundle\CaBundle::getSystemCaRootBundlePath();
+        }
+
+        try {
+            $res = Http::withOptions($opties)->timeout(60)->get('https://opendata.cbs.nl/ODataApi/odata/85984NED/TypedDataSet', [
+                '$select' => 'WijkenEnBuurten,Gemeentenaam_1,AantalInwoners_5',
+                '$filter' => "startswith(WijkenEnBuurten,'GM')",
+            ]);
+            if (! $res->ok()) {
+                $this->warn('CBS gaf HTTP ' . $res->status() . ' — inwonertal overgeslagen.');
+
+                return;
+            }
+        } catch (\Throwable $e) {
+            $this->warn('CBS niet bereikbaar (' . $e->getMessage() . ') — inwonertal overgeslagen.');
+
+            return;
+        }
+
+        // CBS levert de namen met spaties opgevuld; trimmen en op kleine letters
+        // vergelijken, anders matcht "Bergen (NH.)  " nooit met onze gemeentenaam.
+        $perGemeente = [];
+        foreach ((array) data_get($res->json(), 'value', []) as $rij) {
+            $naam = mb_strtolower(trim((string) ($rij['Gemeentenaam_1'] ?? '')));
+            $aantal = $rij['AantalInwoners_5'] ?? null;
+            if ($naam !== '' && $aantal !== null) $perGemeente[$naam] = (int) $aantal;
+        }
+        if (! $perGemeente) {
+            $this->warn('CBS leverde geen gemeenten op — inwonertal overgeslagen.');
+
+            return;
+        }
+
+        // CBS schrijft provincie-achtervoegsels mét punten ("Bergen (NH.)") waar
+        // PDOK ze zonder punt geeft ("Bergen (NH)"), en soms laat PDOK het
+        // achtervoegsel helemaal weg ("Beek" tegenover "Beek (L.)"). Daarom een
+        // genormaliseerde sleutel plus, als die niets oplevert, een zoektocht op
+        // naam + achtervoegsel — maar alleen als er precies één kandidaat is.
+        $normaliseer = fn (string $s) => preg_replace('/[^a-z0-9()]/', '', mb_strtolower($s));
+        $genormaliseerd = [];
+        foreach ($perGemeente as $naam => $aantal) $genormaliseerd[$normaliseer($naam)] = $aantal;
+
+        $gezet = 0; $onbekend = [];
+        foreach (DB::table('channel_place_facts')->whereNotNull('gemeente')->get(['slug', 'gemeente']) as $r) {
+            $ruw     = trim((string) $r->gemeente);
+            $sleutel = $normaliseer($ruw);
+            $aantal  = $genormaliseerd[$sleutel] ?? null;
+
+            if ($aantal === null) {
+                $kandidaten = [];
+                foreach ($genormaliseerd as $cbs => $n) {
+                    if (str_starts_with($cbs, $sleutel . '(')) $kandidaten[$cbs] = $n;
+                }
+                if (count($kandidaten) === 1) $aantal = reset($kandidaten);
+            }
+
+            if ($aantal === null) { $onbekend[mb_strtolower($ruw)] = true; continue; }
+            DB::table('channel_place_facts')->where('slug', $r->slug)->update(['inwoners' => $aantal]);
+            $gezet++;
+        }
+
+        $this->info('Inwonertal gezet voor ' . $gezet . ' plaatsen (' . count($perGemeente) . ' gemeenten uit CBS'
+            . ($onbekend ? ', ' . count($onbekend) . ' gemeentenamen niet herkend' : '') . ').');
+        if ($onbekend) {
+            $this->line('  niet herkend: ' . implode(', ', array_slice(array_keys($onbekend), 0, 8)));
+        }
     }
 
     /** Stap 1: gemeente + coördinaten per plaats bij PDOK ophalen. */
