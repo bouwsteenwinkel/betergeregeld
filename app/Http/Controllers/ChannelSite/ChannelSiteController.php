@@ -250,16 +250,45 @@ class ChannelSiteController extends Controller
         $businesses = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)
             ->forPlace((string) $site->brancheKey(), $data['slug'], $data['naam'], $data['provincie'], $business);
 
-        // Nabije plaatsen (zelfde provincie) — zoveel mogelijk interne links.
+        // Echte feiten bij deze plaats: gemeente, coördinaten, afstand tot de
+        // vestiging en de werkelijke buurplaatsen (channel_place_facts, gevuld
+        // door `php artisan channel:places-enrich` uit de PDOK-locatieserver).
+        // Ontbreekt de rij, dan valt alles hieronder terug op het oude gedrag.
+        $facts = null;
+        try {
+            $rij = \Illuminate\Support\Facades\DB::table('channel_place_facts')->where('slug', $data['slug'])->first();
+            if ($rij && $rij->bron !== 'onbekend') {
+                $facts = [
+                    'gemeente'   => $rij->gemeente,
+                    'provincie'  => $rij->provincie,
+                    'afstand_km' => $rij->afstand_km !== null ? (int) $rij->afstand_km : null,
+                    'buren'      => array_values(array_filter(explode(',', (string) $rij->buren))),
+                ];
+            }
+        } catch (\Throwable $e) {
+            $facts = null;   // tabel bestaat nog niet → pagina werkt gewoon door
+        }
+
+        // Nabije plaatsen — bij voorkeur de écht dichtstbijzijnde (uit de
+        // coördinaten), anders het oude gedrag: alles uit dezelfde provincie.
+        // Echte buren maken de interne links zinniger: Wessem verwijst dan naar
+        // buurdorpen en niet naar een plaats 80 km verderop in dezelfde provincie.
         $names   = $resolver->places();
         $nearby  = [];
-        foreach ($resolver->regions() as $pSlug => $prov) {
-            if ($pSlug === $data['slug'] || $prov !== $data['provincie']) {
-                continue;
+        if ($facts && $facts['buren']) {
+            foreach ($facts['buren'] as $bSlug) {
+                if (isset($names[$bSlug])) $nearby[$bSlug] = $names[$bSlug];
             }
-            $nearby[$pSlug] = $names[$pSlug] ?? $pSlug;
         }
-        asort($nearby);
+        if (! $nearby) {
+            foreach ($resolver->regions() as $pSlug => $prov) {
+                if ($pSlug === $data['slug'] || $prov !== $data['provincie']) {
+                    continue;
+                }
+                $nearby[$pSlug] = $names[$pSlug] ?? $pSlug;
+            }
+            asort($nearby);
+        }
 
         // SEO-gating: alleen plaatsen met genoeg echte bedrijven indexeren.
         $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3);
@@ -274,6 +303,7 @@ class ChannelSiteController extends Controller
             'businesses' => $businesses,
             'nearby'     => $nearby,
             'indexable'  => $indexable,
+            'facts'      => $facts,
         ]);
     }
 

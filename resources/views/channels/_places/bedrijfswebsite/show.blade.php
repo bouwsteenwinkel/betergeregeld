@@ -142,11 +142,51 @@
         </section>
     @endif
 
+    {{-- Feiten die per plaats écht verschillen: gemeente, afstand tot Bussum en
+         de dichtstbijzijnde plaatsen. Komen uit channel_place_facts (PDOK), niet
+         uit een tekstvariant — zonder deze regels verschilden twee plaatspagina's
+         alleen in formulering, en dat is precies waar Google op afhaakt. --}}
+    @if (! empty($facts) && ! empty($facts['gemeente']))
+        <section style="padding: 44px 0; border-top: 1px solid #E5E3DF;">
+            <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
+                <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 8px; color: #1A1A1A;">{{ $placeName }} in het kort</h2>
+                <p style="font-size: 16px; line-height: 1.6; color: #4A4844; max-width: 62ch; margin: 0 0 22px;">
+                    {{ $placeName }} valt onder de gemeente {{ $facts['gemeente'] }}
+                    @if (! empty($facts['provincie'])) in {{ $facts['provincie'] }}@endif.
+                    @if (! empty($facts['afstand_km']))
+                        Vanaf ons kantoor in Bussum is dat zo'n {{ $facts['afstand_km'] }} kilometer —
+                        {{ $facts['afstand_km'] <= 35 ? 'we komen hier geregeld langs' : 'we werken hier op afstand, met videobellen wanneer dat handiger is' }}.
+                    @endif
+                </p>
+                <dl style="display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 0;">
+                    <div>
+                        <dt style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B;">Gemeente</dt>
+                        <dd style="margin: 4px 0 0; font-size: 17px; font-weight: 700; color: #1A1A1A;">{{ $facts['gemeente'] }}</dd>
+                    </div>
+                    @if (! empty($facts['provincie']))
+                        <div>
+                            <dt style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B;">Provincie</dt>
+                            <dd style="margin: 4px 0 0; font-size: 17px; font-weight: 700; color: #1A1A1A;">{{ $facts['provincie'] }}</dd>
+                        </div>
+                    @endif
+                    @if (! empty($facts['afstand_km']))
+                        <div>
+                            <dt style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #12386B;">Afstand tot Bussum</dt>
+                            <dd style="margin: 4px 0 0; font-size: 17px; font-weight: 700; color: #1A1A1A;">± {{ $facts['afstand_km'] }} km</dd>
+                        </div>
+                    @endif
+                </dl>
+            </div>
+        </section>
+    @endif
+
     {{-- Nabije plaatsen (interne links voor SEO). --}}
     @if (! empty($nearby))
         <section style="padding: 56px 0; border-top: 1px solid #E5E3DF;">
             <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
-                <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 20px; color: #1A1A1A;">Ook actief in de buurt</h2>
+                <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 20px; color: #1A1A1A;">
+                    {{ ! empty($facts) && ! empty($facts['buren']) ? 'Dichtstbijzijnde plaatsen' : 'Ook actief in de buurt' }}
+                </h2>
                 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                     @foreach ($nearby as $slug => $naam)
                         <a href="{{ $site->url('plaatsen/' . $slug) }}" class="bg-card" style="padding: 10px 16px; background: #fff; border: 1.5px solid #E5E3DF; border-radius: 6px; text-decoration: none; font-size: 15px; font-weight: 600; color: #2E2C29;">{{ $naam }}</a>
