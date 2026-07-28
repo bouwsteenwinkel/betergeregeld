@@ -18,8 +18,10 @@ use App\Http\Controllers\ChannelSite\ChannelSiteController;
 use App\Http\Controllers\ChannelSite\PreviewToolController;
 use App\Http\Controllers\ChannelSite\SavePreviewController;
 use App\Http\Middleware\BlockChannelPages;
+use App\Http\Middleware\CacheChannelPage;
 use App\Http\Middleware\ResolveChannelSite;
 use App\Services\ChannelSiteResolver;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 // Geldige Groeidiamant-fase-keys, voor de schone fase-URL's (/webshop e.d.).
@@ -133,9 +135,30 @@ $channelRoutes = function () use ($facetKeys) {
 };
 
 // 1) Live kanalen op hun eigen domein.
-foreach (app(ChannelSiteResolver::class)->live() as $site) {
-    Route::domain($site->domain())
-        ->middleware([ResolveChannelSite::class, BlockChannelPages::class])
+// Voor het registreren van de routes is alleen de domeinnaam nodig, maar
+// ChannelSiteResolver::live() haalde daarvoor bij ELK verzoek alle live sites op
+// mét hun branche en blokken. Die query stond dus voor elke paginaweergave in de
+// weg, ook voor een pagina die daarna uit de cache kwam. Vijf minuten een lijstje
+// domeinnamen bewaren scheelt dat; een kanaal dat live gaat is dus hooguit een
+// paar minuten later bereikbaar. Bewust alleen strings in de cache — Eloquent-
+// objecten horen daar niet in.
+$liveDomains = Cache::remember('channel:live-domains', 300, function () {
+    $uit = [];
+    foreach (app(ChannelSiteResolver::class)->live() as $s) {
+        $d = (string) $s->domain();
+        if ($d !== '') $uit[] = $d;
+    }
+    return $uit;
+});
+
+// CacheChannelPage alleen op de LIVE domeinen, niet op de preview-groep
+// hieronder: een concept-kanaal moet direct tonen wat er net gewijzigd is.
+foreach ($liveDomains as $liveDomain) {
+    Route::domain($liveDomain)
+        // CacheChannelPage staat vóór ResolveChannelSite: bij een treffer hoeft
+        // het kanaal niet eens uit de database te komen. Dat scheelt de query's
+        // die juist de traagste stap waren.
+        ->middleware([CacheChannelPage::class, ResolveChannelSite::class, BlockChannelPages::class])
         ->group($channelRoutes);
 }
 
