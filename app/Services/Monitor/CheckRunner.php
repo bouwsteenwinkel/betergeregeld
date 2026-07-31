@@ -43,12 +43,22 @@ class CheckRunner
 					$error = trim("{$errno} {$errstr}") ?: 'verbinding mislukt';
 				}
 			} else {
-				// Eigen User-Agent, want zonder stuurt Guzzle "GuzzleHttp/7" en dat is voor een
-				// WAF een botsignaal. Gemeten 31-07-2026: bouwsteenwinkel.nl (achter Cloudflare)
-				// gaf 6.411 keer op rij HTTP 403 sinds 9 juli — de site was al die tijd gewoon in
-				// de lucht, de checker werd geblokkeerd. Met deze UA komt dezelfde URL op 200.
-				// De check stond dus drie weken op "down" te roepen, en dat is erger dan geen
-				// check: niemand kijkt er meer naar als hij altijd rood staat.
+				// Eigen User-Agent: een checker hoort zich bekend te maken, zodat een beheerder
+				// in zijn logboek kan zien wie er klopt. Zonder stuurt Guzzle "GuzzleHttp/7".
+				//
+				// LET OP — dit lost een WAF-blokkade NIET op. Gemeten 31-07-2026 op
+				// bouwsteenwinkel.nl (achter Cloudflare), dat sinds 9 juli 6.411 keer op rij
+				// HTTP 403 gaf terwijl de site gewoon in de lucht was: vanuit deze PHP-client
+				// geeft / een 403 met élke User-Agent, ook een volledige browser-UA, en ook met
+				// Accept-headers of een afgedwongen HTTP/1.1 of HTTP/2. Dezelfde UA vanaf curl
+				// op dezelfde machine geeft 200. Cloudflare kijkt dus naar de TLS-vingerafdruk
+				// van de client, niet naar wat wij meesturen.
+				//
+				// Uitwijken naar /robots.txt of /sitemap.xml werkt wél (200), maar die worden
+				// door Cloudflare zélf uit de edge-cache geserveerd (cf-cache-status: HIT) —
+				// dan staat de check groen terwijl de server plat ligt. Dat is erger dan het
+				// valse rood. De echte oplossing is een skip-regel in Cloudflare voor deze
+				// monitor; tot die er is blijft die ene check onterecht rood.
 				$resp = Http::withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
 					->withHeaders(['User-Agent' => self::USER_AGENT])
 					->timeout($timeout)
