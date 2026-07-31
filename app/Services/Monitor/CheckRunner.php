@@ -23,6 +23,45 @@ class CheckRunner
 	 */
 	public const USER_AGENT = 'BeterGeregeld-Monitor/1.0 (+https://betergeregeld.com/monitoring)';
 
+	/**
+	 * Het doorlaatbewijs voor een WAF, maar alléén naar hosts die we zelf beheren.
+	 *
+	 * De monitor controleert ook sites van klanten. Zou hij het geheim overal meesturen, dan
+	 * geeft hij zijn sleutel weg aan elke partij die hij aanroept — en daarmee aan iedereen die
+	 * hun logs kan lezen. Vandaar de allowlist uit config/monitor.php: geen host in de lijst,
+	 * geen header. Zonder ingesteld geheim stuurt hij sowieso niets extra's.
+	 *
+	 * De vergelijking gaat op de hostnaam, niet op de hele URL: een pad kan verschillen en een
+	 * poort hoort er niet toe te doen. Subdomeinen tellen mee, zodat één entry
+	 * (bouwsteenwinkel.nl) ook www. en shop. dekt zonder dat je ze los moet opsommen.
+	 *
+	 * @return array<string,string> leeg als er niets meegestuurd mag worden
+	 */
+	public function bypassHeaderFor(string $url): array
+	{
+		$secret = (string) config('monitor.bypass.secret', '');
+		$header = (string) config('monitor.bypass.header', 'X-BG-Monitor');
+		$hosts  = (array) config('monitor.bypass.hosts', []);
+
+		if ($secret === '' || $header === '' || $hosts === []) {
+			return [];
+		}
+
+		$host = strtolower((string) parse_url($url, PHP_URL_HOST));
+		if ($host === '') {
+			return [];
+		}
+
+		foreach ($hosts as $toegestaan) {
+			$toegestaan = strtolower(trim((string) $toegestaan));
+			if ($toegestaan !== '' && ($host === $toegestaan || str_ends_with($host, '.' . $toegestaan))) {
+				return [$header => $secret];
+			}
+		}
+
+		return [];
+	}
+
 	public function run(Check $check): CheckResult
 	{
 		$start = microtime(true);
@@ -60,7 +99,7 @@ class CheckRunner
 				// valse rood. De echte oplossing is een skip-regel in Cloudflare voor deze
 				// monitor; tot die er is blijft die ene check onterecht rood.
 				$resp = Http::withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
-					->withHeaders(['User-Agent' => self::USER_AGENT])
+					->withHeaders(['User-Agent' => self::USER_AGENT] + $this->bypassHeaderFor($check->target))
 					->timeout($timeout)
 					->get($check->target);
 

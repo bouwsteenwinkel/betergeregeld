@@ -44,6 +44,33 @@ return [
 	'alert_email' => env('MONITOR_ALERT_EMAIL', 'info@bouwsteenwinkel.nl'),
 
 	/*
+	 * Doorlaatbewijs voor een WAF die de checker blokkeert.
+	 *
+	 * Aanleiding (31-07-2026): bouwsteenwinkel.nl staat achter Cloudflare en gaf de check
+	 * 6.411 keer op rij een 403 terwijl de site gewoon in de lucht was. Nagemeten: dat ligt
+	 * niet aan de headers — élke User-Agent krijgt 403, ook een volledige browser-UA, terwijl
+	 * curl vanaf dezelfde machine 200 geeft. Cloudflare herkent de TLS-vingerafdruk van de
+	 * PHP-client. Uitwijken naar /robots.txt helpt niet: dat serveert Cloudflare uit zijn
+	 * edge-cache, dus dan staat de check groen terwijl de server plat ligt.
+	 *
+	 * De oplossing is een skip-regel aan de Cloudflare-kant die verzoeken mét onderstaande
+	 * header doorlaat. Zolang `secret` leeg is stuurt de checker niets extra's mee.
+	 *
+	 * HOSTS IS GEEN OPTIE MAAR EEN VEILIGHEIDSGRENS. Er worden ook sites van klanten
+	 * gemonitord; het geheim mag alleen naar hosts die we zelf beheren, anders deelt de
+	 * monitor zijn sleutel met iedereen die hij aanroept. Leeg = naar niemand sturen.
+	 * Een entry dekt de host zelf én zijn subdomeinen (bouwsteenwinkel.nl → www.bouwsteenwinkel.nl).
+	 */
+	'bypass' => [
+		'header' => env('MONITOR_BYPASS_HEADER', 'X-BG-Monitor'),
+		'secret' => env('MONITOR_BYPASS_SECRET', ''),
+		'hosts'  => array_values(array_filter(array_map(
+			fn ($h) => strtolower(trim($h)),
+			explode(',', (string) env('MONITOR_BYPASS_HOSTS', ''))
+		))),
+	],
+
+	/*
 	 * Interne Laravel-scheduler-jobs die zichzelf bewaken via de cron-monitor
 	 * (dead-man's-switch). Elke entry wordt idempotent geprovisioned tot een
 	 * cron_monitors-rij (op source_key); de scheduler-hooks in routes/console.php
