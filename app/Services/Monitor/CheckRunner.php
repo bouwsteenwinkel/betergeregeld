@@ -16,6 +16,13 @@ use Throwable;
  */
 class CheckRunner
 {
+	/**
+	 * Waarmee de checker zich bekendmaakt. Een herkenbare naam plus een URL waar een
+	 * beheerder kan opzoeken wie er klopt: dat is wat je van een nette bot verwacht, en
+	 * het scheelt de klant een raadsel in zijn logboek.
+	 */
+	public const USER_AGENT = 'BeterGeregeld-Monitor/1.0 (+https://betergeregeld.com/monitoring)';
+
 	public function run(Check $check): CheckResult
 	{
 		$start = microtime(true);
@@ -36,7 +43,14 @@ class CheckRunner
 					$error = trim("{$errno} {$errstr}") ?: 'verbinding mislukt';
 				}
 			} else {
+				// Eigen User-Agent, want zonder stuurt Guzzle "GuzzleHttp/7" en dat is voor een
+				// WAF een botsignaal. Gemeten 31-07-2026: bouwsteenwinkel.nl (achter Cloudflare)
+				// gaf 6.411 keer op rij HTTP 403 sinds 9 juli — de site was al die tijd gewoon in
+				// de lucht, de checker werd geblokkeerd. Met deze UA komt dezelfde URL op 200.
+				// De check stond dus drie weken op "down" te roepen, en dat is erger dan geen
+				// check: niemand kijkt er meer naar als hij altijd rood staat.
 				$resp = Http::withOptions(['verify' => CaBundle::getSystemCaRootBundlePath()])
+					->withHeaders(['User-Agent' => self::USER_AGENT])
 					->timeout($timeout)
 					->get($check->target);
 
