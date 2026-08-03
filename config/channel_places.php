@@ -94,6 +94,9 @@ return [
             'Meer aanvragen voor je :trade in :city',
             ':service laten maken voor je :trade in :city',
             'Online groeien met je :trade in :city',
+            ':trade in :city: gevonden worden in Google',
+            ':service voor :trades in :city en omgeving',
+            'Nieuwe klanten voor je :trade in :city',
         ],
 
         'meta_description' => [
@@ -102,6 +105,9 @@ return [
             ':trades in :city en omgeving groeien online met betergeregeld: een :service, webshop en slimme tools die aanvragen opleveren. Bekijk hoe.',
             'Een :service voor je :trade in :city die klussen oplevert: vindbaar in Google, je vakwerk in beeld en aanvragen rechtstreeks in je mailbox.',
             'Meer klanten voor je :trade in :city? Wij regelen je online groei van begin tot eind. Vooraf een gratis voorbeeld, en je weet je prijs voordat je iets beslist.',
+            'Zoekt iemand in :city een :niche, dan wil je erbij staan. Wij bouwen :trades een :service die vindbaar is en aanvragen oplevert. Bekijk vooraf gratis een voorbeeld van je eigen bedrijf.',
+            'Een :service voor je :trade in :city, gemaakt om gevonden te worden en klanten te laten bellen. Vaste prijs vooraf, één aanspreekpunt, en eerst een gratis voorbeeld.',
+            'Je vak beheers je al. Wij regelen de online kant voor :trades in :city: vindbaar in Google, aanvragen in je mailbox en tools die met je meegroeien.',
         ],
 
         'h1' => [
@@ -109,6 +115,9 @@ return [
             ':trade in :city? Word online gevonden',
             'Online groeien met je :trade in :city',
             'Meer aanvragen voor je :trade in :city',
+            'Gevonden worden in :city met je :trade',
+            'Je :trade in :city online op de kaart',
+            ':service voor :trades in :city en omgeving',
         ],
 
         'hero_lead' => [
@@ -116,6 +125,10 @@ return [
             'Wie in :city een :niche zoekt, begint bij Google. Zorg dat jouw :trade daar bovenaan staat. Wij bouwen een strakke :service die je vakwerk laat zien en klanten binnenhaalt. Vooraf krijg je gratis en vrijblijvend een voorbeeld.',
             'Voor :trades in :city (:region): een professionele :service, online verkopen en slimme tools die met je meegroeien. Je begint waar je nu staat en breidt uit wanneer je eraan toe bent.',
             'Meer klussen uit :city en omgeving? Wij regelen de online kant van je :trade van A tot Z: vindbaar in Google, aanvragen in je mailbox en een site waar klanten vertrouwen in krijgen.',
+            'Iemand in :city zoekt een :niche, vindt jouw :trade bovenaan, ziet in één oogopslag wat je doet en neemt contact op. Zo hoort het te werken. Wij bouwen de :service die dat mogelijk maakt, en je ziet vooraf gratis hoe die eruit gaat zien.',
+            'Je vak beheers je. De online kant erbij doen kost avonden die je liever anders besteedt. Laat dat aan ons: wij zorgen dat je :trade gevonden wordt in :city en dat aanvragen rechtstreeks bij je binnenkomen, zonder dat je ergens aan vast zit om te beginnen.',
+            'Een :service die niet alleen mooi is maar ook aanvragen oplevert, voor :trades in :city en de rest van :region. Vaste prijs, één aanspreekpunt, en vooraf een voorbeeld van jouw eigen bedrijf zodat je weet wat je koopt.',
+            'Wat zoekt iemand in :city die jou nodig heeft? Meestal een :niche plus de plaatsnaam, op een telefoon, en dan kiest hij uit de eerste paar resultaten. Daar wil je bij staan, en daar richten wij je :service op in.',
         ],
 
         'intro' => [
@@ -123,18 +136,34 @@ return [
             'In :city en de rest van :region is de concurrentie tussen :trades groot. Een verouderde site of alleen een social-pagina kost je klussen. Met een strakke :service, je mooiste projecten in beeld en een duidelijke aanvraagknop val je op tussen de rest.',
             'Een :trade runnen in :city betekent dat je het druk hebt met het echte werk, niet met techniek. Daarom nemen wij de online kant uit handen: een :service die vindbaar is, aanvragen die vanzelf binnenkomen en tools die je administratie lichter maken. Jij bouwt, wij zorgen dat de klanten je vinden.',
             'Klanten in :city verwachten dat ze een :trade online kunnen vinden, bekijken en aanvragen, het liefst \'s avonds vanaf de bank. Wij bouwen een :service die daarop is gemaakt: snel, vindbaar in :city en omgeving, en gericht op het binnenhalen van aanvragen.',
+            // Vier extra varianten (03-08-2026). Met vier stuks deelden twee plaatsen een
+            // op de vier keer dezelfde intro; met acht is dat een op de acht. Elke variant
+            // pakt een andere invalshoek, want dezelfde boodschap anders opgeschreven
+            // levert nog steeds dezelfde woordreeksen op.
+            'De meeste mensen in :city zoeken pas een :niche op het moment dat het nodig is, en dan willen ze snel iemand vinden die betrouwbaar overkomt. Sta je daar niet tussen, dan bellen ze de volgende. Een goede :service zorgt dat jouw :trade wél in dat rijtje staat.',
+            'Je werk in :city spreekt voor zich, alleen ziet niemand het als het niet online staat. Foto\'s van wat je hebt opgeleverd, een paar woorden over hoe je werkt en een knop om contact op te nemen: daarmee weet iemand die je nog nooit ontmoette al genoeg om je te bellen.',
+            'Adverteren kost geld, gevonden worden in :city levert het op. Wie via Google bij je terechtkomt was al op zoek naar een :niche, dus die hoef je niet meer te overtuigen dat hij iets nodig heeft. Daar is een :service voor bedoeld, en daar richten wij hem op in.',
+            'Vraag een :trade in :region waar de klanten vandaan komen en het antwoord is vaak mond-tot-mondreclame. Dat werkt, tot het even stil valt. Online gevonden worden in :city is het vangnet eronder: er komt ook werk binnen in de weken dat niemand je doorverwijst.',
         ],
 
         'wie' => [
             'Van eenmanszaken tot gevestigde bedrijven: we helpen :trades in :city van elke omvang. Begin je net en wil je vooral gevonden worden? Dan is een professionele :service de eerste stap. Draai je al langer mee en wil je online verkopen of je administratie automatiseren? Dan bouwen we dat er gewoon op voort.',
             'Onze klanten in :city zijn :trades die meer uit hun bedrijf willen halen zonder er zelf een technicus bij te worden. De één wil simpelweg meer aanvragen, de ander wil een webshop of een klantenportaal. Voor elke fase hebben we een passende stap.',
             'Werk je in en rond :city en merk je dat mond-tot-mondreclame niet meer genoeg is? Dan ben je precies wie we helpen. We zorgen dat nieuwe klanten uit :city je online vinden, zodat je niet afhankelijk blijft van toeval.',
+            'Heb je een site die jaren terug is gemaakt door iemand die je niet meer kunt bereiken? Dat komen we vaak tegen bij :trades in :city. We kijken eerst wat er nog bruikbaar is en zeggen ook gewoon als bijschaven genoeg is.',
+            'Sommige :trades in :city adverteren wel, maar sturen bezoekers naar een pagina die het niet afmaakt. Dan betaal je voor bezoek dat niets oplevert. Wij zorgen dat er iets staat wat die klik waard is.',
+            'Neem je een bedrijf over in :city, of begin je voor jezelf na jaren in dienst? Dan is je vakkennis er wel maar je naamsbekendheid nog niet. Online gevonden worden is dan de snelste manier om aan je eerste klanten uit :city te komen.',
+            'Werk je met een paar mensen en loopt de planning via briefjes en telefoontjes? Dan is een :service pas het begin. :trades in :city gebruiken daarnaast een klantenportaal of wat automatisering, zodat er minder tijd naar uitzoekwerk gaat.',
         ],
 
         'trust' => [
             'Betergeregeld helpt ondernemers door heel Nederland online groeien, dus ook :trades in :city (:region). Vaste prijs vooraf en een Nederlands team dat opneemt en meedenkt. We zetten eerst een gratis voorbeeld van jóuw bedrijf klaar, zodat je precies ziet wat je krijgt voordat je iets beslist.',
             'Geen technisch gedoe en geen verrassingen achteraf. Voor :trades in :city werken we met een duidelijke prijs, een vast aanspreekpunt en een aanpak die met je meegroeit. Bij jou op locatie in de regio of gewoon online, net wat jou uitkomt.',
             'Het vertrouwen van ondernemers in :city en heel Nederland is waar we het van moeten hebben. Daarom leveren we echt maatwerk, denken we mee over wat jouw :trade nodig heeft, en zijn we bereikbaar als er iets is. Je begint klein en breidt uit wanneer het jou uitkomt.',
+            'Je site is niet klaar op de dag dat hij live gaat. Wij houden hem bij, doen de updates en zorgen dat hij blijft werken op nieuwe telefoons. Merk je dat er iets niet goed staat, dan bel je ons en dan pakken we het op.',
+            'We leggen uit wat we doen in gewone taal, ook als het over techniek gaat. Je hoeft niet te weten wat hosting is om te kunnen beoordelen of je er goed aan doet. Vragen kunnen altijd, ook de vragen waarvan je denkt dat ze te simpel zijn.',
+            'Niet elke :trade in :city heeft alles nodig. Heb je aan een goede :service genoeg, dan zeggen we dat en verkopen we je er niets bij. Blijkt onderweg dat een webshop of wat automatisering echt tijd scheelt, dan komen we daar op terug.',
+            'Eén vast aanspreekpunt in Nederland, dat opneemt als je belt en weet waar jouw :trade in :city over gaat. Geen wisselende contactpersonen en geen ticketsysteem waar je antwoord in verdwijnt. Dat is het soort samenwerking waar we op mikken.',
         ],
 
         'cta_title' => [
@@ -142,6 +171,9 @@ return [
             'Meer aanvragen in :city? Begin hier.',
             'Jouw :trade online in :city.',
             'Zet de eerste stap in :city.',
+            'Zo ziet jouw :trade er online uit.',
+            'Bekijk het voorbeeld voor :city.',
+            'Nieuwe klanten uit :city halen?',
         ],
 
         'cta' => [
@@ -149,6 +181,9 @@ return [
             'Benieuwd hoe jouw :trade er online uit zou zien in :city? Vraag een gratis voorbeeld aan, wij zetten het voor je klaar.',
             'Nog één stap tot meer klanten uit :city. Vraag je gratis voorbeeld aan en zie zelf hoe het werkt.',
             'In :city hoef je geen omzet meer mis te lopen aan een concurrent die beter vindbaar is. Vraag vandaag je gratis voorbeeld aan.',
+            'Typ je bedrijfsnaam in en je ziet binnen een paar minuten een voorbeeld van jouw :trade in :city. Gratis, en je hoeft er niets voor af te spreken.',
+            'Twijfel je nog? Vraag dan eerst het gratis voorbeeld aan. Dan praten we niet over wat het zou kunnen worden, maar kijken we samen naar wat er staat.',
+            'Wil je weten wat dit voor jouw :trade in :city zou betekenen? Vraag het voorbeeld aan, dan bellen we je met een eerlijk verhaal over wat het je oplevert.',
         ],
 
         // FAQ: nu een lijst van SETS in plaats van één vaste lijst. ChannelPlaceContent
