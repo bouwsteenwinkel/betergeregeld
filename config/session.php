@@ -118,7 +118,18 @@ return [
     |
     */
 
-    'lottery' => [2, 100],
+    // Standaard [2, 100]: bij 2 van de 100 verzoeken ruimt Laravel de sessiemap op
+    // terwijl de bezoeker wacht. Elke bezoeker en elke bot krijgt hier een eigen
+    // sessiebestand -- ook op een pagina uit de cache -- en die blijven 30 dagen
+    // staan, dus die opruiming is een scan van tienduizenden bestanden geworden.
+    // Gemeten gevolg: ongeveer 1 op de 50 verzoeken aan een channel-site gaf een
+    // minuut lang geen byte terug. Op /up, de enige route zonder sessie, gebeurde
+    // dat niet.
+    //
+    // Uit met [0, 100]; het opruimen gebeurt nu in `sessions:prune` (elk uur via de
+    // scheduler). Zet dit alleen terug als die taak niet meer draait -- anders
+    // groeit de map ongelimiteerd.
+    'lottery' => [0, 100],
 
     /*
     |--------------------------------------------------------------------------

@@ -22,6 +22,14 @@ Schedule::command('channel:previews-cleanup')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Sessiebestanden opruimen. Stond standaard IN het verzoek (session.lottery); dat
+// kostte de ongelukkige bezoeker een wachttijd van meer dan een minuut zodra de
+// map groot werd. Hier draait het waar niemand op wacht.
+Schedule::command('sessions:prune')
+    ->hourly()
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Opgeslagen voorbeelden — reminder-mails (dag 1 en dag 4) naar klanten die nog
 // niets lieten horen; stopt bij opt-out of zodra het team de lead oppakt.
 Schedule::command('previews:send-reminders')
