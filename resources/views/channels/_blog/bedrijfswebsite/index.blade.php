@@ -60,6 +60,6 @@
 
     @include('channels._sales._bg-cta', [
         'ctaTitle' => 'Liever meteen aan de slag?',
-        'ctaSub'   => 'Typ je bedrijfsnaam en zie binnen een minuut hoe jouw website eruit kan zien.',
+        'ctaSub'   => 'Vertel kort wat je doet en zie binnen één werkdag hoe jouw website eruit kan zien.',
     ])
 @endsection

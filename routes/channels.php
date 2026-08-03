@@ -47,6 +47,11 @@ $channelRoutes = function () use ($facetKeys) {
     // Elke nieuwe preview kost 1 Claude-call + 1 à 2 gpt-image-calls, dus het
     // aanmaken is per IP gelimiteerd (zie 'preview-start' in AppServiceProvider).
     Route::post('/voorbeeld-maken', [PreviewToolController::class, 'start'])->middleware('throttle:preview-start');
+    // Aanvraag-variant: geen generator maar een intake, met een voorbeeld dat
+    // een mens binnen een werkdag maakt. Aparte routes zodat de tool-endpoints
+    // ongemoeid blijven en we per kanaal kunnen wisselen (config/voorbeeld_aanvraag).
+    Route::post('/voorbeeld-aanvragen', [PreviewToolController::class, 'aanvraagOpslaan'])->middleware('throttle:10,1');
+    Route::get('/voorbeeld-aangevraagd', [PreviewToolController::class, 'aanvraagBedankt']);
     Route::post('/content', [PreviewToolController::class, 'content'])->middleware('throttle:preview-ai');
     Route::post('/hero-image', [PreviewToolController::class, 'heroImage'])->middleware('throttle:preview-ai');
     // Webshop: 3x2-productraster (parallel met /content en /hero-image).

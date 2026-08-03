@@ -90,6 +90,6 @@
 
     @include('channels._sales._bg-cta', [
         'ctaTitle' => 'Zelf een sterke website?',
-        'ctaSub'   => 'Typ je bedrijfsnaam en zie binnen een minuut hoe die van jou eruit kan zien.',
+        'ctaSub'   => 'Vertel kort wat je doet en zie binnen één werkdag hoe die van jou eruit kan zien.',
     ])
 @endsection

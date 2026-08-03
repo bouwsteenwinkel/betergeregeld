@@ -9,7 +9,7 @@
     $heroLead = $c['hero_lead'] ?? \Illuminate\Support\Str::limit($c['intro'] ?? '', 150);
     $faq      = (array) ($c['faq'] ?? []);
     $ctaTitle = $c['cta_title'] ?? ('Meer klanten in ' . $placeName . '?');
-    $ctaSub   = $c['cta'] ?? 'Typ je bedrijfsnaam en zie binnen een minuut hoe jouw website eruit kan zien.';
+    $ctaSub   = $c['cta'] ?? 'Vertel kort wat je doet en zie binnen één werkdag hoe jouw website eruit kan zien.';
 
     $ld = [
         [

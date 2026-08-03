@@ -443,7 +443,12 @@ class ChannelSiteController extends Controller
         $md[] = '## Meer informatie';
         $md[] = "- [Blog]({$base}/blog): praktische artikelen over online gevonden worden, meer klanten krijgen en slim automatiseren";
         $md[] = "- [Werkgebied]({$base}/plaatsen): actief in heel Nederland, met een pagina per plaats";
-        $md[] = "- [Gratis voorbeeld]({$base}/voorbeeld-maken): typ je bedrijfsnaam en zie binnen een minuut een concept";
+        // Levertijd volgt de modus van dit kanaal: een generator belooft een minuut,
+            // een aanvraag belooft een werkdag. Beide staan in llms.txt, dus hier ook.
+            $voorbeeldBelofte = in_array($site->key, (array) config('voorbeeld_aanvraag.kanalen', []), true)
+                ? 'beantwoord een paar vragen en krijg ' . config('voorbeeld_aanvraag.levertijd', 'binnen 1 werkdag') . ' een voorbeeld van je eigen website'
+                : 'typ je bedrijfsnaam en zie binnen een minuut een concept';
+            $md[] = "- [Gratis voorbeeld]({$base}/voorbeeld-maken): {$voorbeeldBelofte}";
         $md[] = "- [Afspraak plannen]({$base}/afspraak): online of telefonisch, gratis en vrijblijvend";
         $md[] = '';
         $md[] = '## Contact';

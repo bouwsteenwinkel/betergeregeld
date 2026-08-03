@@ -9,8 +9,10 @@ use App\Models\WebsiteLead;
 use App\Services\ChannelSites\PreviewSiteGenerator;
 use App\Support\ChannelSite;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 /**
@@ -25,14 +27,151 @@ class PreviewToolController extends Controller
         return app(ChannelSite::class);
     }
 
+    /**
+     * Draait dit kanaal op aanvraag in plaats van op de generator?
+     *
+     * ?tool=1 zet de generator alsnog aan. Dat is er voor onszelf: we maken met
+     * die tool een eerste opzet vóór we de klant bellen, en zonder achterdeur
+     * zouden we daarvoor een config-wijziging moeten deployen.
+     */
+    private function aanvraagModus(): bool
+    {
+        if (request()->boolean('tool')) {
+            return false;
+        }
+
+        return in_array($this->site()->key, (array) config('voorbeeld_aanvraag.kanalen', []), true);
+    }
+
     /** De intake-pagina met het formulier + laadscherm. */
     public function form(): View
     {
+        if ($this->aanvraagModus()) {
+            return view('channels.voorbeeld-aanvragen', [
+                'site'      => $this->site(),
+                'levertijd' => (string) config('voorbeeld_aanvraag.levertijd', 'binnen 1 werkdag'),
+            ]);
+        }
+
         return view('channels.voorbeeld-maken', [
             'site'   => $this->site(),
             'goals'  => PreviewSiteGenerator::GOALS,
             'sferen' => PreviewSiteGenerator::SFEREN,
         ]);
+    }
+
+    /**
+     * Aanvraag van een voorbeeldsite: leg de lead vast en beloof een voorbeeld
+     * binnen een werkdag.
+     *
+     * De vragen hieronder zijn geen formaliteit — met bedrijfsnaam, vak, plaats,
+     * doel en uitstraling kunnen we echt beginnen. We bellen daarna nog kort om
+     * de details op te halen die een formulier nu eenmaal niet vangt, en dat
+     * zeggen we er op de bevestiging ook bij: een belofte die je niet waarmaakt
+     * kost meer dan hij oplevert.
+     */
+    public function aanvraagOpslaan(Request $request): RedirectResponse
+    {
+        // Honeypot, zelfde veldnaam als de tool.
+        if (filled($request->input('website'))) {
+            return redirect()->to($this->site()->url('voorbeeld-aangevraagd'));
+        }
+
+        $data = $request->validate([
+            'company'       => ['required', 'string', 'max:120'],
+            'business_type' => ['required', 'string', 'max:120'],
+            'place'         => ['required', 'string', 'max:80'],
+            'contact_name'  => ['required', 'string', 'max:120'],
+            'email'         => ['required', 'email', 'max:190'],
+            'phone'         => ['required', 'string', 'max:60'],
+            'goal'          => ['nullable', 'string', 'max:60'],
+            'sfeer'         => ['nullable', 'string', 'max:60'],
+            'current_site'  => ['nullable', 'string', 'max:190'],
+            'usp'           => ['nullable', 'string', 'max:400'],
+        ], [], [
+            'company' => 'bedrijfsnaam', 'business_type' => 'wat je doet', 'place' => 'plaats',
+            'contact_name' => 'naam', 'email' => 'e-mailadres', 'phone' => 'telefoonnummer',
+        ]);
+
+        try {
+            $this->aanvraagLead($request, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->to($this->site()->url('voorbeeld-aangevraagd'));
+    }
+
+    /** De bevestiging: wat er nu gebeurt, en wanneer. */
+    public function aanvraagBedankt(): View
+    {
+        return view('channels.voorbeeld-aangevraagd', [
+            'site'      => $this->site(),
+            'levertijd' => (string) config('voorbeeld_aanvraag.levertijd', 'binnen 1 werkdag'),
+        ]);
+    }
+
+    /** Vastleggen + intern melden. Zelfde dedup-regel als de tool: één e-mail = één lead. */
+    private function aanvraagLead(Request $request, array $data): void
+    {
+        $site = $this->site();
+
+        $answers = array_filter([
+            'type_bedrijf' => $data['business_type'] ?? null,
+            'plaats'       => $data['place'] ?? null,
+            'doel'         => $data['goal'] ?? null,
+            'sfeer'        => $data['sfeer'] ?? null,
+            'usp'          => $data['usp'] ?? null,
+        ], fn ($v) => filled($v));
+
+        $lead = WebsiteLead::firstOrNew(['email' => mb_strtolower(trim($data['email']))]);
+        $lead->fill([
+            'contact_name'    => $lead->contact_name ?: $data['contact_name'],
+            'phone'           => $lead->phone ?: $data['phone'],
+            'company'         => $lead->company ?: ($data['company'] ?? null),
+            'city'            => $lead->city ?: ($data['place'] ?? null),
+            'branche'         => $lead->branche ?: $site->branche(),
+            'channel'         => $lead->channel ?: $site->key,
+            'source'          => $lead->source ?: 'voorbeeld_aanvraag',
+            'current_website' => $lead->current_website ?: ($data['current_site'] ?? null),
+            'answers'         => array_merge((array) $lead->answers, $answers) ?: null,
+            // Geen generator, dus geen preview-status: dit wacht op een mens.
+            'preview_status'  => $lead->preview_status ?: 'aangevraagd',
+        ]);
+        $lead->status = $lead->status ?: 'new';
+        $lead->fillAttributionOnce(CaptureAdAttribution::fromRequest($request));
+        $lead->save();
+
+        $this->meldAanvraag($site, $lead, $data);
+    }
+
+    /** Interne melding — zonder deze mail blijft een aanvraag liggen tot iemand de admin opent. */
+    private function meldAanvraag(ChannelSite $site, WebsiteLead $lead, array $data): void
+    {
+        $to = (string) config('channels.lead_mail_to', config('mail.from.address'));
+        if ($to === '') {
+            return;
+        }
+
+        try {
+            Mail::raw(
+                "Aanvraag voorbeeldsite via {$site->name()} ({$site->key}).\n\n"
+                . "BELLEN: kort even doorvragen, daarna voorbeeld maken.\n\n"
+                . "Bedrijf: " . ($lead->company ?: '—') . "\n"
+                . "Wat ze doen: " . ($data['business_type'] ?? '—') . "\n"
+                . "Plaats: " . ($data['place'] ?? '—') . "\n"
+                . "Contact: {$lead->contact_name} · {$lead->phone} · {$lead->email}\n"
+                . "Huidige site: " . ($data['current_site'] ?? '—') . "\n"
+                . "Doel: " . ($data['goal'] ?? '—') . "\n"
+                . "Uitstraling: " . ($data['sfeer'] ?? '—') . "\n"
+                . "Wat ze kwijt wilden: " . ($data['usp'] ?? '—') . "\n\n"
+                . "Beloofd: voorbeeld " . config('voorbeeld_aanvraag.levertijd') . ".\n"
+                . "Opvolgen in de admin → Website-leads.",
+                fn ($m) => $m->to($to)->subject("Voorbeeld aangevraagd ({$site->key}): " . ($lead->company ?: $lead->contact_name))
+            );
+        } catch (\Throwable $e) {
+            Log::warning('voorbeeld_aanvraag_mail: ' . $e->getMessage());
+        }
     }
 
     /**

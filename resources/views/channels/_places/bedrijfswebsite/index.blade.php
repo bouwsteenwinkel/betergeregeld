@@ -36,6 +36,6 @@
 
     @include('channels._sales._bg-cta', [
         'ctaTitle' => 'Klaar om online te groeien?',
-        'ctaSub'   => 'Typ je bedrijfsnaam en zie binnen een minuut hoe jouw website eruit kan zien.',
+        'ctaSub'   => 'Vertel kort wat je doet en zie binnen één werkdag hoe jouw website eruit kan zien.',
     ])
 @endsection
