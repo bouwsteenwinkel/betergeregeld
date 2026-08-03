@@ -162,6 +162,24 @@ foreach ($liveDomains as $liveDomain) {
         ->group($channelRoutes);
 }
 
+// 1b) www.<kanaal> → het kale domein, met een 301.
+//
+// Route::domain() hierboven registreert alleen het kale domein. Alles op www.
+// viel daardoor door naar de hoofdapplicatie: wie www.jouw-bakkerij-website.nl
+// intikte kreeg de homepage van Beter Geregeld ICT te zien, met index,follow en
+// een canonical naar zichzelf. Google mocht dus zeventien vrijwel identieke
+// kopieën van diezelfde pagina indexeren, elk onder een andere merknaam.
+//
+// Een 301 en niet een eigen kopie van de site: één adres per kanaal houdt de
+// linkwaarde bij elkaar en voorkomt dat dezelfde inhoud twee keer bestaat.
+// Pad en querystring gaan mee, zodat een gedeelde diepe link blijft werken.
+foreach ($liveDomains as $liveDomain) {
+    Route::domain('www.' . $liveDomain)->any('{pad?}', function (string $pad = '') use ($liveDomain) {
+        $query = request()->getQueryString();
+        return redirect('https://' . $liveDomain . '/' . ltrim($pad, '/') . ($query ? '?' . $query : ''), 301);
+    })->where('pad', '.*');
+}
+
 // 2) Preview/concept op /_site/{channelKey}/... — domein-loos, dus dit matcht op
 //    ELK host (hoofddomein én een live channel-domein). De catch-all in de
 //    domeingroep hierboven sluit '_site/'-paden bewust uit (zie where-constraint),
