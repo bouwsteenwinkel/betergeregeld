@@ -22,10 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // valt terwijl juist daar een lead ontstaat. Append: moet ná EncryptCookies
         // draaien, anders is de cookie bij het lezen nog versleuteld. Doet niets
         // zolang er geen advertentie-parameter in de URL staat.
-        // Zoekmachines krijgen geen sessiebestand. Moet VOOR StartSession draaien,
+        // Geen sessiebestand voor crawlers en machine-endpoints. Moet VOOR StartSession,
         // want die leest de driver zodra hij aan de beurt is — vandaar prepend.
         $middleware->web(prepend: [
-            \App\Http\Middleware\GeenSessieVoorCrawlers::class,
+            \App\Http\Middleware\GeenOnnodigeSessie::class,
         ]);
 
         $middleware->web(append: [
