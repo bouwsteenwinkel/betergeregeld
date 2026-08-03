@@ -4,6 +4,8 @@ namespace App\Http\Controllers\ChannelSite;
 
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\CaptureAdAttribution;
+use App\Mail\VoorbeeldAanvraagIntern;
+use App\Mail\VoorbeeldAanvraagKlant;
 use App\Models\Channel\Site;
 use App\Models\WebsiteLead;
 use App\Services\ChannelSites\PreviewSiteGenerator;
@@ -142,35 +144,33 @@ class PreviewToolController extends Controller
         $lead->fillAttributionOnce(CaptureAdAttribution::fromRequest($request));
         $lead->save();
 
-        $this->meldAanvraag($site, $lead, $data);
+        $this->mailAanvraag($site, $lead, $answers);
     }
 
-    /** Interne melding — zonder deze mail blijft een aanvraag liggen tot iemand de admin opent. */
-    private function meldAanvraag(ChannelSite $site, WebsiteLead $lead, array $data): void
+    /**
+     * Twee mails: een bevestiging aan de aanvrager en een melding aan onszelf.
+     *
+     * Allebei best-effort en apart afgevangen. Een lead die wél is vastgelegd maar
+     * waarvan de mail strandt, mag geen foutpagina opleveren — en het mislukken van
+     * de ene mail mag de andere niet tegenhouden.
+     */
+    private function mailAanvraag(ChannelSite $site, WebsiteLead $lead, array $antwoorden): void
     {
+        try {
+            Mail::to($lead->email)->send(new VoorbeeldAanvraagKlant($lead, $site, $antwoorden));
+        } catch (\Throwable $e) {
+            Log::warning('voorbeeld_aanvraag_klantmail: ' . $e->getMessage());
+        }
+
         $to = (string) config('channels.lead_mail_to', config('mail.from.address'));
         if ($to === '') {
             return;
         }
 
         try {
-            Mail::raw(
-                "Aanvraag voorbeeldsite via {$site->name()} ({$site->key}).\n\n"
-                . "BELLEN: kort even doorvragen, daarna voorbeeld maken.\n\n"
-                . "Bedrijf: " . ($lead->company ?: '—') . "\n"
-                . "Wat ze doen: " . ($data['business_type'] ?? '—') . "\n"
-                . "Plaats: " . ($data['place'] ?? '—') . "\n"
-                . "Contact: {$lead->contact_name} · {$lead->phone} · {$lead->email}\n"
-                . "Huidige site: " . ($data['current_site'] ?? '—') . "\n"
-                . "Doel: " . ($data['goal'] ?? '—') . "\n"
-                . "Uitstraling: " . ($data['sfeer'] ?? '—') . "\n"
-                . "Wat ze kwijt wilden: " . ($data['usp'] ?? '—') . "\n\n"
-                . "Beloofd: voorbeeld " . config('voorbeeld_aanvraag.levertijd') . ".\n"
-                . "Opvolgen in de admin → Website-leads.",
-                fn ($m) => $m->to($to)->subject("Voorbeeld aangevraagd ({$site->key}): " . ($lead->company ?: $lead->contact_name))
-            );
+            Mail::to($to)->send(new VoorbeeldAanvraagIntern($lead, $site, $antwoorden));
         } catch (\Throwable $e) {
-            Log::warning('voorbeeld_aanvraag_mail: ' . $e->getMessage());
+            Log::warning('voorbeeld_aanvraag_internmail: ' . $e->getMessage());
         }
     }
 
