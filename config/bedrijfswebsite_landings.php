@@ -9,6 +9,14 @@
 
 return [
     'website' => [
+        // Eigen SEO-titel, want de standaard (eyebrow + " voor jouw bedrijf") gaf
+        // "Website laten maken voor jouw bedrijf" terwijl de HOME "Website laten maken
+        // voor ondernemers" heet. Twee pagina's die om dezelfde zoekopdracht vechten:
+        // Google kiest er één en onderdrukt de andere. De home heeft de meeste
+        // autoriteit en houdt dus de hoofdterm; deze pagina pakt de zakelijke variant.
+        // Alleen dit facet botste — webshop, klantenportaal, automatisering en ai zijn
+        // van zichzelf al onderscheidend. Gemeten 03-08-2026.
+        'seo_title' => 'Zakelijke website laten maken met vaste prijs',
         'hero' => [
             'eyebrow' => 'Website laten maken',
             'title'   => 'Een professionele website voor je bedrijf die klanten oplevert',

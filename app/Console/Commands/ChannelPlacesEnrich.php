@@ -24,7 +24,8 @@ class ChannelPlacesEnrich extends Command
     protected $signature = 'channel:places-enrich
         {--limit=0 : Maximaal aantal plaatsen deze run (0 = alles)}
         {--refresh : Ook plaatsen die al opgehaald zijn opnieuw doen}
-        {--afstand-only : Alleen afstand en buurplaatsen herberekenen}';
+        {--afstand-only : Alleen afstand en buurplaatsen herberekenen}
+        {--adressen-only : Alleen het aantal adressen per woonplaats ophalen (BAG/PDOK)}';
 
     protected $description = 'Vult channel_place_facts met gemeente, coördinaten, afstand en buurplaatsen';
 
@@ -41,13 +42,109 @@ class ChannelPlacesEnrich extends Command
             return self::FAILURE;
         }
 
+        // --adressen-only staat vooraan omdat de stappen erboven traag zijn en op
+        // externe diensten wachten: de CBS-aanroep in inwoners() bleef op 03-08-2026
+        // dertien minuten hangen, waardoor de adres-stap nooit aan de beurt kwam. Wie
+        // alleen de adressen nodig heeft, moet daar niet achter hoeven wachten.
+        if ($this->option('adressen-only')) {
+            $this->adressen();
+
+            return self::SUCCESS;
+        }
+
         if (! $this->option('afstand-only')) {
             $this->ophalen($plaatsen);
         }
         $this->afstandEnBuren();
         $this->inwoners();
+        $this->adressen();
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Aantal adressen per WOONPLAATS uit de BAG via PDOK — de enige maat die we
+     * hebben voor hoe groot een plaats werkelijk is.
+     *
+     * Waarom dit nodig is: `inwoners` hierboven is een GEMEENTEcijfer (CBS heeft
+     * het niet per woonplaats), dus Anloo en Annen krijgen beide 25.845 omdat ze
+     * in Aa en Hunze liggen. En het aantal gevonden bedrijven, waar de
+     * indexerings-gating op stond, is door Places afgekapt op 9: alle 984
+     * plaatsen zaten daarmee in dezelfde bak. Adressen lopen wél uiteen —
+     * gemeten 03-08-2026: Anloo 197, Annen 1.887, Beilen 6.053, Bussum 19.514,
+     * Assen 39.100, Amsterdam 579.486.
+     *
+     * We vragen rows=0 en lezen alleen `numFound`: we willen het aantal, niet de
+     * adressen zelf. Eén verzoek per plaats met een korte pauze, en een plaats
+     * die al een getal heeft slaan we over (tenzij --refresh) — dit hoeft maar
+     * één keer, adressen komen er niet met duizenden per maand bij.
+     */
+    private function adressen(): void
+    {
+        $opties = [];
+        if (class_exists(\Composer\CaBundle\CaBundle::class)) {
+            $opties['verify'] = \Composer\CaBundle\CaBundle::getSystemCaRootBundlePath();
+        }
+
+        $query = DB::table('channel_place_facts')->whereNotNull('naam');
+        if (! $this->option('refresh')) {
+            $query->whereNull('adressen');
+        }
+        $rijen = $query->orderBy('slug')->get(['slug', 'naam']);
+
+        if ($rijen->isEmpty()) {
+            $this->info('Adressen: niets te doen (gebruik --refresh om alles opnieuw te tellen).');
+
+            return;
+        }
+
+        $limiet = (int) $this->option('limit');
+        if ($limiet > 0) {
+            $rijen = $rijen->take($limiet);
+        }
+
+        $this->info('Adressen per woonplaats ophalen bij PDOK voor ' . $rijen->count() . ' plaatsen…');
+        $balk = $this->output->createProgressBar($rijen->count());
+        $balk->start();
+
+        $gezet = 0; $nul = 0; $mislukt = 0;
+        foreach ($rijen as $r) {
+            // De query-string bouwen we zelf. Solr wil `fq` TWEE KEER zien, en een array
+            // meegeven aan Http::get() levert `fq[0]=…&fq[1]=…` op — dat begrijpt PDOK
+            // niet, elk verzoek faalde en er werd niets opgeslagen (gemeten 03-08-2026).
+            $url = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/free'
+                . '?q=' . urlencode('*:*')
+                . '&fq=' . urlencode('type:adres')
+                . '&fq=' . urlencode('woonplaatsnaam:"' . $r->naam . '"')
+                . '&rows=0&wt=json';
+
+            try {
+                $res = Http::withOptions($opties)->timeout(20)->get($url);
+                $aantal = $res->ok() ? (int) data_get($res->json(), 'response.numFound', 0) : null;
+            } catch (\Throwable $e) {
+                $aantal = null;
+            }
+
+            if ($aantal === null) {
+                $mislukt++;
+            } else {
+                // 0 is een geldige uitkomst (PDOK kent de woonplaatsnaam niet zoals wij
+                // hem schrijven). We slaan het op, zodat de gating zo'n plaats uitsluit
+                // en een volgende run hem niet opnieuw probeert.
+                DB::table('channel_place_facts')->where('slug', $r->slug)->update(['adressen' => $aantal]);
+                $gezet++;
+                if ($aantal === 0) $nul++;
+            }
+
+            $balk->advance();
+            usleep(120000); // ~8 verzoeken per seconde; PDOK is open data, maar niet onze speeltuin
+        }
+
+        $balk->finish();
+        $this->newLine(2);
+        $this->info('Adressen gezet voor ' . $gezet . ' plaatsen'
+            . ($nul ? ' (' . $nul . ' daarvan op 0 — naam niet gevonden bij PDOK)' : '')
+            . ($mislukt ? ', ' . $mislukt . ' mislukt (opnieuw te proberen)' : '') . '.');
     }
 
     /**

@@ -291,8 +291,14 @@ class ChannelSiteController extends Controller
             asort($nearby);
         }
 
-        // SEO-gating: alleen plaatsen met genoeg echte bedrijven indexeren.
-        $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3);
+        // SEO-gating: genoeg echte bedrijven ÉN een woonplaats van voldoende schaal.
+        // Die tweede eis is de scherpe: het aantal bedrijven is door Places afgekapt op 9,
+        // dus daarmee viel niets te selecteren (zie PlaceBusinessFinder::groteGenoegPlaats).
+        // Dezelfde regel als in de sitemap, en bewust via dezelfde methode zodat pagina en
+        // sitemap niet uiteen kunnen lopen — een pagina op noindex die tóch in de sitemap
+        // staat is precies het signaal dat je niet wil geven.
+        $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3)
+            && app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->groteGenoegPlaats($data['slug']);
 
         return view($site->placeView('show'), [
             'site'       => $site,

@@ -31,6 +31,33 @@ return [
     // pagina's) en zakt badkamer naar ~692 sterkere URL's.
     'index_min_businesses' => 5,
 
+    // Minimaal aantal ADRESSEN in de woonplaats (channel_place_facts.adressen, uit de
+    // BAG via PDOK). Dit is de echte schaal-maat; index_min_businesses hierboven is dat
+    // niet, want Google Places geeft nooit meer dan 9 resultaten terug: gemeten
+    // 03-08-2026 zaten alle 984 "sterke" plaatsen van bedrijfswebsite in de bak 5-9,
+    // dus er viel met die drempel niets te selecteren. `inwoners` helpt ook niet, dat
+    // is een gemeentecijfer (Anloo en Annen krijgen beide 25.845 = Aa en Hunze).
+    //
+    // 4.000 adressen ≈ 8.000 inwoners. Gekozen op de volledige meting van 03-08-2026
+    // (alle 1.195 plaatsen verrijkt), met Google's eigen oordeel als ijkpunt: van de
+    // 1.026 aangeboden URL's had het er 343 geïndexeerd en 684 afgewezen met "Gevonden
+    // — momenteel niet geïndexeerd". Wat de drempel oplevert aan plaatspagina's:
+    //
+    //   drempel 2.500 → 528   (houdt dorpen: Balk 2.596, Beetsterzwaag 2.327)
+    //   drempel 4.000 → 392   ← hier: elk echt stadje blijft (Axel 4.833, Boekel 4.873)
+    //   drempel 5.000 → 327   (snijdt die er net af)
+    //
+    // 392 ligt dicht bij die 343, dus we bieden ongeveer aan wat Google ook wil hebben
+    // in plaats van 984 pagina's waarvan het tweederde weigert. Ter kalibratie: Anloo
+    // 197, Annen 1.887, Beilen 6.053, Bussum 19.514, Assen 39.100, Amsterdam 579.486.
+    // 44 plaatsen staan op 0 adressen: buurtschappen die niet als woonplaats in de BAG
+    // bestaan — precies wat je wilt uitsluiten.
+    //
+    // Eén getal om aan te draaien. Blijft de bak "Gevonden, niet geïndexeerd" over een
+    // paar maanden groot, dan hoger; komen de plaatspagina's juist goed door, dan lager.
+    // Zet op 0 om de grens helemaal uit te zetten.
+    'index_min_addresses' => 4000,
+
     // Fallback-tokens als een branche (nog) geen eigen waarden heeft.
     'defaults' => [
         'trade'   => 'bedrijf',

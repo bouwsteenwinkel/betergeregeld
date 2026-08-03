@@ -31,7 +31,10 @@
 @extends('channels.layout')
 
 {{-- Head-term voorop in de title (eyebrow = "Webshop laten maken" e.d.). --}}
-@section('title', ($hero['eyebrow'] ?? $fLabel) . ' voor jouw bedrijf')
+{{-- data_get en niet $landing['seo_title']: is $landing onverhoopt null, dan geeft een
+     directe array-toegang een PHP-warning, en Laravel promoveert die tot een fatale
+     ErrorException — een 500 op de commerciële pagina om een ontbrekende titel. --}}
+@section('title', data_get($landing, 'seo_title') ?: (($hero['eyebrow'] ?? $fLabel) . ' voor jouw bedrijf'))
 @section('description', $hero['sub'] ?? ($hero['title'] ?? ''))
 
 @if ($faqLd)
@@ -108,7 +111,12 @@
         <section data-section="faq">
             <div class="wrap" style="max-width:760px">
                 <span class="kicker"><span class="kicker-line"></span> Veelgestelde vragen</span>
-                <h2 style="margin:.3rem 0 1.2rem">Vragen over {{ mb_strtolower($fLabel) }}</h2>
+                {{-- Niet blind kleinschrijven: het facet-label "AI" werd zo "Vragen over ai",
+                     wat live op de pagina stond. Afkortingen (helemaal in hoofdletters)
+                     laten we staan, gewone woorden gaan wél naar kleine letters omdat ze
+                     midden in een zin staan. --}}
+                @php($fLabelZin = $fLabel === mb_strtoupper($fLabel) ? $fLabel : mb_strtolower($fLabel))
+                <h2 style="margin:.3rem 0 1.2rem">Vragen over {{ $fLabelZin }}</h2>
                 @foreach ($facetFaq as $f)
                     <details style="border-top:1px solid var(--c-line,#E5E3DF);padding:.1rem 0">
                         <summary style="cursor:pointer;font-weight:700;padding:.95rem 0;list-style:none">{{ $f['q'] }}</summary>
@@ -118,6 +126,11 @@
             </div>
         </section>
     @endif
+
+    {{-- Werkgebied: links naar de grootste plaatsen. Stond hier niet, waardoor de
+         commerciële facetpagina's geen enkele interne link naar de plaatspagina's
+         hadden terwijl die onderling wél linken. --}}
+    @include('channels.partials.facet-werkgebied', ['site' => $site, 'facet' => $facet])
 
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe dit voor jou zou werken?'])
 

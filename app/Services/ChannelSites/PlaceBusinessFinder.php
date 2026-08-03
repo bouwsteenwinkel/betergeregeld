@@ -78,8 +78,49 @@ class PlaceBusinessFinder
                 $out[] = $row->place_slug;
             }
         }
-        return $out;
+
+        return array_values(array_filter($out, fn (string $slug) => $this->groteGenoegPlaats($slug)));
     }
+
+    /**
+     * Is de woonplaats groot genoeg om een eigen indexeerbare pagina te verdienen?
+     *
+     * Dit is de scherpe grens; `index_min_businesses` is dat niet. Google Places geeft
+     * nooit meer dan negen resultaten terug, dus op 03-08-2026 zaten alle 984 "sterke"
+     * plaatsen van bedrijfswebsite in de bak 5-9 en viel er niets te selecteren. Het
+     * gevolg was 684 pagina's in "Gevonden — momenteel niet geïndexeerd": Google kende
+     * ze, keek ernaar en vond ze de moeite niet.
+     *
+     * We meten daarom het aantal adressen in de woonplaats (BAG via PDOK,
+     * channel_place_facts.adressen). Onbekend (NULL) laten we DOOR: een nog niet
+     * verrijkte plaats mag niet stil uit de sitemap vallen — dat is hetzelfde vangnet
+     * als bij de bedrijvencache. Zet `index_min_addresses` op 0 om de grens uit te
+     * zetten. Eén query per verzoek, in het geheugen gehouden: dit wordt per plaats
+     * aangeroepen tijdens het opbouwen van een sitemap van duizend URL's.
+     */
+    public function groteGenoegPlaats(string $slug): bool
+    {
+        $min = (int) config('channel_places.index_min_addresses', 0);
+        if ($min <= 0) {
+            return true;
+        }
+
+        if ($this->adressenPerPlaats === null) {
+            $this->adressenPerPlaats = DB::table('channel_place_facts')
+                ->pluck('adressen', 'slug')
+                ->all();
+        }
+
+        // Niet in de tabel of nog niet gemeten → doorlaten (zie toelichting hierboven).
+        if (! array_key_exists($slug, $this->adressenPerPlaats) || $this->adressenPerPlaats[$slug] === null) {
+            return true;
+        }
+
+        return (int) $this->adressenPerPlaats[$slug] >= $min;
+    }
+
+    /** @var array<string,int|null>|null Adressen per plaats-slug; per request één query. */
+    private ?array $adressenPerPlaats = null;
 
     /* ─────────────────────── Kosten-/quota-plafond ──────────────────────── */
 
