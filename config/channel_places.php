@@ -151,7 +151,14 @@ return [
             'In :city hoef je geen omzet meer mis te lopen aan een concurrent die beter vindbaar is. Vraag vandaag je gratis voorbeeld aan.',
         ],
 
+        // FAQ: nu een lijst van SETS in plaats van één vaste lijst. ChannelPlaceContent
+        // kiest er per plaats één, met dezelfde deterministische keuze als de andere
+        // blokken. Voorheen stond deze FAQ woord voor woord op élke plaatspagina, en dat
+        // was een flinke hap uit de 31% tekstoverlap die ik op 03-08-2026 tussen vier
+        // plaatspagina's van bedrijfswebsite meette. Zet je er weer een losse {q,a}-lijst
+        // neer, dan valt de code terug op het oude gedrag.
         'faq' => [
+        [
             [
                 'q' => 'Werken jullie ook voor :trades in :city?',
                 'a' => 'Ja. We helpen :trades door heel Nederland, dus zeker ook in :city en de rest van :region. Waar je bedrijf ook zit, we zetten vooraf een gratis voorbeeld klaar dat op jouw zaak in :city is afgestemd.',
@@ -168,6 +175,53 @@ return [
                 'q' => 'Wordt mijn :trade dan ook gevonden in :city?',
                 'a' => 'Daar is het hele opzet op gericht. We zorgen dat je site vindbaar is als iemand in :city en omgeving een :niche zoekt, met de juiste teksten en een duidelijke aanvraagknop, zodat aanvragen rechtstreeks bij je binnenkomen.',
             ],
+        ],
+
+        // Set 2 — nadruk op wat de ondernemer zelf moet doen en op de bestaande site.
+        [
+            [
+                'q' => 'Ik heb al een site, kan die niet gewoon beter?',
+                'a' => 'Soms wel. We kijken eerst naar wat je hebt: staat de basis goed, dan is bijschaven vaak genoeg en zeggen we dat ook. Levert opnieuw beginnen meer op, dan leggen we uit waarom. Het voorbeeld dat we voor je bedrijf in :city klaarzetten laat het verschil meteen zien.',
+            ],
+            [
+                'q' => 'Hoeveel werk is het voor mij?',
+                'a' => 'Een uurtje, verdeeld over een paar momenten. Wij schrijven de teksten, richten de site in en regelen het technische deel. Van jou hebben we foto\'s nodig, je gegevens, en een keer een half uur aan de telefoon om te horen wat je in :city precies doet en voor wie.',
+            ],
+            [
+                'q' => 'Wat als ik later iets wil veranderen?',
+                'a' => 'Dat kun je zelf, en anders doen wij het. Kleine aanpassingen zoals openingstijden of een nieuwe foto zijn zo gedaan. Groeit je :trade en wil je een webshop of een klantenportaal erbij, dan bouwen we dat op dezelfde site verder uit.',
+            ],
+            [
+                'q' => 'Zitten jullie in de buurt van :city?',
+                'a' => 'We werken door heel :region en de rest van Nederland, en het meeste gaat online en telefonisch. Dat scheelt jou reistijd en ons ook, en het houdt de prijs laag. Wil je iemand spreken, dan bellen of videobellen we op een moment dat jou schikt.',
+            ],
+        ],
+
+        // Set 3 — nadruk op aanvragen, opzegbaarheid en eigendom.
+        [
+            [
+                'q' => 'Levert een site in :city echt aanvragen op?',
+                'a' => 'Dat is waar we op bouwen. Iemand die in :city een :niche zoekt moet je vinden, meteen zien dat je het doet, en met één druk op de knop contact kunnen opnemen. Die aanvraag komt rechtstreeks in je mailbox, met alles wat je nodig hebt om terug te bellen.',
+            ],
+            // Let op: deze twee antwoorden volgen de algemene voorwaarden en het prijsblok
+            // (config/bedrijfswebsite_facet_faq.php), niet een mooiere versie daarvan. De
+            // voorwaarden zeggen dat aangeleverde content van de klant blijft maar dat
+            // onderliggende systemen en sjablonen ons eigendom blijven, en er zijn twee
+            // prijsvormen waarvan één een looptijd van 24 maanden heeft. Wie hier iets
+            // ruimers belooft, schrijft een claim die de voorwaarden tegenspreken.
+            [
+                'q' => 'Van wie zijn mijn teksten en foto\'s straks?',
+                'a' => 'Die blijven van jou, net als je domeinnaam. Wat je aanlevert is en blijft je eigen materiaal. Het systeem waarop je site draait, met de sjablonen en de techniek eronder, blijft van ons; daar betaal je het onderhoud voor. Zo staat het ook in de voorwaarden.',
+            ],
+            [
+                'q' => 'Wat kost een site voor mijn :trade?',
+                'a' => 'Er zijn twee vormen. Je betaalt 799 euro eenmalig plus 39 euro per maand voor hosting en onderhoud, of je spreidt het naar 69 euro per maand bij een looptijd van 24 maanden. Je weet het bedrag vooraf en het verandert niet.',
+            ],
+            [
+                'q' => 'Wat gebeurt er met mijn plek in Google?',
+                'a' => 'Die nemen we mee. Staat je huidige site al ergens op voor :city, dan zetten we de adressen netjes door zodat je die posities niet kwijtraakt. Dat is het soort werk dat je niet ziet, en dat je wel merkt als het niet gebeurt.',
+            ],
+        ],
         ],
     ],
 ];

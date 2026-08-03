@@ -294,6 +294,43 @@ class PreviewToolController extends Controller
             $meta['preview']['lead_id'] = $lead->id;
             $m->update(['meta' => $meta]);
         });
+
+        // INTERNE MELDING. Deze route stuurde niets — niet intern en niet naar de klant —
+        // terwijl de aanvraag-route (mailAanvraag) dat wél doet. Gevolg, gemeten
+        // 03-08-2026: van de drie leads die er ooit waren, kwamen er twee via déze route
+        // binnen en die lagen tien dagen onaangeroerd, met een afgerond voorbeeld en een
+        // telefoonnummer. Bij één ervan was de klik ook nog betaald (gclid aanwezig).
+        //
+        // Alleen bij een NIEUWE lead. Iemand die de wizard nog eens doorloopt voor een
+        // tweede poging is geen nieuwe kans, en firstOrNew() zou dan bij elke ronde
+        // opnieuw een mail sturen. Beide waargenomen leads waren nieuw, dus dit dekt de
+        // praktijk. Best-effort: een mislukte melding mag de preview niet breken.
+        if ($lead->wasRecentlyCreated) {
+            $this->meldNieuweIntake($lead, $answers);
+        }
+    }
+
+    /**
+     * Meldt een verse intake-lead intern. Bewust geen mail naar de klant: die ziet zijn
+     * voorbeeld meteen in de browser, en slaat hij het op dan neemt PreviewSavedMail +
+     * de herinneringsladder het over (zie PreviewReminderService).
+     *
+     * @param  array<string,mixed>  $answers
+     */
+    private function meldNieuweIntake(WebsiteLead $lead, array $answers): void
+    {
+        $to = (string) config('channels.lead_mail_to', config('mail.from.address'));
+        if ($to === '') {
+            Log::warning('preview_intake_internmail: geen ontvanger ingesteld (channels.lead_mail_to)');
+
+            return;
+        }
+
+        try {
+            Mail::to($to)->send(new VoorbeeldAanvraagIntern($lead, $this->site(), $answers));
+        } catch (\Throwable $e) {
+            Log::warning('preview_intake_internmail: ' . $e->getMessage());
+        }
     }
 
     /**

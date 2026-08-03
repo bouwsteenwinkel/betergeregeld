@@ -48,7 +48,7 @@ class ChannelPlaceContent
         foreach ($variants as $slot => $set) {
             $offset++;
             if ($slot === 'faq') {
-                $out['faq'] = $this->faq((array) $set, $repl);
+                $out['faq'] = $this->faq($this->faqSet((array) $set, $slug, $offset), $repl);
                 continue;
             }
             $out[$slot] = $repl($this->pick((array) $set, $slug, $offset));
@@ -68,6 +68,47 @@ class ChannelPlaceContent
     }
 
     /** FAQ: alle {q,a}-templates ingevuld (niet gekozen — vaste set). */
+    /**
+     * Kiest één FAQ-set voor deze plaats, of geeft de losse lijst ongewijzigd terug.
+     *
+     * WAAROM. Elk ander tekstblok koos al een variant per plaats, maar de FAQ niet: die
+     * stond op álle plaatspagina's letterlijk gelijk. Gemeten 03-08-2026 hadden vier
+     * plaatspagina's van bedrijfswebsite gemiddeld 31% identieke tekst (Assen en Beilen
+     * zelfs 42%, over 6-woord-reeksen), en Google liet 684 van de 1.026 URL's staan op
+     * "Gevonden — momenteel niet geïndexeerd". Een blok dat op honderden pagina's woord
+     * voor woord hetzelfde is, helpt daar niet bij.
+     *
+     * TWEE VORMEN, want de andere zeventien kanalen delen deze config:
+     *   - lijst van {q,a}      → oude gedrag, ongewijzigd (alle vragen, overal gelijk)
+     *   - lijst van LIJSTEN    → per plaats één set, met dezelfde deterministische keuze
+     *                            als de overige blokken (crc32 over de slug)
+     *
+     * Deterministisch en niet willekeurig: dezelfde plaats moet bij elke render dezelfde
+     * tekst geven, anders ziet een crawler bij elk bezoek iets anders.
+     *
+     * @param  array<int,mixed>  $set
+     * @return array<int,mixed>
+     */
+    private function faqSet(array $set, string $slug, int $offset): array
+    {
+        $eerste = reset($set);
+
+        // Losse {q,a}-lijst (of iets onverwachts) → oude gedrag, ongewijzigd. Een set van
+        // sets herkennen we eraan dat het eerste element zelf een lijst is zonder q/a.
+        if (! is_array($eerste) || isset($eerste['q']) || isset($eerste['a'])) {
+            return $set;
+        }
+
+        $sets = array_values(array_filter($set, 'is_array'));
+        if (! $sets) {
+            return [];
+        }
+
+        $hash = abs(crc32($slug . ':faq:' . $offset));
+
+        return (array) $sets[$hash % count($sets)];
+    }
+
     private function faq(array $set, callable $repl): array
     {
         $out = [];
