@@ -38,6 +38,13 @@ return [
     // ook de Filament-admin lang ingelogd zonder .env-aanpassing.
     'lifetime' => max(43200, (int) env('SESSION_LIFETIME', 43200)),
 
+    // Sessies ZONDER login mogen veel eerder weg. De 30 dagen hierboven zijn er
+    // voor wie ingelogd is; een bezoeker die alleen een pagina bekeek laat een
+    // bestand achter met niets dan een CSRF-token erin. Op de VPS stonden er
+    // daardoor 342.220, en het opruimen daarvan kostte 52 seconden. sessions:prune
+    // gebruikt deze waarde (in minuten); 0 zet het onderscheid uit.
+    'anoniem_opruimen_na' => (int) env('SESSION_ANONIEM_OPRUIMEN_NA', 1440),
+
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
     /*

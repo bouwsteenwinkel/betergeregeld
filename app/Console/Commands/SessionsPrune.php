@@ -27,7 +27,8 @@ class SessionsPrune extends Command
 {
     protected $signature = 'sessions:prune
                             {--dry-run : Alleen tellen, niets verwijderen}
-                            {--max-leeftijd= : Overschrijf de levensduur in minuten}';
+                            {--max-leeftijd= : Overschrijf de levensduur in minuten}
+                            {--anoniem-na= : Minuten waarna een sessie zónder login weg mag (0 = uit)}';
 
     protected $description = 'Verwijder verlopen sessiebestanden (buiten het verzoek om)';
 
@@ -50,7 +51,17 @@ class SessionsPrune extends Command
         $grens   = time() - ($minuten * 60);
         $droog   = (bool) $this->option('dry-run');
 
-        $gezien = 0; $verwijderd = 0; $fouten = 0;
+        // De sessieduur staat bewust op minimaal 30 dagen, zodat de Filament-admin
+        // ingelogd blijft. Voor iemand die alleen een pagina bekeek is dat onzin: dat
+        // bestand bevat niets dan een CSRF-token en houdt een maand lang plek bezet.
+        // Zulke sessies mogen veel eerder weg — herkenbaar doordat er geen login in
+        // staat. Wie wél is ingelogd houdt gewoon de volle termijn.
+        $anoniemNa    = $this->option('anoniem-na') !== null
+            ? (int) $this->option('anoniem-na')
+            : (int) config('session.anoniem_opruimen_na', 1440);
+        $anoniemGrens = $anoniemNa > 0 ? time() - ($anoniemNa * 60) : null;
+
+        $gezien = 0; $verwijderd = 0; $fouten = 0; $anoniemWeg = 0;
         $start  = microtime(true);
 
         // Bewust geen glob() of scandir(): die lezen de hele map eerst in het
@@ -74,17 +85,33 @@ class SessionsPrune extends Command
             $gezien++;
 
             $tijd = @filemtime($pad);
-            if ($tijd === false || $tijd >= $grens) {
+            if ($tijd === false) {
+                continue;
+            }
+
+            $verlopen = $tijd < $grens;
+            $anoniem  = false;
+
+            // Alleen als hij nog niet verlopen is, maar wél oud genoeg, kijken we in
+            // het bestand. Dat scheelt: op een verse map hoeft er bijna nooit iets
+            // gelezen te worden, en na de eerste opruiming blijft dat zo.
+            if (! $verlopen && $anoniemGrens !== null && $tijd < $anoniemGrens) {
+                $anoniem = ! $this->heeftLogin($pad);
+            }
+
+            if (! $verlopen && ! $anoniem) {
                 continue;
             }
             if ($droog) {
                 $verwijderd++;
+                if ($anoniem) $anoniemWeg++;
                 continue;
             }
             // Een sessie die net tijdens het opruimen wordt aangeraakt kan al weg
             // zijn; dat is geen fout die iemand hoeft te zien.
             if (@unlink($pad)) {
                 $verwijderd++;
+                if ($anoniem) $anoniemWeg++;
             } elseif (is_file($pad)) {
                 $fouten++;
             }
@@ -95,6 +122,10 @@ class SessionsPrune extends Command
         $this->info(sprintf('%s: %d van %d sessiebestanden %s (%ss).',
             $droog ? 'DRY-RUN' : 'Opgeruimd', $verwijderd, $gezien,
             $droog ? 'zouden weg kunnen' : 'verwijderd', $duur));
+        if ($anoniemWeg > 0) {
+            $this->line(sprintf('  waarvan %d zonder login (ouder dan %d minuten); wie ingelogd is houdt de volle termijn.',
+                $anoniemWeg, $anoniemNa));
+        }
 
         if ($fouten > 0) {
             $this->warn($fouten . ' bestanden konden niet verwijderd worden.');
@@ -110,5 +141,30 @@ class SessionsPrune extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Zit er een ingelogde gebruiker in dit sessiebestand?
+     *
+     * Laravel bewaart de ingelogde gebruiker onder een sleutel die begint met
+     * `login_` (bijvoorbeeld `login_web_<hash>`). Die naam staat leesbaar in het
+     * geserialiseerde bestand, dus een tekstcontrole volstaat — het bestand
+     * uitpakken zou onnodig en risicovol zijn.
+     *
+     * We lezen maar een stuk van het begin: sessiebestanden zijn klein, en een
+     * login-sleutel staat er altijd in de payload zelf. Kunnen we het bestand niet
+     * lezen, dan zeggen we "wél ingelogd" — dan blijft hij staan. Bij twijfel iets
+     * te lang bewaren is beter dan iemand uitloggen.
+     */
+    private function heeftLogin(string $pad): bool
+    {
+        $fh = @fopen($pad, 'rb');
+        if ($fh === false) {
+            return true;
+        }
+        $inhoud = (string) fread($fh, 8192);
+        fclose($fh);
+
+        return str_contains($inhoud, 'login_') || str_contains($inhoud, 'password_hash_');
     }
 }
