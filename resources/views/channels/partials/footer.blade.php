@@ -112,6 +112,22 @@
 				<a href="{{ $site->url('contact') }}">Contact</a>
 			</div>
 		@endunless
+		{{-- Netwerk-regel. Deze kanaalsites linkten tot 02-08-2026 alleen naar zichzelf,
+		     waardoor elk domein voor Google een eiland zonder aanbevelingen was. Twee
+		     links, geen lijst van zeventien: het moet een eerlijke vermelding zijn en
+		     geen linkfarm. Het moederdomein hoort erbij (feitelijk juist: we zijn
+		     onderdeel van Betergeregeld) en de generieke bedrijfswebsite is de logische
+		     doorverwijzing voor wie niet in dit vak zit. Niet op de demo-context: daar is
+		     de bezoeker een prospect die naar een voorbeeld kijkt, geen zoekmachine. --}}
+		@unless ($site->isDemoContext())
+			@php($bw = \App\Support\ChannelNetwork::find('bedrijfswebsite'))
+			<div class="foot-network" style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.12);font-size:.88rem;opacity:.85">
+				Onderdeel van <a href="https://betergeregeld.com" style="font-weight:600">Betergeregeld ICT</a>.
+				@if ($bw && $site->key !== 'bedrijfswebsite')
+					Zit je vak er niet bij? Bekijk <a href="{{ $bw['url'] }}" style="font-weight:600">een bedrijfswebsite laten maken</a>.
+				@endif
+			</div>
+		@endunless
 		<div class="foot-bottom">
 			<span>© {{ now()->year }} {{ $site->displayName() }}</span>
 			<span class="foot-legal">

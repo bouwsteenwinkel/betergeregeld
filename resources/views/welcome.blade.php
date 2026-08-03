@@ -140,9 +140,18 @@
 						? 'From roofers to hairdressers: we build sharp websites, webshops and client portals, tailored to your trade and your region. Fixed price, one point of contact, arranged by phone and online.'
 						: 'Van dakdekker tot kapper: wij bouwen strakke websites, webshops en klantportalen, afgestemd op jouw vak en jouw regio. Vaste prijs, één vast aanspreekpunt, en alles telefonisch en online geregeld.' }}
 				</p>
+				{{-- Deze pillen waren dode <span>'s met een handmatig lijstje vakken. Twee
+				     ervan (Dakdekker, Hovenier, Fysiotherapeut) hebben geen site, terwijl
+				     er wél live domeinen zijn die hier niet stonden. Nu uit
+				     ChannelNetwork: elk vak dat live staat wordt een echte link naar zijn
+				     eigen domein. Dat is de enige plek waar die zestien domeinen een link
+				     vanaf het moederdomein kunnen krijgen — precies wat ze misten. --}}
 				<div class="flex flex-wrap gap-2 mt-6">
-					@foreach ([['nl' => 'Dakdekker', 'en' => 'Roofer'], ['nl' => 'Installateur', 'en' => 'Installer'], ['nl' => 'Kapper', 'en' => 'Hairdresser'], ['nl' => 'Hovenier', 'en' => 'Gardener'], ['nl' => 'Garage', 'en' => 'Garage'], ['nl' => 'Bakkerij', 'en' => 'Bakery'], ['nl' => 'Advocaat', 'en' => 'Lawyer'], ['nl' => 'Fysiotherapeut', 'en' => 'Physio']] as $br)
-						<span class="pill pill-ink">{{ $isEn ? $br['en'] : $br['nl'] }}</span>
+					{{-- Álle live vakken, niet de eerste twaalf: de lijst is alfabetisch, dus
+					     een limiet betekent dat Loodgieter, Rijschool en Yogastudio nooit
+					     een link krijgen. Dit is het enige moederdomein dat ze hebben. --}}
+					@foreach (\App\Support\ChannelNetwork::live('bedrijfswebsite') as $br)
+						<a href="{{ $br['url'] }}" class="pill pill-ink" style="text-decoration:none">{{ $br['name'] }}</a>
 					@endforeach
 					<span class="pill">{{ $isEn ? '+ many more' : '+ veel meer' }}</span>
 				</div>

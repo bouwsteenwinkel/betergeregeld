@@ -128,14 +128,22 @@
 
             <div>
                 <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #7FB0DE; margin-bottom: 12px;">Voor jouw vak</div>
+                {{-- Dit waren dode <span>'s met zes vaknamen die met de hand waren
+                     overgetypt: Dakdekker en Hovenier stonden erbij terwijl we voor die
+                     vakken geen site hebben, en Rijschool, Advocaat en Apotheek — die
+                     wél live staan — ontbraken. Nu uit ChannelNetwork, dus de lijst kan
+                     niet meer uit de pas lopen met wat er echt live is, en het zijn
+                     echte links: onderlinge verwijzingen zijn precies wat deze domeinen
+                     misten (gemeten 02-08-2026: nul links tussen de kanalen). --}}
                 <div style="display: flex; flex-direction: column; font-size: 15px; line-height: 1.9; color: #B9C6DE;">
-                    <span class="bgf-vaklink">Dakdekker</span>
-                    <span class="bgf-vaklink">Installateur</span>
-                    <span class="bgf-vaklink">Hovenier</span>
-                    <span class="bgf-vaklink">Kapper</span>
-                    <span class="bgf-vaklink">Garage</span>
-                    <span class="bgf-vaklink">Bakkerij</span>
-                    <span class="bgf-vaklink">En veel meer vakken.</span>
+                    {{-- Acht van de zestien, maar gespreid over de alfabetische lijst en niet
+                         de eerste acht: die zijn allemaal A en B (Aannemer, Acupuncturist,
+                         Administratiekantoor…), wat als een halve lijst leest. Elke tweede
+                         geeft een dwarsdoorsnede van de vakken. --}}
+                    @foreach (array_values(array_filter(\App\Support\ChannelNetwork::live('bedrijfswebsite'), fn ($v, $i) => $i % 2 === 0, ARRAY_FILTER_USE_BOTH)) as $vak)
+                        <a href="{{ $vak['url'] }}" class="bgf-vaklink" style="color: #B9C6DE; text-decoration: none;">{{ $vak['name'] }}</a>
+                    @endforeach
+                    <a href="https://betergeregeld.com" class="bgf-vaklink" style="color: #B9C6DE; text-decoration: none;">En veel meer vakken.</a>
                 </div>
             </div>
         </div>
