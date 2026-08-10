@@ -39,13 +39,15 @@ class SavePreviewController extends Controller
             'contact_name' => ['required', 'string', 'max:120'],
             'email'        => ['required', 'email', 'max:190'],
             'phone'        => ['nullable', 'string', 'max:60'],
-            'consent'      => ['nullable', 'boolean'],
+            // Geen toestemming-veld: de bezoeker vraagt hier zélf om de mail met zijn
+            // persoonlijke link. Dat is gerechtvaardigd belang, geen toestemming, en
+            // een vóór-aangevinkt vakje zou sowieso niet geldig zijn. Zelfde lijn als
+            // PreviewToolController::start(). De privacy-melding staat onder de knop.
         ], [], ['contact_name' => 'naam', 'email' => 'e-mail']);
 
         $siteKey       = $site->key;
         $input         = (array) $site->get('meta.preview.input', []);
         $sourceChannel = (string) ($site->get('meta.preview.source_channel') ?: $siteKey);
-        $consent       = $request->boolean('consent');
 
         // Ontwerp-voorkeuren uit de preview-meta, voor het team.
         $answers = array_merge((array) null, array_filter([
@@ -57,7 +59,7 @@ class SavePreviewController extends Controller
             'usp'          => $input['usp'] ?? null,
         ], fn ($v) => filled($v)));
 
-        // Find-or-create op e-mail = het account. Consent blijft 'sticky' zodra gegeven.
+        // Find-or-create op e-mail = het account.
         $lead = WebsiteLead::firstOrNew(['email' => mb_strtolower(trim($data['email']))]);
         $lead->fill([
             'contact_name'   => $data['contact_name'],
@@ -66,7 +68,10 @@ class SavePreviewController extends Controller
             'branche'        => $lead->branche ?: $site->branche(),
             'channel'        => $lead->channel ?: $sourceChannel,
             'source'         => $lead->source ?: 'preview_saved',
-            'consent'        => $consent || (bool) $lead->consent,
+            // Altijd true: het bewaren van een voorbeeld is een expliciet verzoek om
+            // de mail met de persoonlijke link. Stond hier eerder op een vinkje dat na
+            // het intake-formulier toch al niets meer deed (consent is sticky).
+            'consent'        => true,
             'answers'        => array_merge((array) $lead->answers, $answers) ?: null,
             'preview_status' => 'ready',
         ]);

@@ -24,15 +24,12 @@
                     <span>Telefoon <em>(optioneel)</em></span>
                     <input type="tel" name="phone" maxlength="60" autocomplete="tel" placeholder="06 12345678">
                 </label>
-                <label class="pv-consent">
-                    <input type="checkbox" name="consent" value="1" checked>
-                    <span>Ja, hou me per e-mail op de hoogte van dit voorbeeld. Je kunt je altijd afmelden.</span>
-                </label>
                 {{-- Honeypot --}}
                 <div style="position:absolute;left:-9999px" aria-hidden="true">
                     <label>Laat leeg<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
                 </div>
                 <button type="submit" class="pv-submit">Bewaar mijn voorbeeld</button>
+                <p class="pv-fine">Je krijgt je persoonlijke link per e-mail, en daarna hooguit een korte herinnering. Afmelden kan met één klik. Zie ons <a href="{{ $site->url('privacybeleid') }}" target="_blank" rel="noopener">privacybeleid</a>.</p>
                 <p class="pv-error" id="pv-save-error" hidden></p>
             </form>
         </div>
@@ -61,8 +58,15 @@
     .pv-field em{color:#94a3b8;font-style:normal;font-weight:400}
     .pv-field input{width:100%;padding:.7rem .85rem;border:1px solid #cbd5e1;border-radius:9px;font:inherit;color:#0f172a}
     .pv-field input:focus{outline:2px solid #1685c4;outline-offset:1px;border-color:#1685c4}
-    .pv-consent{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;color:#475569;margin:.4rem 0 1.1rem}
-    .pv-consent input{margin-top:.15rem}
+    {{-- Hier stond .pv-consent: een vóór-aangevinkt toestemmingsvakje. Weg, om
+         dezelfde reden als op het voorbeeld-formulier (zie PreviewToolController::start):
+         de mail met de persoonlijke link is precies wat de bezoeker hier vraagt, dus dat
+         is gerechtvaardigd belang en geen toestemming. Bovendien deed het vakje niets:
+         consent is sticky (`$consent || $lead->consent`) en staat na het intake-formulier
+         al op true, dus uitvinken had geen enkel effect. Een keuze tonen die niets doet
+         is slechter dan hem niet tonen. --}}
+    .pv-fine{color:#64748b;font-size:.78rem;line-height:1.5;margin:.75rem 0 0;text-align:center}
+    .pv-fine a{color:#64748b;text-decoration:underline;text-underline-offset:2px}
     .pv-submit{display:block;width:100%;text-align:center;background:#1685c4;color:#fff;border:0;border-radius:9px;font:inherit;font-weight:700;font-size:1rem;padding:.85rem;cursor:pointer;text-decoration:none}
     .pv-submit:hover{filter:brightness(1.05)}
     .pv-error{color:#b91c1c;font-size:.88rem;margin:.7rem 0 0}
