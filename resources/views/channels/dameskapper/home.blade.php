@@ -16,8 +16,8 @@
     ];
     $gallery = ['Balayage', 'Coupe', 'Kleur', 'Opsteken', 'Krullen', 'Bruid'];
     $hours = [
-        ['Maandag', 'Gesloten'], ['Dinsdag', '09:00 – 18:00'], ['Woensdag', '09:00 – 18:00'],
-        ['Donderdag', '09:00 – 21:00'], ['Vrijdag', '09:00 – 18:00'], ['Zaterdag', '08:30 – 16:00'], ['Zondag', 'Gesloten'],
+        ['Maandag', 'Gesloten'], ['Dinsdag', '09:00 - 18:00'], ['Woensdag', '09:00 - 18:00'],
+        ['Donderdag', '09:00 - 21:00'], ['Vrijdag', '09:00 - 18:00'], ['Zaterdag', '08:30 - 16:00'], ['Zondag', 'Gesloten'],
     ];
     $reviews = [
         ['Sinds jaren mijn vaste salon. Altijd een prachtige kleur en echt de tijd voor je.', 'Marloes'],

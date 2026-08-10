@@ -18,7 +18,7 @@
 
         <div class="pv-step" data-appt-step="cal">
             <h2 id="pv-appt-title">Plan een online kennismaking</h2>
-            <p class="pv-sub">Kies een moment dat jou uitkomt. Een korte videoafspraak via Google&nbsp;Meet — gratis en vrijblijvend.</p>
+            <p class="pv-sub">Kies een moment dat jou uitkomt. Een korte videoafspraak via Google&nbsp;Meet, gratis en vrijblijvend.</p>
             @include('partials.slot-calendar', [
                 'emptyText' => 'Er zijn nu geen vrije momenten. Bewaar het voorbeeld, dan plannen we samen iets in.',
             ])

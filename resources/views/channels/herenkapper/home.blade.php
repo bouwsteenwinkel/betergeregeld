@@ -16,8 +16,8 @@
     ];
     $gallery = ['Fade', 'Baard', 'Classic', 'Scheren', 'Crop', 'Pompadour'];
     $hours = [
-        ['Maandag', 'Gesloten'], ['Dinsdag', '09:00 – 18:00'], ['Woensdag', '09:00 – 18:00'],
-        ['Donderdag', '09:00 – 21:00'], ['Vrijdag', '09:00 – 18:00'], ['Zaterdag', '08:00 – 16:00'], ['Zondag', 'Gesloten'],
+        ['Maandag', 'Gesloten'], ['Dinsdag', '09:00 - 18:00'], ['Woensdag', '09:00 - 18:00'],
+        ['Donderdag', '09:00 - 21:00'], ['Vrijdag', '09:00 - 18:00'], ['Zaterdag', '08:00 - 16:00'], ['Zondag', 'Gesloten'],
     ];
     $reviews = [
         ['Strakke fade en een scheerbeurt met het mes. Echt vakwerk.', 'Dave'],

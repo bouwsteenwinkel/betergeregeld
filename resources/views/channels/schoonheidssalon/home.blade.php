@@ -30,8 +30,8 @@
         ['Lisa', 'Huidtherapie & massage', '#c97ba0'],
     ];
     $hours = [
-        ['Maandag', 'Gesloten'], ['Dinsdag', '09:00 – 18:00'], ['Woensdag', '09:00 – 18:00'],
-        ['Donderdag', '09:00 – 21:00'], ['Vrijdag', '09:00 – 18:00'], ['Zaterdag', '09:00 – 16:00'], ['Zondag', 'Gesloten'],
+        ['Maandag', 'Gesloten'], ['Dinsdag', '09:00 - 18:00'], ['Woensdag', '09:00 - 18:00'],
+        ['Donderdag', '09:00 - 21:00'], ['Vrijdag', '09:00 - 18:00'], ['Zaterdag', '09:00 - 16:00'], ['Zondag', 'Gesloten'],
     ];
     $reviews = [
         ['Mijn huid is echt rustiger geworden na de behandelingen. Fijn advies en een heerlijke sfeer.', 'Annemiek', 'Gezichtsbehandeling'],

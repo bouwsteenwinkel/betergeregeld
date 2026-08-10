@@ -35,8 +35,8 @@
         <span class="kicker"><span class="kicker-line"></span> Gratis en vrijblijvend</span>
         <h1>Zie hoe jouw website eruit kan zien</h1>
         <p class="lead">
-            Beantwoord een paar korte vragen over je bedrijf. Wij maken daar een echt voorbeeld van —
-            met jouw naam, jouw vak en jouw regio — en je krijgt het {{ $levertijd }} te zien.
+            Beantwoord een paar korte vragen over je bedrijf. Wij maken daar een echt voorbeeld van,
+            met jouw naam, jouw vak en jouw regio, en je krijgt het {{ $levertijd }} te zien.
             Geen account, geen kosten, je zit nergens aan vast.
         </p>
     </div>
@@ -126,7 +126,7 @@
 
             <div class="va-field">
                 <label for="va-usp">Wat moeten we zeker weten?</label>
-                <p class="va-hint">Waar je goed in bent, wat je juist níét doet, een werkgebied — alles helpt. Mag ook leeg.</p>
+                <p class="va-hint">Waar je goed in bent, wat je juist níét doet, een werkgebied: alles helpt. Mag ook leeg.</p>
                 <textarea class="va-input" id="va-usp" name="usp" rows="3" maxlength="400"
                           placeholder="Bijvoorbeeld: alleen particulieren, 24-uurs storingsdienst, werkgebied Gooi en Vechtstreek">{{ old('usp') }}</textarea>
             </div>
@@ -160,12 +160,12 @@
 
         <ol class="va-stappen">
             <li><span class="va-nr">1</span><span><b>Je stuurt dit formulier.</b> Daarmee weten we wie je bent en wat je doet.</span></li>
-            <li><span class="va-nr">2</span><span><b>We bellen je kort.</b> Een paar minuten om de laatste dingen scherp te krijgen — foto's, diensten, wat jou anders maakt.</span></li>
+            <li><span class="va-nr">2</span><span><b>We bellen je kort.</b> Een paar minuten om de laatste dingen scherp te krijgen: foto's, diensten, wat jou anders maakt.</span></li>
             <li><span class="va-nr">3</span><span><b>{{ ucfirst($levertijd) }} staat je voorbeeld klaar.</b> Bevalt het niet, dan hoor je nooit meer iets van ons.</span></li>
         </ol>
 
         <p class="va-hint" style="margin-top:1.4rem">
-            Liever meteen iemand spreken? <a href="{{ $site->url('afspraak') }}">Plan een gesprek in</a> —
+            Liever meteen iemand spreken? <a href="{{ $site->url('afspraak') }}">Plan een gesprek in</a>,
             dat kan ook zonder voorbeeld.
         </p>
     </div>

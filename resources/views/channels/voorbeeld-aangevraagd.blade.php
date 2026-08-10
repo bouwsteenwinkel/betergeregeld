@@ -20,7 +20,7 @@
 <section class="hero">
     <div class="wrap vb-wrap">
         <span class="kicker"><span class="kicker-line"></span> Aanvraag ontvangen</span>
-        <h1>Dank je — we gaan ermee aan de slag</h1>
+        <h1>Dank je, we gaan ermee aan de slag</h1>
         <p class="lead">Je krijgt {{ $levertijd }} een voorbeeld van je eigen website te zien. Hieronder lees je wat er nu gebeurt.</p>
     </div>
 </section>

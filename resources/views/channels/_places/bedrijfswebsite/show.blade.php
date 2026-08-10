@@ -156,13 +156,13 @@
                     @if (! empty($facts['inwoners']))
                         Die gemeente telt zo'n {{ number_format($facts['inwoners'], 0, ',', '.') }} inwoners,
                         {{ $facts['inwoners'] >= 60000
-                            ? 'dus er is hier volop bedrijvigheid — en dus ook volop concurrentie in de zoekresultaten'
+                            ? 'dus er is hier volop bedrijvigheid, en dus ook volop concurrentie in de zoekresultaten'
                             : ($facts['inwoners'] >= 20000
                                 ? 'groot genoeg voor een stevige lokale markt en klein genoeg om op te vallen'
                                 : 'een overzichtelijke markt waarin je met een goede website snel bovenaan staat') }}.
                     @endif
                     @if (! empty($facts['afstand_km']))
-                        Vanaf ons kantoor in Bussum is dat zo'n {{ $facts['afstand_km'] }} kilometer —
+                        Vanaf ons kantoor in Bussum is dat zo'n {{ $facts['afstand_km'] }} kilometer:
                         {{ $facts['afstand_km'] <= 35 ? 'we komen hier geregeld langs' : 'we werken hier op afstand, met videobellen wanneer dat handiger is' }}.
                     @endif
                 </p>

@@ -203,7 +203,7 @@
             <button type="submit" class="btn" style="width:100%;justify-content:center;font-size:1.05rem;padding:.95rem">
                 Maak mijn voorbeeld
             </button>
-            <p class="vm-hint" style="text-align:center;margin-top:.7rem">Klaar in ongeveer 30 seconden. We nemen contact met je op over je voorbeeld — je zit nergens aan vast en kunt je altijd afmelden. Zie ons <a href="{{ $site->url('privacybeleid') }}" target="_blank" rel="noopener">privacybeleid</a>.</p>
+            <p class="vm-hint" style="text-align:center;margin-top:.7rem">Klaar in ongeveer 30 seconden. We nemen contact met je op over je voorbeeld. Je zit nergens aan vast en kunt je altijd afmelden. Zie ons <a href="{{ $site->url('privacybeleid') }}" target="_blank" rel="noopener">privacybeleid</a>.</p>
             <div class="vm-error" id="vm-error"></div>
         </form>
     </div>
