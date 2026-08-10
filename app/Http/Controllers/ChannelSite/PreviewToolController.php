@@ -274,9 +274,17 @@ class PreviewToolController extends Controller
             'branche'        => $lead->branche ?: $this->site()->branche(),
             'channel'        => $lead->channel ?: $sourceChannel,
             'source'         => $lead->source ?: 'preview_intake',
-            // De checkbox is verplicht, dus hier altijd true. Blijft 'sticky': eenmaal
-            // gegeven toestemming halen we niet weg omdat iemand een tweede site probeert.
-            'consent'        => $request->boolean('consent') || (bool) $lead->consent,
+            // Dit formulier heeft geen toestemming-vinkje (meer) — zie de toelichting bij
+            // de validatie hierboven: opvolging over hun eigen aangevraagde voorbeeld is
+            // gerechtvaardigd belang, en een vooraf aangevinkt vakje zou geen geldige
+            // AVG-toestemming zijn. Afmelden kan altijd; PreviewReminderService kijkt
+            // daarvoor naar unsubscribed_at.
+            //
+            // Dit veld stuurt wél de opvolg-mails aan (die dienst filtert op consent=true),
+            // dus het hoort hier op true te staan. Toen het vinkje verdween bleef er
+            // $request->boolean('consent') staan, en dat leverde sindsdien altijd false op:
+            // elke nieuwe lead viel stil buiten de herinneringen. Gemeten 10-08-2026.
+            'consent'        => true,
             'answers'        => array_merge((array) $lead->answers, $answers) ?: null,
             // De preview draait nog; pas /content en /hero-image maken 'm compleet.
             'preview_status' => 'generating',

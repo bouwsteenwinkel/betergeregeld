@@ -14,15 +14,12 @@
     .vm-hint{color:var(--c-muted);font-size:.85rem;margin:.15rem 0 .6rem}
     .vm-input{width:100%;padding:.85rem 1rem;border:1px solid #cbd5e1;border-radius:10px;font:inherit;color:var(--c-ink);background:#fff}
     .vm-input:focus{outline:2px solid var(--c-accent);outline-offset:1px;border-color:var(--c-accent)}
-    /* Voorwaarden: kleine lettertjes, geen veld. Bewust zonder kader of vlak, het is
-       een akkoord en geen vraag die om aandacht vraagt.
-       Selector moet `.vm-field > label` (0,1,1) verslaan, anders wint diens
-       display:block + font-weight:700 en staat het vinkje op een eigen regel. */
-    .vm-field > label.vm-consent{display:flex;gap:.55rem;align-items:flex-start;font-weight:400;
-        cursor:pointer;color:var(--c-muted);font-size:.78rem;line-height:1.5;margin:0}
-    .vm-consent input{flex:0 0 auto;width:14px;height:14px;margin-top:.15rem;accent-color:var(--c-accent);cursor:pointer}
-    .vm-consent a{color:var(--c-muted);text-decoration:underline;text-underline-offset:2px}
-    .vm-consent a:hover{color:var(--c-ink)}
+    /* Hier stond styling voor een toestemming-vinkje (.vm-consent). Dat vinkje is
+       bewust verwijderd: opvolging over je eigen aangevraagde voorbeeld is
+       gerechtvaardigd belang, en een vooraf aangevinkt vakje is sowieso geen geldige
+       AVG-toestemming. De privacy-melding onder de knop dekt het. De regels bleven
+       staan en zetten op 10-08-2026 de zoektocht naar "dat vinkje" op het verkeerde
+       spoor, dus ze zijn weg. Zie de toelichting in PreviewToolController::start(). */
     /* Kleurkiezer */
     .vm-colors{display:flex;flex-wrap:wrap;gap:.55rem;align-items:center}
     .vm-swatch{width:38px;height:38px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1;cursor:pointer;padding:0}
