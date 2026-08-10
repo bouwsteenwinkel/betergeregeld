@@ -36,12 +36,28 @@
 	<title>@yield('title', config('app.name'))</title>
 	<meta name="description" content="@yield('description', __('Beter Geregeld ICT helpt bedrijven met maatwerk websites, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische optimalisatie.'))">
 
-	{{-- Canonical + hreflang per locale (per-page override via @push('head')) --}}
+	{{-- Canonical + hreflang per locale (per-page override via @push('head')).
+
+		 ALLEEN TALEN DIE ER ECHT ZIJN. Dit lijstje stond op SetLocale::SUPPORTED en wisselde blind
+		 het taalvoorvoegsel in de URL om. Dat klopt voor de vaste pagina's — die bestaan in beide
+		 talen — maar niet voor de blog: 357 gepubliceerde artikelen bestaan alleen in het
+		 Nederlands, en die riepen zo tegen Google "er is ook een Engelse versie" terwijl /en/blog/…
+		 een 410 geeft. Search Console meldde daardoor 303 pagina's als "Niet gevonden" (410 valt in
+		 diezelfde bak) en de validatie van 03-07-2026 mislukte, want aan die URL's veranderde niets.
+
+		 Een view die het beter weet geeft $hreflangLocales mee; de rest houdt alle ondersteunde
+		 talen, want daar is het wél waar. --}}
+	@php
+		$__bg_alts     = \App\Support\Hreflang::alternates($hreflangLocales ?? null);
+		$__bg_xdefault = \App\Support\Hreflang::xDefault($__bg_alts);
+	@endphp
 	<link rel="canonical" href="{{ $__bg_canonical }}">
-	@foreach (\App\Http\Middleware\SetLocale::SUPPORTED as $__bg_loc)
+	@foreach ($__bg_alts as $__bg_loc)
 		<link rel="alternate" hreflang="{{ $__bg_loc }}" href="{{ url('/' . $__bg_loc . $__bg_tail) }}">
 	@endforeach
-	<link rel="alternate" hreflang="x-default" href="{{ url('/nl' . $__bg_tail) }}">
+	@if ($__bg_xdefault)
+		<link rel="alternate" hreflang="x-default" href="{{ url('/' . $__bg_xdefault . $__bg_tail) }}">
+	@endif
 
 	{{-- Open Graph defaults (per-page override via @section('og_type', '...') etc) --}}
 	<meta property="og:type" content="@yield('og_type', 'website')">

@@ -230,6 +230,12 @@ $__legacyTools = [
 	'lego-lookup', 'json-formatter', 'diff', 'favicon-generator', 'pdf-merge',
 	'dns-inspector', 'mail-auth-check', 'ssl-check', 'security-headers', 'whois-lookup',
 ];
+// Overblijfsel van de oude site: /index.html. Search Console meldt hem sinds mei als 404, in drie
+// varianten (http, https en www) - die laatste twee lossen zichzelf op zodra de apex het goed doet,
+// want www en http 301'en al naar https://betergeregeld.com. Een regel scheelt drie meldingen en
+// houdt de link-equity van wat er ooit naar wees.
+Route::redirect('/index.html', '/nl', 301);
+
 Route::redirect('/diensten', '/nl/diensten', 301);
 Route::redirect('/tools', '/nl/tools', 301);
 foreach ($__legacyServices as $__s) {

@@ -87,7 +87,35 @@ class BlogController extends Controller
 			$categoryPillar = null;
 		}
 
-		return view('blog.show', compact('post', 'related', 'categoryPillar'));
+		return view('blog.show', compact('post', 'related', 'categoryPillar') + [
+			'hreflangLocales' => $this->beschikbareLocales($slug),
+		]);
+	}
+
+	/**
+	 * In welke talen bestaat deze blog-URL echt?
+	 *
+	 * De layout zette voorheen voor elke ondersteunde taal een hreflang-alternate neer, met het
+	 * taalvoorvoegsel blind omgewisseld. Voor de vaste pagina's klopt dat, voor de blog niet: 357
+	 * gepubliceerde artikelen bestaan alleen in het Nederlands - het zijn de kanaalartikelen
+	 * (bakkerij, advocaat, apotheek) die op de hoofdsite meeliften. Die pagina's beloofden Google een
+	 * Engelse versie die 410 Gone teruggeeft, goed voor 303 meldingen "Niet gevonden" in Search
+	 * Console en een validatie die op 11-07-2026 mislukte.
+	 *
+	 * De toets spiegelt bewust show() hierboven: dezelfde query, dus wat hier als beschikbaar geldt is
+	 * precies wat die URL straks serveert. Een losse regel zou vroeg of laat uit de pas lopen.
+	 *
+	 * @return array<int,string>
+	 */
+	private function beschikbareLocales(string $slug): array
+	{
+		return BlogPost::query()->published()
+			->where('slug', $slug)
+			->whereIn('locale', SetLocale::SUPPORTED)
+			->pluck('locale')
+			->unique()
+			->values()
+			->all();
 	}
 
 	/**
