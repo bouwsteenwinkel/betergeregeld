@@ -215,9 +215,32 @@ Route::match(['get', 'post'], '/cron/ping/{token}/{signal?}', \App\Http\Controll
 
 // Uitgefaseerde locales de/fr/es (waren onvertaalde NL-duplicaten) → 301 naar /nl.
 // Behoudt link-equity voor reeds geïndexeerde URL's i.p.v. kale 404's. MOET vóór
-// de {locale}-groep staan. Slugs waren toch al Nederlands, dus /nl/{rest} resolvet.
+// de {locale}-groep staan.
+//
+// Het pad wordt niet één-op-één overgenomen. Hier stond "slugs waren toch al
+// Nederlands, dus /nl/{rest} resolvet" — dat klopt voor de meeste, maar 63 van de
+// 152 gepubliceerde de/fr/es-artikelen dragen de taal ín hun slug
+// (wat-kost-een-website-de). Die kwamen na de 301 uit op een 410 Gone: eerst een
+// omleiding kosten en dan alsnog zeggen dat de pagina weg is, terwijl het
+// Nederlandse artikel gewoon bestaat onder dezelfde slug zónder suffix.
+//
+// Alleen de suffix van de taal waar we vandaan komen wordt gestript, en alleen op
+// het laatste paddeel. Bestaat de gestripte slug toch niet, dan pakt de gewone
+// blog-afhandeling het op (die 301't naar de juiste locale of geeft 410).
+// Gecontroleerd op 11-08-2026: alle 63 komen zo op een bestaand artikel uit.
 Route::get('/{oldloc}/{rest?}', function (string $oldloc, ?string $rest = null) {
-	return redirect('/nl' . ($rest !== null && $rest !== '' ? '/' . $rest : ''), 301);
+	$rest = (string) $rest;
+	if ($rest !== '') {
+		$delen = explode('/', $rest);
+		$laatste = array_pop($delen);
+		$zonder = preg_replace('/-' . preg_quote($oldloc, '/') . '$/', '', $laatste);
+		if ($zonder !== '' && $zonder !== $laatste) {
+			$delen[] = $zonder;
+			$rest = implode('/', $delen);
+		}
+	}
+
+	return redirect('/nl' . ($rest !== '' ? '/' . $rest : ''), 301);
 })->where('oldloc', 'de|fr|es')->where('rest', '.*');
 
 // ── Legacy landings-URL's → 301 naar huidige gelokaliseerde structuur ─────────
