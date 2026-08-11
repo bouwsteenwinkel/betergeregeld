@@ -2,6 +2,10 @@
 
 @php $locale = app()->getLocale(); @endphp
 
+{{-- Paginering: elke pagina verwijst naar zichzelf, niet naar pagina 1.
+     Alleen binnen het bereik — zie blog/index.blade.php. --}}
+@section('canonical', url('/' . $locale . '/blog/tag/' . $tag->slug) . ($posts->currentPage() > 1 && $posts->currentPage() <= $posts->lastPage() ? '?page=' . $posts->currentPage() : ''))
+
 @section('title', 'Artikelen met tag "' . $tag->name . '", Blog')
 @section('description', 'Alle blog-artikelen met het onderwerp ' . $tag->name . '.')
 

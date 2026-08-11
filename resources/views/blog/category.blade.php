@@ -2,6 +2,10 @@
 
 @php $locale = app()->getLocale(); @endphp
 
+{{-- Paginering: elke pagina verwijst naar zichzelf, niet naar pagina 1.
+     Alleen binnen het bereik — zie blog/index.blade.php. --}}
+@section('canonical', url('/' . $locale . '/blog/categorie/' . $category->slug) . ($posts->currentPage() > 1 && $posts->currentPage() <= $posts->lastPage() ? '?page=' . $posts->currentPage() : ''))
+
 @section('title', $category->name . ', Blog, ' . config('app.name'))
 @section('description', $category->intro ?: ('Artikelen over ' . $category->name . ' op het Betergeregeld-blog.'))
 

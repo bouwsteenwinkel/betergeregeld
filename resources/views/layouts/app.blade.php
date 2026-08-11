@@ -7,6 +7,15 @@
 	$__bg_tail    = count($__bg_pparts) > 1 ? '/' . implode('/', array_slice($__bg_pparts, 1)) : '';
 	$__bg_canon_path = '/' . $__bg_locale . $__bg_tail;
 	$__bg_canonical  = url($__bg_canon_path);
+	// Een view mag de canonical overschrijven. Nodig voor paginering: het pad
+	// hierboven komt uit request()->path() en bevat dus géén querystring,
+	// waardoor /nl/blog?page=3 naar /nl/blog canonicaliseerde. Zo'n pagina
+	// zegt dan tegen Google "ik ben niet echt" terwijl er 29 artikelen op
+	// staan die nergens anders vandaan gelinkt worden — in augustus 2026
+	// stonden er 329 blog-artikelen als "gevonden, nooit gecrawld".
+	// De channel-blog deed dit al goed (channels/blog/index.blade.php:6).
+	$__bg_canon_override = trim((string) View::yieldContent('canonical'));
+	if ($__bg_canon_override !== '') $__bg_canonical = $__bg_canon_override;
 	// yieldContent kan een al door Blade ge-escapete string opleveren; eerst
 	// terug naar plain text decoden, daarna laat Blade's {{ }} ze opnieuw
 	// nét één keer escapen.

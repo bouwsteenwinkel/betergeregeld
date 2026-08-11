@@ -2,6 +2,11 @@
 
 @php $locale = app()->getLocale(); @endphp
 
+{{-- Paginering: elke pagina verwijst naar zichzelf, niet naar pagina 1.
+     Alleen binnen het bereik: ?page=999 bestaat niet, en die naar zichzelf
+     laten wijzen maakt van een typefout een oneindige reeks "echte" pagina's. --}}
+@section('canonical', url('/' . $locale . '/blog') . ($recent->currentPage() > 1 && $recent->currentPage() <= $recent->lastPage() ? '?page=' . $recent->currentPage() : ''))
+
 @section('title', 'Blog, ' . config('app.name'))
 @section('description', 'Praktische gidsen over toegangsbeheer, IT-governance, compliance en MKB-administratie. Geschreven door het Betergeregeld-team.')
 
