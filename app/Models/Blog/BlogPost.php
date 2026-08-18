@@ -9,6 +9,25 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BlogPost extends Model
 {
+
+	/**
+	 * De talen waarin de blog bestaat.
+	 *
+	 * Bewust los van SetLocale::SUPPORTED (nl + en): dat zijn twee verschillende
+	 * vragen — welke talen bedient de SITE, en in welke talen schrijven we. De
+	 * Engelse blog is per 18-08-2026 uitgefaseerd. Het waren 778 vertalingen van
+	 * Nederlandse artikelen die op NEDERLANDSE zoektermen met hun eigen origineel
+	 * concurreerden; gemeten over 90 dagen stond /en/blog/factuur-in-nederlands-en-engels
+	 * op positie 10 en /nl/… op 17 voor dezelfde term. Samen 86 clicks op 14.492
+	 * vertoningen, waarvan maar 43% uit Nederland kwam.
+	 *
+	 * De rijen blijven in de database staan: alleen serveren, adverteren (hreflang,
+	 * sitemap) en bijmaken stopt. Terugdraaien is deze constante weer uitbreiden.
+	 *
+	 * @var array<int,string>
+	 */
+	public const LOCALES = ['nl'];
+
 	protected $table = 'blog_posts';
 
 	protected $fillable = [

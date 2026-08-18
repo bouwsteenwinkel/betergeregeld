@@ -34,9 +34,31 @@ class BlogMissingPostTest extends TestCase
         });
     }
 
-    public function test_wrong_locale_url_redirect_301_naar_juiste_locale(): void
+    public function test_en_suffix_slug_gaat_naar_het_nederlandse_artikel(): void
     {
-        // EN-post met '-en'-slug leeft op /en/blog/... ; Google crawlde 'm verkeerd op /nl/.
+        // Sinds 18-08-2026 is de Engelse blog uitgefaseerd. Een geïndexeerde URL met
+        // '-en' in de slug hoort in ÉÉN hop op het Nederlandse artikel uit te komen,
+        // niet op een 410: dat artikel bestaat gewoon, alleen zonder achtervoegsel.
+        BlogPost::create([
+            'locale' => 'nl', 'channel' => null, 'slug' => 'offertes-sneller-maken',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/nl/blog/offertes-sneller-maken-en')
+            ->assertStatus(301)
+            ->assertRedirect('/nl/blog/offertes-sneller-maken');
+    }
+
+    public function test_en_suffix_gaat_niet_via_de_engelse_blog(): void
+    {
+        // Voorheen ging /nl/blog/<slug>-en naar /en/blog/<slug>. Die bestemming bestaat
+        // niet meer, dus zou dat nu twee hops kosten (en de tweede naar /nl). Het moet
+        // in één keer op het Nederlandse artikel uitkomen. Ook als de oude Engelse
+        // rijen nog in de database staan — die worden niet meer bediend.
+        BlogPost::create([
+            'locale' => 'nl', 'channel' => null, 'slug' => 'offertes-sneller-maken',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
         BlogPost::create([
             'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken-en',
             'title' => 'x', 'published_at' => now()->subDay(),
@@ -44,43 +66,24 @@ class BlogMissingPostTest extends TestCase
 
         $this->get('/nl/blog/offertes-sneller-maken-en')
             ->assertStatus(301)
-            ->assertRedirect('/en/blog/offertes-sneller-maken-en');
+            ->assertRedirect('/nl/blog/offertes-sneller-maken');
     }
 
-    public function test_wrong_locale_en_duplicaat_redirect_in_een_hop_naar_schone_slug(): void
+    public function test_engelse_blog_url_gaat_naar_de_nederlandse(): void
     {
-        // /nl/blog/<slug>-en waar de EN-post een '-en'-duplicaat is mét schone tweeling:
-        // moet in ÉÉN hop naar /en/blog/<slug> (niet eerst naar /en/blog/<slug>-en).
+        // De Engelse blog is uitgefaseerd (18-08-2026). Elke /en/blog-URL 301't naar
+        // /nl/blog, met het '-en'-achtervoegsel eraf zodat het bij het bestaande
+        // Nederlandse artikel uitkomt en niet bij een 410.
         BlogPost::create([
-            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken',
-            'title' => 'x', 'published_at' => now()->subDay(),
-        ]);
-        BlogPost::create([
-            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken-en',
-            'title' => 'x', 'published_at' => now()->subDay(),
-        ]);
-
-        $this->get('/nl/blog/offertes-sneller-maken-en')
-            ->assertStatus(301)
-            ->assertRedirect('/en/blog/offertes-sneller-maken');
-    }
-
-    public function test_en_dubbele_slug_301_naar_schone_versie(): void
-    {
-        // Beide EN-versies gepubliceerd: de schone slug + de '-en'-duplicaat.
-        // De '-en'-variant moet 301'en naar de schone (dedup duplicate content).
-        BlogPost::create([
-            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken',
-            'title' => 'x', 'published_at' => now()->subDay(),
-        ]);
-        BlogPost::create([
-            'locale' => 'en', 'channel' => null, 'slug' => 'offertes-sneller-maken-en',
+            'locale' => 'nl', 'channel' => null, 'slug' => 'offertes-sneller-maken',
             'title' => 'x', 'published_at' => now()->subDay(),
         ]);
 
         $this->get('/en/blog/offertes-sneller-maken-en')
             ->assertStatus(301)
-            ->assertRedirect('/en/blog/offertes-sneller-maken');
+            ->assertRedirect('/nl/blog/offertes-sneller-maken');
+
+        $this->get('/en/blog')->assertStatus(301)->assertRedirect('/nl/blog');
     }
 
     public function test_verwijderde_post_geeft_410(): void

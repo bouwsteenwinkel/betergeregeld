@@ -24,6 +24,9 @@ class SitemapController extends Controller
 	public function sitemap(Request $request): Response
 	{
 		$locales = ['nl', 'en'];
+		// De blog volgt zijn eigen lijst: de Engelse blog is uitgefaseerd terwijl
+		// /en/tools en /en/diensten blijven bestaan. Zie BlogPost::LOCALES.
+		$blogLocales = BlogPost::LOCALES;
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 		$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
@@ -50,7 +53,9 @@ class SitemapController extends Controller
 			$xml .= $this->url(url("/{$locale}/accessguard/demo"), '0.7', 'monthly');
 			$xml .= $this->url(url("/{$locale}/prijzen"), '0.8', 'weekly');
 			$xml .= $this->url(url("/{$locale}/contact"), '0.5', 'yearly');
-			$xml .= $this->url(url("/{$locale}/blog"), '0.8', 'daily');
+			if (in_array($locale, $blogLocales, true)) {
+				$xml .= $this->url(url("/{$locale}/blog"), '0.8', 'daily');
+			}
 
 			// Diensten-index + per slug (commerciële intent → priority 0.8)
 			$xml .= $this->url(url("/{$locale}/diensten"), '0.8', 'weekly');
@@ -66,7 +71,7 @@ class SitemapController extends Controller
 		}
 
 		foreach (BlogCategory::query()->get(['slug', 'updated_at']) as $cat) {
-			foreach ($locales as $locale) {
+			foreach ($blogLocales as $locale) {
 				$xml .= $this->url(
 					url("/{$locale}/blog/categorie/{$cat->slug}"),
 					'0.7',
@@ -77,7 +82,7 @@ class SitemapController extends Controller
 		}
 
 		foreach (BlogTag::query()->get(['slug', 'updated_at']) as $tag) {
-			foreach ($locales as $locale) {
+			foreach ($blogLocales as $locale) {
 				$xml .= $this->url(
 					url("/{$locale}/blog/tag/{$tag->slug}"),
 					'0.5',
@@ -92,7 +97,7 @@ class SitemapController extends Controller
 		// dailyAt 09:00 'blog:generate-daily' command schrijft direct
 		// een NL- en EN-versie; oudere posts hebben alleen NL en zijn
 		// daarom alleen onder /nl/ vindbaar.
-		$posts = BlogPost::query()->published()->whereIn('locale', $locales)->get(['slug', 'locale', 'updated_at', 'is_pillar']);
+		$posts = BlogPost::query()->published()->whereIn('locale', $blogLocales)->get(['slug', 'locale', 'updated_at', 'is_pillar']);
 		// Set van gepubliceerde EN-slugs, om '-en'-duplicaten te herkennen: sommige EN-posts
 		// bestaan dubbel (schone slug + '-en'-variant). De '-en'-variant 301't naar de schone,
 		// dus die hoort NIET in de sitemap (anders stuur je Google naar een redirect).

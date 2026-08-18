@@ -111,7 +111,7 @@ class BlogController extends Controller
 	{
 		return BlogPost::query()->published()
 			->where('slug', $slug)
-			->whereIn('locale', SetLocale::SUPPORTED)
+			->whereIn('locale', BlogPost::LOCALES)
 			->pluck('locale')
 			->unique()
 			->values()
@@ -132,16 +132,30 @@ class BlogController extends Controller
 		$elsewhere = BlogPost::query()->published()
 			->forChannel(null) // alleen hoofdsite-posts; niet per ongeluk naar een channel-site
 			->where('slug', $slug)
-			->whereIn('locale', SetLocale::SUPPORTED)
+			->whereIn('locale', BlogPost::LOCALES)
 			->orderByDesc('published_at')
 			->first();
 
 		if ($elsewhere) {
 			// Als het doel zelf een EN-'-en'-duplicaat is, meteen naar de schone slug —
-			// zo blijft het één redirect (/nl/blog/X-en → /en/blog/X) i.p.v. een keten.
+			// zo blijft het één redirect i.p.v. een keten.
 			$targetSlug = $this->enCanonicalSlug($elsewhere->locale, $slug);
 
 			return redirect()->route('blog.show', ['locale' => $elsewhere->locale, 'slug' => $targetSlug], 301);
+		}
+
+		// Nasleep van de uitgefaseerde Engelse blog (18-08-2026): een deel van de
+		// vertalingen droeg '-en' in de slug. Die URL's staan nog in de index en
+		// hebben geen Nederlandse tweeling ónder diezelfde naam — wel zonder het
+		// achtervoegsel. Eén hop naar dat artikel is beter dan een 410 op iets wat
+		// gewoon bestaat. Zelfde truc als de de/fr/es-omleiding in routes/web.php.
+		if (str_ends_with($slug, '-en')) {
+			$schoon = substr($slug, 0, -3);
+			$nl = BlogPost::query()->published()->forChannel(null)
+				->where('slug', $schoon)->where('locale', 'nl')->exists();
+			if ($nl) {
+				return redirect()->route('blog.show', ['locale' => 'nl', 'slug' => $schoon], 301);
+			}
 		}
 
 		abort(410);

@@ -213,6 +213,34 @@ Route::post('/monitor/socketlabs/webhook', \App\Http\Controllers\Monitor\SocketL
 Route::match(['get', 'post'], '/cron/ping/{token}/{signal?}', \App\Http\Controllers\Monitor\CronPingController::class)
 	->name('cron.ping');
 
+// Uitgefaseerde ENGELSE BLOG (18-08-2026) → 301 naar het Nederlandse artikel.
+//
+// Alleen de blog: /en/tools en /en/diensten blijven gewoon bestaan, dus de locale
+// 'en' blijft in SetLocale::SUPPORTED staan. De slugs van de vertalingen zijn
+// gelijk aan die van het origineel (/en/blog/factuur-in-nederlands-en-engels), dus
+// het pad kan één-op-één mee. Een enkele vertaling draagt '-en' in de slug; die
+// suffix wordt gestript, net als destijds bij de/fr/es.
+//
+// 301 en geen 410: deze URL's stáán in de index en een deel rankt (positie 10 voor
+// 'factuur in het engels'). Die waarde hoort naar het Nederlandse artikel te gaan,
+// niet verloren.
+//
+// MOET vóór de {locale}-groep staan.
+Route::get('/en/blog/{rest?}', function (?string $rest = null) {
+	$rest = (string) $rest;
+	if ($rest !== '') {
+		$delen = explode('/', $rest);
+		$laatste = array_pop($delen);
+		$zonder = preg_replace('/-en$/', '', $laatste);
+		if ($zonder !== '' && $zonder !== $laatste) {
+			$delen[] = $zonder;
+			$rest = implode('/', $delen);
+		}
+	}
+
+	return redirect('/nl/blog' . ($rest !== '' ? '/' . $rest : ''), 301);
+})->where('rest', '.*');
+
 // Uitgefaseerde locales de/fr/es (waren onvertaalde NL-duplicaten) → 301 naar /nl.
 // Behoudt link-equity voor reeds geïndexeerde URL's i.p.v. kale 404's. MOET vóór
 // de {locale}-groep staan.

@@ -52,7 +52,9 @@ class BlogGenerateDaily extends Command
 
 		$translations = [];
 		if (!$this->option('no-translate')) {
-			$targets = array_values(array_diff(SetLocale::SUPPORTED, ['nl']));
+			// Volgt BlogPost::LOCALES, niet de talen van de site: nu de Engelse blog
+			// weg is, is deze lijst leeg en wordt er niets meer vertaald.
+			$targets = array_values(array_diff(\App\Models\Blog\BlogPost::LOCALES, ['nl']));
 			foreach ($targets as $loc) {
 				$this->info("Vertaal naar {$loc}…");
 				try {
