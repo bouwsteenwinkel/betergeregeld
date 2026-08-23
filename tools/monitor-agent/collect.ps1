@@ -47,22 +47,29 @@ try {
 
     $load = $null
     if ($cpu -ge 50 -or $memPercent -ge 80) {
+        # Optellen PER PROCESNAAM, niet per los proces. Gemeten 23-08-2026:
+        # een top-6 van losse processen verklaarde maar ~5 GB van de ~10,5 GB
+        # die in gebruik was — de rest zit in tientallen kleine workers
+        # (php-cgi) die individueel nooit in een top-6 komen maar samen het
+        # geheugen vullen. Juist die zijn de verdachte bij de nachtelijke
+        # stilstand, dus tellen we ze bij elkaar op. 'n' = aantal processen.
         $top = Get-Process -ErrorAction SilentlyContinue |
-            Sort-Object -Property WorkingSet64 -Descending |
-            Select-Object -First 6 |
+            Group-Object -Property ProcessName |
             ForEach-Object {
-                @{
-                    naam    = $_.ProcessName
-                    proc_id = $_.Id
-                    mb      = [int][math]::Round($_.WorkingSet64 / 1MB)
-                    cpu_s   = [int]$_.CPU
-                }
-            }
+                $mb = [int][math]::Round((($_.Group | Measure-Object -Property WorkingSet64 -Sum).Sum) / 1MB)
+                $cs = [int](($_.Group | Measure-Object -Property CPU -Sum).Sum)
+                [pscustomobject]@{ naam = $_.Name; n = $_.Count; mb = $mb; cpu_s = $cs }
+            } |
+            Sort-Object -Property mb -Descending |
+            Select-Object -First 8 |
+            ForEach-Object { @{ naam = $_.naam; n = $_.n; mb = $_.mb; cpu_s = $_.cpu_s } }
+
         $load = @{
-            reden   = 'druk'
-            cpu     = [double]$cpu
-            mem_pct = $memPercent
-            top     = @($top)
+            reden       = 'druk'
+            cpu         = [double]$cpu
+            mem_pct     = $memPercent
+            mem_used_mb = $memUsedMb
+            top         = @($top)
         }
     }
 
@@ -75,7 +82,7 @@ try {
         disk_total_gb = $diskTotalGb
         uptime_seconds = $uptimeSeconds
         load = $load
-        agent_version = 'ps-1.1'
+        agent_version = 'ps-1.2'
     } | ConvertTo-Json -Depth 5 -Compress
 
     $headers = @{ Authorization = "Bearer $Token" }
