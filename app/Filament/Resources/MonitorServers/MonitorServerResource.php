@@ -6,6 +6,7 @@ use App\Filament\Resources\MonitorServers\Pages\CreateMonitorServer;
 use App\Filament\Resources\MonitorServers\Pages\EditMonitorServer;
 use App\Filament\Resources\MonitorServers\Pages\ListMonitorServers;
 use App\Filament\Resources\MonitorServers\RelationManagers\ChecksRelationManager;
+use App\Filament\Resources\MonitorServers\RelationManagers\DiskUsageRelationManager;
 use App\Filament\Resources\MonitorServers\Schemas\MonitorServerForm;
 use App\Filament\Resources\MonitorServers\Tables\MonitorServersTable;
 use App\Models\Monitor\Server;
@@ -56,6 +57,7 @@ class MonitorServerResource extends Resource
 	{
 		return [
 			ChecksRelationManager::class,
+			DiskUsageRelationManager::class,
 		];
 	}
 

@@ -69,6 +69,11 @@ class Server extends Model
 		return $this->hasMany(Metric::class);
 	}
 
+	public function diskUsage(): HasMany
+	{
+		return $this->hasMany(DiskUsage::class);
+	}
+
 	public function tenants(): HasMany
 	{
 		return $this->hasMany(Tenant::class);

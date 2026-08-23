@@ -53,6 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '_ev',            // channel event-beacon (sendBeacon kan geen CSRF-header zetten)
             '_site/*/_ev',    // idem op de preview-route van concept-kanalen
             'monitor/ingest',
+            'monitor/ingest-disk',
             'monitor/socketlabs/webhook',
             'security/ingest/*',
             'cron/ping/*',

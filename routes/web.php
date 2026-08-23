@@ -202,6 +202,7 @@ Route::options('/cmp/consent',[\App\Http\Controllers\CmpController::class, 'cons
 // VPS monitoring ingest — host collectors POST samples here, authenticated by a
 // per-server token (Bearer / X-Monitor-Token). Locale-agnostic + CSRF-exempt.
 Route::post('/monitor/ingest', \App\Http\Controllers\Monitor\IngestController::class)->name('monitor.ingest');
+Route::post('/monitor/ingest-disk', \App\Http\Controllers\Monitor\IngestDiskController::class)->name('monitor.ingest-disk');
 Route::post('/security/ingest/{token}', \App\Http\Controllers\Security\SoftwareIngestController::class)->name('security.ingest');
 
 // SocketLabs event-webhook — deliverability/queue-events. Auth via SecretKey +
@@ -321,12 +322,23 @@ foreach (['nl', 'en'] as $__loc) {
 	Route::redirect("/{$__loc}/disclaimer", "/{$__loc}/algemene-voorwaarden", 301);
 }
 
+// Korte instap-URL's naar de AI-dienstpagina. /ai is wat mensen intikken en wat
+// in offertes en mail het handigst staat; de canonieke URL blijft de volledige
+// slug, zodat de zoekterm in het pad staat.
+Route::redirect('/ai', '/nl/slimmer-werken-met-ai', 301);
+Route::redirect('/slimmer-werken-met-ai', '/nl/slimmer-werken-met-ai', 301);
+foreach (['nl', 'en'] as $__loc) {
+	Route::redirect("/{$__loc}/ai", "/{$__loc}/slimmer-werken-met-ai", 301);
+	Route::redirect("/{$__loc}/diensten/slimmer-werken-met-ai", "/{$__loc}/slimmer-werken-met-ai", 301);
+}
+
 Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)
 	->group(function () {
 		Route::get('/', fn () => view('welcome'))->name('home');
 		Route::get('/over', fn () => view('pages.about'))->name('about');
+		Route::get('/slimmer-werken-met-ai', fn () => view('pages.ai'))->name('ai.landing');
 
 		// Juridische pagina's (generiek uit config/legal.php). noindex,follow.
 		Route::get('/privacybeleid', fn () => view('pages.legal.privacy'))->name('legal.privacy');
