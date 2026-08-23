@@ -60,6 +60,15 @@ while ($stapel.Count -gt 0) {
         Write-Progress -Activity 'Schijf doorlopen' -Status ("{0} mappen, {1} bestanden" -f $aantalMappen, $aantalBestanden)
     }
 
+    # Ook een gewone regel, en niet alleen Write-Progress. Op 23-08-2026 draaide
+    # deze scan negen minuten zonder dat er in het venster iets te zien was: een
+    # voortgangsbalk komt niet in elke host door (en in een geplande taak al
+    # helemaal niet). Zonder teken van leven weet je niet of hij werkt of hangt.
+    if (($aantalMappen % 25000) -eq 0) {
+        $verstreken = [int]((Get-Date) - $begin).TotalSeconds
+        Write-Host ("  [{0}] {1}s -- {2} mappen, {3} bestanden, nu in: {4}" -f (Get-Date -Format 'HH:mm:ss'), $verstreken, $aantalMappen, $aantalBestanden, $huidig.Pad)
+    }
+
     $map = $null
     try { $map = New-Object System.IO.DirectoryInfo $huidig.Pad } catch { continue }
 
