@@ -82,12 +82,107 @@ try {
         disk_total_gb = $diskTotalGb
         uptime_seconds = $uptimeSeconds
         load = $load
-        agent_version = 'ps-1.2'
+        agent_version = 'ps-1.3'
     } | ConvertTo-Json -Depth 5 -Compress
 
+    # Eerst bufferen, dan pas versturen. Een meting die niet verstuurd kan worden
+    # was tot nu toe gewoon weg, en dat is precies de meting die je wilt hebben:
+    # tijdens de nachtelijke stilstand van 03:00 miste de reeks 13 van de 16
+    # minuten. Wat er nu ligt wordt de volgende ronde alsnog nageleverd, dus de
+    # grafiek is achteraf compleet.
+    #
+    # LET OP wat dit NIET oplost: als de geplande taak zelf niet start (machine te
+    # druk om een proces te starten), is er niets om te bufferen. Het onderscheid
+    # tussen die twee is wel meteen zichtbaar geworden — komen er morgen samples
+    # van 03:05 binnen met een verzendtijd van 03:16, dan liep de agent wél en kon
+    # hij alleen niet weg; blijft het gat leeg, dan is de taak niet gestart.
+    $bufferMap = Join-Path $env:ProgramData 'BG-Monitor'
+    if (-not (Test-Path -LiteralPath $bufferMap)) {
+        New-Item -ItemType Directory -Path $bufferMap -Force | Out-Null
+    }
+    $bufferBestand = Join-Path $bufferMap 'buffer.jsonl'
+    Add-Content -LiteralPath $bufferBestand -Value $payload -Encoding utf8
+
+    # Twee runs tegelijk zouden dezelfde regels dubbel versturen en elkaars
+    # herschreven buffer overschrijven. Lukt het slot niet, dan is er al een run
+    # bezig: de meting staat gebufferd en die andere run neemt 'm mee.
+    $slot = New-Object System.Threading.Mutex($false, 'Global\BG-Monitor-Agent')
+    $heeftSlot = $false
+    try {
+        $heeftSlot = $slot.WaitOne(10000)
+    } catch [System.Threading.AbandonedMutexException] {
+        $heeftSlot = $true
+    }
+
+    if (-not $heeftSlot) {
+        Write-Output 'Andere run is bezig; meting staat in de buffer.'
+        exit 0
+    }
+
     $headers = @{ Authorization = "Bearer $Token" }
-    $resp = Invoke-RestMethod -Uri $Endpoint -Method Post -Body $payload -ContentType 'application/json' -Headers $headers -TimeoutSec 20
-    Write-Output ("OK - {0} @ {1}" -f $resp.server, $resp.received_at)
+    $verzonden = 0
+    $laatste = $null
+
+    try {
+        $regels = @(Get-Content -LiteralPath $bufferBestand -Encoding utf8 -ErrorAction SilentlyContinue)
+
+        # Buffer begrenzen: bij een lange storing loopt dit anders onbeperkt vol.
+        # 720 samples = twaalf uur; oudere metingen zijn voor een grafiek toch
+        # niet meer interessant.
+        $maxBuffer = 720
+        if ($regels.Count -gt $maxBuffer) {
+            $regels = $regels[($regels.Count - $maxBuffer)..($regels.Count - 1)]
+        }
+
+        $over = New-Object System.Collections.Generic.List[string]
+
+        foreach ($regel in $regels) {
+            if ([string]::IsNullOrWhiteSpace($regel)) { continue }
+
+            # Na een mislukking niets meer proberen: dan is de endpoint of het
+            # netwerk weg, en houden we de volgorde intact (oudste eerst, zodat
+            # de laatste push de actuele stand achterlaat in last_cpu/mem/disk).
+            if ($over.Count -gt 0) { $over.Add($regel); continue }
+
+            try {
+                $null = Invoke-RestMethod -Uri $Endpoint -Method Post -Body $regel -ContentType 'application/json' -Headers $headers -TimeoutSec 15
+                $verzonden++
+                $laatste = $regel
+            } catch {
+                # Een afgekeurde meting (400/422) komt nooit meer door en zou de
+                # buffer voorgoed verstoppen — die gooien we weg. 401/403/429 en
+                # alles zonder antwoord (netwerk, timeout) bewaren we wél.
+                $code = 0
+                if ($_.Exception.Response) { $code = [int]$_.Exception.Response.StatusCode }
+                if ($code -ge 400 -and $code -lt 500 -and $code -ne 401 -and $code -ne 403 -and $code -ne 429) {
+                    Write-Warning ("Meting geweigerd met HTTP {0}; weggegooid." -f $code)
+                } else {
+                    $over.Add($regel)
+                }
+            }
+        }
+
+        Set-Content -LiteralPath $bufferBestand -Value $over -Encoding utf8
+    }
+    finally {
+        $slot.ReleaseMutex()
+        $slot.Dispose()
+    }
+
+    if ($verzonden -eq 0) {
+        # Bewust niet Write-Error: met ErrorActionPreference = 'Stop' gooit dat
+        # binnen de try-tak een uitzondering die de catch eronder nog eens
+        # inpakt, en dan staat de melding dubbel in het taaklogboek.
+        [Console]::Error.WriteLine('Monitor push mislukt: niets verzonden, metingen staan in de buffer.')
+        exit 1
+    }
+
+    $achterstand = $verzonden - 1
+    if ($achterstand -gt 0) {
+        Write-Output ("OK - {0} metingen verzonden ({1} nageleverd)." -f $verzonden, $achterstand)
+    } else {
+        Write-Output 'OK - 1 meting verzonden.'
+    }
 }
 catch {
     Write-Error ("Monitor push mislukt: {0}" -f $_.Exception.Message)

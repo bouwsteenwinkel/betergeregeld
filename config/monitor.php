@@ -36,6 +36,14 @@ return [
 	 * How long raw metric samples are kept (days). A scheduled prune trims older
 	 * rows so the time-series table stays bounded.
 	 */
+	// Trendwaarschuwingen: niet "drempel bereikt" maar "wanneer bereiken we hem".
+	// De schijf liep in een maand van 105 naar 55 GB vrij zonder signaal, omdat
+	// disk_warn op 90% staat en het gebruik op 86,5% zat.
+	'trend_lookback_days' => (int) env('MONITOR_TREND_LOOKBACK_DAYS', 14),
+	'trend_min_days'      => (int) env('MONITOR_TREND_MIN_DAYS', 7),
+	'trend_warn_days'     => (int) env('MONITOR_TREND_WARN_DAYS', 45),
+	'mem_full_percent'    => (int) env('MONITOR_MEM_FULL_PERCENT', 95),
+
 	'retention_days' => (int) env('MONITOR_RETENTION_DAYS', 30),
 
 	/*

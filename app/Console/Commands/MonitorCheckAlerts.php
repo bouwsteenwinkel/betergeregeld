@@ -7,6 +7,7 @@ use App\Models\Monitor\Server;
 use App\Models\Security\SecurityScan;
 use App\Models\Seo\SeoImportsLog;
 use App\Models\Seo\SeoProperty;
+use App\Services\Monitor\TrendAnalyzer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -49,6 +50,7 @@ class MonitorCheckAlerts extends Command
 
 		$this->info("Klaar — {$changes} overgang(en) van " . $servers->count() . ' server(s).');
 
+		$this->checkTrends($to);
 		$this->checkSeoFreshness($to);
 		$this->checkUptimeChecks();
 		$this->checkSecurity();
@@ -445,6 +447,92 @@ class MonitorCheckAlerts extends Command
 
 				Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
 			}
+		}
+	}
+
+	/**
+	 * Trendwaarschuwingen: schijf of geheugen loopt vol bij het huidige tempo.
+	 *
+	 * Waarom naast de drempels: die zeggen "90% bereikt" en dat is op een schijf
+	 * van 400 GB pas een signaal als je nog dagen hebt. Deze zegt het weken van
+	 * tevoren. Transitie-gebaseerd zoals de rest — één mail als de prognose onder
+	 * de grens zakt, één als het weer goed komt, geen herhaling elke tien minuten.
+	 */
+	private function checkTrends(?string $to): void
+	{
+		$grensDagen = (int) config('monitor.trend_warn_days', 45);
+		$analyse = TrendAnalyzer::make();
+
+		$servers = Server::query()->where('is_active', true)->where('alerts_enabled', true)->get();
+
+		foreach ($servers as $server) {
+			$schijf = $analyse->schijf($server);
+			$geheugen = $analyse->geheugen($server);
+
+			$redenen = [];
+
+			if ($schijf !== null && $schijf['dagen'] !== null && $schijf['dagen'] <= $grensDagen) {
+				$redenen[] = sprintf(
+					'Schijf: +%s GB/dag, nog %s GB vrij van %s GB — vol over ongeveer %s dagen.',
+					number_format($schijf['per_dag'], 2, ',', '.'),
+					number_format($schijf['vrij_gb'], 1, ',', '.'),
+					number_format($schijf['totaal_gb'], 0, ',', '.'),
+					number_format($schijf['dagen'], 0, ',', '.')
+				);
+			}
+
+			if ($geheugen !== null && $geheugen['dagen'] !== null && $geheugen['dagen'] <= $grensDagen) {
+				$redenen[] = sprintf(
+					'Geheugen: +%s procentpunt/dag, nu %s%% — op %s%% over ongeveer %s dagen.',
+					number_format($geheugen['per_dag'], 2, ',', '.'),
+					number_format($geheugen['nu_pct'], 1, ',', '.'),
+					$geheugen['grens_pct'],
+					number_format($geheugen['dagen'], 0, ',', '.')
+				);
+			}
+
+			$conditie = $redenen === [] ? 'ok' : 'trend';
+
+			if ($conditie === ($server->trend_alert_state ?? 'ok')) {
+				continue;
+			}
+
+			$vorige = $server->trend_alert_state ?? 'ok';
+			$server->forceFill([
+				'trend_alert_state' => $conditie,
+				'trend_alerted_at'  => now(),
+			])->save();
+
+			if ($to) {
+				$url = route('filament.admin.resources.monitor-servers.index');
+
+				if ($conditie === 'trend') {
+					$onderwerp = "[Monitoring] TREND: {$server->name} — loopt vol";
+					$tekst = "Server '{$server->name}' loopt bij het huidige tempo vol.
+
+"
+						. implode("
+", $redenen)
+						. "
+
+Gemeten over de laatste " . (int) config('monitor.trend_lookback_days', 14)
+						. " dagen, op dagwaarden. Dit is een prognose, geen storing —
+"
+						. "er is nu nog tijd om het op te lossen.
+
+{$url}";
+				} else {
+					$onderwerp = "[Monitoring] TREND HERSTELD: {$server->name}";
+					$tekst = "De prognose voor '{$server->name}' is weer buiten de waarschuwingsgrens "
+						. "van {$grensDagen} dagen.
+
+{$url}";
+				}
+
+				Mail::raw($tekst, fn ($m) => $m->to($to)->subject($onderwerp));
+			}
+
+			$this->info("{$server->name} (trend): {$vorige} → {$conditie}");
 		}
 	}
 

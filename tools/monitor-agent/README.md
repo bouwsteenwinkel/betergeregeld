@@ -33,6 +33,19 @@ server binnen ~1 minuut als **Online** in het dashboard.
 - Beschikbaarheid/SLA wordt afgeleid uit de heartbeat: ontvangen samples ÷
   verwachte samples per periode (interval = `config/monitor.php`).
 
+## Gemiste metingen worden nageleverd
+
+Elke meting gaat eerst naar `%ProgramData%\BG-Monitoruffer.jsonl` en wordt
+daarna pas verstuurd. Lukt versturen niet, dan blijft de regel staan en gaat hij
+de volgende ronde alsnog mee -- oudste eerst, zodat de laatste push de actuele
+stand achterlaat in `last_cpu/mem/disk`. Zo is de reeks achteraf compleet, ook
+over een storing heen. De buffer is begrensd op 720 metingen (twaalf uur).
+
+Wat dit **niet** oplost: start de geplande taak zelf niet, dan is er niets om te
+bufferen. Het onderscheid is wel meteen zichtbaar -- komen er metingen binnen met
+een tijdstempel dat ver voor de ontvangst ligt, dan liep de agent en kon hij
+alleen niet weg; blijft het gat helemaal leeg, dan is de taak niet gestart.
+
 ## Velden in de payload
 
 | Veld | Betekenis |
