@@ -27,6 +27,12 @@ class SeoImportGsc extends Command
 
 	protected $description = 'Import Google Search Console search-analytics naar seo_query_daily.';
 
+	/**
+	 * Dagen die net binnen de GSC-achterloop vallen halen we elke run opnieuw
+	 * op: ze kunnen nog aangroeien. De upsert maakt dat gratis.
+	 */
+	public const REFRESH_DAYS = 5;
+
 	public function handle(GscDailyImporter $importer): int
 	{
 		$yesterday = Carbon::yesterday()->toDateString();
@@ -58,6 +64,13 @@ class SeoImportGsc extends Command
 				if ($start < $earliest) {
 					$start = $earliest;
 				}
+
+				// Trek het startpunt terug naar het ververs-venster: die dagen
+				// zijn mogelijk incompleet opgehaald en groeien nog aan.
+				$refreshFrom = Carbon::now()->subDays(self::REFRESH_DAYS)->toDateString();
+				if ($refreshFrom < $start && $refreshFrom >= $earliest) {
+					$start = $refreshFrom;
+				}
 				if ($start > $yesterday) {
 					$this->line("[{$prop->label}] up-to-date.");
 					continue;
@@ -72,17 +85,31 @@ class SeoImportGsc extends Command
 
 			$this->info("[{$prop->label}] {$prop->site_url} — " . count($dates) . ' dag(en)');
 
+			$emptyFinalDays = 0;
+
 			foreach ($dates as $date) {
 				$r = $importer->importDay($prop->id, $date);
 				if ($r['ok']) {
 					$totalRows += $r['rows'];
 					$totalDays++;
-					$this->line("  ✓ {$date}: {$r['rows']} rijen");
+					$final = GscDailyImporter::isFinalDate($date);
+					if ($final && $r['rows'] === 0) {
+						$emptyFinalDays++;
+					}
+					$suffix = $final ? '' : ' (nog niet definitief)';
+					$this->line("  ✓ {$date}: {$r['rows']} rijen{$suffix}");
 				} else {
 					$errors[] = "{$prop->site_url} {$date}: " . ($r['message'] ?? 'onbekend');
 					$this->error("  ✕ {$date}: " . ($r['message'] ?? 'onbekend'));
 					break; // stop deze property bij fout, ga naar volgende
 				}
+			}
+
+			// Een definitieve dag zonder rijen is geen succes maar een signaal:
+			// zo bleef de import 53 dagen stil zonder dat iemand het zag.
+			if ($emptyFinalDays > 0) {
+				$errors[] = "{$prop->site_url}: {$emptyFinalDays} definitieve dag(en) leverden nul rijen";
+				$this->warn("  ! {$emptyFinalDays} definitieve dag(en) zonder data — controleer de property.");
 			}
 		}
 

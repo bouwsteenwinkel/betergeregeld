@@ -106,6 +106,49 @@ class GscProvisioner
 			}
 		}
 
+		// 7. property ook in ONS dashboard zetten. Zonder deze stap is een site wel
+		// bij Google bekend maar staat er geen rij in seo_properties, en dus haalt
+		// `seo:import-gsc` er nooit cijfers voor op. Zo stonden 15 van de 17 live
+		// channel-sites ongemeten (vastgesteld 23-08-2026): we konden niet zien of
+		// ze het goed of slecht deden, en stuurden dus op niets.
+		if ($addOk) {
+			try {
+				$steps['dashboard'] = $this->registreerProperty($site, $prop);
+			} catch (\Throwable $e) {
+				$steps['dashboard'] = 'mislukt: ' . $e->getMessage();
+			}
+		}
+
 		return ['domain' => $domain, 'steps' => $steps, 'ok' => $addOk && $sitemapOk];
+	}
+
+	/**
+	 * Zorgt voor een seo_properties-rij bij deze channel-site, zodat de dagelijkse
+	 * GSC-import 'm meeneemt. Idempotent: bestaat de rij al, dan blijft die staan.
+	 */
+	private function registreerProperty(Site $site, string $propertyUrl): string
+	{
+		$bestaand = \App\Models\Seo\SeoProperty::query()->where('site_url', $propertyUrl)->first();
+		if ($bestaand) {
+			// Stond hij uit (bijv. na een eerdere opruiming)? Weer aanzetten.
+			if (! $bestaand->is_active) {
+				$bestaand->update(['is_active' => true]);
+
+				return 'bestond al — weer op actief gezet';
+			}
+
+			return 'stond al in het dashboard';
+		}
+
+		\App\Models\Seo\SeoProperty::create([
+			'tenant_id' => config('seo.gsc_default_tenant_id') ?: \App\Models\Seo\SeoProperty::query()->value('tenant_id'),
+			'site_url'  => $propertyUrl,
+			'label'     => $site->name ?: $site->key,
+			'type'      => 'website',
+			'is_active' => true,
+			'is_demo'   => false,
+		]);
+
+		return 'toegevoegd aan het dashboard';
 	}
 }

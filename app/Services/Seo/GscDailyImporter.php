@@ -21,6 +21,20 @@ class GscDailyImporter
 	public const ROW_LIMIT = 5000;
 	public const MAX_PAGES = 6; // ~30k rijen per dag voor onze schaal ruim genoeg
 
+	/**
+	 * GSC's 'final' data komt 2-3 dagen achterloop binnen. Een dag die verser
+	 * is dan dit telt niet als definitief opgehaald: hij levert (bijna) altijd
+	 * nul rijen op, en als we de watermark er tóch op zetten wordt die dag
+	 * nooit meer opgehaald. Zo liep de import vanaf eind juni 53 dagen leeg.
+	 */
+	public const LAG_DAYS = 3;
+
+	/** Een dag is pas definitief als hij ouder is dan de GSC-achterloop. */
+	public static function isFinalDate(string $date): bool
+	{
+		return $date <= Carbon::now()->subDays(self::LAG_DAYS)->toDateString();
+	}
+
 	public function __construct(private readonly GoogleSearchConsoleClient $gsc) {}
 
 	/**
@@ -104,12 +118,21 @@ class GscDailyImporter
 			}
 
 			$this->finishLog($log, 'success', $total);
-			$property->update([
-				'last_imported_date' => $date,
-				'last_import_error'  => null,
-			]);
 
-			return ['ok' => true, 'rows' => $total];
+			// Watermark alleen opschuiven als deze dag definitief is. Een te
+			// verse dag mag wél alvast geïmporteerd worden (rijen die er zijn
+			// zijn winst, de upsert ververst ze later), maar hij blijft in de
+			// wachtrij tot hij buiten de achterloop valt.
+			$update = ['last_import_error' => null];
+			// Alleen vooruit: een backfill van oudere dagen mag de watermark
+			// niet terugzetten, anders wordt alles daarna opnieuw opgehaald.
+			$current = $property->last_imported_date?->toDateString();
+			if (self::isFinalDate($date) && ($current === null || $date > $current)) {
+				$update['last_imported_date'] = $date;
+			}
+			$property->update($update);
+
+			return ['ok' => true, 'rows' => $total, 'final' => self::isFinalDate($date)];
 		} catch (Throwable $e) {
 			$this->finishLog($log, 'failed', $total, $e->getMessage());
 			$property->update(['last_import_error' => mb_substr($e->getMessage(), 0, 500)]);

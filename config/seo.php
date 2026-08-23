@@ -28,4 +28,12 @@ return [
         'trim',
         explode(',', (string) env('GSC_OWNER_EMAILS', ''))
     ))),
+
+    /*
+     * Tenant waaronder een nieuw geprovisionde channel-site-property in ons eigen
+     * dashboard (seo_properties) wordt gehangen. Leeg = de tenant van de eerste
+     * bestaande property, wat voor onze eigen sites klopt maar impliciet is; zet
+     * 'm expliciet zodra er meerdere klant-tenants naast elkaar draaien.
+     */
+    'gsc_default_tenant_id' => env('GSC_DEFAULT_TENANT_ID'),
 ];
