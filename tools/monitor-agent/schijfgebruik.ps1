@@ -130,6 +130,24 @@ $duur = [int]((Get-Date) - $begin).TotalSeconds
 function Toon-Gb { param([double]$Bytes) return [math]::Round($Bytes / 1GB, 2) }
 
 Write-Output ("Doorlopen in {0}s: {1} mappen, {2} bestanden." -f $duur, $aantalMappen, $aantalBestanden)
+
+# Zeggen hoeveel van de schijf we NIET verklaren. Op 23-08-2026 telden de
+# mappen op tot ~331 GB terwijl Windows 351 GB in gebruik meldde: 20 GB die je
+# nergens ziet staan. Dat is geen meetfout maar een aanwijzing -- schaduwkopieën
+# (vssadmin list shadowstorage), de MFT, of mappen waar de scan niet in mocht.
+# Zonder deze regel ga je die 20 GB zoeken in de lijst waar hij niet in staat.
+$gemetenBytes = 0
+foreach ($v in $mapTotaal.Values) { $gemetenBytes += [long]$v }
+try {
+    $vol = Get-CimInstance Win32_LogicalDisk -Filter ("DeviceID='{0}'" -f $Schijf.TrimEnd('\')) -ErrorAction Stop
+    if (-not $vol) { throw 'geen volume' }
+    $inGebruik = [long]$vol.Size - [long]$vol.FreeSpace
+    $verschil = $inGebruik - $gemetenBytes
+    Write-Output ("Gemeten {0} GB van de {1} GB die Windows in gebruik meldt -- {2} GB niet toegewezen (schaduwkopieen/MFT/geen toegang), {3} GB vrij." -f (Toon-Gb $gemetenBytes), (Toon-Gb $inGebruik), (Toon-Gb $verschil), (Toon-Gb $vol.FreeSpace))
+} catch {
+    Write-Output ("Gemeten {0} GB (volume-informatie niet op te vragen)." -f (Toon-Gb $gemetenBytes))
+}
+
 Write-Output ''
 Write-Output "== Hoofdmappen van $Schijf =="
 $mapTotaal.GetEnumerator() | Sort-Object Value -Descending | Select-Object -First $Top |

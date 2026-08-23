@@ -44,7 +44,7 @@ kolom Groei over zeven dagen.
 Zonder `-Push` drukt het script alleen af en bewaart het niets.
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Inetpubhostsetergeregeld.com\httpdocs	ools\monitor-agent\schijfgebruik.ps1" -Push
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Inetpub\vhosts\betergeregeld.com\httpdocs\tools\monitor-agent\schijfgebruik.ps1" -Push
 ```
 
 Als dagelijkse taak (eenmalig, als administrator). Bewust 's ochtends en niet
@@ -52,7 +52,7 @@ Als dagelijkse taak (eenmalig, als administrator). Bewust 's ochtends en niet
 tussen 03:00 en 05:00 is die machine al het drukst.
 
 ```powershell
-$actie = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -ExecutionPolicy Bypass -File "C:\Inetpubhostsetergeregeld.com\httpdocs	ools\monitor-agent\schijfgebruik.ps1" -Push'
+$actie = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -ExecutionPolicy Bypass -File "C:\Inetpub\vhosts\betergeregeld.com\httpdocs\tools\monitor-agent\schijfgebruik.ps1" -Push'
 $trigger = New-ScheduledTaskTrigger -Daily -At 08:00
 Register-ScheduledTask -TaskName 'BG-Monitor-Schijf' -Action $actie -Trigger $trigger -User 'SYSTEM' -RunLevel Highest
 ```
@@ -62,7 +62,7 @@ mappen zijn ruis en zouden de tabel vullen zonder iets te vertellen.
 
 ## Gemiste metingen worden nageleverd
 
-Elke meting gaat eerst naar `%ProgramData%\BG-Monitoruffer.jsonl` en wordt
+Elke meting gaat eerst naar `%ProgramData%\BG-Monitor\buffer.jsonl` en wordt
 daarna pas verstuurd. Lukt versturen niet, dan blijft de regel staan en gaat hij
 de volgende ronde alsnog mee -- oudste eerst, zodat de laatste push de actuele
 stand achterlaat in `last_cpu/mem/disk`. Zo is de reeks achteraf compleet, ook
