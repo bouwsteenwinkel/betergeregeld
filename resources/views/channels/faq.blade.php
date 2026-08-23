@@ -12,7 +12,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'Veelgestelde vragen')
+@section('title', $r('Veelgestelde vragen van :trades'))
 @section('description', 'Antwoorden op de vragen die ' . ($t['trades'] ?? 'ondernemers') . ' stellen over een website, webshop of slimme tools voor hun bedrijf.')
 
 @push('head')
@@ -24,7 +24,7 @@
     <section class="hero hero--slim">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Vragen</span>
-            <h1>Veelgestelde vragen</h1>
+            <h1>{{ $r('Veelgestelde vragen van :trades') }}</h1>
             <p class="lead" style="max-width:56ch">Geen kleine lettertjes. Hieronder de eerlijke antwoorden op wat {{ $t['trades'] ?? 'ondernemers' }} het vaakst vragen.</p>
         </div>
     </section>

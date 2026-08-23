@@ -2,11 +2,16 @@
     /** @var \App\Support\ChannelSite $site */
     $p        = (array) config('channel_pricing', []);
     $packages = (array) ($p['packages'] ?? []);
+    // Branche-tokens (zelfde bron als de plaatsen-content), zodat deze pagina in de
+    // taal van de ondernemer staat i.p.v. op alle 17 sites woordelijk gelijk te zijn.
+    $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
+    $map = [':trades' => $t['trades'] ?? 'bedrijven', ':trade' => $t['trade'] ?? 'bedrijf', ':niches' => $t['niches'] ?? 'diensten', ':niche' => $t['niche'] ?? 'vak', ':service' => $t['service'] ?? 'website'];
+    $r = fn ($s) => strtr((string) $s, $map);
 @endphp
 @extends('channels.layout')
 
-@section('title', $p['h1'] ?? 'Prijzen')
-@section('description', $p['intro'] ?? 'Duidelijke richtprijzen en pakketten. Vooraf een vaste prijs en een gratis voorbeeld van jouw bedrijf.')
+@section('title', $r($p['h1'] ?? 'Wat kost een website voor :trades?'))
+@section('description', $r($p['intro'] ?? 'Duidelijke richtprijzen en pakketten voor :trades. Vooraf een vaste prijs en een gratis voorbeeld.'))
 
 @section('content')
     @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Prijzen']]])
@@ -14,8 +19,8 @@
     <section class="hero">
         <div class="wrap">
             <span class="eyebrow">{{ $p['eyebrow'] ?? 'Prijzen' }}</span>
-            <h1>{{ $p['h1'] ?? 'Duidelijke prijzen, geen verrassingen' }}</h1>
-            @if (!empty($p['intro']))<p class="lead" style="max-width:58ch">{{ $p['intro'] }}</p>@endif
+            <h1>{{ $r($p['h1'] ?? 'Wat kost een website voor :trades?') }}</h1>
+            @if (!empty($p['intro']))<p class="lead" style="max-width:58ch">{{ $r($p['intro']) }}</p>@endif
         </div>
     </section>
 

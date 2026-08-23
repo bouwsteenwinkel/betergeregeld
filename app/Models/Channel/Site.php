@@ -184,6 +184,37 @@ class Site extends Model
     }
 
     /** Bouwt de render-wrapper (incl. blokken) die de channel-views gebruiken. */
+    /**
+     * Voegt de plaatsen-tokens van de branche en de site samen. Eén niveau diep
+     * mergen volstaat niet: 'business' is zelf een blok (label/intro/query/limit)
+     * dat een site gedeeltelijk mag overschrijven zonder de rest te verliezen.
+     *
+     * @param  array<string,mixed>  $branche
+     * @param  array<string,mixed>  $site
+     * @return array<string,mixed>
+     */
+    private function mergePlaces(array $branche, array $site): array
+    {
+        $out = array_merge($branche, $site);
+
+        // Lege waarden uit de site-meta mogen een gevulde branche-waarde niet
+        // wegdrukken: een leeg admin-veld betekent "niet ingevuld", niet "wis dit".
+        foreach ($site as $key => $value) {
+            if ($value === null || $value === '' || $value === []) {
+                $out[$key] = $branche[$key] ?? $value;
+            }
+        }
+
+        if (is_array($branche['business'] ?? null) || is_array($site['business'] ?? null)) {
+            $out['business'] = array_merge(
+                (array) ($branche['business'] ?? []),
+                array_filter((array) ($site['business'] ?? []), fn ($v) => $v !== null && $v !== '' && $v !== []),
+            );
+        }
+
+        return $out;
+    }
+
     public function toChannelSite(): ChannelSite
     {
         $cfg = [
@@ -200,9 +231,17 @@ class Site extends Model
             'meta'    => (array) $this->meta,
             'header'  => (array) $this->header,
             'view'    => $this->legacy_view,
-            // Plaatsen-SEO-config (kop + per-stad sjabloonteksten) uit de site-meta,
-            // zodat blok-gedreven DB-sites óók niche-specifieke plaatspagina's hebben.
-            'places'  => (array) (($this->meta['places'] ?? []) ?: []),
+            // Plaatsen-SEO-config (branche-tokens + per-stad sjabloonteksten).
+            // Cascade zoals bij 'theme' hierboven: de branche levert de basis
+            // (trade/trades/niche/niches/service + business-blok), de site-meta
+            // overschrijft per token. Zonder deze cascade viel élke site terug op
+            // de defaults uit config/channel_places.php (trade=bedrijf, niche=vak),
+            // waardoor alle channel-sites woordelijk dezelfde plaatspagina's
+            // publiceerden — 98-99% identieke tekst, gemeten 23-08-2026.
+            'places'  => $this->mergePlaces(
+                (array) ($this->branche?->places ?? []),
+                (array) (($this->meta['places'] ?? []) ?: []),
+            ),
         ];
 
         return new ChannelSite($this->key, $cfg, $this->relationLoaded('blocks') ? $this->blocks : null);

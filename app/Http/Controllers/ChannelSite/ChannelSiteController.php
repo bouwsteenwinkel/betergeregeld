@@ -232,7 +232,7 @@ class ChannelSiteController extends Controller
 
         // Unieke, branche-gerichte content (variatie-engine) voor deze plaats.
         $tokens  = (array) $site->get('places', []);
-        $content = app(\App\Services\ChannelSites\ChannelPlaceContent::class)->assemble($tokens, $data);
+        $content = app(\App\Services\ChannelSites\ChannelPlaceContent::class)->assemble($tokens, $data, $site->key . '|');
 
         // Branche-tokens (niet plaats) alvast in de bedrijven-config invullen.
         $business = array_merge((array) config('channel_places.business', []), (array) ($tokens['business'] ?? []));

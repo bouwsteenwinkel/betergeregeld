@@ -16,7 +16,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'Zelf een website bouwen of laten maken?')
+@section('title', 'Zelf een website bouwen of laten maken voor ' . ($t['trades'] ?? 'ondernemers') . '?')
 @section('description', 'Zelf bouwen met een website-bouwer of je website laten maken? Een eerlijke vergelijking voor je ' . $trade . '.')
 
 @section('content')
@@ -24,7 +24,7 @@
     <section class="hero">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Vergelijken</span>
-            <h1>Zelf bouwen of laten maken?</h1>
+            <h1>Zelf bouwen of laten maken voor {{ $t['trades'] ?? 'ondernemers' }}?</h1>
             <p class="lead" style="max-width:60ch">Je kunt zelf een site in elkaar zetten met een website-bouwer, of het laten doen. Beide kan. Hieronder een eerlijke vergelijking, zodat je weet wat bij jou past.</p>
         </div>
     </section>

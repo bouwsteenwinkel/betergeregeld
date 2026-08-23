@@ -11,8 +11,8 @@
 
 return [
     'eyebrow' => 'Onze diensten',
-    'h1'      => 'Wat we voor je bouwen, van website tot slimme AI',
-    'intro'   => 'We leveren niet zomaar een website. We zorgen dat je online gevonden wordt, dat klanten je makkelijk kunnen bereiken en dat je minder tijd kwijt bent aan administratie. Je begint waar je nu staat en breidt uit wanneer je eraan toe bent. Hieronder lees je precies wat elke stap inhoudt en wat je eraan hebt.',
+    'h1'      => 'Wat we bouwen voor :trades, van website tot slimme AI',
+    'intro'   => 'We leveren niet zomaar een website. We bouwen voor :trades en zorgen dat je online gevonden wordt, dat klanten je makkelijk kunnen bereiken en dat je minder tijd kwijt bent aan administratie. Je begint waar je nu staat en breidt uit wanneer je eraan toe bent. Hieronder lees je precies wat elke stap inhoudt en wat je eraan hebt.',
 
     'services' => [
 
@@ -52,7 +52,7 @@ return [
             'label'   => 'Klantenportaal',
             'icon'    => 'lock',
             'tagline' => 'Laat klanten hun eigen zaken online regelen.',
-            'intro'   => 'Een klantenportaal is een beveiligde omgeving waar je klanten zelf hun afspraken, offertes, facturen en de status van hun project kunnen bekijken. Dat scheelt jou een hoop telefoontjes en mailtjes, en je klant weet altijd waar hij aan toe is.',
+            'intro'   => 'Een klantenportaal is een beveiligde omgeving waar klanten zelf hun afspraken, offertes, facturen en de status van hun project kunnen bekijken. Dat scheelt jou een hoop telefoontjes en mailtjes, en je klant weet altijd waar hij aan toe is.',
             'bullets' => [
                 'Een eigen, beveiligde inlog voor elke klant',
                 'Afspraken en planning zelf inzien',
@@ -68,7 +68,7 @@ return [
             'label'   => 'Automatisering',
             'icon'    => 'gear',
             'tagline' => 'Laat terugkerende klussen zichzelf doen.',
-            'intro'   => 'Veel tijd gaat op aan steeds dezelfde handelingen: offertes typen, facturen sturen, afspraken inplannen, herinneringen versturen. We automatiseren die stappen en koppelen ze aan je agenda en boekhouding. Zo verdwijnt een groot deel van je administratie naar de achtergrond, zonder dat er iets tussen wal en schip valt.',
+            'intro'   => 'Bij :trades gaat veel tijd op aan steeds dezelfde handelingen: offertes typen, facturen sturen, afspraken inplannen, herinneringen versturen. We automatiseren die stappen en koppelen ze aan je agenda en boekhouding. Zo verdwijnt een groot deel van je administratie naar de achtergrond, zonder dat er iets tussen wal en schip valt.',
             'bullets' => [
                 'Offertes en facturen die automatisch de deur uit gaan',
                 'Herinneringen en bevestigingen zonder erover na te denken',
@@ -84,7 +84,7 @@ return [
             'label'   => 'AI',
             'icon'    => 'spark',
             'tagline' => 'Een slimme assistent die met je meewerkt.',
-            'intro'   => 'Met AI voegen we slimme hulp toe die je tijd en aandacht bespaart. Denk aan een assistent die de eerste vragen van klanten beantwoordt, je offertes helpt voorbereiden of je telefoon en chat aanneemt als je aan het werk bent. Volledig afgestemd op jouw manier van werken, en jij houdt altijd de controle.',
+            'intro'   => 'Met AI voegen we slimme hulp toe die je tijd en aandacht bespaart. Denk aan een assistent die de eerste vragen van klanten beantwoordt, je offertes helpt voorbereiden of je telefoon en chat aanneemt als je aan het werk bent. Volledig afgestemd op hoe het er bij :trades aan toegaat, en jij houdt altijd de controle.',
             'bullets' => [
                 'Een chat die klantvragen direct beantwoordt',
                 'Telefoon en berichten aannemen als je niet kunt opnemen',

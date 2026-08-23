@@ -51,7 +51,8 @@
 	{!! json_encode([
 		"\x40context" => 'https://schema.org',
 		"\x40type"    => 'Service',
-		'name'        => $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)),
+		{{-- Zelfde kop als de H1, anders belooft het schema iets anders dan de pagina. --}}
+		'name'        => $c['h1'] ?? $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)),
 		'serviceType' => $service,
 		'areaServed'  => ["\x40type" => 'City', 'name' => $placeName],
 		'provider'    => ["\x40id" => $site->url('') . '#org'],
@@ -76,8 +77,11 @@
 	<section class="hero">
 		<div class="wrap">
 			{{-- Geen eyebrow-pill (afspraak). --}}
-			<h1>{{ $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)) }}</h1>
-			<p class="lead" style="max-width:58ch">{{ $site->placeIntro($placeSlug, $placeName) }}</p>
+			{{-- H1/lead uit de variatie-engine ($c): die is branche- én plaatsgericht
+			     ("Badkamerbedrijf in Utrecht? Word online gevonden"). De oude
+			     city_h1-fallback gaf op alle 17 sites dezelfde kop. --}}
+			<h1>{{ $c['h1'] ?? $repl($pl['city_h1'] ?? ('Website laten maken in ' . $placeName)) }}</h1>
+			<p class="lead" style="max-width:58ch">{{ $site->placeIntro($placeSlug, $placeName) ?: ($c['hero_lead'] ?? '') }}</p>
 			<a href="#contact" class="btn">Gratis voorbeeld in {{ $placeName }}</a>
 		</div>
 	</section>
@@ -90,22 +94,85 @@
 		</section>
 	@endif
 
-	{{-- Echte lokale bedrijven in de regio (Google Places) — branche-gerichte info. --}}
+	{{-- Echte lokale bedrijven in de regio (Google Places) — branche-gerichte info.
+	     Dit blok lúisterde eerst wel naar $biz maar toonde de generieke
+	     site-features, met een bronvermelding zonder bron. De opgehaalde
+	     bedrijven zijn juist het enige wat deze pagina echt uniek maakt én de
+	     directe aanleiding voor de pitch: "sta jij hier tussen?" --}}
 	@if ($biz)
 		<section style="background:var(--c-surface)">
 			<div class="wrap">
-				<h2>Wat je krijgt in {{ $placeName }}</h2>
+				<h2>{{ $business['label'] ?? ($pl['trades'] ?? 'Bedrijven') . ' in ' . $placeName }}</h2>
+				@if (!empty($business['intro']))
+					<p class="muted" style="max-width:70ch;margin-top:.6rem">{{ $business['intro'] }}</p>
+				@endif
+
+				{{-- Marktbeeld, gerekend uit de échte listings. Uniek per plaats én per
+				     branche omdat het uit de cijfers van díe combinatie volgt — geen
+				     sjabloonzin die op 1.195 plaatsen hetzelfde is. --}}
+				@php
+					$mRatings = array_values(array_filter(array_map(fn ($b) => $b['rating'] ?? null, $biz)));
+					$mReviews = array_sum(array_map(fn ($b) => (int) ($b['reviews'] ?? 0), $biz));
+					$mGem     = $mRatings ? array_sum($mRatings) / count($mRatings) : null;
+					$mTop     = null;
+					foreach ($biz as $b) {
+						if (($b['rating'] ?? 0) && (! $mTop || $b['rating'] > $mTop['rating'])) { $mTop = $b; }
+					}
+				@endphp
+				@if ($mGem)
+					<p style="max-width:70ch;margin-top:.9rem">
+						In {{ $placeName }} en omgeving vonden we {{ count($biz) }}
+						{{ $pl['trades'] ?? 'bedrijven' }}, samen goed voor
+						{{ number_format($mReviews, 0, ',', '.') }} beoordelingen met een gemiddelde van
+						{{ number_format($mGem, 1, ',', '') }}.
+						@if ($mTop)
+							De hoogst gewaardeerde is {{ $mTop['name'] }} ({{ number_format((float) $mTop['rating'], 1, ',', '') }}).
+						@endif
+						Dat is het gezelschap waarin een klant uit {{ $placeName }} jou vergelijkt.
+					</p>
+				@endif
 				<div class="grid cols-4" style="margin-top:1.4rem">
-					@foreach (($h['features'] ?? []) as $f)
+					@foreach ($biz as $b)
 						<div class="card">
-							{{-- Altijd inline-SVG (nooit emoji). --}}
-							<div style="color:var(--c-primary);margin-bottom:.5rem">@include('channels.partials.icon', ['name' => $f['icon'] ?? 'check'])</div>
-							<h3>{{ $f['title'] }}</h3>
-							<p class="muted" style="font-size:.95rem">{{ $f['text'] }}</p>
+							<h3 style="font-size:1rem">{{ $b['name'] ?? '' }}</h3>
+							@if (!empty($b['address']))
+								<p class="muted" style="font-size:.9rem">{{ $b['address'] }}</p>
+							@endif
+							@if (!empty($b['rating']))
+								<p class="muted" style="font-size:.85rem">
+									{{ number_format((float) $b['rating'], 1, ',', '') }}★
+									@if (!empty($b['reviews'])) · {{ $b['reviews'] }} reviews @endif
+								</p>
+							@endif
 						</div>
 					@endforeach
 				</div>
 				<p class="muted" style="font-size:.8rem;margin-top:1rem">Bron: openbare Google-bedrijfsgegevens. Staat jouw bedrijf hier en wil je online opvallen? <a href="#contact" style="color:var(--c-cta);font-weight:600">Vraag een gratis voorbeeld aan</a>.</p>
+			</div>
+		</section>
+	@endif
+
+	{{-- Echte feiten over deze plaats (channel_place_facts): gemeente, provincie,
+	     inwoners en de werkelijke buurplaatsen. Stond al klaar in de controller
+	     maar werd door geen enkele view gebruikt. --}}
+	@if (!empty($facts))
+		<section>
+			<div class="wrap" style="max-width:760px">
+				<h2>{{ $placeName }} in het kort</h2>
+				<div class="grid cols-4" style="margin-top:1.2rem">
+					@if (!empty($facts['gemeente']))
+						<div class="card"><h3 style="font-size:.85rem" class="muted">Gemeente</h3><p>{{ $facts['gemeente'] }}</p></div>
+					@endif
+					@if (!empty($facts['provincie']))
+						<div class="card"><h3 style="font-size:.85rem" class="muted">Provincie</h3><p>{{ $facts['provincie'] }}</p></div>
+					@endif
+					@if (!empty($facts['inwoners']))
+						<div class="card"><h3 style="font-size:.85rem" class="muted">Inwoners</h3><p>{{ number_format($facts['inwoners'], 0, ',', '.') }}</p></div>
+					@endif
+					@if (!empty($facts['afstand_km']))
+						<div class="card"><h3 style="font-size:.85rem" class="muted">Afstand tot ons</h3><p>{{ $facts['afstand_km'] }} km</p></div>
+					@endif
+				</div>
 			</div>
 		</section>
 	@endif

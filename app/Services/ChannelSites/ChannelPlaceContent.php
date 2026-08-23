@@ -15,9 +15,14 @@ class ChannelPlaceContent
     /**
      * @param array<string,mixed> $tokens branche.places (trade/trades/niche/niches/service, ...)
      * @param array<string,mixed> $place  ['slug','naam','provincie','context']
+     * De $seed onderscheidt sites onderling: zonder seed hasht de variantkeuze
+     * alleen op de plaatsslug, waardoor álle channel-sites voor dezelfde plaats
+     * exact dezelfde variant kozen. De pagina's varieerden dus wél per plaats,
+     * maar niet per site — 98% identieke tekst tussen de kanalen (23-08-2026).
+     *
      * @return array<string,mixed>  ingevulde blokken (meta_title, h1, hero_lead, intro, wie, trust, cta, cta_title, faq)
      */
-    public function assemble(array $tokens, array $place): array
+    public function assemble(array $tokens, array $place, string $seed = ''): array
     {
         $cfg      = (array) config('channel_places', []);
         $defaults = (array) ($cfg['defaults'] ?? []);
@@ -48,12 +53,27 @@ class ChannelPlaceContent
         foreach ($variants as $slot => $set) {
             $offset++;
             if ($slot === 'faq') {
-                $out['faq'] = $this->faq($this->faqSet((array) $set, $slug, $offset), $repl);
+                $out['faq'] = $this->faq($this->faqSet((array) $set, $seed . $slug, $offset), $repl);
                 continue;
             }
-            $out[$slot] = $repl($this->pick((array) $set, $slug, $offset));
+            $out[$slot] = $this->zinBeginKapitaal($repl($this->pick((array) $set, $seed . $slug, $offset)));
         }
         return $out;
+    }
+
+    /**
+     * Hoofdletter aan het begin van de zin. De varianten beginnen vaak met een
+     * token (:trade, :service) en die zijn per definitie kleingeschreven, dus
+     * zonder dit levert de engine koppen als "badkamerbedrijf in Utrecht?" op.
+     * mb_-functies: branche-tokens kunnen accenten bevatten (diëtist).
+     */
+    private function zinBeginKapitaal(string $tekst): string
+    {
+        if ($tekst === '') {
+            return $tekst;
+        }
+
+        return mb_strtoupper(mb_substr($tekst, 0, 1)) . mb_substr($tekst, 1);
     }
 
     /** Deterministische keuze uit een variantset o.b.v. slug + slot-offset. */

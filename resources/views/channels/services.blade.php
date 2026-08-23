@@ -10,7 +10,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'Diensten: website, webshop, portaal, automatisering en AI')
+@section('title', $r('Wat we bouwen voor :trades: website, webshop, portaal, automatisering en AI'))
 @section('description', $r($cfg['intro'] ?? 'Alles wat we voor je bouwen, van een professionele website tot slimme automatisering en AI.'))
 
 @push('head')

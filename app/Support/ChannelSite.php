@@ -689,6 +689,35 @@ class ChannelSite
         return preg_match('#^https?://#', $img) ? $img : asset(ltrim($img, '/'));
     }
 
+    /**
+     * Titel voor een productlandings-pagina (/website, /automatisering, ...).
+     *
+     * De landingsviews zetten er een achtervoegsel achter ("voor je badkamerbedrijf")
+     * omdat de fallback-titel alleen het facet-label is ("Website"). Maar zodra er een
+     * echte hero-titel is, staat de branche daar al in — en dan leverde dat koppen op
+     * als "Minder papierwerk in je badkamerbedrijf voor je badkamerbedrijf" (gemeten op
+     * de live sites, 23-08-2026). Deze helper plakt het achtervoegsel er alleen achter
+     * als het brancheword nog niet in de titel voorkomt.
+     */
+    public function landingTitle(?string $titel, string $fallbackLabel, string $achtervoegsel): string
+    {
+        $basis         = trim((string) ($titel ?: $fallbackLabel));
+        $achtervoegsel = trim($achtervoegsel);
+
+        if ($basis === '' || $achtervoegsel === '') {
+            return $basis !== '' ? $basis : $achtervoegsel;
+        }
+
+        // Kernwoord uit het achtervoegsel: "voor je badkamerbedrijf" → "badkamerbedrijf".
+        $kern = trim(preg_replace('/^voor\s+(je|jouw|een|uw)?\s*/iu', '', $achtervoegsel));
+
+        if ($kern !== '' && mb_stripos($basis, $kern) !== false) {
+            return $basis;
+        }
+
+        return $basis . ' ' . $achtervoegsel;
+    }
+
     public function homeTitle(): string
     {
         return (string) ($this->cfg['meta']['home_title'] ?? $this->name());

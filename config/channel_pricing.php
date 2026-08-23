@@ -11,8 +11,8 @@
 
 return [
     'eyebrow' => 'Prijzen',
-    'h1'      => 'Duidelijke prijzen, geen verrassingen',
-    'intro'   => 'Je begint waar je nu staat en breidt uit wanneer je eraan toe bent, precies zoals de Groeidiamant werkt. Hieronder de richtprijzen per pakket. Je krijgt altijd vooraf een vaste prijs op maat, en een gratis voorbeeld van jouw bedrijf om te zien wat je krijgt.',
+    'h1'      => 'Wat kost een website voor :trades?',
+    'intro'   => 'Je begint waar je nu staat en breidt uit wanneer je eraan toe bent, precies zoals de Groeidiamant werkt. Hieronder de richtprijzen per pakket. Je krijgt altijd vooraf een vaste prijs op maat, en een gratis voorbeeld van jouw eigen bedrijf om te zien wat je krijgt.',
     'note'    => 'Alle prijzen zijn indicatief en exclusief btw. Geen lange contracten, maandelijks opzegbaar. De exacte prijs krijg je vooraf, zonder verrassingen achteraf.',
 
     'packages' => [

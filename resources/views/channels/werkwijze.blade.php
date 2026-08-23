@@ -18,7 +18,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'Onze werkwijze')
+@section('title', 'Zo werken we voor ' . ($t['trades'] ?? 'ondernemers'))
 @section('description', 'Van gratis voorbeeld tot een website die voor je werkt. Zo pakken we het aan voor je ' . $trade . ', zonder technisch gedoe.')
 
 @section('content')
@@ -26,7 +26,7 @@
     <section class="hero">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Zo werkt het</span>
-            <h1>Van gratis voorbeeld tot een site die voor je werkt</h1>
+            <h1>Van gratis voorbeeld tot een site die voor {{ $t['trades'] ?? 'ondernemers' }} werkt</h1>
             <p class="lead" style="max-width:58ch">Geen technisch gedoe en geen dure alles-of-niets-projecten. In een paar duidelijke stappen sta je online, met een aanpak die met je meegroeit.</p>
             <a href="#contact" class="btn">Gratis voorbeeld aanvragen</a>
         </div>

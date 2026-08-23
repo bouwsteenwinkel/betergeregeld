@@ -56,7 +56,14 @@ return [
     // Eén getal om aan te draaien. Blijft de bak "Gevonden, niet geïndexeerd" over een
     // paar maanden groot, dan hoger; komen de plaatspagina's juist goed door, dan lager.
     // Zet op 0 om de grens helemaal uit te zetten.
-    'index_min_addresses' => 4000,
+    //
+    // 23-08-2026 verhoogd van 4.000 naar 10.000 op basis van gemeten trefkans: van de
+    // plaatsen onder 2.000 adressen kreeg 11% ooit een impressie, tussen 10.000-25.000
+    // is dat 41% en daarboven 57%. De lange staart leverde dus vooral duplicaat-massa
+    // op (208 van de 271 sitemap-URL's waren plaatspagina's) zonder ooit een klik: over
+    // juli+augustus 0 klikken op 3.600+ impressies uit plaatspagina's. Het zwaartepunt
+    // hoort bij de ondernemer-pagina's (/website, /automatisering, ...) te liggen.
+    'index_min_addresses' => 10000,
 
     // Fallback-tokens als een branche (nog) geen eigen waarden heeft.
     'defaults' => [
@@ -89,14 +96,14 @@ return [
     'variants' => [
 
         'meta_title' => [
-            ':service voor je :trade in :city',
+            ':service voor :trades in :city',
             ':trade in :city online laten groeien',
-            'Meer aanvragen voor je :trade in :city',
-            ':service laten maken voor je :trade in :city',
-            'Online groeien met je :trade in :city',
+            'Meer aanvragen voor :trades in :city',
+            ':service laten maken voor :trades in :city',
+            'Online groeien als :trade in :city',
             ':trade in :city: gevonden worden in Google',
             ':service voor :trades in :city en omgeving',
-            'Nieuwe klanten voor je :trade in :city',
+            'Nieuwe klanten voor :trades in :city',
         ],
 
         'meta_description' => [
@@ -111,12 +118,12 @@ return [
         ],
 
         'h1' => [
-            ':service voor je :trade in :city',
+            ':service voor :trades in :city',
             ':trade in :city? Word online gevonden',
-            'Online groeien met je :trade in :city',
-            'Meer aanvragen voor je :trade in :city',
-            'Gevonden worden in :city met je :trade',
-            'Je :trade in :city online op de kaart',
+            'Online groeien als :trade in :city',
+            'Meer aanvragen voor :trades in :city',
+            'Gevonden worden in :city als :trade',
+            ':trades in :city online op de kaart',
             ':service voor :trades in :city en omgeving',
         ],
 

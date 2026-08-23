@@ -14,7 +14,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', ($hero['title'] ?? $fLabel) . ' voor je vechtsportschool')
+@section('title', $site->landingTitle($hero['title'] ?? null, $fLabel, 'voor je vechtsportschool'))
 @section('description', $hero['sub'] ?? '')
 
 @section('content')
