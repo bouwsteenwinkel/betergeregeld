@@ -30,6 +30,21 @@ $facetKeys = implode('|', array_keys((array) config('groeidiamant.facets', [])))
 $channelRoutes = function () use ($facetKeys) {
     Route::get('/', [ChannelSiteController::class, 'home']);
 
+    // /nl toont dezelfde homepage. Reparatie voor een fout van 24-08-2026:
+    // tussen 17:10 en 18:30 stuurde een IIS-regel op deze codebase / naar /nl
+    // met een PERMANENTE omleiding, ook op de channel-domeinen -- en daar
+    // bestaat geen taalvoorvoegsel. De regel is meteen gescoped op het
+    // hoofddomein (zie public/web.config), maar dat repareert de bezoekers
+    // niet: een browser bewaart een 301 en vraagt het de server nooit meer.
+    // Wie in dat venster langskwam, komt sindsdien op een 404 uit.
+    //
+    // BEWUST GEEN OMLEIDING TERUG. De browser heeft / -> /nl in het geheugen;
+    // stuurt /nl dan terug naar /, dan pakt hij opnieuw zijn eigen cache en
+    // loopt hij in een kring. De pagina gewoon tonen is de enige uitweg die
+    // geen lus maakt. De canonical wijst naar het kale adres, dus voor
+    // zoekmachines blijft / het enige adres van de homepage.
+    Route::get('/nl', [ChannelSiteController::class, 'home']);
+
     // First-party event-beacon (funnel-triggers → eigen DB, zie ChannelEventController).
     // Ruime throttle: sendBeacon vuurt per funnel-stap, niet per klik.
     Route::post('/_ev', [ChannelEventController::class, 'store'])->middleware('throttle:120,1');
