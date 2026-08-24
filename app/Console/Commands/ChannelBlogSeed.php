@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 /**
  * Publiceert de handgeschreven, niche-specifieke blog-artikelen uit
- * config/blog_{channel}.php als blog_posts voor die channel-site. Idempotent
+ * resources/blog/{channel}.php als blog_posts voor die channel-site. Idempotent
  * (bestaande (channel, slug) worden bijgewerkt). Publicatiedata worden gespreid
  * over een langere periode, zodat het een natuurlijke blog-historie oogt.
  *
@@ -19,7 +19,7 @@ use Illuminate\Console\Command;
 class ChannelBlogSeed extends Command
 {
     protected $signature = 'channel:blog:seed {channel : channel-key} {--force}';
-    protected $description = 'Handgeschreven blog-artikelen (config/blog_{channel}.php) publiceren voor een channel-site';
+    protected $description = 'Handgeschreven blog-artikelen (resources/blog/{channel}.php) publiceren voor een channel-site';
 
     public function handle(ChannelSiteResolver $resolver): int
     {
@@ -30,9 +30,18 @@ class ChannelBlogSeed extends Command
             return self::FAILURE;
         }
 
-        $articles = (array) config("blog_{$key}", []);
+        // Bewust NIET via config(): elk bestand in config/ wordt door
+        // config:cache in een enkele bootstrap/cache/config.php gebakken die
+        // Laravel bij ELK verzoek inleest. Deze zeventien artikelensets waren
+        // samen 2,42 MB en werden alleen hier gebruikt, in een console-
+        // commando dat ze naar blog_posts schrijft. De site leest ze daarna uit
+        // de database. Ze zaten dus voor niets in het geheugen van elke
+        // bezoeker. Gemeten op 24-08-2026: config.php was 6,3 MB, waar een
+        // normale Laravel config-cache 50 tot 100 KB is.
+        $pad      = resource_path("blog/{$key}.php");
+        $articles = is_file($pad) ? (array) require $pad : [];
         if (! $articles) {
-            $this->error("Geen artikelen in config/blog_{$key}.php. Gebruik `channel:blog:generate {$key}` voor AI-content.");
+            $this->error("Geen artikelen in resources/blog/{$key}.php. Gebruik `channel:blog:generate {$key}` voor AI-content.");
             return self::FAILURE;
         }
 
