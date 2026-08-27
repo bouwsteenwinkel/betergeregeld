@@ -33,6 +33,20 @@ return [
 	'disk_warn' => (int) env('MONITOR_DISK_WARN', 90),
 
 	/*
+	 * Ondergrens in VRIJE GIGABYTES, naast het percentage hierboven.
+	 *
+	 * Een percentage zegt niets over wat een backup nodig heeft. De Plesk-backup op de
+	 * productie-VPS eist 97,79 GB vrij; op een schijf van 399,5 GB is dat bereikt bij 75%
+	 * gebruik. Met disk_warn op 90% (= 40 GB vrij) gaat het alarm dus pas af als er al weken
+	 * geen backup meer gemaakt is. Gemeten 27-08-2026: de Plesk-backup faalde die ochtend met
+	 * "At least 97.79 GB free space is required (44.65 GB is available)", en de schijf zat toen
+	 * al sinds begin augustus boven die grens.
+	 *
+	 * Op 0 zetten schakelt deze controle uit; dan telt alleen het percentage weer.
+	 */
+	'disk_free_min_gb' => (int) env('MONITOR_DISK_FREE_MIN_GB', 100),
+
+	/*
 	 * How long raw metric samples are kept (days). A scheduled prune trims older
 	 * rows so the time-series table stays bounded.
 	 */

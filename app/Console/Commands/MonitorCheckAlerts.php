@@ -543,23 +543,29 @@ Gemeten over de laatste " . (int) config('monitor.trend_lookback_days', 14)
 	{
 		$lastSeen = $server->agent_last_seen_at?->diffForHumans() ?? 'nooit';
 		$disk = $server->last_disk_percent !== null ? "{$server->last_disk_percent}%" : 'onbekend';
+		// De vrije ruimte erbij: een percentage zegt niets over of er nog een backup in past. De
+		// Plesk-backup op deze machine eist 97,79 GB vrij, dus "86% gebruikt" leest geruststellend
+		// terwijl de backup al weken faalt.
+		$vrij = $server->vrijeSchijfGb();
+		$vrijTekst = $vrij !== null ? "{$vrij} GB vrij" : 'vrije ruimte onbekend';
 		$url = route('filament.admin.resources.monitor-servers.index');
 
 		if ($condition === 'ok') {
 			$subject = "[Monitoring] HERSTELD: {$server->name}";
 			$body = "Server '{$server->name}' is weer normaal (was: {$previous}).\n\n"
-				. "Laatste contact: {$lastSeen}\nSchijfgebruik: {$disk}\n\n{$url}";
+				. "Laatste contact: {$lastSeen}\nSchijfgebruik: {$disk} ({$vrijTekst})\n\n{$url}";
 
 			return [$subject, $body];
 		}
 
 		$reden = $condition === 'offline'
 			? "De server stuurt geen heartbeat meer (laatste contact: {$lastSeen})."
-			: "De systeemschijf zit vol: {$disk} gebruikt.";
+			: "De systeemschijf loopt vol: {$disk} gebruikt, {$vrijTekst}. "
+				. 'De Plesk-backup heeft 97,79 GB vrij nodig en slaat over zodra er minder is.';
 
 		$subject = "[Monitoring] ALERT: {$server->name} — " . ($condition === 'offline' ? 'OFFLINE' : 'SCHIJF VOL');
 		$body = "Server '{$server->name}' ({$server->ip_address}) heeft een probleem.\n\n"
-			. "{$reden}\n\nLaatste contact: {$lastSeen}\nSchijfgebruik: {$disk}\n\nBekijk: {$url}";
+			. "{$reden}\n\nLaatste contact: {$lastSeen}\nSchijfgebruik: {$disk} ({$vrijTekst})\n\nBekijk: {$url}";
 
 		return [$subject, $body];
 	}

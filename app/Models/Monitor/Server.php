@@ -144,7 +144,37 @@ class Server extends Model
 			return 'disk';
 		}
 
+		// Naast het percentage een ondergrens in vrije gigabytes. Een percentage zegt niets over
+		// wat een backup nodig heeft: de Plesk-backup op deze machine eist 97,79 GB vrij, en op een
+		// schijf van 399,5 GB is dat al bereikt bij 75% gebruik. Met disk_warn op 90% ging het
+		// alarm dus pas af als er allang geen backup meer gemaakt werd — gemeten 27-08-2026, toen
+		// Plesk faalde met "At least 97.79 GB free space is required (44.65 GB is available)".
+		if ($this->vrijeSchijfGb() !== null && $this->vrijeSchijfGb() < (int) config('monitor.disk_free_min_gb')) {
+			return 'disk';
+		}
+
 		return 'ok';
+	}
+
+	/**
+	 * Vrije schijfruimte in GB volgens het laatste agent-monster, of null als dat er niet is.
+	 *
+	 * De server-rij bewaart alleen `last_disk_percent`; totaal en gebruikt staan per monster in
+	 * monitor_metrics. Eén rij ophalen is genoeg en dat is precies wat de alarmcontrole nodig heeft.
+	 */
+	public function vrijeSchijfGb(): ?float
+	{
+		$laatste = $this->metrics()
+			->whereNotNull('disk_total_gb')
+			->whereNotNull('disk_used_gb')
+			->orderByDesc('collected_at')
+			->first(['disk_total_gb', 'disk_used_gb']);
+
+		if (! $laatste) {
+			return null;
+		}
+
+		return round((float) $laatste->disk_total_gb - (float) $laatste->disk_used_gb, 1);
 	}
 
 	/**
