@@ -191,18 +191,31 @@ class ChannelSite
             return (string) $map[$bk];
         }
 
-        // 3) meervoud van de nette branche-naam per niche ("Badkamerspecialist").
+        // 3) het meervoud dat al in de branche-tokens staat.
+        //
+        // Dat is met de hand nagelopen; pluralizeNl() hieronder is een gok, en
+        // die zat op 05-09-2026 bij 37 van de 204 branches mis. Zichtbaar
+        // gevolg: "Afgestemd op klusbedrijfen" in de pitch-strip, op elke
+        // pagina van jouw-klusbedrijf-website.nl. Het Nederlands kent te veel
+        // uitzonderingen (bedrijf → bedrijven, huis → huizen) en de leenwoorden
+        // helemaal (escape room, consultant, camping), dus beter geraden wordt
+        // het niet. Er ís goede data — gebruik die.
+        if ($trades = $this->get('places.trades')) {
+            return mb_strtolower(trim((string) $trades));
+        }
+
+        // 4) meervoud van de nette branche-naam per niche ("Badkamerspecialist").
         if ($base = ($this->cfg['branche_name'] ?? null)) {
             return self::pluralizeNl(mb_strtolower(trim((string) $base)));
         }
 
-        // 4) groeps-fallback op lead-branche (config-kanalen zonder branche-naam).
+        // 5) groeps-fallback op lead-branche (config-kanalen zonder branche-naam).
         $b = $this->branche();
         if ($b !== '' && isset($map[$b])) {
             return (string) $map[$b];
         }
 
-        // 5) laatste redmiddel: meervoud van de key.
+        // 6) laatste redmiddel: meervoud van de key.
         return self::pluralizeNl(mb_strtolower(str_replace(['-', '_'], ' ', (string) ($bk ?: $b))));
     }
 
@@ -271,6 +284,20 @@ class ChannelSite
         // lettergreep (zaak → zaken, rijschool is hierboven al afgevangen).
         if (preg_match('/(aa|ee|oo|uu)[bcdfgklmnprst]$/u', $w)) {
             $w = preg_replace_callback('/(aa|ee|oo|uu)([bcdfgklmnprst])$/u', fn ($m) => $m[1][0] . $m[2], $w);
+        }
+
+        // Slotmedeklinker verstemlozing: bedrijf → bedrijven, huis → huizen.
+        // Zonder deze regel werd elk van de tientallen "...bedrijf"-branches
+        // "...bedrijfen".
+        //
+        // Alleen na een lange klinker of tweeklank. Na een korte verdubbelt de
+        // medeklinker juist (bus → bussen, stof → stoffen), dus een bredere
+        // regel maakt het slechter in plaats van beter.
+        if (preg_match('/(aa|ee|oo|uu|ie|oe|ui|ei|ij|au|ou|eu)f$/u', $w)) {
+            return substr($w, 0, -1) . 'ven';
+        }
+        if (preg_match('/(aa|ee|oo|uu|ie|oe|ui|ei|ij|au|ou|eu)s$/u', $w)) {
+            return substr($w, 0, -1) . 'zen';
         }
 
         return $w . 'en';

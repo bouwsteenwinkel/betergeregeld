@@ -93,6 +93,28 @@ return [
     ],
 
     /*
+     * Meervouden die geen enkele regel volgt.
+     *
+     * `channel:tokens:controle` herstelt een kapot `niches`-token door `trades`
+     * over te nemen, maar dat mag alleen als enkelvoud en vakwoord hetzelfde
+     * zijn. Bij deze branches verschillen ze -- de niche is een dienst, geen
+     * beroep -- en dan levert die regel onzin op ("badkamerbedrijven" waar
+     * "badkamers" hoort te staan). Hier staat per geval het goede woord.
+     *
+     * Wie een branche mist: eerst `channel:tokens:controle` draaien, die zet ze
+     * onder "met de hand nakijken".
+     */
+    'meervoud_uitzonderingen' => [
+        'fietsverhuur'   => 'fietsverhuurbedrijven',   // was: fietsverhuuren
+        'horeca'         => 'horecazaken',             // was: horecas
+        'kraanverhuur'   => 'kraanverhuurbedrijven',   // was: kraanverhuuren
+        'uitlaat-remmen' => 'uitlaat- en remmenspecialisten', // was: uitlaat & remmens
+        'wellness-spa'   => "wellness & spa's",        // was: wellness & spas
+        // badkamerspecialist (badkamer/badkamers) en wasserij-stomerij zijn goed;
+        // die staan hier bewust niet, zodat het commando ze blijft melden.
+    ],
+
+    /*
      * Hosts die nooit als vakgenoot getoond mogen worden.
      *
      * De Places-zoekopdracht vult op wanneer er in een plaats te weinig echte
