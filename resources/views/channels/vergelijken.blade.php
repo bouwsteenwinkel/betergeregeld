@@ -90,5 +90,8 @@
     </section>
 
     <div id="contact" class="scroll-anchor" aria-hidden="true"></div>
+    {{-- Echte marktcijfers voor deze branche: maakt "beter dan de buren" concreet --}}
+    @include('channels.partials.marktcijfers', ['site' => $site, 'variant' => 'vergelijken'])
+
     @include('channels.partials.lead-wizard', ['site' => $site, 'facet' => 'website'])
 @endsection

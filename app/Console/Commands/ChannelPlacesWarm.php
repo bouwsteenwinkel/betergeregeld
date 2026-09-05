@@ -94,6 +94,15 @@ class ChannelPlacesWarm extends Command
         }
 
         $this->info("Klaar. {$fetched} opgehaald, {$skipped} overgeslagen (al gecachet). Calls vandaag: {$finder->todayCalls()}/{$finder->dailyCap()}.");
+
+        // De marktcijfers op /prijzen en /vergelijken worden uit deze rijen
+        // gedicht. Hier meteen opnieuw uitrekenen, anders wacht de eerste
+        // bezoeker na het verlopen van de cache ~1,3 seconde op de optelsom.
+        $cijfers = app(\App\Services\ChannelSites\BrancheMarktcijfers::class)->warm($brKey);
+        $this->line($cijfers
+            ? sprintf('Marktcijfers ververst: %d aanbieders in %d plaatsen.', $cijfers['aanbieders'], $cijfers['plaatsen'])
+            : 'Marktcijfers: nog te weinig data voor deze branche.');
+
         return self::SUCCESS;
     }
 }

@@ -33,7 +33,8 @@ class ChannelSeoEigenheid extends Command
         {--paden= : komma-gescheiden paden, standaard de tien vaste paginasoorten}
         {--limiet=0 : hooguit N live sites ophalen (0 = alle)}
         {--details= : channel-key waarvan de eigen blokken getoond worden}
-        {--drempel=80 : vanaf welk percentage sites een blok als sjabloon telt}';
+        {--drempel=80 : vanaf welk percentage sites een blok als sjabloon telt}
+        {--lokaal : render in-process i.p.v. de live site ophalen (meet nog niet uitgerolde code)}';
 
     protected $description = 'Meet per paginasoort hoeveel tekst branche-specifiek is';
 
@@ -62,7 +63,8 @@ class ChannelSeoEigenheid extends Command
             return self::FAILURE;
         }
 
-        $this->info(sprintf('%d live sites, %d paginasoorten', $sites->count(), count($paden)));
+        $this->info(sprintf('%d live sites, %d paginasoorten%s', $sites->count(), count($paden),
+            $this->option('lokaal') ? ' (lokale render)' : ''));
         $this->newLine();
 
         $rijen = [];
@@ -72,7 +74,9 @@ class ChannelSeoEigenheid extends Command
         foreach ($paden as $pad) {
             $teksten = [];
             foreach ($sites as $site) {
-                $blokken = $this->blokken('https://' . $site->domain . $pad);
+                $blokken = $this->option('lokaal')
+                    ? $this->blokkenLokaal($site->domain, $pad)
+                    : $this->blokken('https://' . $site->domain . $pad);
                 if ($blokken) {
                     $teksten[$site->key] = $blokken;
                 }
@@ -147,6 +151,23 @@ class ChannelSeoEigenheid extends Command
     }
 
     /**
+     * Zelfde meting, maar de pagina wordt in dit proces gerenderd.
+     *
+     * Nodig om een wijziging te kunnen beoordelen voordat hij uitgerold is:
+     * zonder dit meet je altijd de vorige versie en lijkt elke verbetering te
+     * mislukken. De HTML komt uit dezelfde routes en views als op de server.
+     */
+    private function blokkenLokaal(string $domein, string $pad): array
+    {
+        try {
+            $resp = app()->handle(\Illuminate\Http\Request::create('https://' . $domein . $pad, 'GET'));
+        } catch (\Throwable $e) {
+            return [];
+        }
+        return $resp->getStatusCode() === 200 ? $this->splits((string) $resp->getContent()) : [];
+    }
+
+    /**
      * Zichtbare tekst van een pagina, opgeknipt in blokken van >= 4 woorden.
      *
      * Blokken en niet losse woorden, want je verwijdert of herschrijft secties,
@@ -162,6 +183,12 @@ class ChannelSeoEigenheid extends Command
         $html = @file_get_contents($url, false, $ctx);
         if ($html === false || $html === '') return [];
 
+        return $this->splits($html);
+    }
+
+    /** HTML naar tekstblokken. Gedeeld door de live- en de lokale meting. */
+    private function splits(string $html): array
+    {
         $html = preg_replace('#<(script|style|noscript)[^>]*>.*?</\1>#is', ' ', $html);
         $html = preg_replace('#<br\s*/?>|</(p|div|li|h[1-6]|td|section|span)>#i', "\n", $html);
         $html = preg_replace('#<[^>]+>#s', ' ', $html);

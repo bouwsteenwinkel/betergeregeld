@@ -65,6 +65,9 @@
         </div>
     </section>
 
+    {{-- Echte marktcijfers voor deze branche: geeft de prijs een maatstaf --}}
+    @include('channels.partials.marktcijfers', ['site' => $site, 'variant' => 'prijzen'])
+
     {{-- Koppeling met de Groeidiamant --}}
     @include('channels.partials.groeipad', [
         'site'   => $site,

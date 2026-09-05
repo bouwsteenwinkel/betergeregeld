@@ -92,6 +92,38 @@ return [
         'min_reviews' => 3,
     ],
 
+    /*
+     * Hosts die nooit als vakgenoot getoond mogen worden.
+     *
+     * De Places-zoekopdracht vult op wanneer er in een plaats te weinig echte
+     * treffers zijn, en levert dan de dichtstbijzijnde grote winkel. Gevolg:
+     * Action stond als aannemer op de pagina en Albert Heijn als dietist. Op
+     * 05-09-2026 gemeten: 3.551 van de 94.625 listings (3,8%), verspreid over
+     * 2.595 van de 18.885 plaatspagina's -- oftewel 14% van de pagina's die het
+     * in Search Console juist het beste doen.
+     *
+     * Filteren gebeurt bij het LEZEN (PlaceBusinessFinder::forPlace), niet bij
+     * het ophalen: dan werkt het meteen op de 18.885 rijen die er al liggen,
+     * zonder opnieuw door de betaalde API te hoeven.
+     *
+     * Alleen ketens die in geen enkele channel-branche een vakgenoot kunnen
+     * zijn, plus een paar bedrijvengids-domeinen die zichzelf overal inschrijven.
+     */
+    'uitsluiten_hosts' => [
+        // supermarkten en warenhuizen
+        'action.com', 'ah.nl', 'jumbo.com', 'plus.nl', 'aldi.nl', 'lidl.nl',
+        'hoogvliet.com', 'dekamarkt.nl', 'coop.nl', 'spar.nl', 'vomar.nl',
+        'hema.nl', 'blokker.nl', 'jysk.nl', 'ikea.com', 'kruidvat.nl',
+        'etos.nl', 'trekpleister.nl', 'bigbazar.nl',
+        // bouwmarkten
+        'gamma.nl', 'karwei.nl', 'praxis.nl', 'hornbach.nl', 'bauhaus.nl',
+        // overig niet-branche
+        'landal.com', 'roompot.nl', 'center-parcs.nl', 'werktalent.com',
+        // bedrijvengidsen die zich in elke plaats inschrijven
+        'nlcompanies.org', 'netherbusi.org', 'netherbusinesses.org',
+        'bedrijvenpagina.nl', 'telefoonboek.nl', 'detelefoongids.nl',
+    ],
+
     // Tekstvarianten per blok. Deterministisch één per plaats gekozen.
     'variants' => [
 

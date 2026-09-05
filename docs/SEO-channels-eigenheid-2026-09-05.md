@@ -140,19 +140,97 @@ data. De verkooppagina's — website, webshop, prijzen, vergelijken — niet.
 5. **Externe links.** Nul is het echte getal. Zolang dat nul blijft, is de rest
    schuiven aan de marge.
 
+## Wat er op 05-09-2026 is gebouwd (advies 1)
+
+`App\Services\ChannelSites\BrancheMarktcijfers` dicht `channel_place_listings`
+per branche samen en `channels.partials.marktcijfers` zet dat op `/prijzen` en
+`/vergelijken`, met twee verschillende invalshoeken zodat die twee pagina's
+elkaars duplicaat niet worden.
+
+Meting voor en na, met `php artisan channel:seo:eigenheid --lokaal`:
+
+```
+                 VOOR   NA
+/prijzen           5%   17%
+/vergelijken      14%   33%
+```
+
+Het doel van 40% is dus nog niet gehaald. Op `/vergelijken` scheelt het niet
+veel meer; op `/prijzen` blijft het achter, en dat is verklaarbaar: het grootste
+tekstblok daar is de prijstabel, en die prijzen zijn per branche werkelijk
+gelijk. Ze verschillend láten lijken zou verzinsel zijn. De volgende echte winst
+zit in de pakket-omschrijvingen en de vergelijkingstabel, die nu nog in
+algemeenheden praten.
+
+Wat de cijfers per branche laten zien -- en meteen het bewijs dat er iets te
+zeggen valt:
+
+```
+BRANCHE                AANB.  /PLAATS  STER  MED.REV  KOPLOPER
+rijschool               4663      4,5  4,75       42       124
+bakkerij                5416      4,7  4,43       89       278
+administratiekantoor    3124      3,3  4,57        7        13
+dietist                 6002      5,4  4,38       95       720
+acupuncturist           4962      4,7  4,88       13        35
+```
+
+**Eén advies uit dit document is onderweg ingetrokken.** Het idee was om te
+schrijven: "in Utrecht hebben zeven van de twaalf rijscholen geen eigen site."
+Gemeten over alle branches heeft **91 tot 99% wél een website**. Dat argument
+bestaat niet, en het staat dus ook niet op de pagina's.
+
+Twee dingen zijn bewust niet gedaan: geen bedrijfsnamen op de verkooppagina's
+(een verkeerd getal verdwijnt in een gemiddelde, een verkeerde naam niet), en
+geen "drukste plaats" (de Places-zoekopdracht kapt af op acht, dus die koploper
+is een meetartefact -- bij rijschool rolde het dorp Aalst eruit).
+
+## Bijvangst: 2.595 plaatspagina's toonden een supermarkt
+
+Bij het aggregeren kwam Action als aannemer naar boven, en Albert Heijn als
+dietist. Google Places vult een magere zoekopdracht aan met de dichtstbijzijnde
+grote zaak.
+
+```
+listings totaal                      94.625
+duidelijk fout (retailketen)          3.551   3,8%
+plaatspagina's geraakt                2.595   14% van 18.885
+```
+
+Juist die plaatspagina's zijn de enige die klikken opleveren. Opgelost met
+`channel_places.uitsluiten_hosts` en `PlaceBusinessFinder::schoon()`, dat
+filtert bij het **lezen** -- zo geldt het meteen voor de 18.885 rijen die er al
+liggen, zonder de betaalde API opnieuw af te lopen.
+
+`indexableSlugs()` telt na hetzelfde filter, anders zou een plaats met drie
+supermarkten in de sitemap belanden terwijl de pagina op noindex staat.
+
 ## Los hiervan: betergeregeld.com zelf
 
 4.155 vertoningen, **nul klikken** in 90 dagen, terwijl sommige pagina's op
-positie 6 staan. Oorzaak lijkt de meertalige opzet:
+positie 6 staan.
 
-- `/es/`, `/fr/`, `/de/`, `/en/` dragen een canonical naar de `/nl/`-versie —
-  je vertelt Google dus dat de vertalingen duplicaten zijn.
-- De hreflang-set noemt alleen `nl` en `x-default`, zonder zelfverwijzing en
-  zonder de andere talen. Zonder zelfverwijzing negeert Google de annotatie.
-- De sitemap bevat 925 NL- en 37 EN-URL's; es/fr/de staan er niet in terwijl
-  die pagina's wel bestaan en vertoningen krijgen.
-- De slugs zijn Nederlands gebleven: `/es/blog/wachtwoordmanager-kiezen-mkb`.
+**Dit is GEEN fout in de site.** Bij het onderzoek leek het alsof de vertaalde
+blogpagina's een canonical naar `/nl/` droegen en daarmee zichzelf als duplicaat
+aanmerkten. Dat was een meetfout: `curl -L` volgde de omleiding en las de
+Nederlandse bestemmingspagina alsof het de Spaanse was.
 
-Elke taalversie zou naar zichzelf moeten canonicaliseren, met een complete
-hreflang-set inclusief zichzelf. Dat is een wijziging in de layout en raakt
-alles tegelijk.
+Zonder redirects te volgen:
+
+```
+/nl/blog/wachtwoordmanager-kiezen-mkb-praktisch   200
+/en/  /de/  /es/  /fr/                            301  ->  /nl/...
+```
+
+Alle vreemdtalige blog-URL's sturen netjes door. Zie
+`BlogController::resolveMissingPost()` en `App\Support\Hreflang` — daar staat
+uitgebreid beschreven waarom, inclusief de afhandeling van de `-en`-import-cruft
+en de 410's die eruit moesten.
+
+De verklaring voor de vertoningen zonder klikken is dan ook eenvoudig: Google
+heeft die oude `/es/`- en `/fr/`-URL's nog in de index uit de tijd dat ze wél
+inhoud gaven, en toont ze aan anderstalige zoekers die vervolgens een
+Nederlandse titel zien. Dat ruimt zichzelf op zodra hij de 301's verwerkt heeft.
+Geen ingreep nodig; wel iets om over een maand opnieuw te bekijken.
+
+**Les voor de volgende meting:** status en inhoud apart bekijken. Een `curl -L`
+verbergt precies het antwoord waar je naar op zoek bent.

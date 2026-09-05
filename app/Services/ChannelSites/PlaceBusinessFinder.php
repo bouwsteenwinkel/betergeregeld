@@ -31,7 +31,7 @@ class PlaceBusinessFinder
             ->first();
 
         if ($row && $row->fetched_at && Carbon::parse($row->fetched_at)->diffInDays(now()) < $this->ttlDays) {
-            return (array) json_decode($row->listings ?? '[]', true);
+            return $this->schoon((array) json_decode($row->listings ?? '[]', true));
         }
 
         $fresh = $this->fetch($city, $region, $search);
@@ -46,11 +46,46 @@ class PlaceBusinessFinder
                     'created_at' => $row->created_at ?? now(),
                 ]
             );
-            return $fresh;
+            return $this->schoon($fresh);
         }
 
         // Fout/geen key → val terug op (evt. oude) cache i.p.v. de pagina te breken.
-        return $row ? (array) json_decode($row->listings ?? '[]', true) : [];
+        return $row ? $this->schoon((array) json_decode($row->listings ?? '[]', true)) : [];
+    }
+
+    /**
+     * Haalt de niet-vakgenoten eruit.
+     *
+     * Google Places vult een magere zoekopdracht aan met de dichtstbijzijnde
+     * grote zaak. Daardoor stond Action als aannemer op de pagina en Albert
+     * Heijn als dietist: 3.551 listings over 2.595 plaatspagina's (14%). Juist
+     * die pagina's zijn de enige die klikken opleveren, dus daar hoort geen
+     * supermarkt tussen te staan.
+     *
+     * Bewust bij het lezen: zo geldt het meteen voor de 18.885 rijen die er al
+     * liggen, zonder de betaalde API opnieuw af te lopen. De ruwe rij blijft
+     * ongemoeid, dus de lijst is achteraf bij te stellen.
+     *
+     * Publiek omdat BrancheMarktcijfers over dezelfde rijen aggregeert en de
+     * pagina en de cijfers niet uiteen mogen lopen.
+     *
+     * @param  array<int,array<string,mixed>> $listings
+     * @return array<int,array<string,mixed>>
+     */
+    public function schoon(array $listings): array
+    {
+        $uit = array_flip((array) config('channel_places.uitsluiten_hosts', []));
+        if (! $uit) {
+            return $listings;
+        }
+
+        return array_values(array_filter($listings, function ($l) use ($uit) {
+            $host = parse_url((string) ($l['website'] ?? ''), PHP_URL_HOST);
+            if (! is_string($host) || $host === '') {
+                return true;   // geen website is geen reden om iemand weg te laten
+            }
+            return ! isset($uit[preg_replace('/^www\./', '', strtolower($host))]);
+        }));
     }
 
     /** Heeft deze (branche, plaats) al een cache-rij? (voor de warm-command). */
@@ -74,7 +109,10 @@ class PlaceBusinessFinder
     {
         $out = [];
         foreach (DB::table('channel_place_listings')->where('branche_key', $brancheKey)->get(['place_slug', 'listings']) as $row) {
-            if (count((array) json_decode($row->listings ?? '[]', true)) >= $min) {
+            // Tellen NA het filter, precies zoals de pagina zelf telt: anders
+            // belandt een plaats met drie supermarkten in de sitemap terwijl de
+            // pagina op noindex staat.
+            if (count($this->schoon((array) json_decode($row->listings ?? '[]', true))) >= $min) {
                 $out[] = $row->place_slug;
             }
         }
