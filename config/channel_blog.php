@@ -22,7 +22,7 @@ return [
         // Fundamenteel
         ['slug' => 'online-gevonden-worden-in-je-regio',   'product' => 'website',        'title' => 'Zo word je als :trade online gevonden in je regio', 'angle' => 'lokale vindbaarheid in Google, plaatsen noemen, zoeken zoals de klant'],
         ['pillar' => true, 'slug' => 'wat-kost-een-website',                 'product' => 'website',        'title' => 'Wat kost een website voor een :trade?',            'angle' => 'kosten/waarde, vast maandbedrag, wat het oplevert, geen verrassingen'],
-        ['slug' => 'website-of-social-media',              'product' => 'website',        'title' => 'Website of alleen social media voor je :trade?',   'angle' => 'eigen site vs afhankelijkheid platform, combineren, vindbaarheid'],
+        ['slug' => 'website-of-social-media',              'product' => 'website',        'title' => 'Website of alleen social media voor je :zaak?',   'angle' => 'eigen site vs afhankelijkheid platform, combineren, vindbaarheid'],
         ['slug' => 'reviews-goud-waard',                   'product' => 'website',        'title' => 'Waarom reviews goud waard zijn voor een :trade',   'angle' => 'sociale bewijskracht, reviews verzamelen en tonen, vertrouwen'],
         ['slug' => 'meer-aanvragen-binnenhalen',           'product' => 'website',        'title' => 'Meer offerteaanvragen binnenhalen als :trade',     'angle' => 'drempel verlagen, snel reageren, duidelijke CTA, korte formulieren'],
         // Website
@@ -30,7 +30,7 @@ return [
         ['slug' => 'vakwerk-in-beeld-fotos',               'product' => 'website',        'title' => 'Je vakwerk in beeld: foto\'s die klanten overtuigen', 'angle' => 'fotografie van afgeleverd werk, before/after, portfolio'],
         ['slug' => 'verouderde-website-kost-klussen',      'product' => 'website',        'title' => 'Waarom een verouderde website je klussen kost',    'angle' => 'eerste indruk, mobiel, snelheid, concurrent die er beter uitziet'],
         // Webshop
-        ['slug' => 'loont-een-webshop',                    'product' => 'webshop',        'title' => 'Loont een webshop voor je :trade?',                'angle' => 'producten online verkopen naast je werk, 24/7 open, iDEAL'],
+        ['slug' => 'loont-een-webshop',                    'product' => 'webshop',        'title' => 'Loont een webshop voor je :zaak?',                'angle' => 'producten online verkopen naast je werk, 24/7 open, iDEAL'],
         ['pillar' => true, 'slug' => 'online-verkopen-naast-je-werk',        'product' => 'webshop',        'title' => 'Online verkopen naast je :niche-werk',             'angle' => 'extra omzet, showroom online, bezorgen of afhalen'],
         ['slug' => 'montage-bijverkopen',                  'product' => 'webshop',        'title' => 'Montage of plaatsing bijverkopen via je webshop',  'angle' => 'product + dienst combineren, meer marge, upsell'],
         // Klantenportaal
@@ -46,7 +46,7 @@ return [
         ['pillar' => true, 'slug' => 'ai-bereidt-je-offerte-voor',           'product' => 'ai',             'title' => 'AI die je offerte voorbereidt',                    'angle' => 'uit foto\'s/vragen een eerste inschatting, jij houdt controle'],
         ['slug' => 'automatisch-reviews-verzamelen',       'product' => 'ai',             'title' => 'Automatisch reviews verzamelen na oplevering',     'angle' => 'na de klus automatisch om een Google-review vragen'],
         // Groei
-        ['slug' => 'groeien-van-website-tot-ai',           'product' => 'groei',          'title' => 'Groeien met je :trade: van website tot AI',        'angle' => 'de Groeidiamant, stap voor stap uitbreiden, nooit opnieuw beginnen'],
+        ['slug' => 'groeien-van-website-tot-ai',           'product' => 'groei',          'title' => 'Groeien met je :zaak: van website tot AI',        'angle' => 'de Groeidiamant, stap voor stap uitbreiden, nooit opnieuw beginnen'],
     ],
 
     // ── Beeld-scène per onderwerp ─────────────────────────────────────────

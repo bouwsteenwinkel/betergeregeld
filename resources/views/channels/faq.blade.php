@@ -1,7 +1,7 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
-    $map = [':trades' => $t['trades'] ?? 'bedrijven', ':trade' => $t['trade'] ?? 'bedrijf', ':niches' => $t['niches'] ?? 'diensten', ':niche' => $t['niche'] ?? 'vak'];
+    $map = \App\Support\ChannelTokens::map((array) $site->get('places', []), $site->brancheKey());
     $r = fn ($s) => strtr((string) $s, $map);
     $items = array_map(fn ($x) => ['q' => $r($x['q'] ?? ''), 'a' => $r($x['a'] ?? '')], (array) config('channel_faq.items', []));
 

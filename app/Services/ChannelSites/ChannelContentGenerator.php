@@ -180,12 +180,7 @@ class ChannelContentGenerator
      */
     public function blogDraftForTopic(ChannelSite $site, array $topic, array $tokens = []): array
     {
-        $map = [
-            ':trades' => (string) ($tokens['trades'] ?? 'bedrijven'),
-            ':trade'  => (string) ($tokens['trade'] ?? 'bedrijf'),
-            ':niches' => (string) ($tokens['niches'] ?? 'diensten'),
-            ':niche'  => (string) ($tokens['niche'] ?? 'vak'),
-        ];
+        $map = \App\Support\ChannelTokens::map($tokens, $site->brancheKey());
         $title = strtr((string) ($topic['title'] ?? ''), $map);
         $angle = strtr((string) ($topic['angle'] ?? ''), $map);
         $trade = $map[':trade'];

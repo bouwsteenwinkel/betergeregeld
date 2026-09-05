@@ -2,7 +2,7 @@
 	/** @var \App\Support\ChannelSite $site */
 	$pl = (array) $site->get('places', []);
 	$t  = array_merge((array) config('channel_places.defaults', []), array_filter($pl, fn ($v) => is_scalar($v) && $v !== ''));
-	$map = [':trades' => $t['trades'] ?? 'bedrijven', ':trade' => $t['trade'] ?? 'bedrijf', ':niches' => $t['niches'] ?? 'diensten', ':niche' => $t['niche'] ?? 'vak', ':service' => $t['service'] ?? 'website'];
+	$map = \App\Support\ChannelTokens::map((array) $site->get('places', []), $site->brancheKey());
 	$ix  = array_merge((array) config('channel_places.index', []), array_intersect_key($pl, array_flip(['eyebrow', 'h1', 'intro', 'pick_h2', 'pick_note'])));
 	$r   = fn ($k, $d = '') => strtr((string) ($ix[$k] ?? $d), $map);
 	$provinces = (array) ($provinces ?? []);

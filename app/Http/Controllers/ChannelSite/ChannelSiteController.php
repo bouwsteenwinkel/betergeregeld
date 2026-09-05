@@ -232,16 +232,11 @@ class ChannelSiteController extends Controller
 
         // Unieke, branche-gerichte content (variatie-engine) voor deze plaats.
         $tokens  = (array) $site->get('places', []);
-        $content = app(\App\Services\ChannelSites\ChannelPlaceContent::class)->assemble($tokens, $data, $site->key . '|');
+        $content = app(\App\Services\ChannelSites\ChannelPlaceContent::class)->assemble($tokens, $data, $site->key . '|', $site->brancheKey());
 
         // Branche-tokens (niet plaats) alvast in de bedrijven-config invullen.
         $business = array_merge((array) config('channel_places.business', []), (array) ($tokens['business'] ?? []));
-        $brancheMap = [
-            ':trades'  => (string) ($tokens['trades'] ?? config('channel_places.defaults.trades')),
-            ':trade'   => (string) ($tokens['trade'] ?? config('channel_places.defaults.trade')),
-            ':niches'  => (string) ($tokens['niches'] ?? config('channel_places.defaults.niches')),
-            ':niche'   => (string) ($tokens['niche'] ?? config('channel_places.defaults.niche')),
-        ];
+        $brancheMap = \App\Support\ChannelTokens::map($tokens, $site->brancheKey());
         $business['query'] = strtr((string) ($business['query'] ?? ':niche :city'), $brancheMap);
         $business['label'] = str_replace([':city', ':region'], [$data['naam'], $data['provincie']], strtr((string) ($business['label'] ?? ''), $brancheMap));
         $business['intro'] = str_replace([':city', ':region'], [$data['naam'], $data['provincie']], strtr((string) ($business['intro'] ?? ''), $brancheMap));

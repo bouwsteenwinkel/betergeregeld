@@ -43,7 +43,7 @@ class ChannelBlogImages extends Command
         $tokens = (array) $site->get('places', []);
         $niche  = (string) ($tokens['niche'] ?? 'vak');
         $trade  = (string) ($tokens['trade'] ?? 'bedrijf');
-        $map    = [':trades' => (string) ($tokens['trades'] ?? 'bedrijven'), ':trade' => $trade, ':niches' => (string) ($tokens['niches'] ?? 'diensten'), ':niche' => $niche];
+        $map    = \App\Support\ChannelTokens::map($tokens, $site->brancheKey());
         $scenesBySlug = (array) config('channel_blog.topic_images', []);
 
         $posts = BlogPost::where('channel', $key)->orderBy('id')->get();

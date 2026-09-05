@@ -22,7 +22,7 @@ class ChannelPlaceContent
      *
      * @return array<string,mixed>  ingevulde blokken (meta_title, h1, hero_lead, intro, wie, trust, cta, cta_title, faq)
      */
-    public function assemble(array $tokens, array $place, string $seed = ''): array
+    public function assemble(array $tokens, array $place, string $seed = '', ?string $brancheKey = null): array
     {
         $cfg      = (array) config('channel_places', []);
         $defaults = (array) ($cfg['defaults'] ?? []);
@@ -35,13 +35,9 @@ class ChannelPlaceContent
         $full    = $context ? "{$city} ({$context})" : $city;
         $slug    = (string) ($place['slug'] ?? '');
 
-        // Volgorde: langste tokens eerst (:trades vóór :trade) om deel-vervanging te voorkomen.
-        $map = [
-            ':trades'  => (string) ($t['trades'] ?? 'bedrijven'),
-            ':trade'   => (string) ($t['trade'] ?? 'bedrijf'),
-            ':niches'  => (string) ($t['niches'] ?? 'diensten'),
-            ':niche'   => (string) ($t['niche'] ?? 'vak'),
-            ':service' => (string) ($t['service'] ?? 'website'),
+        // Branche-tokens uit één bron (App\Support\ChannelTokens), plaats-tokens
+        // erbij. Volgorde: langste eerst (:trades vóór :trade), zie die klasse.
+        $map = \App\Support\ChannelTokens::map($t, $brancheKey) + [
             ':region'  => $region,
             ':full'    => $full,
             ':city'    => $city,

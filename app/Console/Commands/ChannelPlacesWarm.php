@@ -44,12 +44,9 @@ class ChannelPlacesWarm extends Command
         $tokens   = (array) $branche->places;
         $business = array_merge((array) config('channel_places.business', []), (array) ($tokens['business'] ?? []));
         // Branche-tokens (niet plaats) in de query invullen; :city doet de finder.
-        $business['query'] = strtr((string) ($business['query'] ?? ':niche :city'), [
-            ':trades' => (string) ($tokens['trades'] ?? config('channel_places.defaults.trades')),
-            ':trade'  => (string) ($tokens['trade'] ?? config('channel_places.defaults.trade')),
-            ':niches' => (string) ($tokens['niches'] ?? config('channel_places.defaults.niches')),
-            ':niche'  => (string) ($tokens['niche'] ?? config('channel_places.defaults.niche')),
-        ]);
+        $business['query'] = \App\Support\ChannelTokens::vul(
+            (string) ($business['query'] ?? ':niche :city'), $tokens, $branche->key
+        );
 
         $prov   = (string) $this->option('province');
         $places = $prov ? $resolver->provincePlaces($prov) : $resolver->places();

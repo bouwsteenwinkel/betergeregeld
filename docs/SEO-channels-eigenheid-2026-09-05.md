@@ -184,6 +184,60 @@ Twee dingen zijn bewust niet gedaan: geen bedrijfsnamen op de verkooppagina's
 geen "drukste plaats" (de Places-zoekopdracht kapt af op acht, dus die koploper
 is een meetartefact -- bij rijschool rolde het dorp Aalst eruit).
 
+## De acupuncturist trok patienten (advies uit "wat er goed is")
+
+In Search Console werd `jouw-acupuncturist-website.nl` gevonden op
+"acupunctuur zeeland" en "acupunctuur nieuw vennep" -- door patienten dus, niet
+door acupuncturisten. De vraag was of meer zorg-branches dat zouden doen.
+
+**De oorzaak is gevonden, en hij is breder dan de zorg.** De verkoopteksten
+spreken de ondernemer aan met "je :trade":
+
+> Meer klanten voor je :trade in :city?
+
+Dat werkt voor een rijschool of een bakkerij. Maar bij **55 van de 204 branches
+is `trade` een mens**, en dan staat er letterlijk "Meer klanten voor je
+acupuncturist in Middelburg" of "Klaar om te groeien met je advocaat". Dat is
+niet alleen krom -- het draait de toon van de pagina om, van "wij bouwen jou een
+site" naar iets dat leest als een consumentengids. Google leest dat mee.
+
+Ruim een kwart van de geplande uitbreiding zit in die groep.
+
+Opgelost met een token `:zaak`: het woord voor de ondernemíng in plaats van de
+persoon. `channel_places.zaakwoord` zet dat per branche (praktijk, kantoor,
+bureau, studio, zaak, bedrijf) en valt terug op `:trade` voor de 149 branches
+die al een zaak zijn -- daar verandert dus niets.
+
+```
+acupuncturist  Meer klanten voor je praktijk in Middelburg? ...
+dietist        Meer klanten voor je praktijk in Middelburg? ...
+rijschool      Heb je een rijschool in Middelburg? ...        (ongewijzigd)
+```
+
+De token-map stond op negen plekken los overgeschreven. Die zijn samengebracht
+in `App\Support\ChannelTokens`, anders was dit ene token negen bewerkingen
+geweest die uit de pas gaan lopen.
+
+## Bijvangst: kapotte meervouden op 45 branches
+
+`niches` is ooit machinaal gemaakt met "+en" of "+s". Bij 45 van de 204
+branches levert dat een woord op dat niet bestaat:
+
+```
+advocaat      advocaaten       moet zijn: advocaten
+klusbedrijf   klusbedrijfen    moet zijn: klusbedrijven
+psycholoog    psycholoogen     moet zijn: psychologen
+yogastudio    yogastudios      moet zijn: yogastudio's
+```
+
+Vijf daarvan staan live. Op `jouw-klusbedrijf-website.nl` stond het op elke
+pagina; bij de andere vier op de plaatspagina's -- de enige pagina's die klikken
+krijgen.
+
+De bron zat dieper: `ChannelSite::pluralizeNl()` raadt het meervoud, en zat bij
+37 van de 204 mis. `pitchAudience()` gebruikt nu eerst het `trades`-token, dat
+met de hand is nagelopen. Herstel en controle: `channel:tokens:controle`.
+
 ## Bijvangst: 2.595 plaatspagina's toonden een supermarkt
 
 Bij het aggregeren kwam Action als aannemer naar boven, en Albert Heijn als

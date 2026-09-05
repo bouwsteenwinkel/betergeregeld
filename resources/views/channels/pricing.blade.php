@@ -5,7 +5,7 @@
     // Branche-tokens (zelfde bron als de plaatsen-content), zodat deze pagina in de
     // taal van de ondernemer staat i.p.v. op alle 17 sites woordelijk gelijk te zijn.
     $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
-    $map = [':trades' => $t['trades'] ?? 'bedrijven', ':trade' => $t['trade'] ?? 'bedrijf', ':niches' => $t['niches'] ?? 'diensten', ':niche' => $t['niche'] ?? 'vak', ':service' => $t['service'] ?? 'website'];
+    $map = \App\Support\ChannelTokens::map((array) $site->get('places', []), $site->brancheKey());
     $r = fn ($s) => strtr((string) $s, $map);
 @endphp
 @extends('channels.layout')
