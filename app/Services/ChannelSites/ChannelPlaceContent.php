@@ -38,9 +38,10 @@ class ChannelPlaceContent
         // Branche-tokens uit één bron (App\Support\ChannelTokens), plaats-tokens
         // erbij. Volgorde: langste eerst (:trades vóór :trade), zie die klasse.
         $map = \App\Support\ChannelTokens::map($t, $brancheKey) + [
-            ':region'  => $region,
-            ':full'    => $full,
-            ':city'    => $city,
+            ':aanspreek' => $this->aanspreek($t, $brancheKey, $city),
+            ':region'    => $region,
+            ':full'      => $full,
+            ':city'      => $city,
         ];
         $repl = fn ($str) => strtr((string) $str, $map);
 
@@ -58,9 +59,49 @@ class ChannelPlaceContent
     }
 
     /**
-     * Hoofdletter aan het begin van de zin. De varianten beginnen vaak met een
+     * De openingszin die de ONDERNEMER aanspreekt, niet zijn klant.
+     *
+     * Aanleiding (06-09-2026): de plaatspagina's trokken 93% verkeerd publiek.
+     * De titels begonnen met branche + plaats ("Meer aanvragen voor loodgieters
+     * in Amstelveen"), en dat is woordelijk waar iemand met een lekkage op
+     * zoekt. Een pagina die opent met "Ben jij de loodgieter uit Amstelveen
+     * die..." kiest meteen partij: de consument leest die zin en klikt weg.
+     *
+     * Twee vormen, want het Nederlands laat hier geen enkele toe. Is `trade`
+     * een beroep, dan kan het rechtstreeks ("Ben jij de loodgieter uit
+     * Baarn"); is het een zaak, dan moet de eigenaar ertussen ("Ben jij de
+     * eigenaar van een rijschool in Baarn"). Beide lopen door in dezelfde
+     * bijzin, zodat één variant-tekst voor alle 204 branches volstaat.
+     *
+     * De scheidslijn is `channel_places.beroep_branches`, via
+     * ChannelTokens::isBeroep(). Zo hangen de aanspreekvorm en het zaakwoord
+     * aan dezelfde lijst en kunnen ze niet uit elkaar lopen.
+     *
+     * @param array<string,mixed> $t
+     */
+    private function aanspreek(array $t, ?string $brancheKey, string $city): string
+    {
+        if (\App\Support\ChannelTokens::isBeroep($brancheKey)) {
+            return 'Ben jij de ' . (string) ($t['trade'] ?? 'ondernemer') . " uit {$city}";
+        }
+
+        // Zaak-vorm bewust op :zaak en niet op :trade, zodat een dienstwoord met
+        // een eigen zaakwoord ("asbestverwijdering" -> "bedrijf") hier ook goed
+        // uitkomt in plaats van "de eigenaar van een asbestverwijdering".
+        $zaak = \App\Support\ChannelTokens::map($t, $brancheKey)[':zaak'] ?? 'bedrijf';
+
+        return "Ben jij de eigenaar van een {$zaak} in {$city}";
+    }
+
+    /**
+     * Hoofdletter aan het begin van ELKE zin. De varianten beginnen vaak met een
      * token (:trade, :service) en die zijn per definitie kleingeschreven, dus
      * zonder dit levert de engine koppen als "badkamerbedrijf in Utrecht?" op.
+     *
+     * Ook ná een punt, vraagteken of uitroepteken: sinds de titels met een vraag
+     * openen ("Zelf een website bouwen of laten maken? :trades in :city") staat
+     * er anders "... laten maken? acupuncturisten in Middelburg".
+     *
      * mb_-functies: branche-tokens kunnen accenten bevatten (diëtist).
      */
     private function zinBeginKapitaal(string $tekst): string
@@ -69,7 +110,13 @@ class ChannelPlaceContent
             return $tekst;
         }
 
-        return mb_strtoupper(mb_substr($tekst, 0, 1)) . mb_substr($tekst, 1);
+        $tekst = mb_strtoupper(mb_substr($tekst, 0, 1)) . mb_substr($tekst, 1);
+
+        return (string) preg_replace_callback(
+            '/([.?!])(\s+)(\p{Ll})/u',
+            fn ($m) => $m[1] . $m[2] . mb_strtoupper($m[3]),
+            $tekst
+        );
     }
 
     /** Deterministische keuze uit een variantset o.b.v. slug + slot-offset. */

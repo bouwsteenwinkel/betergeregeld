@@ -85,11 +85,60 @@ return [
 
     // Labels voor de "echte bedrijven in de regio"-sectie (Google Places).
     'business' => [
-        'label' => 'Bedrijven in de regio :city',
+        // Bewust NIET ":trades in :city" -- dat las als een bedrijvengids en was
+        // de sterkste consumenten-match op de hele pagina.
+        'label' => 'Je concurrentie in :city',
         'intro' => 'Zo ziet het landschap in :city en omgeving eruit. Zorg dat jouw :zaak hiertussen opvalt met een sterke online aanwezigheid.',
         'query' => ':niche :city',
         'limit' => 8,
         'min_reviews' => 3,
+    ],
+
+    /*
+     * Branches waarvan `trade` een MENS is en geen zaak.
+     *
+     * Bepaalt twee dingen: het woord voor de onderneming (zie zaakwoord
+     * hieronder) en de aanspreekvorm op de plaatspagina's:
+     *
+     *     beroep   "Ben jij de loodgieter uit Baarn die ..."
+     *     zaak     "Ben jij de eigenaar van een rijschool in Baarn die ..."
+     *
+     * Waarom een lijst en geen regel: het Nederlands laat zich hier niet met
+     * achtervoegsels vangen. "-er" is meestal een beroep (loodgieter, kapper,
+     * schilder) maar niet altijd, en "-ij" is meestal een zaak (bakkerij) maar
+     * "asbestverwijdering" is een dienst. Vier pogingen met suffixregels gaven
+     * telkens tien tot vijftien fouten op 204 woorden -- en een fout hier draait
+     * de toon van een hele site om. 204 woorden is klein genoeg om op te
+     * schrijven.
+     *
+     * Een branche die hier NIET in staat krijgt de zaak-vorm. Dat is de veilige
+     * kant: "de eigenaar van een X" is hooguit omslachtig, terwijl "de X uit
+     * Baarn" bij een zaak ronduit fout is. Klopt het bij een dienstwoord alsnog
+     * niet ("de eigenaar van een asbestverwijdering"), zet dan een zaakwoord in
+     * de lijst hieronder -- dan staat er "de eigenaar van een bedrijf".
+     */
+    'beroep_branches' => [
+        'aanhangwagenspecialist', 'aankoopmakelaar', 'aannemer', 'acupuncturist',
+        'advocaat', 'airco-installateur', 'architect', 'autoruit-specialist',
+        'barbier', 'bedrijfsmakelaar', 'belastingadviseur', 'bloemist',
+        'boekhouder', 'bouwkundig-keurder', 'businesscoach', 'cateraar',
+        'chiropractor', 'consultant', 'cv-installateur', 'dakdekker',
+        'dakkapel-specialist', 'dameskapper', 'dierenarts', 'dietist',
+        'elektricien', 'energieadviseur', 'ergotherapeut', 'fotograaf',
+        'fysiotherapeut', 'garagedeuren-specialist', 'glaszetter', 'glazenwasser',
+        'grafisch-ontwerper', 'herenkapper', 'hoefsmid', 'hovenier',
+        'huidtherapeut', 'hypotheekadviseur', 'interieurbouwer', 'interieurontwerper',
+        'juridisch-adviseur', 'juwelier', 'kapper', 'kapper-aan-huis',
+        'keukenmonteur', 'logopedist', 'loodgieter', 'loopbaancoach',
+        'makelaar', 'metselaar', 'mondhygienist', 'notaris',
+        'opticien', 'optometrist', 'orthodontist', 'osteopaat',
+        'paardenfysio', 'pedicure', 'podotherapeut', 'psycholoog',
+        'rioolontstopper', 'schilder', 'slotenmaker', 'stukadoor',
+        'tandarts', 'taxateur', 'tegelzetter', 'tekstschrijver',
+        'timmerman', 'trainer', 'uitlaat-remmen', 'uitvaartverzorger',
+        'verhuurmakelaar', 'verloskundige', 'vertaler', 'videograaf',
+        'virtual-assistant', 'visagist', 'vloerenlegger', 'warmtepomp-installateur',
+        'webdesigner', 'wimperstyliste', 'zonnepanelen-installateur', 'zonwering-specialist',
     ],
 
     /*
@@ -142,6 +191,15 @@ return [
 
         // winkel
         'bloemist' => 'zaak', 'juwelier' => 'zaak', 'cateraar' => 'bedrijf',
+
+        // vakmensen met een gangbaar bedrijfswoord -- zonder deze regel valt
+        // :zaak terug op het neutrale "bedrijf" en raakt de branchenaam weg
+        'aannemer'   => 'aannemersbedrijf', 'architect'  => 'architectenbureau',
+        'loodgieter' => 'loodgietersbedrijf', 'dakdekker' => 'dakdekkersbedrijf',
+        'elektricien' => 'installatiebedrijf', 'schilder'  => 'schildersbedrijf',
+        'stukadoor'  => 'stukadoorsbedrijf', 'timmerman' => 'timmerbedrijf',
+        'boekhouder' => 'administratiekantoor', 'tekstschrijver' => 'bureau',
+        'webdesigner' => 'bureau',
 
         // vakmensen en installateurs
         'aanhangwagenspecialist'    => 'bedrijf', 'airco-installateur'       => 'bedrijf',
@@ -210,19 +268,31 @@ return [
     // Tekstvarianten per blok. Deterministisch één per plaats gekozen.
     'variants' => [
 
+        /*
+         * Titels beginnen NOOIT met branche + plaats.
+         *
+         * Dat was woordelijk de zoekopdracht van de klant van de branche
+         * ("loodgieter amstelveen"), en het leverde 93% verkeerd publiek op de
+         * plaatspagina's op. Google matcht daar terecht op; het lag aan de kop,
+         * niet aan Google. Wat er nu staat opent met de vraag die alleen een
+         * ondernemer met ja beantwoordt. De branchenaam blijft erin voor de
+         * relevantie, maar niet meer vooraan. Zie :aanspreek in
+         * ChannelPlaceContent en de herziening in
+         * betergeregeldv2/docs/SEO-channels-eigenheid-2026-09-05.md.
+         */
         'meta_title' => [
-            ':service voor :trades in :city',
-            ':trade in :city online laten groeien',
-            'Meer aanvragen voor :trades in :city',
+            'Nieuwe :service voor :trades in :city?',
+            'Toe aan een nieuwe :service? Voor :trades in :city',
             ':service laten maken voor :trades in :city',
-            'Online groeien als :trade in :city',
-            ':trade in :city: gevonden worden in Google',
-            ':service voor :trades in :city en omgeving',
-            'Nieuwe klanten voor :trades in :city',
+            'Beter gevonden worden als :trade in :city',
+            'Meer aanvragen uit :city voor :trades',
+            'Zelf een :service bouwen of laten maken? Voor :trades in :city',
+            'Wat een :service kost voor :trades in :city',
+            'Online groeien met je :zaak in :city',
         ],
 
         'meta_description' => [
-            'Heb je een :trade in :city? Wij zorgen dat je online gevonden wordt en meer aanvragen binnenhaalt met een strakke :service. Vooraf een gratis voorbeeld van jóuw bedrijf in :city.',
+            'Voor :trades in :city: wij zorgen dat je online gevonden wordt en meer aanvragen binnenhaalt met een strakke :service. Vooraf een gratis voorbeeld van jóuw bedrijf in :city.',
             'Word gevonden in :city (:region) als iemand een :niche zoekt. Wij bouwen :trades een :service die klanten oplevert. Vooraf krijg je gratis en vrijblijvend een voorbeeld.',
             ':trades in :city en omgeving groeien online met betergeregeld: een :service, webshop en slimme tools die aanvragen opleveren. Bekijk hoe.',
             'Een :service voor je :zaak in :city die klussen oplevert: vindbaar in Google, je vakwerk in beeld en aanvragen rechtstreeks in je mailbox.',
@@ -232,18 +302,23 @@ return [
             'Je vak beheers je al. Wij regelen de online kant voor :trades in :city: vindbaar in Google, aanvragen in je mailbox en tools die met je meegroeien.',
         ],
 
+        /*
+         * Zelfde regel als bij meta_title: de kop spreekt de ondernemer aan.
+         * ":trades in :city online op de kaart" stond hier eerder en las als
+         * een bedrijvengids -- precies het signaal dat consumenten aantrok.
+         */
         'h1' => [
-            ':service voor :trades in :city',
-            ':trade in :city? Word online gevonden',
-            'Online groeien als :trade in :city',
-            'Meer aanvragen voor :trades in :city',
-            'Gevonden worden in :city als :trade',
-            ':trades in :city online op de kaart',
-            ':service voor :trades in :city en omgeving',
+            ':aanspreek die toe is aan een nieuwe :service?',
+            ':aanspreek die zijn klanten online beter wil bereiken?',
+            'Toe aan een nieuwe :service voor je :zaak in :city?',
+            'Je :zaak in :city verdient een betere :service',
+            'Beter gevonden worden als :trade in :city',
+            ':aanspreek die meer aanvragen wil?',
+            'Wat een goede :service oplevert voor je :zaak in :city',
         ],
 
         'hero_lead' => [
-            'Heb je een :trade in :city en omgeving? Wij zorgen dat je online gevonden wordt door mensen die in :city een :niche zoeken, met een :service die aanvragen oplevert. Vooraf een gratis voorbeeld van jóuw bedrijf in :city.',
+            'Voor :trades in :city en omgeving: wij zorgen dat je online gevonden wordt door mensen die in :city een :niche zoeken, met een :service die aanvragen oplevert. Vooraf een gratis voorbeeld van jóuw bedrijf in :city.',
             'Wie in :city een :niche zoekt, begint bij Google. Zorg dat jouw :zaak daar bovenaan staat. Wij bouwen een strakke :service die je vakwerk laat zien en klanten binnenhaalt. Vooraf krijg je gratis en vrijblijvend een voorbeeld.',
             'Voor :trades in :city (:region): een professionele :service, online verkopen en slimme tools die met je meegroeien. Je begint waar je nu staat en breidt uit wanneer je eraan toe bent.',
             'Meer klussen uit :city en omgeving? Wij regelen de online kant van je :zaak van A tot Z: vindbaar in Google, aanvragen in je mailbox en een site waar klanten vertrouwen in krijgen.',

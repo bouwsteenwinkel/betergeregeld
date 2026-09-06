@@ -71,7 +71,29 @@ class ChannelTokens
                 return $uit;
             }
         }
-        return $trade;
+
+        // Is `trade` een mens, dan is er sowieso een ander woord nodig: "je
+        // loodgieter" leest als de loodgieter van de klant. Zonder eigen
+        // zaakwoord is "bedrijf" het neutrale antwoord.
+        return self::isBeroep($brancheKey) ? 'bedrijf' : $trade;
+    }
+
+    /**
+     * Is `trade` bij deze branche een mens en geen zaak?
+     *
+     * Eén bron voor het onderscheid: `channel_places.beroep_branches`. Zowel
+     * het zaakwoord hierboven als de aanspreekvorm op de plaatspagina's
+     * (ChannelPlaceContent::aanspreek) hangt eraan, en die twee mogen niet uit
+     * elkaar lopen -- dan staat er "Ben jij de eigenaar van een loodgieter"
+     * naast "je praktijk".
+     *
+     * Niet in de lijst = zaak. Dat is de veilige kant; zie de toelichting bij
+     * de lijst zelf.
+     */
+    public static function isBeroep(?string $brancheKey): bool
+    {
+        return $brancheKey !== null
+            && in_array($brancheKey, (array) config('channel_places.beroep_branches', []), true);
     }
 
     /** Vult de tokens in een tekst in. */
