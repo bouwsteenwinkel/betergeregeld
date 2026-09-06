@@ -384,3 +384,68 @@ eigen tekst verandert niets aan wie er zoekt.
 **Methodische les:** dit onderzoek trok een conclusie over zeventien sites uit
 de tien die zichtbaar waren, en controleerde niet of de andere zeven er echt
 niet waren. Ze waren er wel, ze waren groter, en ze wezen een andere kant op.
+
+
+## 06-09-2026, tweede meting: de zoekopdrachten bestaan niet
+
+Search Console laat zien waar we al staan. Keyword Planner laat zien of er iets
+te halen valt. Dat tweede was nooit gemeten, en het is het getal waar de hele
+uitbreiding op rust.
+
+Gemeten over **189 van de 204 branches**, Nederland, Nederlandstalig, op de
+familie "website laten maken <branche>":
+
+```
+restaurant           170 per maand
+kapper                90
+aannemer              70   live
+schoonheidssalon      50
+timmerman             50
+hotel / hovenier      40
+psycholoog / tandarts 40
+rijschool             20   live
+loodgieter            10   live
+─────────────────────────────────────
+alle 204 samen       700 per maand
+171 branches op       0
+de 17 live samen     110 per maand
+```
+
+Ter vergelijking, dezelfde meting zonder branchenaam:
+
+```
+website maken       8.100 per maand
+website laten maken 6.600 per maand
+website bouwen      2.900 per maand
+```
+
+**De generieke term alleen is bijna tien keer groter dan alle 204
+branchetermen samen.**
+
+Wat dat betekent: 700 zoekopdrachten per maand, verdeeld over 204 domeinen, is
+ruim drie per domein per maand. Zelfs op plek een met een royale doorklik houd
+je daar geen kanaal aan over. De branche-specifieke invalshoek is niet te laag
+geoptimaliseerd -- er wordt simpelweg niet zo gezocht.
+
+Dit maakt de eerdere adviezen niet onjuist, maar wel ondergeschikt. Meer eigen
+tekst, betere aanspreekvorm en schonere plaatspagina's zijn alle drie
+verbeteringen, en ze zijn doorgevoerd. Ze verplaatsen alleen iets binnen een
+markt van drie zoekopdrachten per domein per maand.
+
+**Wat hier wel uit volgt:**
+
+1. **Zet de 195 wachtende branches niet live op deze grond.** Niet omdat de
+   sites slecht zijn, maar omdat er per domein geen vraag tegenover staat.
+2. **De vraag zit op de generieke term**, waar betergeregeld.com zelf op moet
+   staan. Dat is een moeilijker en drukker speelveld, maar het is wel waar de
+   6.600 zoekopdrachten zitten.
+3. **De channel-domeinen houden waarde buiten zoeken**: als landingspagina
+   achter advertenties, in verkoopgesprekken en in mailings, waar het
+   branche-specifieke juist overtuigt. Alleen niet als SEO-kanaal.
+
+Herhaalbaar: `bouwsteenwinkel_v3/scripts/_channel-doelgroep.php` voor het
+publiek, en de Keyword Planner-aanroep via de Ads-koppeling voor de vraag.
+
+**Losse vondst:** die Ads-koppeling stond op API-versie `v21` en die bestaat
+niet meer -- elke aanroep gaf HTTP 404, ook `GoogleAdsClient::search()`. Met
+`v22` werkt hij. Zie `GOOGLE_ADS_API_VERSION`.
