@@ -4,6 +4,13 @@ Onderzoek 05-09-2026, op basis van Search Console en een tekstmeting over de
 zestien live channel-sites. Nulmeting voor het plan om naar ongeveer 200
 branches uit te breiden.
 
+> **LEES EERST DE HERZIENING VAN 06-09-2026 ONDERAAN.** De hoofdconclusie
+> hieronder -- "ze ranken te laag door te weinig eigen tekst" -- is gebaseerd op
+> tien van de zeventien channels. De zeven die ontbraken bleken de grootste, en
+> ze laten een ander en groter probleem zien: **80% van alle vertoningen komt
+> van de verkeerde doelgroep.** De tekstmeting en de bouwsels kloppen; de
+> weging van het advies niet.
+
 ## Samenvatting
 
 De sites zijn technisch in orde en worden op de juiste zoekopdrachten gevonden.
@@ -288,3 +295,92 @@ Geen ingreep nodig; wel iets om over een maand opnieuw te bekijken.
 
 **Les voor de volgende meting:** status en inhoud apart bekijken. Een `curl -L`
 verbergt precies het antwoord waar je naar op zoek bent.
+
+## HERZIENING 06-09-2026: het echte probleem is de doelgroep
+
+Dit onderzoek stelde dat zeven channels geen Search Console-property hadden en
+dat er dus "geen enkel cijfer" van was. **Dat was onjuist.** Via de
+Site Verification API bleek: alle zeventien hebben al een geverifieerde
+property, al die tijd. Ze stonden alleen niet op het gebruikersaccount -- de
+service-account was de enige eigenaar. Eén API-aanroep per property loste dat
+op; er was geen DNS-record en geen nieuwe property voor nodig.
+
+Daarmee kwamen de cijfers van de zeven grootste ontbrekende sites vrij, en die
+zetten het beeld op zijn kop.
+
+### De zeven die ontbraken waren de grootste
+
+```
+badkamerspecialist   3.191 vertoningen   positie 26,1     <- grootste van alle 17
+uitlaat-remmen       1.738 vertoningen   positie  8,7     <- pagina EEN
+loodgieter             829 vertoningen   positie 71,9
+rijschool            1.845 vertoningen   positie 39,4     (waar dit onderzoek op steunde)
+```
+
+`uitlaat-remmen` staat op **positie 8,7** met 1.738 vertoningen en één klik. Dat
+is geen rankingprobleem. Dat is iets anders.
+
+### 80% van het verkeer is de verkeerde doelgroep
+
+Per zoekopdracht gemeten over 90 dagen, waarbij een zoekopdracht als doelgroep
+telt zodra er een woord in staat dat over een site of online aanwezigheid gaat:
+
+```
+CHANNEL                   VERT.  DOELGROEP  AANDEEL
+badkamerspecialist         2286        318      14%
+uitlaat-remmen             1472          1       0%
+rijschool                  1119        790      71%   <- de uitzondering
+loodgieter                  786         88      11%
+apotheek                    682          4       1%
+aannemer                    529         67      13%
+acupuncturist               281          6       2%
+─────────────────────────────────────────────────────
+TOTAAL                     8332       1631      20%
+```
+
+Waar die vertoningen vandaan komen:
+
+```
+badkamerspecialist   "badkamer 's gravendeel" (79)   "aalsmeer badkamerspeciaalzaak" (54)
+loodgieter           "loodgieter amstelveen" (120)   "loodgieter enschede" (40)
+uitlaat-remmen       "auto garage assendelft"        "autobedrijf streurman"
+```
+
+Dat zijn mensen met een lekkende leiding en mensen die een badkamer willen. Niet
+de loodgieter of de badkamerzaak die een website zoekt. Die klikken nooit op
+"website laten maken voor loodgieters", en dat verklaart de nul klikken
+rechtstreeks -- zonder dat er iets mis is met de tekst.
+
+### Wat dit betekent voor de eerdere conclusies
+
+**De acupuncturist was geen uitzondering maar de regel.** Dit onderzoek noemde
+hem "één uitzondering" en adviseerde na te kijken of meer zorg-branches dit
+hadden. Het speelt bij dertien van de zestien, en het hardst bij de grootste.
+
+**Het onderzoek stond op de atypische branche.** `rijschool` was de basis van
+"waar het op vastloopt", en is met 71% doelgroep juist de enige die het goed
+doet. Op de rest is de gemiddelde positie een optelsom van twee verschillende
+publieken en zegt hij weinig.
+
+**De tekstmeting blijft staan**, en de bouwsels ook: 15% eigen tekst is nog
+steeds te weinig voor 200 domeinen, de marktcijfers en het `:zaak`-token zijn
+nog steeds verbeteringen. Maar ze zijn geen antwoord op dit. Van 15% naar 40%
+eigen tekst verandert niets aan wie er zoekt.
+
+### Wat wel te doen
+
+1. **Meet voortaan alleen de doelgroep.** 8.332 vertoningen klinkt als iets;
+   1.631 is het echte getal en dat is over 90 dagen en zeventien sites. Elke
+   conclusie over "we ranken te laag" moet op dat deel rusten.
+2. **Kijk opnieuw naar de plaatspagina's.** Ze zijn de enige die klikken
+   opleveren én de bron van het verkeerde verkeer. Bij `rijschool` werken ze;
+   bij `loodgieter` trekken ze uitsluitend consumenten. Dat verschil zit
+   waarschijnlijk in of de branchenaam ook de consumentenzoekterm is
+   ("loodgieter amstelveen") of niet ("rijschool website maken").
+3. **Beslis dit vóór de uitbreiding.** Van de 204 branches is het overgrote deel
+   van het type waar de naam samenvalt met de consumentenzoekterm. Uitrollen
+   naar 200 vermenigvuldigt dan vooral het verkeerde verkeer.
+
+**Methodische les:** dit onderzoek trok een conclusie over zeventien sites uit
+de tien die zichtbaar waren, en controleerde niet of de andere zeven er echt
+niet waren. Ze waren er wel, ze waren groter, en ze wezen een andere kant op.
