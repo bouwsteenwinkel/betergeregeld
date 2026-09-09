@@ -43,7 +43,7 @@ class CreateAppointment extends CreateRecord
                 'note'      => $data['note'] ?? null,
                 // Zo is later terug te zien dat dit met de hand is ingepland en
                 // niet door een bezoeker op een van de sites.
-                'source_site' => $data['source_site'] ?: 'handmatig (admin)',
+                'source_site' => ($data['source_site'] ?? null) ?: 'handmatig (admin)',
             ]);
         } catch (SlotTakenException $e) {
             $this->melding(

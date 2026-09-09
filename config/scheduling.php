@@ -32,7 +32,7 @@ return [
     // Het adres dat de klant terugmailt (Reply-To) en dat als ORGANIZER in de
     // .ics-bijlage staat. Moet een echt postvak zijn: de bevestigings- en
     // herinneringsmails nodigen expliciet uit om te antwoorden.
-    'organizer_email' => env('SCHEDULING_ORGANIZER_EMAIL', 'info@bouwsteenwinkel.nl'),
+    'organizer_email' => env('SCHEDULING_ORGANIZER_EMAIL', 'info@betergeregeld.com'),
 
     // Waar de interne "nieuwe afspraak"-melding en de storingsalarmen heen gaan.
     // Losgetrokken van MAIL_FROM_ADDRESS: dat is een afzender, geen postbus die

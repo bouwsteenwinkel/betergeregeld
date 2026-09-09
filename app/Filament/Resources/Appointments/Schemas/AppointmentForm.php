@@ -2,47 +2,138 @@
 
 namespace App\Filament\Resources\Appointments\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
+use App\Models\Appointment;
+use App\Services\Scheduling\SlotEngine;
+use Carbon\CarbonImmutable;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
+/**
+ * Het formulier om een afspraak in te plannen.
+ *
+ * EERST EEN DAG, DAN EEN TIJD UIT EEN LIJST. Hier stond een vrij
+ * datum-tijdveld, en dat is een valstrik: de planner werkt met een raster van
+ * hele uren binnen werktijden, dus "14:11" wordt geweigerd met een melding die
+ * lijkt te zeggen dat de agenda vol zit. Een veld waarin je iets mag typen dat
+ * daarna toch niet mag, hoort er niet te zijn.
+ *
+ * WAT HIER NIET MEER STAAT. ends_at, type, status, hold_expires_at,
+ * google_event_id en meet_url zijn weg. Dat zijn allemaal uitkomsten van het
+ * inplannen: de eindtijd volgt uit de duur, het type is meet, de status wordt
+ * booked, en het event-id en de Meet-link komen van Google terug. Ze invulbaar
+ * maken levert alleen een rij op die iets anders beweert dan de agenda.
+ */
 class AppointmentForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email()
-                    ->required(),
-                TextInput::make('phone')
-                    ->tel()
-                    ->default(null),
-                DateTimePicker::make('starts_at')
-                    ->required(),
-                DateTimePicker::make('ends_at')
-                    ->required(),
-                TextInput::make('type')
-                    ->required()
-                    ->default('meet'),
-                TextInput::make('status')
-                    ->required()
-                    ->default('booked'),
-                DateTimePicker::make('hold_expires_at'),
-                TextInput::make('google_event_id')
-                    ->default(null),
-                TextInput::make('meet_url')
-                    ->url()
-                    ->default(null),
-                TextInput::make('source_site')
-                    ->default(null),
+                Section::make('Voor wie')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Naam')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->label('E-mailadres')
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText('Hier gaan de uitnodiging en de bevestiging heen.'),
+                        TextInput::make('phone')
+                            ->label('Telefoon')
+                            ->tel()
+                            ->maxLength(40),
+                        TextInput::make('source_site')
+                            ->label('Herkomst')
+                            ->placeholder('handmatig (admin)')
+                            ->helperText('Laat leeg als je hem zelf inplant.')
+                            ->maxLength(255),
+                    ]),
+
+                Section::make('Wanneer')
+                    ->columns(2)
+                    ->description(static::uitleg())
+                    ->schema([
+                        DatePicker::make('slot_datum')
+                            ->label('Dag')
+                            ->native(false)
+                            ->displayFormat('d-m-Y')
+                            ->firstDayOfWeek(1)
+                            ->minDate(now()->startOfDay())
+                            ->maxDate(now()->addDays((int) config('scheduling.horizon_days', 21)))
+                            ->required()
+                            ->live()
+                            // Hoort niet bij de afspraak zelf: het is alleen de vraag
+                            // welke dag we tijden voor moeten tonen.
+                            ->dehydrated(false)
+                            ->afterStateUpdated(fn ($set) => $set('starts_at', null))
+                            ->afterStateHydrated(function ($state, $set, $record) {
+                                if (! $state && $record?->starts_at) {
+                                    $set('slot_datum', CarbonImmutable::parse($record->starts_at)->toDateString());
+                                }
+                            }),
+
+                        Select::make('starts_at')
+                            ->label('Tijd')
+                            ->native(false)
+                            ->required()
+                            ->placeholder('Kies eerst een dag')
+                            ->options(fn ($get, $record) => static::tijden($get('slot_datum'), $record))
+                            ->helperText('Alleen tijden die vrij zijn. Staat er niets, dan is die dag vol of gesloten.')
+                            ->formatStateUsing(fn ($state) => $state
+                                ? CarbonImmutable::parse($state)->format('Y-m-d H:i:s')
+                                : null),
+                    ]),
+
                 Textarea::make('note')
-                    ->default(null)
+                    ->label('Notitie')
+                    ->rows(3)
+                    ->helperText('Waar gaat het gesprek over? Komt mee in de interne melding.')
                     ->columnSpanFull(),
             ]);
+    }
+
+    /** De vrije tijden van een dag, als 'Y-m-d H:i:s' => 'H:i'. */
+    private static function tijden($datum, ?Appointment $record = null): array
+    {
+        $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
+        $uit = [];
+
+        if ($datum) {
+            $dag = CarbonImmutable::parse($datum, $tz);
+            $vrij = app(SlotEngine::class)->slots($dag->startOfDay(), $dag->endOfDay());
+            foreach ($vrij[$dag->toDateString()] ?? [] as $hm) {
+                $uit[$dag->setTimeFromTimeString($hm)->format('Y-m-d H:i:s')] = $hm;
+            }
+        }
+
+        // Bij bewerken staat het eigen moment niet in de vrije lijst -- die afspraak
+        // bezet hem immers zelf. Zonder deze regel lijkt het veld leeg en zou je bij
+        // het opslaan ongemerkt verzetten.
+        if ($record?->starts_at) {
+            $eigen = CarbonImmutable::parse($record->starts_at)->setTimezone($tz);
+            $uit[$eigen->format('Y-m-d H:i:s')] = $eigen->format('H:i') . ' (nu ingepland)';
+            ksort($uit);
+        }
+
+        return $uit;
+    }
+
+    /** Waarom de keuze beperkt is, in gewone taal onder de kop. */
+    private static function uitleg(): string
+    {
+        $duur = (int) config('scheduling.meeting_minutes', 60);
+        $notice = (int) config('scheduling.min_notice_hours', 4);
+        $horizon = (int) config('scheduling.horizon_days', 21);
+
+        return "Gesprekken duren {$duur} minuten en beginnen op het hele uur, binnen werktijd. "
+             . "Niet binnen {$notice} uur vanaf nu, en niet verder dan {$horizon} dagen vooruit.";
     }
 }
