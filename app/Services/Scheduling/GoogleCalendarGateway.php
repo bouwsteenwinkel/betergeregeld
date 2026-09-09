@@ -25,7 +25,20 @@ use Illuminate\Support\Facades\Storage;
 class GoogleCalendarGateway implements CalendarGateway
 {
     private const TOKEN_FILE = 'google-agenda.json';
-    public const SCOPE = 'https://www.googleapis.com/auth/calendar';
+    /**
+     * De rechten die de koppeling vraagt.
+     *
+     * drive.readonly zit erbij om bijlagen te kunnen kiezen uit een gedeelde
+     * Drive-map. Google laat aan een agenda-item namelijk alleen Drive-bestanden
+     * hangen -- een los bestand meesturen kan niet. Lezen is genoeg: wij zetten
+     * niets in Drive, we verwijzen alleen naar wat er al staat.
+     *
+     * LET OP: dit geldt pas na een NIEUWE koppeling. Een bestaand token houdt de
+     * rechten waarmee het is afgegeven, dus zonder opnieuw koppelen blijft het
+     * bij agenda alleen -- en dan mislukt het ophalen van de map.
+     */
+    public const SCOPE = 'https://www.googleapis.com/auth/calendar'
+        . ' https://www.googleapis.com/auth/drive.readonly';
 
     private function ca(): string
     {
