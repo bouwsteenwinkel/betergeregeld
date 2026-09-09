@@ -108,7 +108,17 @@ class AppointmentForm
 
         if ($datum) {
             $dag = CarbonImmutable::parse($datum, $tz);
-            $vrij = app(SlotEngine::class)->slots($dag->startOfDay(), $dag->endOfDay());
+            try {
+                $vrij = app(SlotEngine::class)->slots($dag->startOfDay(), $dag->endOfDay());
+            } catch (\Throwable $e) {
+                // De vrij/bezet-vraag gaat langs Google. Valt die weg, dan hoort dit
+                // veld leeg te blijven en niet het hele formulier mee te nemen: je
+                // bent dan je ingevulde naam en e-mailadres kwijt aan een storing die
+                // niets met jouw invoer te maken heeft.
+                report($e);
+
+                return [];
+            }
             foreach ($vrij[$dag->toDateString()] ?? [] as $hm) {
                 $uit[$dag->setTimeFromTimeString($hm)->format('Y-m-d H:i:s')] = $hm;
             }
