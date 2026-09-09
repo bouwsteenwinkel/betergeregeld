@@ -116,8 +116,11 @@ class AppointmentForm
 
                 Section::make('Mee te sturen stukken')
                     ->columns(2)
-                    ->description('Uit de gedeelde map, met een submap per klant. De genodigde krijgt '
-                        . 'leesrecht op precies de stukken die je aanvinkt -- niet op de map.')
+                    ->description(fn (?Appointment $record) => $record
+                        ? 'Let op: de uitnodiging is al verstuurd. Wat je hier verandert komt in onze '
+                          . 'administratie te staan, maar niet meer in het agenda-item bij Google.'
+                        : 'Uit de gedeelde map, met een submap per klant. De genodigde krijgt '
+                          . 'leesrecht op precies de stukken die je aanvinkt -- niet op de map.')
                     ->schema([
                         Select::make('drive_map')
                             ->label('Klantmap')
@@ -136,9 +139,7 @@ class AppointmentForm
                             ->multiple()
                             ->native(false)
                             ->placeholder('Kies eerst een klantmap')
-                            ->options(fn ($get) => ($m = $get('drive_map'))
-                                ? app(DriveClient::class)->bestanden((string) $m)
-                                : [])
+                            ->options(fn ($get, $record) => static::bijlagekeuzes($get('drive_map'), $record))
                             ->helperText('Optioneel. Ze komen als bijlage in de agenda-uitnodiging.'),
                     ]),
 
@@ -148,6 +149,34 @@ class AppointmentForm
                     ->helperText('Waar gaat het gesprek over? Komt mee in de interne melding.')
                     ->columnSpanFull(),
             ]);
+    }
+
+    /**
+     * De keuzelijst met bijlagen: wat er in de gekozen klantmap staat, plus wat
+     * er al aan deze afspraak hangt.
+     *
+     * Dat tweede is geen luxe. Bij bewerken is er nog geen klantmap gekozen, dus
+     * zou de lijst leeg zijn -- en een meerkeuzeveld laat waarden vallen die niet
+     * in zijn opties staan. Je zou de bijlagen dan wissen door alleen op Opslaan
+     * te drukken, zonder ze ooit gezien te hebben.
+     */
+    private static function bijlagekeuzes($mapId, ?Appointment $record = null): array
+    {
+        $drive = app(DriveClient::class);
+
+        $uit = $mapId ? $drive->bestanden((string) $mapId) : [];
+
+        foreach ((array) ($record->attachments ?? []) as $id) {
+            $id = (string) $id;
+            if ($id === '' || isset($uit[$id])) {
+                continue;
+            }
+            // Naam onbekend (Drive niet bereikbaar, of het bestand is weg): dan
+            // liever het id tonen dan de bijlage stilzwijgend laten verdwijnen.
+            $uit[$id] = $drive->bestand($id)['name'] ?? ('Bestand ' . $id);
+        }
+
+        return $uit;
     }
 
     /** De vrije tijden van een dag, als 'Y-m-d H:i:s' => 'H:i'. */

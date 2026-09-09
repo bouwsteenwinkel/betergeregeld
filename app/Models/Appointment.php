@@ -20,6 +20,22 @@ class Appointment extends Model
         'bussum'     => 'Bij ons in Bussum',
     ];
 
+    /**
+     * De standen waarin een afspraak kan staan, in gewone taal.
+     *
+     * De sleutels zijn de waarden in de kolom `status`; die blijven Engels omdat
+     * er code en oude rijen aan hangen. Alleen wat je op het scherm ziet is
+     * Nederlands -- vertalen in de database zou elke bestaande rij en elke
+     * match() op status breken.
+     */
+    public const STATUSSEN = [
+        'held'      => 'Gereserveerd',
+        'booked'    => 'Ingepland',
+        'cancelled' => 'Geannuleerd',
+        'completed' => 'Geweest',
+        'no_show'   => 'Niet verschenen',
+    ];
+
     /** Waar de afspraak plaatsvindt, voor in de agenda. Leeg bij Meet. */
     public function locatie(): string
     {

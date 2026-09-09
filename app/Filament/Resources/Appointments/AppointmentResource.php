@@ -26,6 +26,21 @@ class AppointmentResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
+    /**
+     * Hoe de afspraak in de schermtekst heet.
+     *
+     * Zonder deze twee maakt Filament de naam uit de klassenaam en staat er
+     * "Appointment aanmaken" boven een verder Nederlands formulier, met
+     * "Appointments" in de kruimelpaden. De klasse blijft Appointment -- alleen
+     * wat je leest verandert.
+     */
+    protected static ?string $modelLabel = 'afspraak';
+
+    protected static ?string $pluralModelLabel = 'afspraken';
+
+    /** Waarmee een afspraak zich noemt in meldingen en zoekresultaten. */
+    protected static ?string $recordTitleAttribute = 'name';
+
     public static function form(Schema $schema): Schema
     {
         return AppointmentForm::configure($schema);
