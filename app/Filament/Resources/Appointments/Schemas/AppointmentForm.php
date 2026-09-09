@@ -107,7 +107,7 @@ class AppointmentForm
                             ->native(false)
                             ->required()
                             ->placeholder('Kies eerst een dag')
-                            ->options(fn ($get, $record) => static::tijden($get('slot_datum'), $record))
+                            ->options(fn ($get) => static::tijden($get('slot_datum'), $get('starts_at')))
                             ->helperText('Alleen tijden die vrij zijn. Staat er niets, dan is die dag vol of gesloten.')
                             ->formatStateUsing(fn ($state) => $state
                                 ? CarbonImmutable::parse($state)->format('Y-m-d H:i:s')
@@ -139,7 +139,7 @@ class AppointmentForm
                             ->multiple()
                             ->native(false)
                             ->placeholder('Kies eerst een klantmap')
-                            ->options(fn ($get, $record) => static::bijlagekeuzes($get('drive_map'), $record))
+                            ->options(fn ($get) => static::bijlagekeuzes($get('drive_map'), $get('attachments')))
                             ->helperText('Optioneel. Ze komen als bijlage in de agenda-uitnodiging.'),
                     ]),
 
@@ -159,14 +159,18 @@ class AppointmentForm
      * zou de lijst leeg zijn -- en een meerkeuzeveld laat waarden vallen die niet
      * in zijn opties staan. Je zou de bijlagen dan wissen door alleen op Opslaan
      * te drukken, zonder ze ooit gezien te hebben.
+     *
+     * We lezen de gekozen bestanden uit de veldwaarde en niet uit het record, om
+     * dezelfde reden als bij [[tijden]]: dat is de waarde die het veld op dit
+     * moment echt heeft, ook halverwege het invullen.
      */
-    private static function bijlagekeuzes($mapId, ?Appointment $record = null): array
+    private static function bijlagekeuzes($mapId, $gekozen = null): array
     {
         $drive = app(DriveClient::class);
 
         $uit = $mapId ? $drive->bestanden((string) $mapId) : [];
 
-        foreach ((array) ($record->attachments ?? []) as $id) {
+        foreach ((array) ($gekozen ?? []) as $id) {
             $id = (string) $id;
             if ($id === '' || isset($uit[$id])) {
                 continue;
@@ -179,8 +183,20 @@ class AppointmentForm
         return $uit;
     }
 
-    /** De vrije tijden van een dag, als 'Y-m-d H:i:s' => 'H:i'. */
-    private static function tijden($datum, ?Appointment $record = null): array
+    /**
+     * De vrije tijden van een dag, als 'Y-m-d H:i:s' => 'H:i'.
+     *
+     * $huidig is de tijd die nu in het veld staat. Bij bewerken staat die niet in
+     * de vrije lijst -- de afspraak bezet hem immers zelf -- en een keuzeveld dat
+     * zijn eigen waarde niet kent toont de rauwe '2026-09-10 10:00:00' en laat hem
+     * bij het opslaan vallen. Daarom zetten we hem er altijd zelf bij.
+     *
+     * We lezen hem uit de veldwaarde en niet uit het record: die is er ook als het
+     * formulier al een keer is bijgewerkt, en hij komt langs dezelfde weg binnen
+     * als formatStateUsing hem heeft weggeschreven -- dus dezelfde opmaak, dus een
+     * sleutel die gegarandeerd matcht.
+     */
+    private static function tijden($datum, $huidig = null): array
     {
         $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
         $uit = [];
@@ -190,26 +206,26 @@ class AppointmentForm
             try {
                 $vrij = app(SlotEngine::class)->slots($dag->startOfDay(), $dag->endOfDay());
             } catch (\Throwable $e) {
-                // De vrij/bezet-vraag gaat langs Google. Valt die weg, dan hoort dit
-                // veld leeg te blijven en niet het hele formulier mee te nemen: je
-                // bent dan je ingevulde naam en e-mailadres kwijt aan een storing die
-                // niets met jouw invoer te maken heeft.
+                // De vrij/bezet-vraag gaat langs Google. Valt die weg, dan blijft de
+                // lijst leeg in plaats van dat het hele formulier omvalt: je bent
+                // anders je ingevulde naam en e-mailadres kwijt aan een storing die
+                // niets met jouw invoer te maken heeft. Het eigen moment hieronder
+                // hoort er dan nog steeds bij te staan.
                 report($e);
-
-                return [];
+                $vrij = [];
             }
             foreach ($vrij[$dag->toDateString()] ?? [] as $hm) {
                 $uit[$dag->setTimeFromTimeString($hm)->format('Y-m-d H:i:s')] = $hm;
             }
         }
 
-        // Bij bewerken staat het eigen moment niet in de vrije lijst -- die afspraak
-        // bezet hem immers zelf. Zonder deze regel lijkt het veld leeg en zou je bij
-        // het opslaan ongemerkt verzetten.
-        if ($record?->starts_at) {
-            $eigen = CarbonImmutable::parse($record->starts_at)->setTimezone($tz);
-            $uit[$eigen->format('Y-m-d H:i:s')] = $eigen->format('H:i') . ' (nu ingepland)';
-            ksort($uit);
+        if ($huidig) {
+            $eigen = CarbonImmutable::parse($huidig);
+            $sleutel = $eigen->format('Y-m-d H:i:s');
+            if (! isset($uit[$sleutel])) {
+                $uit[$sleutel] = $eigen->format('H:i') . ' (nu ingepland)';
+                ksort($uit);
+            }
         }
 
         return $uit;
