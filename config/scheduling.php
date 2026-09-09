@@ -69,7 +69,13 @@ return [
         // Het account dat gekoppeld MOET zijn. Koppelen met een ander Google-account
         // wordt geweigerd: dat is de fout die je pas maanden later ontdekt, wanneer
         // blijkt dat alle afspraken in een privé-agenda staan.
-        'expected_account' => env('GOOGLE_CALENDAR_ACCOUNT', 'info@bouwsteenwinkel.nl'),
+        //
+        // Sinds 09-09-2026 een eigen Betergeregeld-mailbox. Het stond op
+        // info@bouwsteenwinkel.nl, en dat was het adres van de LEGO-webshop: de klant
+        // kreeg zijn bevestiging van Betergeregeld en zijn agenda-uitnodiging van
+        // Bouwsteenwinkel. Een alias volstond niet -- die heeft geen eigen agenda --
+        // dus is er een echte gebruiker van gemaakt.
+        'expected_account' => env('GOOGLE_CALENDAR_ACCOUNT', 'info@betergeregeld.com'),
 
         // Nodigt Google de klant zelf uit (en zegt het af bij annuleren/verzetten)?
         'send_updates' => env('GOOGLE_CALENDAR_SEND_UPDATES', 'all'),
