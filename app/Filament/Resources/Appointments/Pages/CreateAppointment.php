@@ -37,6 +37,8 @@ class CreateAppointment extends CreateRecord
         try {
             return app(BookingService::class)->book([
                 'name'      => (string) ($data['name'] ?? ''),
+                'company'   => $data['company'] ?? null,
+                'type'      => $data['type'] ?? 'meet',
                 'email'     => (string) ($data['email'] ?? ''),
                 'phone'     => $data['phone'] ?? null,
                 'starts_at' => $data['starts_at'],

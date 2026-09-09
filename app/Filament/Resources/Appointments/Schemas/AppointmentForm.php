@@ -47,6 +47,10 @@ class AppointmentForm
                             ->required()
                             ->maxLength(255)
                             ->helperText('Hier gaan de uitnodiging en de bevestiging heen.'),
+                        TextInput::make('company')
+                            ->label('Bedrijfsnaam')
+                            ->maxLength(255)
+                            ->helperText('Optioneel. Komt achter de naam in de agenda te staan.'),
                         TextInput::make('phone')
                             ->label('Telefoon')
                             ->tel()
@@ -68,6 +72,16 @@ class AppointmentForm
                     ->columns(2)
                     ->description(static::uitleg())
                     ->schema([
+                        Select::make('type')
+                            ->label('Soort afspraak')
+                            ->options(Appointment::SOORTEN)
+                            ->default('meet')
+                            ->required()
+                            ->native(false)
+                            ->columnSpanFull()
+                            ->helperText('Alleen bij Google Meet komt er een videolink in de uitnodiging; '
+                                . 'bij de andere zetten we de plek erbij.'),
+
                         DatePicker::make('slot_datum')
                             ->label('Dag')
                             ->native(false)

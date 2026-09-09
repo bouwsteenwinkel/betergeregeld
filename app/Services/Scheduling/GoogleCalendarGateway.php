@@ -262,8 +262,11 @@ class GoogleCalendarGateway implements CalendarGateway
 
         $tz   = (string) config('scheduling.timezone', 'Europe/Amsterdam');
         $body = [
-            'summary'     => 'Online kennismaking · ' . $appointment->name,
-            'description' => "Online kennismaking, aangevraagd via de website.\nNaam: {$appointment->name}\nE-mail: {$appointment->email}"
+            'summary'     => (Appointment::SOORTEN[$appointment->type] ?? 'Kennismaking') . ' · ' . $appointment->name
+                . ($appointment->company ? ' (' . $appointment->company . ')' : ''),
+            'description' => 'Kennismaking (' . (Appointment::SOORTEN[$appointment->type] ?? $appointment->type) . ").\nNaam: {$appointment->name}"
+                . ($appointment->company ? "\nBedrijf: {$appointment->company}" : '')
+                . "\nE-mail: {$appointment->email}"
                 . ($appointment->phone ? "\nTelefoon: {$appointment->phone}" : '')
                 . ($appointment->source_site ? "\nVia site: {$appointment->source_site}" : '')
                 . ($appointment->note ? "\nBericht: {$appointment->note}" : ''),
@@ -271,13 +274,22 @@ class GoogleCalendarGateway implements CalendarGateway
             'end'         => ['dateTime' => Carbon::parse($appointment->ends_at)->toRfc3339String(), 'timeZone' => $tz],
             'attendees'   => [['email' => $appointment->email, 'displayName' => $appointment->name]],
             'reminders'   => ['useDefault' => true],
-            'conferenceData' => [
+        ];
+
+        // ALLEEN EEN MEET-LINK BIJ EEN MEET-AFSPRAAK. Wie op locatie afspreekt of
+        // gebeld wordt, heeft niets aan een videolink in zijn uitnodiging -- die
+        // nodigt juist uit om op het verkeerde moment op de verkeerde plek te zijn.
+        // Dan zetten we in plaats daarvan de plek erbij.
+        if ($appointment->type === 'meet') {
+            $body['conferenceData'] = [
                 'createRequest' => [
                     'requestId' => 'appt-' . $appointment->id . '-' . substr(md5((string) ($appointment->cancel_token ?: $appointment->id)), 0, 10),
                     'conferenceSolutionKey' => ['type' => 'hangoutsMeet'],
                 ],
-            ],
-        ];
+            ];
+        } elseif ($plek = $appointment->locatie()) {
+            $body['location'] = $plek;
+        }
 
         try {
             $resp = Http::withToken($token)->withOptions(['verify' => $this->ca()])->timeout(15)

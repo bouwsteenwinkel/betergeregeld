@@ -57,11 +57,12 @@ class BookingService
 
             return Appointment::create([
                 'name'         => $data['name'],
+                'company'      => $data['company'] ?? null,
                 'email'        => $data['email'],
                 'phone'        => $data['phone'] ?? null,
                 'starts_at'    => $start,
                 'ends_at'      => $end,
-                'type'         => 'meet',
+                'type'         => $data['type'] ?? 'meet',
                 'status'       => 'booked',
                 'cancel_token' => Str::random(48),
                 'source_site'  => $data['source_site'] ?? null,
@@ -263,7 +264,8 @@ class BookingService
         $tz = (string) config('scheduling.timezone', 'Europe/Amsterdam');
 
         return "Wanneer: " . $appt->starts_at->copy()->setTimezone($tz)->format('d-m-Y H:i') . "\n"
-            . "Naam: {$appt->name}\n"
+            . "Naam: {$appt->name}" . ($appt->company ? " ({$appt->company})" : '') . "\n"
+            . "Soort: " . (Appointment::SOORTEN[$appt->type] ?? $appt->type) . "\n"
             . "Contact: {$appt->email} · " . ($appt->phone ?: '—') . "\n"
             . 'Via: ' . ($appt->source_site ?: 'onbekend') . "\n";
     }

@@ -6,8 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
+    /**
+     * De soorten afspraak die je kunt inplannen.
+     *
+     * Alleen 'meet' krijgt een Google Meet-link; bij de andere hoort een plek in
+     * plaats van een videogesprek. De sleutels staan in de kolom `type` en zijn
+     * bewust kort -- ze gaan mee in de agenda en in de mail.
+     */
+    public const SOORTEN = [
+        'meet'       => 'Google Meet',
+        'locatie'    => 'Op locatie bij de klant',
+        'telefoon'   => 'Telefonisch',
+        'bussum'     => 'Bij ons in Bussum',
+    ];
+
+    /** Waar de afspraak plaatsvindt, voor in de agenda. Leeg bij Meet. */
+    public function locatie(): string
+    {
+        return match ($this->type) {
+            'bussum'   => 'Betergeregeld, Bussum',
+            'telefoon' => 'Telefonisch' . ($this->phone ? ' — ' . $this->phone : ''),
+            'locatie'  => 'Op locatie bij de klant',
+            default    => '',
+        };
+    }
+
     protected $fillable = [
-        'name', 'email', 'phone', 'starts_at', 'ends_at', 'type', 'status',
+        'name', 'company', 'email', 'phone', 'starts_at', 'ends_at', 'type', 'status',
         'hold_expires_at', 'google_event_id', 'meet_url', 'cancel_token', 'source_site', 'note',
         'reminder_2d_sent_at', 'reminder_day_of_sent_at', 'calendar_synced_at', 'calendar_error',
     ];
