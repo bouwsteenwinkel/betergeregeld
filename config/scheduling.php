@@ -56,6 +56,19 @@ return [
         'min_lead_minutes'  => 60,
     ],
 
+    /**
+     * Bijlagen komen uit een gedeelde Drive-map met een submap per klant. In de
+     * Verkenner is dat "G:\Shared drives\04] Beter Geregeld ICT\Google Meet".
+     *
+     * Op naam en niet op id, zodat je hem kunt hernoemen zonder hier iets te
+     * hoeven wijzigen. Staat er wel een id in de omgeving, dan wint die -- handig
+     * als er ooit twee mappen met dezelfde naam blijken te bestaan.
+     */
+    'drive' => [
+        'folder_name' => env('SCHEDULING_DRIVE_FOLDER', 'Google Meet'),
+        'folder_id'   => env('SCHEDULING_DRIVE_FOLDER_ID', ''),
+    ],
+
     // Google-koppeling (fase 1b). Zolang leeg → stub-gateway (geen echte Meet-links).
     'google' => [
         'enabled'       => env('GOOGLE_CALENDAR_ENABLED', false),

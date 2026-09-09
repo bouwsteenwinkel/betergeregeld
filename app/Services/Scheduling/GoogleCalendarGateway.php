@@ -28,19 +28,25 @@ class GoogleCalendarGateway implements CalendarGateway
     /**
      * De rechten die de koppeling vraagt.
      *
-     * drive.readonly zit erbij om bijlagen te kunnen kiezen uit een gedeelde
+     * Het drive-recht zit erbij om bijlagen te kunnen kiezen uit een gedeelde
      * Drive-map. Google laat aan een agenda-item namelijk alleen Drive-bestanden
-     * hangen -- een los bestand meesturen kan niet. Lezen is genoeg: wij zetten
-     * niets in Drive, we verwijzen alleen naar wat er al staat.
+     * hangen -- een los bestand meesturen kan niet.
+     *
+     * WAAROM VOLLEDIG EN NIET ALLEEN LEZEN. De bestanden staan in klantmappen op
+     * een gedeelde Drive, en een externe genodigde komt daar niet bij. Bij het
+     * versturen geven wij hem leesrecht op precies dat ene bestand -- en een
+     * rechtenwijziging kan niet met een leesrecht. Het alternatief was de map op
+     * "iedereen met de link" zetten, en dat is bij klantstukken geen optie.
      *
      * LET OP: dit geldt pas na een NIEUWE koppeling. Een bestaand token houdt de
      * rechten waarmee het is afgegeven, dus zonder opnieuw koppelen blijft het
      * bij agenda alleen -- en dan mislukt het ophalen van de map.
      */
     public const SCOPE = 'https://www.googleapis.com/auth/calendar'
-        . ' https://www.googleapis.com/auth/drive.readonly';
+        . ' https://www.googleapis.com/auth/drive';
 
-    private function ca(): string
+    /** Het CA-bundel, gedeeld met de Drive-koppeling. */
+    public function ca(): string
     {
         return CaBundle::getSystemCaRootBundlePath();
     }
@@ -180,7 +186,8 @@ class GoogleCalendarGateway implements CalendarGateway
         }
     }
 
-    private function accessToken(): ?string
+    /** Ook de Drive-koppeling heeft dit token nodig; het is dezelfde koppeling. */
+    public function accessToken(): ?string
     {
         if ($t = Cache::get('google_agenda_access_token')) {
             return $t;
@@ -304,11 +311,51 @@ class GoogleCalendarGateway implements CalendarGateway
             $body['location'] = $plek;
         }
 
+        // BIJLAGEN. Google hangt alleen Drive-bestanden aan een event, en de
+        // genodigde moet erbij kunnen -- een externe klant komt niet in een
+        // gedeelde Drive. Daarom eerst leesrecht op precies dat ene bestand, en
+        // pas dan de verwijzing meesturen.
+        //
+        // Lukt het leesrecht niet, dan laten we de bijlage weg. Een bestand dat
+        // in de uitnodiging staat maar niet te openen is, is vervelender dan geen
+        // bijlage: de klant denkt dat hij iets mist en gaat bellen.
+        $bijlagen = [];
+        foreach ((array) ($appointment->attachments ?? []) as $bestandId) {
+            $bestandId = (string) $bestandId;
+            if ($bestandId === '') {
+                continue;
+            }
+
+            $drive = app(DriveClient::class);
+            if (! $drive->geefLeesrecht($bestandId, (string) $appointment->email)) {
+                Log::warning("appointment_attachment (#{$appointment->id}): leesrecht op {$bestandId} mislukt, bijlage weggelaten.");
+
+                continue;
+            }
+
+            $info = $drive->bestand($bestandId);
+            if (! $info || empty($info['webViewLink'])) {
+                Log::warning("appointment_attachment (#{$appointment->id}): {$bestandId} niet op te halen, bijlage weggelaten.");
+
+                continue;
+            }
+
+            $bijlagen[] = array_filter([
+                'fileUrl'  => $info['webViewLink'],
+                'title'    => $info['name'] ?? null,
+                'mimeType' => $info['mimeType'] ?? null,
+                'iconLink' => $info['iconLink'] ?? null,
+            ]);
+        }
+        if ($bijlagen) {
+            $body['attachments'] = $bijlagen;
+        }
+
         try {
             $resp = Http::withToken($token)->withOptions(['verify' => $this->ca()])->timeout(15)
                 ->post(
                     'https://www.googleapis.com/calendar/v3/calendars/' . rawurlencode($this->calendarId())
-                        . '/events?conferenceDataVersion=1&sendUpdates=' . $this->sendUpdates(),
+                        . '/events?conferenceDataVersion=1&supportsAttachments=true&sendUpdates=' . $this->sendUpdates(),
                     $body
                 );
         } catch (\Throwable $e) {

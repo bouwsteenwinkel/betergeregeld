@@ -35,6 +35,7 @@ class Appointment extends Model
         'name', 'company', 'email', 'phone', 'starts_at', 'ends_at', 'type', 'status',
         'hold_expires_at', 'google_event_id', 'meet_url', 'cancel_token', 'source_site', 'note',
         'reminder_2d_sent_at', 'reminder_day_of_sent_at', 'calendar_synced_at', 'calendar_error',
+        'attachments',
     ];
 
     protected $casts = [
@@ -44,6 +45,7 @@ class Appointment extends Model
         'reminder_2d_sent_at'     => 'datetime',
         'reminder_day_of_sent_at' => 'datetime',
         'calendar_synced_at'      => 'datetime',
+        'attachments'             => 'array',
     ];
 
     /**

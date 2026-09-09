@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Appointments\Schemas;
 
 use App\Models\Appointment;
+use App\Services\Scheduling\DriveClient;
 use App\Services\Scheduling\SlotEngine;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\DatePicker;
@@ -111,6 +112,34 @@ class AppointmentForm
                             ->formatStateUsing(fn ($state) => $state
                                 ? CarbonImmutable::parse($state)->format('Y-m-d H:i:s')
                                 : null),
+                    ]),
+
+                Section::make('Mee te sturen stukken')
+                    ->columns(2)
+                    ->description('Uit de gedeelde map, met een submap per klant. De genodigde krijgt '
+                        . 'leesrecht op precies de stukken die je aanvinkt -- niet op de map.')
+                    ->schema([
+                        Select::make('drive_map')
+                            ->label('Klantmap')
+                            ->options(fn () => app(DriveClient::class)->klantmappen())
+                            ->searchable()
+                            ->native(false)
+                            ->live()
+                            // Hoort niet bij de afspraak: het is alleen de vraag uit
+                            // welke map we bestanden moeten tonen.
+                            ->dehydrated(false)
+                            ->afterStateUpdated(fn ($set) => $set('attachments', []))
+                            ->helperText('Staat er niets? Dan is er nog niet opnieuw gekoppeld met het Drive-recht.'),
+
+                        Select::make('attachments')
+                            ->label('Bijlagen')
+                            ->multiple()
+                            ->native(false)
+                            ->placeholder('Kies eerst een klantmap')
+                            ->options(fn ($get) => ($m = $get('drive_map'))
+                                ? app(DriveClient::class)->bestanden((string) $m)
+                                : [])
+                            ->helperText('Optioneel. Ze komen als bijlage in de agenda-uitnodiging.'),
                     ]),
 
                 Textarea::make('note')

@@ -67,6 +67,7 @@ class BookingService
                 'cancel_token' => Str::random(48),
                 'source_site'  => $data['source_site'] ?? null,
                 'note'         => $data['note'] ?? null,
+                'attachments'  => $data['attachments'] ?? null,
             ]);
         });
 
