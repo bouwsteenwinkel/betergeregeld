@@ -1,0 +1,18 @@
+[Unit]
+Description=Beter Geregeld VPS-monitoring: elke minuut een meting
+Documentation=https://betergeregeld.com/admin/monitor-servers
+
+[Timer]
+# Eerste meting kort na het opstarten, daarna elke minuut. Bewust dezelfde
+# frequentie als de Windows-agent, anders zijn de grafieken van twee servers
+# niet naast elkaar te leggen.
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=5s
+# Niet alle machines op dezelfde seconde laten pushen.
+RandomizedDelaySec=10
+Unit=bsw-monitor.service
+Persistent=false
+
+[Install]
+WantedBy=timers.target

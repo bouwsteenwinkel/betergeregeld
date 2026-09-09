@@ -1,7 +1,13 @@
 # VPS Monitoring — collector agent
 
-Pusht elke minuut CPU/RAM/disk/uptime van een Windows-VPS naar het Beter
-Geregeld monitoring-dashboard.
+Pusht elke minuut CPU/RAM/disk/uptime van een VPS naar het Beter Geregeld
+monitoring-dashboard.
+
+**Twee agents, één contract.** `collect.ps1` voor Windows, `collect.py` voor
+Linux. Ze sturen dezelfde velden naar hetzelfde endpoint met dezelfde
+token-koptekst; alleen de manier waarop de cijfers van de machine komen
+verschilt (WMI tegenover `/proc`). De `agent_version` in het dashboard zegt
+welke er draait: `ps-*` of `py-*`.
 
 ## Installeren (aanbevolen)
 
@@ -82,3 +88,43 @@ alleen niet weg; blijft het gat helemaal leeg, dan is de taak niet gestart.
 | `disk_used_gb` / `disk_total_gb` | systeemschijf C: in GB |
 | `uptime_seconds` | tijd sinds laatste boot |
 | `collected_at` | ISO-8601 tijdstip van meting |
+
+
+## Linux (collect.py)
+
+De **Install**-actie in het admin toont alleen het PowerShell-blok. Voor Linux
+is er geen knop; dit is de handmatige weg:
+
+```bash
+# 1) Script en units neerzetten (vanaf een werkplek met de repo):
+scp tools/monitor-agent/collect.py root@SERVER:/usr/local/bin/bsw-monitor-collect.py
+scp tools/monitor-agent/bsw-monitor.{service,timer} root@SERVER:/etc/systemd/system/
+ssh root@SERVER 'chmod 755 /usr/local/bin/bsw-monitor-collect.py'
+
+# 2) Token uit de serverregel in het admin, in een bestand dat niet
+#    wereldleesbaar is:
+ssh root@SERVER 'umask 077; cat > /etc/bsw-monitor.env' <<EOF
+MONITOR_ENDPOINT=https://betergeregeld.com/monitor/ingest
+MONITOR_TOKEN=<token uit VPS Servers > de server > Bewerken>
+EOF
+ssh root@SERVER 'chmod 640 /etc/bsw-monitor.env'
+
+# 3) Aanzetten:
+ssh root@SERVER 'mkdir -p /var/lib/bsw-monitor && systemctl daemon-reload   && systemctl enable --now bsw-monitor.timer && systemctl start bsw-monitor.service'
+```
+
+Controleren: `journalctl -u bsw-monitor.service -n 5` toont een regel als
+`verstuurd: 1/1 | cpu 32.5% mem 16.2% schijf 3.48/115.2 GB`.
+
+### Waar dit draait
+
+| server | agent | sinds |
+|---|---|---|
+| Productie-VPS (85.215.166.3, Windows) | `collect.ps1` | — |
+| Telefonie-VPS (188.166.37.220, Ubuntu 24.04) | `collect.py` | 09-09-2026 |
+
+De telefonie-machine draait de AI-telefonie (Asterisk + OpenAI Realtime); zie
+`bouwsteenwinkel_v3/telefonie/README.md`. Die machine had al een eigen waakhond
+die mailt als de lijn niet meer opneemt — dat is iets anders dan deze agent: de
+waakhond kijkt of de dienst wérkt, deze agent levert de cijfers waarmee je ziet
+dat het krap wordt voordat het misgaat.

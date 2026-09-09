@@ -1,0 +1,30 @@
+[Unit]
+# Beter Geregeld — monitoring-collector (Linux).
+# Eén meting per aanroep; de herhaling zit in bsw-monitor.timer.
+Description=Beter Geregeld VPS-monitoring: meting versturen
+Documentation=https://betergeregeld.com/admin/monitor-servers
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/bsw-monitor-collect.py
+# Het token staat in dit bestand, niet in de unit: unit-bestanden zijn
+# wereldleesbaar, /etc/bsw-monitor.env is dat niet (640 root:root).
+EnvironmentFile=/etc/bsw-monitor.env
+# De meting zelf duurt ~1 seconde (CPU-venster) plus de POST. Blijft hij hangen
+# aan een netwerk dat niet antwoordt, dan is afkappen beter dan een stapel
+# processen: de volgende ronde levert de gebufferde meting alsnog na.
+TimeoutStartSec=60
+Nice=10
+IOSchedulingClass=idle
+
+# Deze dienst leest alleen /proc en schrijft één bufferbestand.
+ProtectSystem=strict
+ReadWritePaths=/var/lib/bsw-monitor
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target
