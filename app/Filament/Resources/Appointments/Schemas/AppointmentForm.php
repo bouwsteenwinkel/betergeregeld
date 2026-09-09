@@ -71,7 +71,10 @@ class AppointmentForm
 
                 Section::make('Wanneer')
                     ->columns(2)
-                    ->description(static::uitleg())
+                    ->description(fn (?Appointment $record) => $record
+                        ? static::uitleg() . ' Let op: opslaan werkt het agenda-item bij Google bij en '
+                          . 'stuurt de klant een bijgewerkte uitnodiging.'
+                        : static::uitleg())
                     ->schema([
                         Select::make('type')
                             ->label('Soort afspraak')
@@ -116,11 +119,8 @@ class AppointmentForm
 
                 Section::make('Mee te sturen stukken')
                     ->columns(2)
-                    ->description(fn (?Appointment $record) => $record
-                        ? 'Let op: de uitnodiging is al verstuurd. Wat je hier verandert komt in onze '
-                          . 'administratie te staan, maar niet meer in het agenda-item bij Google.'
-                        : 'Uit de gedeelde map, met een submap per klant. De genodigde krijgt '
-                          . 'leesrecht op precies de stukken die je aanvinkt -- niet op de map.')
+                    ->description('Uit de gedeelde map, met een submap per klant. De genodigde krijgt '
+                        . 'leesrecht op precies de stukken die je aanvinkt -- niet op de map.')
                     ->schema([
                         Select::make('drive_map')
                             ->label('Klantmap')
@@ -140,7 +140,9 @@ class AppointmentForm
                             ->native(false)
                             ->placeholder('Kies eerst een klantmap')
                             ->options(fn ($get) => static::bijlagekeuzes($get('drive_map'), $get('attachments')))
-                            ->helperText('Optioneel. Ze komen als bijlage in de agenda-uitnodiging.'),
+                            ->helperText(fn (?Appointment $record) => $record
+                                ? 'Bij opslaan gaan ze mee in de bijgewerkte uitnodiging, en krijgt de genodigde er leesrecht op.'
+                                : 'Optioneel. Ze komen als bijlage in de agenda-uitnodiging.'),
                     ]),
 
                 Textarea::make('note')

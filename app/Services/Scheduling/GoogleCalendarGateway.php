@@ -282,14 +282,8 @@ class GoogleCalendarGateway implements CalendarGateway
 
         $tz   = (string) config('scheduling.timezone', 'Europe/Amsterdam');
         $body = [
-            'summary'     => (Appointment::SOORTEN[$appointment->type] ?? 'Kennismaking') . ' · ' . $appointment->name
-                . ($appointment->company ? ' (' . $appointment->company . ')' : ''),
-            'description' => 'Kennismaking (' . (Appointment::SOORTEN[$appointment->type] ?? $appointment->type) . ").\nNaam: {$appointment->name}"
-                . ($appointment->company ? "\nBedrijf: {$appointment->company}" : '')
-                . "\nE-mail: {$appointment->email}"
-                . ($appointment->phone ? "\nTelefoon: {$appointment->phone}" : '')
-                . ($appointment->source_site ? "\nVia site: {$appointment->source_site}" : '')
-                . ($appointment->note ? "\nBericht: {$appointment->note}" : ''),
+            'summary'     => $this->samenvatting($appointment),
+            'description' => $this->omschrijving($appointment),
             'start'       => ['dateTime' => Carbon::parse($appointment->starts_at)->toRfc3339String(), 'timeZone' => $tz],
             'end'         => ['dateTime' => Carbon::parse($appointment->ends_at)->toRfc3339String(), 'timeZone' => $tz],
             'attendees'   => [['email' => $appointment->email, 'displayName' => $appointment->name]],
@@ -311,45 +305,7 @@ class GoogleCalendarGateway implements CalendarGateway
             $body['location'] = $plek;
         }
 
-        // BIJLAGEN. Google hangt alleen Drive-bestanden aan een event, en de
-        // genodigde moet erbij kunnen -- een externe klant komt niet in een
-        // gedeelde Drive. Daarom eerst leesrecht op precies dat ene bestand, en
-        // pas dan de verwijzing meesturen.
-        //
-        // Lukt het leesrecht niet, dan laten we de bijlage weg. Een bestand dat
-        // in de uitnodiging staat maar niet te openen is, is vervelender dan geen
-        // bijlage: de klant denkt dat hij iets mist en gaat bellen.
-        $bijlagen = [];
-        foreach ((array) ($appointment->attachments ?? []) as $bestandId) {
-            $bestandId = (string) $bestandId;
-            if ($bestandId === '') {
-                continue;
-            }
-
-            $drive = app(DriveClient::class);
-            if (! $drive->geefLeesrecht($bestandId, (string) $appointment->email)) {
-                Log::warning("appointment_attachment (#{$appointment->id}): leesrecht op {$bestandId} mislukt, bijlage weggelaten.");
-
-                continue;
-            }
-
-            $info = $drive->bestand($bestandId);
-            if (! $info || empty($info['webViewLink'])) {
-                Log::warning("appointment_attachment (#{$appointment->id}): {$bestandId} niet op te halen, bijlage weggelaten.");
-
-                continue;
-            }
-
-            $bijlagen[] = array_filter([
-                'fileUrl'  => $info['webViewLink'],
-                'title'    => $info['name'] ?? null,
-                'mimeType' => $info['mimeType'] ?? null,
-                'iconLink' => $info['iconLink'] ?? null,
-            ]);
-        }
-        if ($bijlagen) {
-            $body['attachments'] = $bijlagen;
-        }
+        $body['attachments'] = $this->bijlagenVoor($appointment);
 
         try {
             $resp = Http::withToken($token)->withOptions(['verify' => $this->ca()])->timeout(15)
@@ -372,6 +328,150 @@ class GoogleCalendarGateway implements CalendarGateway
         }
 
         return ['event_id' => $eventId, 'meet_url' => $resp->json('hangoutLink')];
+    }
+
+    /**
+     * Werk een bestaand agenda-item bij en laat Google de genodigde inlichten.
+     *
+     * WAAROM DIT ER IS. Het bewerkscherm schreef alleen onze eigen tabel bij. Wie
+     * daar een afspraak verzette, hield daarna twee waarheden over: bij ons 15:00,
+     * in de agenda van de klant nog 10:00 -- en de klant hoorde niets. Hetzelfde
+     * gold voor een stuk dat er achteraf bij moest.
+     *
+     * De bijgewerkte uitnodiging die Google hierna stuurt IS het signaal aan de
+     * klant. Daarom staat sendUpdates hier op dezelfde waarde als bij het
+     * aanmaken, en niet op 'none'.
+     *
+     * PATCH en geen PUT: wat wij niet noemen blijft staan zoals het stond.
+     * `attachments` gaat wel altijd mee, ook leeg -- anders krijg je een bijlage
+     * er nooit meer af.
+     *
+     * @return array{meet_url: string|null}
+     *
+     * @throws CalendarSyncException als het event niet bijgewerkt kon worden
+     */
+    public function updateEvent(Appointment $appointment): array
+    {
+        $token = $this->accessToken();
+        if (! $token) {
+            throw new CalendarSyncException('Geen geldig Google-token; agenda-event niet bijgewerkt.');
+        }
+
+        $eventId = (string) $appointment->google_event_id;
+        if ($eventId === '') {
+            throw new CalendarSyncException('Deze afspraak heeft geen agenda-item bij Google om bij te werken.');
+        }
+
+        $tz   = (string) config('scheduling.timezone', 'Europe/Amsterdam');
+        $body = [
+            'summary'     => $this->samenvatting($appointment),
+            'description' => $this->omschrijving($appointment),
+            'start'       => ['dateTime' => Carbon::parse($appointment->starts_at)->toRfc3339String(), 'timeZone' => $tz],
+            'end'         => ['dateTime' => Carbon::parse($appointment->ends_at)->toRfc3339String(), 'timeZone' => $tz],
+            'attendees'   => [['email' => $appointment->email, 'displayName' => $appointment->name]],
+            'attachments' => $this->bijlagenVoor($appointment),
+        ];
+
+        // DE SOORT AFSPRAAK KAN VERANDERD ZIJN. Van Meet naar 'op locatie' betekent:
+        // videolink weg, plek erbij. Andersom precies omgekeerd. Blijft die link
+        // staan bij een bezoek op locatie, dan zit de klant achter zijn scherm te
+        // wachten terwijl jij voor zijn deur staat.
+        if ($appointment->type === 'meet') {
+            $body['location'] = '';
+            if (! $appointment->meet_url) {
+                $body['conferenceData'] = [
+                    'createRequest' => [
+                        'requestId' => 'appt-' . $appointment->id . '-' . substr(md5((string) ($appointment->cancel_token ?: $appointment->id)), 0, 10),
+                        'conferenceSolutionKey' => ['type' => 'hangoutsMeet'],
+                    ],
+                ];
+            }
+        } else {
+            $body['location'] = $appointment->locatie();
+            $body['conferenceData'] = null;
+        }
+
+        try {
+            $resp = Http::withToken($token)->withOptions(['verify' => $this->ca()])->timeout(15)
+                ->patch(
+                    'https://www.googleapis.com/calendar/v3/calendars/' . rawurlencode($this->calendarId())
+                        . '/events/' . rawurlencode($eventId)
+                        . '?conferenceDataVersion=1&supportsAttachments=true&sendUpdates=' . $this->sendUpdates(),
+                    $body
+                );
+        } catch (\Throwable $e) {
+            throw new CalendarSyncException('Google-agenda onbereikbaar bij het bijwerken van het event: ' . $e->getMessage(), 0, $e);
+        }
+
+        if (! $resp->successful()) {
+            throw new CalendarSyncException('Google-agenda weigerde de wijziging (status ' . $resp->status() . '): ' . substr($resp->body(), 0, 200));
+        }
+
+        return ['meet_url' => $resp->json('hangoutLink')];
+    }
+
+    /** De titel van het agenda-item. */
+    private function samenvatting(Appointment $a): string
+    {
+        return (Appointment::SOORTEN[$a->type] ?? 'Kennismaking') . ' · ' . $a->name
+            . ($a->company ? ' (' . $a->company . ')' : '');
+    }
+
+    /** Wat er in het agenda-item onder de titel staat. */
+    private function omschrijving(Appointment $a): string
+    {
+        return 'Kennismaking (' . (Appointment::SOORTEN[$a->type] ?? $a->type) . ").\nNaam: {$a->name}"
+            . ($a->company ? "\nBedrijf: {$a->company}" : '')
+            . "\nE-mail: {$a->email}"
+            . ($a->phone ? "\nTelefoon: {$a->phone}" : '')
+            . ($a->source_site ? "\nVia site: {$a->source_site}" : '')
+            . ($a->note ? "\nBericht: {$a->note}" : '');
+    }
+
+    /**
+     * De Drive-bestanden zoals Google ze aan een agenda-item wil hebben.
+     *
+     * Google hangt alleen Drive-bestanden aan een event, en de genodigde moet
+     * erbij kunnen -- een externe klant komt niet in een gedeelde Drive. Daarom
+     * eerst leesrecht op precies dat ene bestand, en pas dan de verwijzing.
+     *
+     * Lukt dat leesrecht niet, dan laten we die bijlage weg. Een bestand dat in de
+     * uitnodiging staat maar niet te openen is, is vervelender dan geen bijlage:
+     * de klant denkt dat hij iets mist en gaat bellen.
+     */
+    private function bijlagenVoor(Appointment $appointment): array
+    {
+        $drive = app(DriveClient::class);
+        $uit = [];
+
+        foreach ((array) ($appointment->attachments ?? []) as $bestandId) {
+            $bestandId = (string) $bestandId;
+            if ($bestandId === '') {
+                continue;
+            }
+
+            if (! $drive->geefLeesrecht($bestandId, (string) $appointment->email)) {
+                Log::warning("appointment_attachment (#{$appointment->id}): leesrecht op {$bestandId} mislukt, bijlage weggelaten.");
+
+                continue;
+            }
+
+            $info = $drive->bestand($bestandId);
+            if (! $info || empty($info['webViewLink'])) {
+                Log::warning("appointment_attachment (#{$appointment->id}): {$bestandId} niet op te halen, bijlage weggelaten.");
+
+                continue;
+            }
+
+            $uit[] = array_filter([
+                'fileUrl'  => $info['webViewLink'],
+                'title'    => $info['name'] ?? null,
+                'mimeType' => $info['mimeType'] ?? null,
+                'iconLink' => $info['iconLink'] ?? null,
+            ]);
+        }
+
+        return $uit;
     }
 
     /**
