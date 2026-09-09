@@ -117,6 +117,17 @@ Route::middleware(['web', 'auth'])->prefix('admin/google-agenda')->group(functio
     Route::post('/disconnect', [\App\Http\Controllers\GoogleAgendaController::class, 'disconnect'])->name('google-agenda.disconnect');
 });
 
+// Eenmalige link om zelf een wachtwoord te zetten. Het admin-paneel heeft geen
+// "wachtwoord vergeten" (AdminPanelProvider roept ->login() aan, niet
+// ->passwordReset()), dus wie zijn wachtwoord kwijt is komt er anders niet meer
+// in. Buiten elke auth-middleware, want je bent per definitie niet ingelogd.
+// De token zit in password_reset_tokens, is gehasht, verloopt na 48 uur en gaat
+// bij gebruik meteen weg. Zie WachtwoordInstellenController.
+Route::get('/wachtwoord-instellen/{token}', [\App\Http\Controllers\WachtwoordInstellenController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{16,128}')->name('wachtwoord.instellen');
+Route::post('/wachtwoord-instellen/{token}', [\App\Http\Controllers\WachtwoordInstellenController::class, 'store'])
+    ->where('token', '[A-Za-z0-9]{16,128}');
+
 Route::get('/', fn () => redirect('/' . config('app.locale', 'nl')));
 
 // Blok-template preview (thumbnail in de admin). Buiten de locale-prefix.
