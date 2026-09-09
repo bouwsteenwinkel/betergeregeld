@@ -37,9 +37,10 @@ class AppointmentForm
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
-                            ->label('Naam')
+                            ->label('Naam van de klant')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Zoals het in de uitnodiging komt te staan.'),
                         TextInput::make('email')
                             ->label('E-mailadres')
                             ->email()
@@ -50,10 +51,16 @@ class AppointmentForm
                             ->label('Telefoon')
                             ->tel()
                             ->maxLength(40),
+                        // ALLEEN BIJ BEWERKEN. Wie hier iets aanmaakt plant het zelf
+                        // in, dus is de herkomst per definitie "handmatig (admin)" --
+                        // dat zet CreateAppointment er zelf op. Het veld tonen maakt
+                        // er een vraag van waar geen keuze in zit. Bij bewerken blijft
+                        // hij wel staan: dan kun je een afspraak alsnog aan een site
+                        // toeschrijven als dat achteraf blijkt.
                         TextInput::make('source_site')
-                            ->label('Herkomst')
-                            ->placeholder('handmatig (admin)')
-                            ->helperText('Laat leeg als je hem zelf inplant.')
+                            ->label('Via welke site')
+                            ->hiddenOn('create')
+                            ->helperText('De channel-key, bijvoorbeeld bedrijfswebsite of apotheek.')
                             ->maxLength(255),
                     ]),
 
