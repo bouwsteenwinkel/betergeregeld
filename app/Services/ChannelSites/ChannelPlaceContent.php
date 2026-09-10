@@ -27,6 +27,9 @@ class ChannelPlaceContent
         $cfg      = (array) config('channel_places', []);
         $defaults = (array) ($cfg['defaults'] ?? []);
         $variants = (array) ($cfg['variants'] ?? []);
+        // array_replace en niet array_merge: de slotvolgorde moet gelijk blijven,
+        // want de slot-offset stuurt de variantkeuze van álle blokken.
+        $variants = array_replace($variants, (array) ($cfg['variants_per_branche'][$brancheKey] ?? []));
         $t        = array_merge($defaults, array_filter($tokens, fn ($v) => is_scalar($v) && $v !== ''));
 
         $city    = (string) ($place['naam'] ?? '');

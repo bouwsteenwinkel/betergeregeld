@@ -265,6 +265,39 @@ return [
         'bedrijvenpagina.nl', 'telefoonboek.nl', 'detelefoongids.nl',
     ],
 
+    /*
+     * Eigen variantsets per branche. Vervangen het gelijknamige blok uit
+     * 'variants' hieronder; de rest van de pagina blijft gedeeld.
+     *
+     * bedrijfswebsite is de uitzondering op "titels beginnen nooit met branche +
+     * plaats". Die regel weert de klanten van de branche ("loodgieter
+     * amstelveen"). Hier is er geen branche: wie "website laten maken zelhem"
+     * intypt, IS de doelgroep. Search Console, 90 dagen tot 09-09-2026: dat
+     * soort zoekopdrachten over tientallen kleine plaatsen, een deel al op
+     * positie 5 tot 15, terwijl de titel bijvoorbeeld "Meer aanvragen uit
+     * Waddinxveen voor bedrijven" luidde.
+     * Elke variant opent daarom met de zoekterm zelf.
+     */
+    'variants_per_branche' => [
+        'bedrijfswebsite' => [
+            'meta_title' => [
+                'Website laten maken in :city',
+                'Website laten maken in :city? Eerst een gratis voorbeeld',
+                'Website laten maken voor je bedrijf in :city',
+                'Website of webshop laten maken in :city',
+                'Website laten maken in :city tegen een vaste prijs',
+                'Zakelijke website laten maken in :city',
+            ],
+            'h1' => [
+                'Website laten maken voor je bedrijf in :city?',
+                ':aanspreek die toe is aan een nieuwe website?',
+                'Een website laten maken in :city die aanvragen oplevert',
+                'Toe aan een nieuwe website voor je bedrijf in :city?',
+                'Je bedrijf in :city verdient een betere website',
+            ],
+        ],
+    ],
+
     // Tekstvarianten per blok. Deterministisch één per plaats gekozen.
     'variants' => [
 
