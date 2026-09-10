@@ -1,6 +1,11 @@
 *.log
 .DS_Store
 .env
+# Elke kopie van het omgevingsbestand, hoe je hem ook noemt. Er stond een
+# .env.bak-mail in de werkmap die door .env.backup NIET werd gedekt: een
+# enkele `git add -A` had de sleutels op GitHub gezet.
+.env.*
+!.env.example
 .env.backup
 .env.production
 .phpactor.json
