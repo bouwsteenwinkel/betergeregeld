@@ -128,6 +128,60 @@
 	</div>
 </section>
 
+{{-- ============ SLIMMER WERKEN MET AI ============
+     Staat bewust direct onder de hero en niet in de dienstengrid: dit is het
+     onderwerp waar we op willen binnenkomen, en tussen dertien kaartjes zou het
+     onzichtbaar zijn. Volledige uitleg op /{locale}/slimmer-werken-met-ai. --}}
+<section class="bg-[color:var(--color-accent-soft)] border-b border-[color:var(--color-line)] py-16 sm:py-20">
+	<div class="max-w-[1400px] mx-auto px-6">
+		<div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+			<div class="lg:col-span-7">
+				<span class="pill pill-ink mb-4">{{ $isEn ? 'AI & automation' : 'AI & automatisering' }}</span>
+				<h2 class="display-2 mb-5">
+					{{ $isEn ? 'Working smarter' : 'Slimmer werken' }}
+					<span class="accent-word">{{ $isEn ? 'with AI.' : 'met AI.' }}</span>
+				</h2>
+				<p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
+					{{ $isEn ? 'Less manual work. More overview. More capacity.' : 'Minder handwerk. Meer overzicht. Meer capaciteit.' }}
+				</p>
+				<p class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-8">
+					{{ $isEn
+						? 'Data copied over by hand, email that has to be read and forwarded, documents that need checking, reports compiled by hand. We map your process and show where automation and AI genuinely save time.'
+						: 'Gegevens die handmatig worden overgenomen, e-mail die gelezen en doorgestuurd moet worden, documenten die gecontroleerd worden, rapportages die met de hand worden samengesteld. Wij brengen het proces in kaart en laten zien waar automatisering en AI daadwerkelijk tijd besparen.' }}
+				</p>
+				<div class="flex flex-wrap gap-3">
+					<a href="/{{ $locale }}/slimmer-werken-met-ai" class="btn-accent">
+						{{ $isEn ? 'See how it works' : 'Bekijk hoe dat werkt' }}
+						<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</a>
+					<a href="/{{ $locale }}/contact?topic=ai-procesanalyse" class="btn-outline">
+						{{ $isEn ? 'Have your process analysed' : 'Laat uw proces analyseren' }}
+					</a>
+				</div>
+			</div>
+			<div class="lg:col-span-5">
+				<div class="card">
+					<div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-ink-muted)] mb-4">{{ $isEn ? 'For example' : 'Bijvoorbeeld' }}</div>
+					<ul class="space-y-3 text-sm">
+						@foreach ([
+							['nl' => 'Binnenkomende e-mail automatisch verwerken en classificeren', 'en' => 'Incoming email processed and classified automatically'],
+							['nl' => 'Documenten, formulieren en facturen uitlezen',                'en' => 'Documents, forms and invoices read automatically'],
+							['nl' => 'Dossiers controleren op ontbrekende informatie',              'en' => 'Case files checked for missing information'],
+							['nl' => 'Conceptbrieven en rapportages laten opstellen',               'en' => 'Draft letters and reports written for you'],
+							['nl' => 'Afwijkingen en benodigde acties automatisch signaleren',      'en' => 'Deviations and required actions flagged automatically'],
+						] as $ai)
+							<li class="flex items-start gap-3">
+								<svg class="w-4 h-4 mt-0.5 shrink-0 text-[color:var(--color-accent)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+								<span class="leading-relaxed">{{ $isEn ? $ai['en'] : $ai['nl'] }}</span>
+							</li>
+						@endforeach
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
 {{-- ============ WEBSITES VOOR ELKE BRANCHE (jouw-bedrijfswebsite.nl) ============ --}}
 <section class="py-20 border-b border-[color:var(--color-line)]">
 	<div class="max-w-[1400px] mx-auto px-6">

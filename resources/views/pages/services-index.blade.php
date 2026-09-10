@@ -30,6 +30,28 @@
 
 <section class="py-20">
 	<div class="max-w-[1400px] mx-auto px-6">
+		{{-- Uitgelicht boven de catalogus: de AI-dienst heeft een eigen pagina omdat
+		     hij niet in het sjabloon van een catalogusdienst past. --}}
+		{{-- Achtergrond inline: .card zet zelf een witte achtergrond en wint van een
+		     losse bg-utility, waardoor het uitgelichte blok niet opviel. --}}
+		<a href="/{{ $locale }}/slimmer-werken-met-ai" class="card card-accent group block mb-8" style="background: var(--color-accent-soft)">
+			<div class="flex flex-wrap items-center justify-between gap-6">
+				<div class="max-w-2xl">
+					<span class="pill pill-ink text-[10px] mb-3">{{ $isEn ? 'Featured' : 'Uitgelicht' }} · {{ $isEn ? 'AI & automation' : 'AI & automatisering' }}</span>
+					<h2 class="display-3 mb-2">{{ $isEn ? 'Working smarter with AI' : 'Slimmer werken met AI' }}</h2>
+					<p class="text-[color:var(--color-ink-muted)] leading-relaxed">
+						{{ $isEn
+							? 'Less manual work, more overview, more capacity. We map your process and show where automation and AI genuinely save time.'
+							: 'Minder handwerk, meer overzicht, meer capaciteit. Wij brengen uw proces in kaart en laten zien waar automatisering en AI daadwerkelijk tijd besparen.' }}
+					</p>
+				</div>
+				<span class="btn-accent shrink-0">
+					{{ $isEn ? 'Read more' : 'Lees meer' }}
+					<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+				</span>
+			</div>
+		</a>
+
 		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
 			@foreach ($services as $slug => $s)
 				<a href="/{{ $locale }}/diensten/{{ $slug }}" class="card card-accent group block">

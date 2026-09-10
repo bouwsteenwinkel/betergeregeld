@@ -19,6 +19,7 @@
 		'website-migratie-zonder-gedoe' => $isEn ? 'Website migration' : 'Website migratie',
 		'website-structuur-check' => $isEn ? 'Website structure check' : 'Structuur check',
 		'iban-check' => 'IBAN check',
+		'ai-procesanalyse' => $isEn ? 'Process analysis: AI & automation' : 'Procesanalyse: AI & automatisering',
 		'maatwerk' => $isEn ? 'Custom / advice' : 'Maatwerk / advies',
 		'anders' => $isEn ? 'Other / not sure yet' : 'Anders / nog niet zeker',
 	];

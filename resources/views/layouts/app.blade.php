@@ -172,6 +172,13 @@
 				<div class="flex items-center gap-6 font-medium">
 					<a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Home') }}</a>
 					<a href="/{{ $currentLocale }}/diensten" class="{{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Diensten') }}</a>
+					{{-- AI staat bewust náást Diensten en niet erin: het is de dienst waar we op
+					     willen binnenkomen, en in de dienstencatalogus zou hij één kaartje van
+					     veertien worden. Accentkleur maakt hem vindbaar zonder extra breedte. --}}
+					<a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="inline-flex items-center gap-1.5 {{ request()->is('*slimmer-werken-met-ai*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-accent-hover)] hover:text-[color:var(--color-accent)]' }}">
+						<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
+						{{ __('AI') }}
+					</a>
 					<a href="/{{ $currentLocale }}/tools" class="{{ request()->is('*tools*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Tools') }}</a>
 					<a href="/{{ $currentLocale }}/prijzen" class="{{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Prijzen') }}</a>
 					<a href="/{{ $currentLocale }}/over" class="{{ request()->is('*over*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Over ons') }}</a>
@@ -215,6 +222,10 @@
 			<nav class="px-6 py-4 flex flex-col gap-1 text-[15px]" aria-label="{{ __('Mobiele navigatie') }}">
 				<a href="{{ route('home') }}" class="py-2 {{ request()->routeIs('home') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Home') }}</a>
 				<a href="/{{ $currentLocale }}/diensten" class="py-2 {{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Diensten') }}</a>
+				<a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="py-2 inline-flex items-center gap-2 {{ request()->is('*slimmer-werken-met-ai*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-accent-hover)] font-semibold' }}">
+					<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
+					{{ $currentLocale === 'en' ? 'Working smarter with AI' : 'Slimmer werken met AI' }}
+				</a>
 				<a href="/{{ $currentLocale }}/tools" class="py-2 {{ request()->is('*tools*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Tools') }}</a>
 				<a href="/{{ $currentLocale }}/prijzen" class="py-2 {{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Prijzen') }}</a>
 				<a href="/{{ $currentLocale }}/over" class="py-2 {{ request()->is('*over*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Over ons') }}</a>
@@ -282,6 +293,7 @@
 				<div>
 					<h3 class="font-semibold mb-4 text-sm tracking-wide uppercase text-[color:var(--color-on-dark-soft)]">{{ __('Diensten') }}</h3>
 					<ul class="space-y-2 text-sm text-[color:var(--color-on-dark-muted)]">
+						<li><a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="text-white hover:text-[color:var(--color-accent)] font-semibold">{{ $currentLocale === 'en' ? 'Working smarter with AI' : 'Slimmer werken met AI' }}</a></li>
 						<li><a href="/{{ $currentLocale }}/diensten/seo-check" class="hover:text-white">SEO check</a></li>
 						<li><a href="/{{ $currentLocale }}/diensten/2fa-implementeren" class="hover:text-white">2FA</a></li>
 						<li><a href="/{{ $currentLocale }}/diensten/website-snelheid-verbeteren" class="hover:text-white">{{ $currentLocale === 'en' ? 'Speed' : 'Snelheid' }}</a></li>
