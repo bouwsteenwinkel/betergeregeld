@@ -448,4 +448,107 @@ publiek, en de Keyword Planner-aanroep via de Ads-koppeling voor de vraag.
 
 **Losse vondst:** die Ads-koppeling stond op API-versie `v21` en die bestaat
 niet meer -- elke aanroep gaf HTTP 404, ook `GoogleAdsClient::search()`. Met
-`v22` werkt hij. Zie `GOOGLE_ADS_API_VERSION`.
+`v22` werkt hij. Zie `GOOGLE_ADS_API_VERSION`. (Op 10-09-2026 is de standaard in
+`config/google_ads.php` naar `v22` gezet.)
+
+
+## 10-09-2026: wat de channels opleveren, en waar de vraag echt zit
+
+### Van bezoek naar aanvraag: de route werkt, er komt niemand langs
+
+Alle 17 live sites geven 200, elke homepage linkt naar `/afspraak`, de
+beschikbaarheid laadt op het channel-domein, `/contact` en `/bedankt` werken.
+Technisch is er niets stuk.
+
+Wat het in totaal heeft opgeleverd, uit `website_leads`, `appointments` en
+`channel_events`:
+
+```
+website_leads     4   waarvan 1 echte klant via een branche-site
+appointments     16   waarvan 1 echte klant; de rest zijn testboekingen
+```
+
+De ene echte is **Apotheek Avereest** (03-09-2026, via `/ai` op
+jouw-apotheek-website.nl, Meet-afspraak dezelfde middag, vervolgafspraak
+17-09). Let op: `apotheek` heeft volgens Keyword Planner **nul** zuivere
+ondernemersvraag. De enige klant kwam dus van een site die op grond van
+zoekvolume nooit live had gemogen. Zoekvolume is een argument, geen oordeel.
+
+Wat je in `channel_events` niet moet misverstaan: `page_view` staat er
+**nooit** in, en dat is geen storing. `analytics-head.blade.php` logt alleen
+sleutel-events (`LOG_EVENTS`); paginaweergaven gaan uitsluitend naar GTM. Wie
+bezoekers per channel wil tellen, moet in GA4 kijken of in Search Console.
+
+### betergeregeld.com staat nergens op "website laten maken"
+
+Search Console, 90 dagen tot 09-09-2026: 95 klikken, 12.695 vertoningen, en
+**nul vertoningen** op welke vorm van "website laten maken" dan ook. Het verkeer
+komt uit de IT- en compliance-blogs (IBAN-check, zwartlakken, M365). De site
+heeft geen pagina die op die zoekterm mikt.
+
+jouw-bedrijfswebsite.nl doet het wél, in de staart: 482 vertoningen in 90
+dagen (158 in de laatste 28, gemiddelde positie 7,9), op zoekopdrachten als
+"website laten maken zelhem", "webshop maken gennep", "webdesign beek en donk".
+Dat is 100% doelgroep. De plaatstitels noemden die zoekterm alleen niet --
+"Meer aanvragen uit Waddinxveen voor bedrijven" -- en zijn daarom op 10-09
+aangepast (`channel_places.variants_per_branche`). Alleen voor bedrijfswebsite:
+de branche-sites zijn aantoonbaar ongewijzigd, want hun plaatspagina's worden
+begin oktober nagemeten.
+
+Let op bij het doelgroep-script: `_channel-doelgroep.php` ziet voor
+bedrijfswebsite maar 6 vertoningen. Google laat zeldzame zoekopdrachten weg uit
+de uitsplitsing per zoekterm, en "website laten maken <dorp>" is per definitie
+zeldzaam. Het totaal via de API (482) is het echte getal.
+
+### De vraag per branche, zuiver gemeten
+
+De meting van 06-09 telde ook "website <branche>" en "<branche> website". Die
+zijn grotendeels consumenten die de site van een zaak zoeken: "vertaler website"
+(720) is iemand die Google Translate zoekt, "website hotel" (390) iemand die
+wil boeken. Hieronder alleen **"website (laten) maken <branche>"** en
+**"website voor <branches>"**. Keyword Planner, NL, Nederlands, historische
+cijfers; een bandbreedte omdat nauwe varianten kunnen overlappen.
+
+```
+BRANCHE             ONDERNEMERS/MND   KLANTTERM/MND
+fotograaf               260 - 360          6.600    <- beste verhouding
+makelaar                210 - 230         33.100
+kapper                   70 - 80         165.000
+schoonheidssalon         50 - 60           9.900
+hovenier                 40 - 50          12.100
+psycholoog               40 - 50        (niet gemeten)
+tandarts                 40 - 50        (niet gemeten)
+restaurant               20 - 40       6.120.000
+────────────────────────────────────────────────
+rijschool (live)         20 - 30          14.800
+loodgieter (live)             10          18.100
+aannemer (live)               10          14.800
+13 andere live                 0
+183 van 203 branches           0
+```
+
+"Niet gemeten" betekent dat Keyword Planner de kale term onder een andere
+variant groepeerde, niet dat er geen klanten naar zoeken.
+
+**Wat hieruit volgt:**
+
+1. **Geen brede uitrol.** Dat blijft staan; nu met de volledige lijst eronder.
+2. **Als er één bij moet, dan fotograaf.** Hoogste ondernemersvraag én de
+   kleinste klantterm ernaast. Makelaar is tweede, maar met vijf keer zoveel
+   klantverkeer dat de plaatspagina's gaan aantrekken.
+3. **Zet zo'n nieuwe site live zonder plaatspagina's**
+   (`config/channel_page_blocklist.php`, segment `plaatsen`). Bij elke branche
+   in deze lijst is de kale naam 18 tot 150.000 keer zo groot als de
+   ondernemersvraag, en de plaatspagina's zijn precies waar dat verkeer
+   binnenkomt.
+4. **Zeven live sites hebben nul zuivere vraag** (acupuncturist, autogarage,
+   badkamerspecialist, dietist, golfschool, uitlaat-remmen, yogastudio). Daar
+   niets aan veranderen vóór de hermeting van begin oktober -- en de apotheek
+   laat zien dat nul zoekvolume niet hetzelfde is als nul waarde.
+
+Opnieuw meten: er is (nog) geen commando voor. De aanroep is
+`POST customers/{cid}:generateKeywordHistoricalMetrics` met
+`language: languageConstants/1010` en `geoTargetConstants: [geoTargetConstants/2528]`,
+per branche de zoekwoorden uit `branche.places.trade`/`trades`. `accessToken()`
+en `request()` van `GoogleAdsClient` zijn private, dus vanuit tinker via
+reflectie.
