@@ -39,6 +39,9 @@ class GoogleAds extends Page
     /** Per campagne-ID de advertentie-/reviewstatus + kwaliteit. @var array<string,array<string,string>> */
     public array $adStatus = [];
 
+    /** Conversies (30d) uitgesplitst per conversie-actie. @var array<int,array<string,mixed>> */
+    public array $conversionBreakdown = [];
+
     /** Toon ook gearchiveerde (verwijderde) campagnes in het overzicht. */
     public bool $showArchived = false;
 
@@ -134,6 +137,7 @@ class GoogleAds extends Page
         }
 
         $this->adStatus   = app(GoogleAdsManager::class)->adStatusByCampaign();
+        $this->conversionBreakdown = app(GoogleAdsManager::class)->conversionBreakdown();
         $this->lastLoaded = now()->format('H:i:s');
     }
 
@@ -147,6 +151,7 @@ class GoogleAds extends Page
     {
         $this->campaigns  = app(GoogleAdsManager::class)->listCampaigns();
         $this->adStatus   = app(GoogleAdsManager::class)->adStatusByCampaign();
+        $this->conversionBreakdown = app(GoogleAdsManager::class)->conversionBreakdown();
         $this->lastLoaded = now()->format('H:i:s');
     }
 
@@ -171,14 +176,15 @@ class GoogleAds extends Page
         return count(array_filter($this->campaigns, fn ($c) => $c['status'] === 'REMOVED'));
     }
 
-    /** @return array{impressions:int,clicks:int,cost:float,conversions:float} */
+    /** @return array{impressions:int,clicks:int,cost:float,conversions:float,allConversions:float} */
     public function totals(): array
     {
         return [
-            'impressions' => array_sum(array_column($this->campaigns, 'impressions')),
-            'clicks'      => array_sum(array_column($this->campaigns, 'clicks')),
-            'cost'        => array_sum(array_column($this->campaigns, 'cost')),
-            'conversions' => array_sum(array_column($this->campaigns, 'conversions')),
+            'impressions'    => array_sum(array_column($this->campaigns, 'impressions')),
+            'clicks'         => array_sum(array_column($this->campaigns, 'clicks')),
+            'cost'           => array_sum(array_column($this->campaigns, 'cost')),
+            'conversions'    => array_sum(array_column($this->campaigns, 'conversions')),
+            'allConversions' => array_sum(array_column($this->campaigns, 'allConversions')),
         ];
     }
 

@@ -343,4 +343,126 @@ return [
         'call_phone' => '035 201 1720',
     ],
 
+    // LEGO-kinderfeestje OP LOCATIE in Bussum ('t Gooi) — géén pakket-aan-huis
+    // (die misvatting is bewust rechtgezet, zie migratie 2026_05_03_056). €18 per
+    // kind, 8 t/m 16 kinderen, 2,5 uur all-in (begeleiding, drinken, diploma,
+    // opruimen), optioneel goodiebag €3,50/kind. Dit is de enige LOKALE campagne:
+    // zet de geo-targeting strak op Bussum + 't Gooi/omgeving bij het aanmaken,
+    // anders verbrand je budget op landelijke vertoningen.
+    'bouwersfeestje' => [
+        'label'      => 'Bouwersfeestje — LEGO-kinderfeestje',
+        'name'       => 'bouwersfeestje',
+        'final_url'  => 'https://bouwersfeestje.nl',
+        'budget'     => 15,
+        'max_cpc'    => 1.5,
+        'paths'      => ['lego-feestje', 'bussum'],
+
+        // LOKAAL: straal van 25 km rond Bussum (dekt heel 't Gooi + Almere, Weesp,
+        // Amersfoort-west, Amsterdam-Zuidoost). Zonder dit blok zou de campagne
+        // landelijk draaien — verspild budget voor een feestje op één locatie.
+        'geo' => ['lat' => 52.2769, 'lng' => 5.1614, 'radius_km' => 25],
+
+        'ad_groups'  => [
+            'LEGO-kinderfeestje' => [
+                ['lego kinderfeestje', 'PHRASE'],
+                ['lego feestje', 'PHRASE'],
+                ['kinderfeestje lego', 'PHRASE'],
+                ['lego verjaardagsfeest', 'PHRASE'],
+                ['lego feestje kind', 'PHRASE'],
+                ['bouw kinderfeestje', 'PHRASE'],
+                ['lego kinderfeestje', 'EXACT'],
+            ],
+            "Kinderfeestje 't Gooi" => [
+                ['kinderfeestje bussum', 'PHRASE'],
+                ['kinderfeestje naarden', 'PHRASE'],
+                ['kinderfeestje hilversum', 'PHRASE'],
+                ['kinderfeestje het gooi', 'PHRASE'],
+                ['origineel kinderfeestje', 'PHRASE'],
+                ['leuk kinderfeestje', 'PHRASE'],
+                ['kinderfeestje uitje', 'PHRASE'],
+                ['kinderfeestje bussum', 'EXACT'],
+            ],
+        ],
+
+        'negatives' => [
+            'gratis', 'zelf', 'diy', 'thuis', 'aan huis', 'printable', 'kleurplaat',
+            'versiering', 'tweedehands', 'vacature', 'baan', 'stage', 'minecraft',
+        ],
+
+        // pin_h1 = 0: ongepind voor de beste Advertentiekwaliteit; zoekwoord-koppen vooraan.
+        'pin_h1'    => 0,
+        'headlines' => [
+            'LEGO-kinderfeestje', 'LEGO-feestje in Bussum', 'Origineel LEGO-feestje',
+            '€18 per kind, all-in', 'Nog weken napraten', 'Voor 8 t/m 16 kinderen',
+            '2,5 uur bouwplezier', 'Diploma voor elk kind', 'Wij verzorgen alles',
+            'Bouw een grote LEGO-stad', 'Boek jullie LEGO-feestje', 'Feestje zonder gedoe',
+            'LEGO-verjaardagsfeest', 'Samen bouwen, samen lol', 'Kinderfeestje in de buurt',
+        ],
+
+        'descriptions' => [
+            'Een LEGO-kinderfeestje in Bussum. 2,5 uur all-in, €18 per kind, voor 8 t/m 16 kinderen.',
+            'Samen bouwen aan een grote LEGO-stad. Inclusief begeleiding, drinken en een diploma.',
+            'Wij verzorgen alles en ruimen op. Een feestje waar ze nog weken over napraten.',
+            'Boek eenvoudig online jullie LEGO-feestje. Origineel, gezellig en zonder gedoe.',
+        ],
+
+        // Koppen per advertentiegroep: de eerste dekt de LEGO-feestje-zoekwoorden,
+        // de tweede de lokale kinderfeestje-zoekwoorden ('t Gooi). Zoekwoord-dekkend
+        // en divers, zodat de Advertentiekwaliteit per groep op Goed komt.
+        'ad_group_headlines' => [
+            'LEGO-kinderfeestje' => [
+                'LEGO-kinderfeestje', 'LEGO-feestje in Bussum', 'Origineel LEGO-feestje',
+                'LEGO-verjaardagsfeest', 'Bouw een grote LEGO-stad', 'Boek jullie LEGO-feestje',
+                '€18 per kind, all-in', 'Voor 8 t/m 16 kinderen', '2,5 uur bouwplezier',
+                'Diploma voor elk kind', 'Nog weken napraten', 'Wij verzorgen alles',
+                'Samen bouwen, samen lol', 'Feestje zonder gedoe', 'LEGO-feestje voor kids',
+            ],
+            "Kinderfeestje 't Gooi" => [
+                'Kinderfeestje in Bussum', "Kinderfeestje in 't Gooi", 'Origineel kinderfeestje',
+                'Kinderfeestje met LEGO', 'Uniek kinderfeestje', 'Kinderfeestje in de buurt',
+                '€18 per kind, all-in', 'Voor 8 t/m 16 kinderen', '2,5 uur, alles verzorgd',
+                'Diploma voor elk kind', 'Nog weken napraten', 'Boek jullie kinderfeestje',
+                'Samen een LEGO-stad bouwen', 'Feestje zonder gedoe', 'Leuk kinderfeestje-uitje',
+            ],
+        ],
+
+        // Zoekwoord-rijke descriptions per groep (LEGO-feestje vs lokaal kinderfeestje).
+        'ad_group_descriptions' => [
+            'LEGO-kinderfeestje' => [
+                'Vier het LEGO-kinderfeestje in Bussum: 2,5 uur samen bouwen, €18 per kind, all-in.',
+                'LEGO-feestje met begeleiding, drinken, diploma en opruimen. Jullie hoeven niets te doen.',
+                'Bouw samen een grote LEGO-stad. Een origineel LEGO-feestje waar ze over napraten.',
+                'Boek jullie LEGO-feestje online. Voor 8 t/m 16 kinderen, 2,5 uur, €18 per kind.',
+            ],
+            "Kinderfeestje 't Gooi" => [
+                "Origineel kinderfeestje in Bussum en 't Gooi: samen een grote LEGO-stad bouwen.",
+                'Kinderfeestje zonder gedoe: wij verzorgen alles, van drinken tot opruimen. €18 p.k.',
+                '2,5 uur bouwplezier voor 8 t/m 16 kinderen. Een feestje waar ze weken over napraten.',
+                'Boek eenvoudig online een kinderfeestje in de buurt. All-in vanaf €18 per kind.',
+            ],
+        ],
+
+        // Echte feestje-slugs (themes/feestje/page-*.php), alle geverifieerd op HTTP 200.
+        'sitelinks' => [
+            ['Bekijk de prijs', '/prijs', '€18 per kind, all-in', 'Geen verborgen kosten'],
+            ['Zo werkt het', '/hoe-werkt-het', 'Van boeken tot bouwen', 'In een paar stappen'],
+            ['Boek een feestje', '/aanvraag', 'Kies jullie datum', 'Snel online geregeld'],
+            ['Reviews van ouders', '/reviews', 'Lees hun ervaringen', 'Waar ze over napraten'],
+            ['Bekijk de galerij', '/galerij', "Foto's van feestjes", 'Proef de sfeer'],
+            ['Veelgestelde vragen', '/veelgestelde-vragen', 'Alles over het feestje', 'Datum, groep en meer'],
+            ['Kies op leeftijd', '/leeftijd', 'Passend per leeftijd', 'Voor elk kind wat leuks'],
+            ['Contact', '/contact', 'Bel of mail ons', 'Snel een antwoord'],
+        ],
+
+        'callouts' => [
+            '€18 per kind, all-in', 'Voor 8 t/m 16 kinderen', '2,5 uur op locatie',
+            'Begeleiding inbegrepen', 'Diploma voor elk kind', 'Wij ruimen op',
+        ],
+
+        // Fragment: feest-TYPES (geen leeftijd-ladder — die vlagt Google's classifier).
+        'snippet' => ['header' => 'Types', 'values' => ['Bouwfeestje', 'Verjaardagsfeest', 'Schooluitje', 'Groepsuitje']],
+
+        'call_phone' => '035 201 1720',
+    ],
+
 ];

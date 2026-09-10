@@ -83,7 +83,7 @@ class GoogleAdsManager
             ],
         ]]];
 
-        $ops[] = ['campaignCriterionOperation' => ['create' => ['campaign' => $camp, 'location' => ['geoTargetConstant' => self::GEO_NL]]]];
+        $ops[] = ['campaignCriterionOperation' => ['create' => ['campaign' => $camp] + $this->geoCriterion($p)]];
         $ops[] = ['campaignCriterionOperation' => ['create' => ['campaign' => $camp, 'language' => ['languageConstant' => self::LANG_NL]]]];
 
         foreach ($p['negatives'] ?? [] as $neg) {
@@ -140,6 +140,32 @@ class GoogleAdsManager
         }
 
         return $ops;
+    }
+
+    /**
+     * Locatie-criterium voor de campagne. Standaard heel Nederland (geoTargetConstant);
+     * een profiel met een 'geo'-blok (lat/lng/radius_km) target in plaats daarvan een
+     * STRAAL rond een punt (proximity). Dat is het juiste middel voor een lokale, fysieke
+     * dienst zoals Bouwersfeestje in Bussum — zonder giswerk met geoTargetConstant-ID's.
+     *
+     * @param array<string,mixed> $p
+     * @return array<string,mixed>  Deelsleutel voor de campaignCriterion (location óf proximity)
+     */
+    private function geoCriterion(array $p): array
+    {
+        $geo = $p['geo'] ?? null;
+        if (is_array($geo) && isset($geo['lat'], $geo['lng'], $geo['radius_km'])) {
+            return ['proximity' => [
+                'geoPoint' => [
+                    'latitudeInMicroDegrees'  => (int) round(((float) $geo['lat']) * 1_000_000),
+                    'longitudeInMicroDegrees' => (int) round(((float) $geo['lng']) * 1_000_000),
+                ],
+                'radius'      => (float) $geo['radius_km'],
+                'radiusUnits' => 'KILOMETERS',
+            ]];
+        }
+
+        return ['location' => ['geoTargetConstant' => self::GEO_NL]];
     }
 
     /**
@@ -343,7 +369,7 @@ class GoogleAdsManager
         $metrics = [];
         $mres = $this->client->search(
             'SELECT campaign.id, metrics.impressions, metrics.clicks, metrics.cost_micros, '
-            . 'metrics.conversions, metrics.search_impression_share, '
+            . 'metrics.conversions, metrics.all_conversions, metrics.search_impression_share, '
             . 'metrics.search_budget_lost_impression_share, metrics.search_rank_lost_impression_share '
             . 'FROM campaign WHERE segments.date DURING LAST_30_DAYS'
         );
@@ -366,6 +392,7 @@ class GoogleAdsManager
                 'clicks'      => (int) ($m['clicks'] ?? 0),
                 'cost'        => ((int) ($m['costMicros'] ?? 0)) / 1_000_000,
                 'conversions' => (float) ($m['conversions'] ?? 0),
+                'allConversions' => (float) ($m['allConversions'] ?? 0),
                 'imprShare'   => (float) ($m['searchImpressionShare'] ?? 0),
                 'lostBudget'  => (float) ($m['searchBudgetLostImpressionShare'] ?? 0),
                 'lostRank'    => (float) ($m['searchRankLostImpressionShare'] ?? 0),
@@ -453,6 +480,58 @@ class GoogleAdsManager
         }
 
         return $out;
+    }
+
+    /**
+     * Conversies over de afgelopen 30 dagen, uitgesplitst PER conversie-actie.
+     * Waarom: de hoofd-kolom "Conversies" telt alleen conversie-acties die als
+     * primair (Include in "Conversions") staan. Automatische acties zoals
+     * "Lokale acties – Route" vallen daarbuiten en lijken dan een stille 0.
+     * Deze uitsplitsing maakt zichtbaar wát er wél binnenkwam, en of het de
+     * échte waarde-conversie ("Nieuw abonnement") is of alleen ruis.
+     *
+     * @return array<int,array{name:string,category:string,primary:bool,count:float,value:float}>
+     */
+    public function conversionBreakdown(): array
+    {
+        $res = $this->client->search(
+            'SELECT segments.conversion_action_name, segments.conversion_action_category, '
+            . 'metrics.all_conversions, metrics.all_conversions_value '
+            . 'FROM campaign WHERE segments.date DURING LAST_30_DAYS AND metrics.all_conversions > 0'
+        );
+        if (! $res['ok']) {
+            return [];
+        }
+
+        // Welke acties tellen als "primair" (in de hoofd-kolom)? Leiden we af door dezelfde
+        // periode nog eens op te vragen met metrics.conversions: alleen primaire acties geven
+        // daar een waarde > 0. Zo hoeven we de conversie-actie-config niet apart te kennen.
+        $primaryNames = [];
+        $pr = $this->client->search(
+            'SELECT segments.conversion_action_name, metrics.conversions '
+            . 'FROM campaign WHERE segments.date DURING LAST_30_DAYS AND metrics.conversions > 0'
+        );
+        if ($pr['ok']) {
+            foreach ($pr['results'] as $r) {
+                $n = (string) data_get($r, 'segments.conversionActionName', '');
+                if ($n !== '') {
+                    $primaryNames[$n] = true;
+                }
+            }
+        }
+
+        $agg = [];
+        foreach ($res['results'] as $r) {
+            $name = (string) data_get($r, 'segments.conversionActionName', '—');
+            $cat  = (string) data_get($r, 'segments.conversionActionCategory', '');
+            $agg[$name] ??= ['name' => $name, 'category' => $cat, 'primary' => isset($primaryNames[$name]), 'count' => 0.0, 'value' => 0.0];
+            $agg[$name]['count'] += (float) data_get($r, 'metrics.allConversions', 0);
+            $agg[$name]['value'] += (float) data_get($r, 'metrics.allConversionsValue', 0);
+        }
+
+        usort($agg, fn ($a, $b) => $b['count'] <=> $a['count']);
+
+        return array_values($agg);
     }
 
     /* ─────────────────────────── Beheren ─────────────────────────── */

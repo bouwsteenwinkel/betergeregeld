@@ -109,7 +109,11 @@ class AdsCreateCampaign extends Command
         $this->line('  Eind-URL        : ' . $p['final_url']);
         $this->line('  Dagbudget       : € ' . number_format($budget, 2, ',', '.'));
         $this->line('  Biedstrategie   : Klikken maximaliseren, max. CPC € ' . number_format($cpc, 2, ',', '.'));
-        $this->line('  Doelgebied/taal : Nederland / Nederlands');
+        $geo = $p['geo'] ?? null;
+        $geoLabel = (is_array($geo) && isset($geo['radius_km']))
+            ? 'Straal ' . rtrim(rtrim(number_format((float) $geo['radius_km'], 1, ',', ''), '0'), ',') . ' km rond ' . $geo['lat'] . ', ' . $geo['lng']
+            : 'Nederland';
+        $this->line('  Doelgebied/taal : ' . $geoLabel . ' / Nederlands');
         $this->line('  Advertentiegroepen : ' . count((array) $p['ad_groups']) . ' (' . implode(', ', array_keys((array) $p['ad_groups'])) . ')');
         $this->line("  Zoekwoorden     : {$kwCount}   ·   Uitsluitingen: " . count($p['negatives'] ?? []));
         $this->line('  Advertentie     : 1 RSA per groep — ' . count((array) $p['headlines']) . ' koppen, ' . count((array) $p['descriptions']) . ' beschrijvingen');

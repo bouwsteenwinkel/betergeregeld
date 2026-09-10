@@ -55,11 +55,13 @@
 
         @php
             $t = $this->totals();
+            $fmtConv = fn ($v) => rtrim(rtrim(number_format($v, 1, ',', '.'), '0'), ',');
             $kaarten = [
                 ['Vertoningen', number_format($t['impressions'], 0, ',', '.')],
                 ['Klikken', number_format($t['clicks'], 0, ',', '.')],
                 ['Kosten', '€ ' . number_format($t['cost'], 2, ',', '.')],
-                ['Conversies', rtrim(rtrim(number_format($t['conversions'], 1, ',', '.'), '0'), ',')],
+                ['Conversies', $fmtConv($t['conversions']), 'Alleen primaire conversie-acties (bv. Nieuw abonnement).'],
+                ['Alle conversies', $fmtConv($t['allConversions']), 'Inclusief secundaire/automatische acties zoals route-klikken.'],
             ];
         @endphp
 
@@ -72,9 +74,51 @@
                     <div class="gads-stat">
                         <div class="gads-stat-label">{{ $kaart[0] }}</div>
                         <div class="gads-stat-value">{{ $kaart[1] }}</div>
+                        @if (! empty($kaart[2]))
+                            <div class="gads-muted" style="font-size:11px; margin-top:2px; line-height:1.3;">{{ $kaart[2] }}</div>
+                        @endif
                     </div>
                 @endforeach
             </div>
+        </x-filament::section>
+
+        {{-- Conversies uitgesplitst per actie: maakt zichtbaar of het de échte waarde-conversie
+             ("Nieuw abonnement") is of alleen ruis (route-klikken e.d.), i.p.v. een stille 0. --}}
+        <x-filament::section>
+            <x-slot name="heading">Conversies per actie (afgelopen 30 dagen)</x-slot>
+            <x-slot name="description">De hoofd-kolom "Conversies" telt alleen primaire acties. Hier zie je álles wat vuurde, per type.</x-slot>
+
+            @php $cb = $this->conversionBreakdown; @endphp
+            @if (empty($cb))
+                <p class="gads-hint">Geen enkele conversie in de afgelopen 30 dagen — ook geen automatische acties. Er is dus nog niets binnengekomen op de lopende campagnes.</p>
+            @else
+                <table class="gads-table">
+                    <thead>
+                        <tr>
+                            <th>Conversie-actie</th>
+                            <th>Type</th>
+                            <th class="gads-num">Aantal</th>
+                            <th class="gads-num">Waarde</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($cb as $row)
+                            <tr>
+                                <td>{{ $row['name'] }}</td>
+                                <td>
+                                    @if ($row['primary'])
+                                        <x-filament::badge color="success" size="sm">Primair (telt mee)</x-filament::badge>
+                                    @else
+                                        <x-filament::badge color="gray" size="sm">Secundair</x-filament::badge>
+                                    @endif
+                                </td>
+                                <td class="gads-num">{{ $fmtConv($row['count']) }}</td>
+                                <td class="gads-num">{{ $row['value'] > 0 ? '€ ' . number_format($row['value'], 2, ',', '.') : '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
         </x-filament::section>
 
         <x-filament::section collapsible collapsed>
