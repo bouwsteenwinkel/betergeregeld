@@ -182,7 +182,7 @@ return [
         'pains' => [
             ['title' => 'Je kunt niet altijd opnemen', 'text' => 'Zit je in een gesprek, dan gaat de aanvraag vaak naar wie wél opneemt. De assistent vangt dat op.'],
             ['title' => 'Veel vragen, weinig serieuze klanten', 'text' => 'De assistent vraagt door, zodat je alleen de kansrijke aanvragen terugbelt.'],
-            ['title' => 'Reviews vragen vergeet je', 'text' => 'Na de klus vraagt de assistent automatisch om een Google-review.'],
+            ['title' => 'Terugbellen schiet erbij in', 'text' => 'Na de klus staat elk terugbelverzoek in je overzicht, met waar het over ging.'],
         ],
         'zkhw' => [
             'label'     => 'AI',
@@ -199,7 +199,7 @@ return [
                 ['title' => 'Neemt op als jij niet kan', 'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.'],
                 ['title' => 'Bereidt je offerte voor', 'text' => 'Uit wat de klant doorgeeft een eerste inschatting van werk en kosten.'],
                 ['title' => 'Filtert serieuze aanvragen', 'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke klanten terugbelt.'],
-                ['title' => 'Verzamelt reviews', 'text' => 'Vraagt na afloop automatisch om een Google-review.'],
+                ['title' => 'Stuurt een verslag', 'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.'],
             ],
         ],
     ],

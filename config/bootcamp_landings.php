@@ -386,13 +386,13 @@ return array (
     array (
       'eyebrow' => 'AI-assistent',
       'title' => 'Een assistent voor je bootcampbedrijf die nooit een aanvraag mist',
-      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt vragen en plant meteen een afspraak in. Dag en nacht, in gewoon Nederlands.',
+      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt vragen en noteert meteen een terugbelverzoek. Dag en nacht, in gewoon Nederlands.',
       'note' => 'Praat in jouw eigen toon, jij houdt de controle',
       'usps' => 
       array (
         0 => 'Neemt telefoon en chat aan, 24 uur per dag',
         1 => 'Nooit meer een aanvraag missen buiten kantooruren',
-        2 => 'Plant afspraken in en beantwoordt vragen',
+        2 => 'Beantwoordt vragen en noteert terugbelverzoeken',
       ),
     ),
     'pains' => 
@@ -409,15 +409,15 @@ return array (
       ),
       2 => 
       array (
-        'title' => 'Reviews vragen vergeet je',
-        'text' => 'Na de afspraak vraagt de assistent automatisch om een Google-review.',
+        'title' => 'Terugbellen schiet erbij in',
+        'text' => 'Na de afspraak staat elk terugbelverzoek in je overzicht, met waar het over ging.',
       ),
     ),
     'zkhw' => 
     array (
       'label' => 'AI',
       'title' => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-      'intro' => 'Bel je een keer niet op tijd terug, dan boekt de klant vaak ergens anders. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en plant een afspraak in, dag en nacht. Bekijk hoe dat werkt op een bootcampbedrijf.',
+      'intro' => 'Bel je een keer niet op tijd terug, dan boekt de klant vaak ergens anders. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en noteert een terugbelverzoek, dag en nacht. Bekijk hoe dat werkt op een bootcampbedrijf.',
       'brand' => 'BootFit',
       'heroTitle' => 'Altijd bereikbaar, ook als jij aan het werk bent',
       'urlLabel' => 'jouw-bootcampbedrijf.nl',
@@ -436,7 +436,7 @@ return array (
         1 => 
         array (
           'slot' => 'gallery2',
-          'price' => 'Afspraak ✓',
+          'price' => 'Terugbellen ✓',
         ),
         2 => 
         array (
@@ -453,8 +453,8 @@ return array (
         ),
         1 => 
         array (
-          'title' => 'Plant afspraken in',
-          'text' => 'Zoekt een passend moment en zet de afspraak meteen in je agenda.',
+          'title' => 'Noteert terugbelverzoeken',
+          'text' => 'Noteert wie teruggebeld wil worden en waarover, en zet het klaar in je overzicht.',
         ),
         2 => 
         array (
@@ -463,8 +463,8 @@ return array (
         ),
         3 => 
         array (
-          'title' => 'Verzamelt reviews',
-          'text' => 'Vraagt na de klus automatisch om een Google-review.',
+          'title' => 'Stuurt een verslag',
+          'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.',
         ),
       ),
     ),

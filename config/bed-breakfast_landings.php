@@ -386,13 +386,13 @@ return array (
     array (
       'eyebrow' => 'AI-assistent',
       'title' => 'Een assistent voor je bed & breakfast die nooit een aanvraag mist',
-      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt vragen en neemt reserveringen aan. Dag en nacht, in gewoon Nederlands.',
+      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt vragen en zet reserveringsvragen klaar om terug te bellen. Dag en nacht, in gewoon Nederlands.',
       'note' => 'Praat in jouw eigen toon, jij houdt de controle',
       'usps' => 
       array (
         0 => 'Neemt telefoon en chat aan, 24 uur per dag',
         1 => 'Nooit meer een aanvraag missen buiten kantooruren',
-        2 => 'Neemt reserveringen aan en beantwoordt vragen',
+        2 => 'Beantwoordt vragen en noteert terugbelverzoeken',
       ),
     ),
     'pains' => 
@@ -400,7 +400,7 @@ return array (
       0 => 
       array (
         'title' => 'Je kunt niet altijd opnemen',
-        'text' => 'Heb je het druk in de zaak, dan blijft de telefoon liggen. De assistent neemt op en noteert de reservering.',
+        'text' => 'Heb je het druk in de zaak, dan blijft de telefoon liggen. De assistent neemt op en noteert de reserveringsvraag.',
       ),
       1 => 
       array (
@@ -409,15 +409,15 @@ return array (
       ),
       2 => 
       array (
-        'title' => 'Reviews vragen vergeet je',
-        'text' => 'Na het bezoek vraagt de assistent automatisch om een review.',
+        'title' => 'Terugbellen schiet erbij in',
+        'text' => 'Na de drukte staat elk terugbelverzoek in je overzicht, met waar het over ging.',
       ),
     ),
     'zkhw' => 
     array (
       'label' => 'AI',
       'title' => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-      'intro' => 'Een gemiste telefoon is een lege tafel. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en neemt reserveringen aan, dag en nacht. Bekijk hoe dat werkt op een bed & breakfast.',
+      'intro' => 'Een gemiste telefoon is een lege tafel. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en noteert een terugbelverzoek, dag en nacht. Bekijk hoe dat werkt op een bed & breakfast.',
       'brand' => 'BedBoek',
       'heroTitle' => 'Altijd bereikbaar, ook als jij aan het werk bent',
       'urlLabel' => 'jouw-bed&breakfast.nl',
@@ -436,7 +436,7 @@ return array (
         1 => 
         array (
           'slot' => 'gallery2',
-          'price' => 'Reservering ✓',
+          'price' => 'Terugbellen ✓',
         ),
         2 => 
         array (
@@ -453,8 +453,8 @@ return array (
         ),
         1 => 
         array (
-          'title' => 'Neemt reserveringen aan',
-          'text' => 'Noteert datum, tijd en aantal personen en zet het in je systeem.',
+          'title' => 'Noteert reserveringsvragen',
+          'text' => 'Noteert wat de gast wil en zet het terugbelverzoek klaar in je overzicht.',
         ),
         2 => 
         array (
@@ -463,8 +463,8 @@ return array (
         ),
         3 => 
         array (
-          'title' => 'Verzamelt reviews',
-          'text' => 'Vraagt na de klus automatisch om een Google-review.',
+          'title' => 'Stuurt een verslag',
+          'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.',
         ),
       ),
     ),

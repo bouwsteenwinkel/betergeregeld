@@ -409,8 +409,8 @@ return array (
       ),
       2 => 
       array (
-        'title' => 'Reviews vragen vergeet je',
-        'text' => 'Na de klus vraagt de assistent automatisch om een Google-review.',
+        'title' => 'Terugbellen schiet erbij in',
+        'text' => 'Na de klus staat elk terugbelverzoek in je overzicht, met waar het over ging.',
       ),
     ),
     'zkhw' => 
@@ -436,7 +436,7 @@ return array (
         1 => 
         array (
           'slot' => 'gallery2',
-          'price' => 'Afspraak ✓',
+          'price' => 'Terugbellen ✓',
         ),
         2 => 
         array (
@@ -463,8 +463,8 @@ return array (
         ),
         3 => 
         array (
-          'title' => 'Verzamelt reviews',
-          'text' => 'Vraagt na de klus automatisch om een Google-review.',
+          'title' => 'Stuurt een verslag',
+          'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.',
         ),
       ),
     ),

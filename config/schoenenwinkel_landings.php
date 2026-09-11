@@ -409,8 +409,8 @@ return array (
       ),
       2 => 
       array (
-        'title' => 'Reviews vragen vergeet je',
-        'text' => 'Na een aankoop vraagt de assistent automatisch om een Google-review.',
+        'title' => 'Terugbellen schiet erbij in',
+        'text' => 'Na een drukke dag staat elk terugbelverzoek in je overzicht, met waar het over ging.',
       ),
     ),
     'zkhw' => 
@@ -463,8 +463,8 @@ return array (
         ),
         3 => 
         array (
-          'title' => 'Verzamelt reviews',
-          'text' => 'Vraagt na de klus automatisch om een Google-review.',
+          'title' => 'Stuurt een verslag',
+          'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.',
         ),
       ),
     ),

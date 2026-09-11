@@ -170,7 +170,7 @@ return [
         'hero' => [
             'eyebrow' => 'AI-assistent',
             'title'   => 'Een assistent voor je rijschool die nooit een aanmelding mist',
-            'sub'     => 'De assistent neemt telefoon en appjes aan, beantwoordt vragen over prijzen en beschikbaarheid en plant proeflessen in. Dag en nacht, in gewoon Nederlands.',
+            'sub'     => 'De assistent neemt telefoon en appjes aan, beantwoordt vragen over prijzen en beschikbaarheid en noteert wie een proefles wil. Dag en nacht, in gewoon Nederlands.',
             'note'    => 'Praat in jouw eigen toon, jij houdt de controle',
             'usps'    => [
                 'Neemt telefoon en chat aan, 24 uur per dag',
@@ -181,13 +181,13 @@ return [
         'pains' => [
             ['title' => 'Je kunt niet opnemen tijdens de les', 'text' => 'Zit je in de auto, dan gaat de leerling vaak naar wie wél opneemt. De assistent vangt dat op.'],
             ['title' => 'Steeds dezelfde vragen', 'text' => 'Prijzen, beschikbaarheid, pakketten. De assistent beantwoordt ze meteen, zodat jij alleen de serieuze aanmeldingen terugbelt.'],
-            ['title' => 'Reviews vragen vergeet je', 'text' => 'Na het slagen vraagt de assistent automatisch om een Google-review.'],
+            ['title' => 'Terugbellen schiet erbij in', 'text' => 'Na de les staat elk terugbelverzoek in je overzicht, met waar het over ging.'],
         ],
         'zkhw' => [
             'imageSlot'    => 'ai-preview',
             'label'        => 'AI',
             'title'        => 'Zo kan het worden: een assistent die nooit een aanmelding mist',
-            'intro'        => 'Zit je in de auto, dan kun je niet opnemen, en is de leerling vaak al weg. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en plant een proefles in, dag en nacht. Bekijk hoe dat werkt bij een rijschool.',
+            'intro'        => 'Zit je in de auto, dan kun je niet opnemen, en is de leerling vaak al weg. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen en noteert wie een proefles wil, dag en nacht. Bekijk hoe dat werkt bij een rijschool.',
             'brand'        => 'Rijschool Vooruit',
             'heroTitle'    => 'Altijd bereikbaar, ook als jij lesgeeft',
             'urlLabel'     => 'jouw-rijschool.nl',
@@ -195,12 +195,12 @@ return [
             'heroBtn'      => 'Stel je vraag',
             'ctaLabel'     => 'Bekijk het AI-voorbeeld',
             'galleryLabel' => 'De assistent aan het werk',
-            'gallery'      => [['slot' => 'gallery1', 'price' => 'Chat ✓'], ['slot' => 'gallery2', 'price' => 'Proefles ✓'], ['slot' => 'gallery3', 'price' => 'Antwoord ✓']],
+            'gallery'      => [['slot' => 'gallery1', 'price' => 'Chat ✓'], ['slot' => 'gallery2', 'price' => 'Terugbellen ✓'], ['slot' => 'gallery3', 'price' => 'Antwoord ✓']],
             'bullets'      => [
                 ['title' => 'Neemt op als jij lesgeeft', 'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.'],
-                ['title' => 'Plant proeflessen in', 'text' => 'De assistent stelt een moment voor dat in jouw agenda past.'],
+                ['title' => 'Noteert proefles-aanvragen', 'text' => 'De assistent noteert wie een proefles wil, zodat jij gericht terugbelt.'],
                 ['title' => 'Filtert serieuze aanmeldingen', 'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke leerlingen terugbelt.'],
-                ['title' => 'Verzamelt reviews', 'text' => 'Vraagt na het slagen automatisch om een Google-review.'],
+                ['title' => 'Stuurt een verslag', 'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.'],
             ],
         ],
     ],

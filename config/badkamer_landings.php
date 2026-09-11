@@ -191,7 +191,7 @@ return [
         'pains' => [
             ['title' => 'Je kunt niet altijd opnemen', 'text' => 'Sta je op de steiger, dan gaat de klus vaak naar wie wél opneemt. De assistent vangt dat op.'],
             ['title' => 'Veel vragen, weinig serieuze klussen', 'text' => 'De assistent vraagt door, zodat je alleen de kansrijke aanvragen terugbelt.'],
-            ['title' => 'Reviews vragen vergeet je', 'text' => 'Na oplevering vraagt de assistent automatisch om een Google-review.'],
+            ['title' => 'Terugbellen schiet erbij in', 'text' => 'Kom je van de steiger, dan staat elk terugbelverzoek in je overzicht, met waar het over ging.'],
         ],
         'zkhw' => [
             'label'        => 'AI',
@@ -206,12 +206,12 @@ return [
             // Kant-en-klare AI-mockup (eigen browser-frame) i.p.v. de CSS-mockup.
             'imageSlot'    => 'ai-preview',
             'galleryLabel' => 'De assistent aan het werk',
-            'gallery'      => [['slot' => 'gallery1', 'price' => 'Chat ✓'], ['slot' => 'gallery2', 'price' => 'Afspraak ✓'], ['slot' => 'gallery3', 'price' => 'Offerte ✓']],
+            'gallery'      => [['slot' => 'gallery1', 'price' => 'Chat ✓'], ['slot' => 'gallery2', 'price' => 'Terugbellen ✓'], ['slot' => 'gallery3', 'price' => 'Offerte ✓']],
             'bullets'      => [
                 ['title' => 'Neemt op als jij niet kan', 'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.'],
                 ['title' => 'Bereidt je offerte voor', 'text' => 'Uit een paar foto\'s een eerste inschatting van werk en materiaal.'],
                 ['title' => 'Filtert serieuze aanvragen', 'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke klussen terugbelt.'],
-                ['title' => 'Verzamelt reviews', 'text' => 'Vraagt na oplevering automatisch om een Google-review.'],
+                ['title' => 'Stuurt een verslag', 'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.'],
             ],
         ],
     ],
