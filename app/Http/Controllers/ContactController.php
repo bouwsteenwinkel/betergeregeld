@@ -6,6 +6,8 @@ use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -43,7 +45,8 @@ class ContactController extends Controller
 			'locale' => $locale,
 		];
 
-		ContactMessage::create([
+		// Eerst opslaan, dan mailen: loopt de mail vast, dan staat het bericht er al.
+		$bericht = ContactMessage::create([
 			'public_id' => 'BGR-' . strtoupper(Str::random(12)),
 			'created_at' => now(),
 			'status' => 'new',
@@ -65,7 +68,54 @@ class ContactController extends Controller
 			'user_id' => Auth::id(),
 		]);
 
+		$this->meldIntern($bericht);
+
 		return redirect(route('contact.sent'))->with('submitted', true);
+	}
+
+	/**
+	 * Interne melding van een nieuwe inzending. Tot 11-09-2026 bestond die niet: aanvragen
+	 * stonden alleen in de admin en niemand kreeg bericht (zie config/contact.php).
+	 *
+	 * [WEBFORM] vooraan in het onderwerp is geen versiering: de Gmail-regel op dennis@
+	 * filtert daarop en zet de mail in Primair. Nooit weghalen of vertalen, zelfde
+	 * afspraak als bij de formulieren van Bouwsteenwinkel.
+	 *
+	 * Een mislukte mail mag de inzending niet breken; het bericht staat al opgeslagen.
+	 */
+	private function meldIntern(ContactMessage $bericht): void
+	{
+		try {
+			$aan = (string) config('contact.notify_email');
+			if ($aan === '') {
+				return;
+			}
+
+			$regels = [
+				'Nieuwe aanvraag via het contactformulier van betergeregeld.com.',
+				'',
+				'Naam: ' . $bericht->name . ($bericht->company ? " ({$bericht->company})" : ''),
+				'E-mail: ' . $bericht->email,
+				'Telefoon: ' . ($bericht->phone ?: '—'),
+				'Website: ' . ($bericht->website ?: '—'),
+				'Onderwerp: ' . ($bericht->topic ?: '—'),
+				'Pagina: ' . $bericht->page_uri,
+				'Referentie: ' . $bericht->public_id,
+				'',
+				$bericht->message,
+				'',
+				'Beantwoorden kan rechtstreeks op deze mail. Terug te vinden in de admin onder ContactMessages.',
+			];
+
+			Mail::raw(implode("\n", $regels), function ($m) use ($aan, $bericht) {
+				$m->to($aan)
+					->replyTo($bericht->email, $bericht->name)
+					->subject('[WEBFORM] Betergeregeld — ' . Str::limit($bericht->subject, 120));
+			});
+		} catch (\Throwable $e) {
+			Log::error("contact_notify_mail ({$bericht->public_id}): " . $e->getMessage());
+			report($e);
+		}
 	}
 
 	public function sent(string $locale): View
