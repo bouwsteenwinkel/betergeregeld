@@ -163,12 +163,12 @@ return [
         'hero' => [
             'eyebrow' => 'AI-assistent',
             'title'   => 'Een assistent voor je bedrijf die nooit een aanvraag mist',
-            'sub'     => 'De assistent neemt telefoon en chat aan, vraagt door naar wat de klant nodig heeft en bereidt je offerte voor. Dag en nacht, in gewoon Nederlands.',
+            'sub'     => 'De assistent neemt telefoon en chat aan, vraagt door naar wat de klant nodig heeft en zet de aanvraag voor je klaar. Dag en nacht, in gewoon Nederlands.',
             'note'    => 'Praat in jouw eigen toon, jij houdt de controle',
             'usps'    => [
                 'Neemt telefoon en chat aan, 24 uur per dag',
                 'Nooit meer een aanvraag missen buiten kantooruren',
-                'Bereidt een eerste offerte voor',
+                'Noteert wat de klant nodig heeft',
             ],
         ],
         'pains' => [
@@ -179,7 +179,7 @@ return [
         'zkhw' => [
             'label'     => 'AI',
             'title'     => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-            'intro'     => 'Bel je een keer niet op tijd terug, dan is de klant vaak al weg. Een slimme assistent neemt telefoon en chat aan, vraagt door en bereidt je offerte voor, dag en nacht. Bekijk hoe dat werkt.',
+            'intro'     => 'Bel je een keer niet op tijd terug, dan is de klant vaak al weg. Een slimme assistent neemt telefoon en chat aan, vraagt door en zet de aanvraag voor je klaar, dag en nacht. Bekijk hoe dat werkt.',
             'brand'     => 'Jouw Website',
             'heroTitle' => 'Altijd bereikbaar, ook als jij aan het werk bent',
             'urlLabel'  => 'jouw-bedrijf.nl',
@@ -189,7 +189,7 @@ return [
             'imageSlot' => 'ai-preview',
             'bullets'   => [
                 ['title' => 'Neemt op als jij niet kan', 'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.'],
-                ['title' => 'Bereidt je offerte voor', 'text' => 'Uit wat de klant doorgeeft een eerste inschatting van werk en kosten.'],
+                ['title' => 'Noteert de aanvraag', 'text' => 'Wat de klant nodig heeft staat voor je klaar, zodat jij de offerte kunt maken.'],
                 ['title' => 'Filtert serieuze aanvragen', 'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke klanten terugbelt.'],
                 ['title' => 'Stuurt een verslag', 'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.'],
             ],

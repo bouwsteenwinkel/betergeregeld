@@ -386,13 +386,13 @@ return array (
     array (
       'eyebrow' => 'AI-assistent',
       'title' => 'Een assistent voor je kledingwinkel die nooit een aanvraag mist',
-      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt productvragen en helpt de klant bestellen. Dag en nacht, in gewoon Nederlands.',
+      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt productvragen en zoekt de status van een bestelling op. Dag en nacht, in gewoon Nederlands.',
       'note' => 'Praat in jouw eigen toon, jij houdt de controle',
       'usps' => 
       array (
         0 => 'Neemt telefoon en chat aan, 24 uur per dag',
         1 => 'Nooit meer een aanvraag missen buiten kantooruren',
-        2 => 'Beantwoordt productvragen en helpt bestellen',
+        2 => 'Beantwoordt vragen over producten en levertijden',
       ),
     ),
     'pains' => 
@@ -417,7 +417,7 @@ return array (
     array (
       'label' => 'AI',
       'title' => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-      'intro' => 'Een vraag die blijft liggen is een gemiste verkoop. Een slimme assistent neemt telefoon en chat aan, beantwoordt productvragen en helpt bestellen, dag en nacht. Bekijk hoe dat werkt op een kledingwinkel.',
+      'intro' => 'Een vraag die blijft liggen is een gemiste verkoop. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen over producten en levertijden, dag en nacht. Bekijk hoe dat werkt op een kledingwinkel.',
       'brand' => 'Modique',
       'heroTitle' => 'Altijd bereikbaar, ook als jij aan het werk bent',
       'urlLabel' => 'jouw-kledingwinkel.nl',
@@ -436,7 +436,7 @@ return array (
         1 => 
         array (
           'slot' => 'gallery2',
-          'price' => 'Bestelling ✓',
+          'price' => 'Orderstatus ✓',
         ),
         2 => 
         array (
@@ -453,8 +453,8 @@ return array (
         ),
         1 => 
         array (
-          'title' => 'Helpt bij het bestellen',
-          'text' => 'Beantwoordt productvragen en zet de klant op weg naar de kassa.',
+          'title' => 'Helpt met productvragen',
+          'text' => 'Beantwoordt vragen over producten en zoekt de status van een bestelling op.',
         ),
         2 => 
         array (

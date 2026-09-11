@@ -170,17 +170,17 @@ return [
         'hero' => [
             'eyebrow' => 'AI-assistent',
             'title'   => 'Een assistent voor je rijschool die nooit een aanmelding mist',
-            'sub'     => 'De assistent neemt telefoon en appjes aan, beantwoordt vragen over prijzen en beschikbaarheid en noteert wie een proefles wil. Dag en nacht, in gewoon Nederlands.',
+            'sub'     => 'De assistent neemt telefoon en chat aan, beantwoordt vragen over prijzen en lespakketten en noteert wie een proefles wil. Dag en nacht, in gewoon Nederlands.',
             'note'    => 'Praat in jouw eigen toon, jij houdt de controle',
             'usps'    => [
                 'Neemt telefoon en chat aan, 24 uur per dag',
                 'Nooit meer een aanmelding missen tijdens de les',
-                'Beantwoordt vragen over prijzen en beschikbaarheid',
+                'Beantwoordt vragen over prijzen en lespakketten',
             ],
         ],
         'pains' => [
             ['title' => 'Je kunt niet opnemen tijdens de les', 'text' => 'Zit je in de auto, dan gaat de leerling vaak naar wie wél opneemt. De assistent vangt dat op.'],
-            ['title' => 'Steeds dezelfde vragen', 'text' => 'Prijzen, beschikbaarheid, pakketten. De assistent beantwoordt ze meteen, zodat jij alleen de serieuze aanmeldingen terugbelt.'],
+            ['title' => 'Steeds dezelfde vragen', 'text' => 'Prijzen, pakketten, openingstijden. De assistent beantwoordt ze meteen, zodat jij alleen de serieuze aanmeldingen terugbelt.'],
             ['title' => 'Terugbellen schiet erbij in', 'text' => 'Na de les staat elk terugbelverzoek in je overzicht, met waar het over ging.'],
         ],
         'zkhw' => [

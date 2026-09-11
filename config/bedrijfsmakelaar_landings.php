@@ -386,13 +386,13 @@ return array (
     array (
       'eyebrow' => 'AI-assistent',
       'title' => 'Een assistent voor je bedrijfsmakelaar die nooit een aanvraag mist',
-      'sub' => 'De assistent neemt telefoon en chat aan, vraagt door naar wat de klant nodig heeft en bereidt je offerte voor. Dag en nacht, in gewoon Nederlands.',
+      'sub' => 'De assistent neemt telefoon en chat aan, vraagt door naar wat de klant nodig heeft en zet de aanvraag voor je klaar. Dag en nacht, in gewoon Nederlands.',
       'note' => 'Praat in jouw eigen toon, jij houdt de controle',
       'usps' => 
       array (
         0 => 'Neemt telefoon en chat aan, 24 uur per dag',
         1 => 'Nooit meer een aanvraag missen buiten kantooruren',
-        2 => 'Bereidt een eerste offerte voor uit foto\'s',
+        2 => 'Noteert wat de klant nodig heeft',
       ),
     ),
     'pains' => 
@@ -417,7 +417,7 @@ return array (
     array (
       'label' => 'AI',
       'title' => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-      'intro' => 'Bel je een keer niet op tijd terug, dan is de klus vaak al weg. Een slimme assistent neemt telefoon en chat aan, vraagt door en bereidt je offerte voor, dag en nacht. Bekijk hoe dat werkt op een bedrijfsmakelaar.',
+      'intro' => 'Bel je een keer niet op tijd terug, dan is de klus vaak al weg. Een slimme assistent neemt telefoon en chat aan, vraagt door en zet de aanvraag voor je klaar, dag en nacht. Bekijk hoe dat werkt op een bedrijfsmakelaar.',
       'brand' => 'BedrijfsBaken',
       'heroTitle' => 'Altijd bereikbaar, ook als jij aan het werk bent',
       'urlLabel' => 'jouw-bedrijfsmakelaar.nl',
@@ -441,7 +441,7 @@ return array (
         2 => 
         array (
           'slot' => 'gallery3',
-          'price' => 'Offerte ✓',
+          'price' => 'Aanvraag ✓',
         ),
       ),
       'bullets' => 
@@ -453,8 +453,8 @@ return array (
         ),
         1 => 
         array (
-          'title' => 'Bereidt je offerte voor',
-          'text' => 'Uit een paar foto\'s een eerste inschatting van werk en materiaal.',
+          'title' => 'Noteert de aanvraag',
+          'text' => 'Wat de klant nodig heeft staat voor je klaar, zodat jij de offerte kunt maken.',
         ),
         2 => 
         array (
