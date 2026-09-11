@@ -11,19 +11,20 @@ use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
- * Schrijft elke dag een nieuwe Nederlandse blog-post via Claude.
+ * Schrijft een nieuwe Nederlandse blog-post via Claude (twee keer per week,
+ * zie routes/console.php).
  *
  * Topic-keuze: Claude bedenkt het zelf gegeven de bestaande categorieën,
  * de afgelopen 30 posts (om duplicates te vermijden), en de positionering
- * van Beter Geregeld ICT (MKB-tools/-checks/-diensten). Geen externe
- * topic-queue nodig.
+ * van Beter Geregeld ICT: maatwerk, koppelingen en automatisering, voor de
+ * beslisser die overweegt iets te laten bouwen. Geen externe topic-queue nodig.
  *
  * Output-shape (Claude moet exact deze JSON teruggeven):
  *   {
  *     "category_slug": "...",
  *     "slug":          "kebab-case-slug",
  *     "title":         "...",
- *     "meta_title":    "... — Beter Geregeld ICT",
+ *     "meta_title":    "... (zonder merknaam, max 55 tekens)",
  *     "excerpt":       "1-2 zin samenvatting",
  *     "body_html":     "<p>...</p><h2>...</h2><p>...</p>",
  *     "tags":          ["tag-slug-1", "tag-slug-2"],
@@ -55,14 +56,42 @@ class BlogGenerator
 			->map(fn ($t) => '- ' . $t)
 			->implode("\n");
 
+		$diensten = collect(array_keys(config('services_catalog', [])))
+			->map(fn ($slug) => "- /nl/diensten/{$slug}")
+			->implode("\n");
+
+		// WIE WE AANSPREKEN. Tot 11-09-2026 schreef deze prompt voor "ondernemers en
+		// kantoormanagers zonder IT-afdeling" over losse beheertaken. Dat leverde 572 posts
+		// op over M365-instellingen, patch management en bankafschriften zwartlakken, met
+		// in 90 dagen 30 klikken en vrijwel geen lezer die iets wil laten bouwen: 73% van de
+		// posts had nul vertoningen, de dienstenpagina's samen 45. Wat Beter Geregeld
+		// verkoopt is maatwerk, koppelingen en automatisering; daar schrijven we nu over,
+		// voor de persoon die daarover beslist.
 		$systemPrompt = <<<TXT
-Je bent een ervaren technisch redacteur voor Beter Geregeld ICT, een Nederlands MKB-georiënteerd technisch consultancy- en tools-bedrijf in Bussum (sinds 1989).
+Je bent een ervaren redacteur voor Beter Geregeld ICT in Bussum (sinds 1989). Wij bouwen maatwerk webapplicaties, klantportalen, API-koppelingen en procesautomatisering, en helpen organisaties AI zinnig in hun werk in te zetten.
 
-Onze blog richt zich op ondernemers en kantoormanagers ZONDER IT-afdeling. Toon: helder, praktisch, geen jargon waar dat vermijdbaar is. Geen marketing-frasen. Geen "in een wereld waar...". We schrijven Nederlands van mensen voor mensen.
+VOOR WIE: de beslisser in een MKB-organisatie van zo'n 5 tot 250 mensen. Een directeur-eigenaar, operationeel manager of office manager die merkt dat het werk vastloopt: dubbele invoer, Excel-lijsten die niemand meer vertrouwt, systemen die niet met elkaar praten, klanten die bellen voor informatie die ze zelf zouden moeten kunnen zien. Zo iemand overweegt iets te laten bouwen of koppelen, en wil weten wat dat inhoudt.
 
-Diensten waar onze tekst naar kan verwijzen: SEO-check, website-snelheid verbeteren, mail-beveiliging (SPF/DKIM/DMARC), 2FA implementeren, toegang-check, cookie-banner-instellen, website meertalig maken, WordPress opschonen, website-beveiliging, website-backup-en-herstel, website-migratie, website-structuur-check.
+WAAROVER: vragen die zo iemand heeft vóór en tijdens zo'n keuze. Bijvoorbeeld:
+- wanneer een standaardpakket volstaat en wanneer maatwerk loont
+- wat een klantportaal oplost, en wat erbij komt kijken
+- koppelingen tussen pakketten (boekhouding, CRM, planning, webshop): wat kan, wat valt tegen
+- welke processen zich lenen voor automatisering, en welke niet
+- AI in het dagelijkse werk: waar het tijd scheelt, waar het risico's heeft
+- hoe een bouwtraject verloopt, wat je zelf moet aanleveren, hoe je een bouwer kiest
+- beveiliging, toegang en websitebeheer, uitsluitend vanuit de vraag "wat moet ik als beslisser regelen of uitbesteden"
 
-Tools waar onze tekst naar kan verwijzen: /nl/tools/iban-check, /nl/tools/vat-check, /nl/tools/postcode-check, /nl/tools/json-formatter, /nl/tools/diff, /nl/tools/ip-lookup, /nl/tools/favicon-generator, /nl/tools/speedtest, /nl/tools/pdf-merge, /nl/tools/shipping-rates, /nl/tools/lego-lookup.
+NIET: stap-voor-stap handleidingen voor systeembeheerders (instellingen in M365, PowerShell, configuratiemenu's), algemene kantoortips, consumentenonderwerpen. Noem geen prijzen of doorlooptijden van Beter Geregeld; die staan op /nl/prijzen. Verzin geen klantcases, cijfers of onderzoeken.
+
+Toon: helder, eerlijk, geen jargon waar dat vermijdbaar is. Benoem ook wanneer maatwerk NIET de oplossing is. Geen marketing-frasen, geen "in een wereld waar...". Nederlands van mensen voor mensen.
+
+Pagina's waar de tekst naar MOET verwijzen (minstens één, in de lopende tekst waar het past):
+- /nl/slimmer-werken-met-ai
+- /nl/prijzen
+- /nl/contact
+$diensten
+
+Tools mogen alleen als ze echt bij het onderwerp horen: /nl/tools/iban-check, /nl/tools/vat-check, /nl/tools/postcode-check, /nl/tools/json-formatter, /nl/tools/mail-auth-check, /nl/tools/ssl-check.
 
 Beschikbare categorieën:
 $categories
@@ -70,16 +99,16 @@ $categories
 REGELS:
 1. Geef ALLEEN een geldig JSON-object terug, geen tekst eromheen, geen markdown-fences.
 2. body_html moet schone HTML zijn: <p>, <h2>, <h3>, <ul>/<ol>/<li>, <strong>, <em>, <a href>. GEEN <h1> (de title is al h1). GEEN <html>/<head>/<body>.
-3. Lengte: 600-1200 woorden, ~4-7 minuten leestijd.
+3. Lengte: 800-1400 woorden.
 4. excerpt: 1-2 zinnen die nieuwsgierig maken zonder clickbait.
-5. meta_title eindigt op " — Beter Geregeld ICT" (max 65 chars totaal).
+5. meta_title: de zoekvraag in gewone woorden, ZONDER merknaam, maximaal 55 tekens. De site zet er zelf " | Beter Geregeld" achter.
 6. slug: lowercase kebab-case, geen accenten, max 80 chars.
 7. tags: 3-6 stuks, lowercase kebab-case, herbruikbaar (geen one-off-tags).
-8. Sluit af met een korte, niet-marketinge call-to-action die naar een relevante tool of dienst-pagina linkt.
-9. Vermijd onderwerpen die we recent al schreven (zie lijst). Kies iets verfrissends maar binnen onze niche.
+8. Sluit af met een korte, niet-marketinge alinea die naar de best passende pagina uit de lijst hierboven linkt.
+9. Vermijd onderwerpen die we recent al schreven (zie lijst).
 TXT;
 
-		$userPrompt = "Schrijf een nieuwe blog-post voor vandaag ({datum}).\n\nWe schreven recent over (vermijd herhaling):\n{recent}\n\nKies een onderwerp dat 1) past in een bestaande categorie, 2) actueel en praktisch is voor het MKB, 3) een natuurlijke aanleiding biedt om naar een van onze tools of diensten te verwijzen.\n\nGeef ALLEEN het JSON-object terug.";
+		$userPrompt = "Schrijf een nieuwe blog-post voor vandaag ({datum}).\n\nWe schreven recent over (vermijd herhaling):\n{recent}\n\nKies een onderwerp dat 1) past in een bestaande categorie, 2) een vraag beantwoordt die een beslisser heeft die overweegt iets te laten bouwen, koppelen of automatiseren, 3) een natuurlijke aanleiding biedt om naar een van onze dienst- of landingspagina's te verwijzen.\n\nGeef ALLEEN het JSON-object terug.";
 		$userPrompt = strtr($userPrompt, [
 			'{datum}'  => Carbon::now()->translatedFormat('d F Y'),
 			'{recent}' => $recent !== '' ? $recent : '(nog niets — eerste post)',
@@ -98,7 +127,7 @@ TXT;
 					'category_slug'    => ['type' => 'string', 'description' => 'slug van een bestaande categorie'],
 					'slug'             => ['type' => 'string', 'description' => 'kebab-case slug, max 80 chars'],
 					'title'            => ['type' => 'string'],
-					'meta_title'       => ['type' => 'string', 'description' => 'eindigt op " — Beter Geregeld ICT", max 65 chars'],
+					'meta_title'       => ['type' => 'string', 'description' => 'zonder merknaam, max 55 tekens'],
 					'excerpt'          => ['type' => 'string', 'description' => '1-2 zin samenvatting'],
 					'body_html'        => ['type' => 'string', 'description' => 'volledige HTML body, geen <h1>'],
 					'tags'             => ['type' => 'array', 'items' => ['type' => 'string'], 'description' => '3-6 kebab-case tags'],
@@ -138,7 +167,9 @@ TXT;
 			'locale'               => 'nl',
 			'slug'                 => $slug,
 			'title'                => mb_substr((string) $data['title'], 0, 255),
-			'meta_title'           => mb_substr((string) ($data['meta_title'] ?? $data['title']), 0, 65),
+			// Merknaam eraf als Claude hem toch meegaf; die zet de view er zelf achter
+			// (App\Support\PaginaTitel). Niet afkappen: een halve zin leest slechter.
+			'meta_title'           => mb_substr(\App\Support\PaginaTitel::zonderMerk((string) ($data['meta_title'] ?? $data['title'])), 0, 255),
 			'excerpt'              => mb_substr((string) $data['excerpt'], 0, 500),
 			'body'                 => (string) $data['body_html'],
 			'reading_time_min'     => (int) ($data['reading_time_min'] ?? max(2, ceil(str_word_count(strip_tags($data['body_html'])) / 220))),
@@ -192,6 +223,11 @@ TXT;
 		}
 		if (mb_strlen($d['body_html']) < 800) {
 			throw new RuntimeException('BlogGenerator: body_html is te kort (< 800 chars). Mogelijk lege of placeholder content.');
+		}
+		// Een post zonder link naar iets wat we verkopen publiceren we niet: dat is precies
+		// de blog van vóór 11-09-2026, met lezers die nergens heen konden.
+		if (!preg_match('~href="(?:https://betergeregeld\.com)?/nl/(?:diensten/|slimmer-werken-met-ai|prijzen|contact)~', $d['body_html'])) {
+			throw new RuntimeException('BlogGenerator: body_html linkt niet naar een dienst-, prijs-, contact- of AI-pagina.');
 		}
 	}
 

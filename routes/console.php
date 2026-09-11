@@ -212,12 +212,15 @@ CronMonitorPinger::watch(
     'rankdata:send-reports'
 );
 
-// Dagelijkse blog-generatie via Claude — NL + EN vertaling, direct
-// gepubliceerd, met notify-mail naar Dennis voor review. 09:00 zodat
-// de mail rond koffietijd binnenkomt.
+// Blog-generatie via Claude, direct gepubliceerd, met notify-mail naar Dennis
+// voor review. 09:00 zodat de mail rond koffietijd binnenkomt.
+// Sinds 11-09-2026 dinsdag en donderdag in plaats van elke dag: de blog schrijft
+// nu voor beslissers over maatwerk (zie BlogGenerator), en twee goede posts per
+// week wegen zwaarder dan zeven brede. De commandonaam blijft, want de cron-monitor
+// kent hem onder die sleutel.
 CronMonitorPinger::watch(
     Schedule::command('blog:generate-daily --skip-if-todays-post')
-        ->dailyAt('09:00')
+        ->cron('0 9 * * 2,4')
         ->onOneServer()
         ->withoutOverlapping(),
     'blog:generate-daily'
