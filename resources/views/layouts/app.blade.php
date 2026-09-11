@@ -179,6 +179,12 @@
 						<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
 						{{ __('AI') }}
 					</a>
+					{{-- AI Telefoniste prominent in het menu (besluit Dennis 11-09-2026), om dezelfde
+					     reden als AI hierboven. De pagina is alleen Nederlands, dus altijd /nl. --}}
+					<a href="/nl/ai-telefoniste" class="inline-flex items-center gap-1.5 {{ request()->is('*ai-telefoniste*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-accent-hover)] hover:text-[color:var(--color-accent)]' }}">
+						<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						{{ $currentLocale === 'en' ? 'AI receptionist' : 'AI Telefoniste' }}
+					</a>
 					<a href="/{{ $currentLocale }}/tools" class="{{ request()->is('*tools*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Tools') }}</a>
 					<a href="/{{ $currentLocale }}/prijzen" class="{{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Prijzen') }}</a>
 					<a href="/{{ $currentLocale }}/over" class="{{ request()->is('*over*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Over ons') }}</a>
@@ -203,7 +209,8 @@
 					</form>
 				@else
 					<a href="{{ route('login') }}" class="hidden sm:inline text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">{{ __('Inloggen') }}</a>
-					<a href="/{{ $currentLocale }}/contact" class="btn-accent text-sm">
+					{{-- "Plan gesprek" gaat sinds 11-09-2026 naar de afsprakenpagina (alleen NL). --}}
+					<a href="/nl/afspraak" class="btn-accent text-sm">
 						{{ __('Plan gesprek') }}
 						<svg class="w-3.5 h-3.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
 					</a>
@@ -225,6 +232,10 @@
 				<a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="py-2 inline-flex items-center gap-2 {{ request()->is('*slimmer-werken-met-ai*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-accent-hover)] font-semibold' }}">
 					<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
 					{{ $currentLocale === 'en' ? 'Working smarter with AI' : 'Slimmer werken met AI' }}
+				</a>
+				<a href="/nl/ai-telefoniste" class="py-2 inline-flex items-center gap-2 {{ request()->is('*ai-telefoniste*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-accent-hover)] font-semibold' }}">
+					<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
+					{{ $currentLocale === 'en' ? 'AI receptionist' : 'AI Telefoniste' }}
 				</a>
 				<a href="/{{ $currentLocale }}/tools" class="py-2 {{ request()->is('*tools*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Tools') }}</a>
 				<a href="/{{ $currentLocale }}/prijzen" class="py-2 {{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Prijzen') }}</a>
@@ -294,9 +305,12 @@
 					<h3 class="font-semibold mb-4 text-sm tracking-wide uppercase text-[color:var(--color-on-dark-soft)]">{{ __('Diensten') }}</h3>
 					<ul class="space-y-2 text-sm text-[color:var(--color-on-dark-muted)]">
 						<li><a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="text-white hover:text-[color:var(--color-accent)] font-semibold">{{ $currentLocale === 'en' ? 'Working smarter with AI' : 'Slimmer werken met AI' }}</a></li>
-						<li><a href="/{{ $currentLocale }}/diensten/seo-check" class="hover:text-white">SEO check</a></li>
-						<li><a href="/{{ $currentLocale }}/diensten/2fa-implementeren" class="hover:text-white">2FA</a></li>
-						<li><a href="/{{ $currentLocale }}/diensten/website-snelheid-verbeteren" class="hover:text-white">{{ $currentLocale === 'en' ? 'Speed' : 'Snelheid' }}</a></li>
+						{{-- Kernaanbod (11-09-2026), alleen Nederlandse pagina's. --}}
+						<li><a href="/nl/ai-telefoniste" class="text-white hover:text-[color:var(--color-accent)] font-semibold">{{ $currentLocale === 'en' ? 'AI receptionist' : 'AI Telefoniste' }}</a></li>
+						<li><a href="/nl/maatwerk-webapplicatie" class="hover:text-white">{{ $currentLocale === 'en' ? 'Custom web applications' : 'Maatwerk webapplicatie' }}</a></li>
+						<li><a href="/nl/klantportaal-laten-maken" class="hover:text-white">{{ $currentLocale === 'en' ? 'Client portals' : 'Klantportaal' }}</a></li>
+						<li><a href="/nl/api-koppelingen" class="hover:text-white">{{ $currentLocale === 'en' ? 'API integrations' : 'API-koppelingen' }}</a></li>
+						<li><a href="/nl/processen-automatiseren" class="hover:text-white">{{ $currentLocale === 'en' ? 'Process automation' : 'Processen automatiseren' }}</a></li>
 						<li><a href="/{{ $currentLocale }}/diensten" class="hover:text-white">{{ $currentLocale === 'en' ? 'All services' : 'Alle diensten' }}</a></li>
 					</ul>
 				</div>

@@ -49,6 +49,12 @@ class SitemapController extends Controller
 			$xml .= $this->url(url("/{$locale}"), '1.0', 'daily');
 			$xml .= $this->url(url("/{$locale}/over"), '0.6', 'monthly');
 			$xml .= $this->url(url("/{$locale}/slimmer-werken-met-ai"), '0.9', 'weekly');
+			// Kernaanbod: alleen Nederlands (zie routes/web.php); /en/... 301't.
+			if ($locale === 'nl') {
+				foreach (['ai-telefoniste', 'maatwerk-webapplicatie', 'klantportaal-laten-maken', 'api-koppelingen', 'processen-automatiseren'] as $kern) {
+					$xml .= $this->url(url("/nl/{$kern}"), '0.9', 'weekly');
+				}
+			}
 			$xml .= $this->url(url("/{$locale}/accessguard"), '0.9', 'weekly');
 			$xml .= $this->url(url("/{$locale}/accessguard/demo"), '0.7', 'monthly');
 			$xml .= $this->url(url("/{$locale}/prijzen"), '0.8', 'weekly');

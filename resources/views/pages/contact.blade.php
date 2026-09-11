@@ -20,6 +20,12 @@
 		'website-structuur-check' => $isEn ? 'Website structure check' : 'Structuur check',
 		'iban-check' => 'IBAN check',
 		'ai-procesanalyse' => $isEn ? 'Process analysis: AI & automation' : 'Procesanalyse: AI & automatisering',
+		// Kernaanbod-pagina's (11-09-2026): hun knoppen komen hier binnen met ?topic=.
+		'ai-telefoniste' => $isEn ? 'AI receptionist' : 'AI Telefoniste',
+		'maatwerk-webapplicatie' => $isEn ? 'Custom web application' : 'Maatwerk webapplicatie',
+		'klantportaal' => $isEn ? 'Client portal' : 'Klantportaal',
+		'api-koppelingen' => $isEn ? 'API integrations' : 'API-koppelingen',
+		'processen-automatiseren' => $isEn ? 'Process automation' : 'Processen automatiseren',
 		'maatwerk' => $isEn ? 'Custom / advice' : 'Maatwerk / advies',
 		'anders' => $isEn ? 'Other / not sure yet' : 'Anders / nog niet zeker',
 	];

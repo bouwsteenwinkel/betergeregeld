@@ -351,6 +351,34 @@ Route::prefix('{locale}')
 		Route::get('/over', fn () => view('pages.about'))->name('about');
 		Route::get('/slimmer-werken-met-ai', fn () => view('pages.ai'))->name('ai.landing');
 
+		// Kernaanbod (11-09-2026): de vier diensten die de homepage verkocht maar waar geen
+		// pagina voor bestond, plus de AI Telefoniste. Alleen Nederlands: de Engelse blog is
+		// op 18-08 uit de lucht gehaald omdat hij met zijn Nederlandse origineel concurreerde,
+		// en deze pagina's zijn voor Nederlandse organisaties geschreven. /en/... 301't.
+		foreach ([
+			'maatwerk-webapplicatie'   => 'maatwerk-webapplicatie',
+			'klantportaal-laten-maken' => 'klantportaal',
+			'api-koppelingen'          => 'api-koppelingen',
+			'processen-automatiseren'  => 'processen-automatiseren',
+			'ai-telefoniste'           => 'ai-telefoniste',
+		] as $__kernSlug => $__kernView) {
+			Route::get("/{$__kernSlug}", fn (string $locale) => $locale === 'nl'
+				? view("pages.kernaanbod.{$__kernView}")
+				: redirect("/nl/{$__kernSlug}", 301)
+			)->name("kernaanbod.{$__kernView}");
+		}
+
+		// Afspraak inplannen op betergeregeld.com zelf (11-09-2026). Boekt via dezelfde
+		// /afspraak/boeken als de channel-sites; zie pages/afspraak.blade.php.
+		Route::get('/afspraak', fn (string $locale) => $locale === 'nl'
+			? view('pages.afspraak')
+			: redirect('/nl/afspraak', 301)
+		)->name('afspraak');
+		Route::get('/afspraak-bevestigd', fn (string $locale) => $locale === 'nl'
+			? view('pages.afspraak-bevestigd')
+			: redirect('/nl/afspraak-bevestigd', 301)
+		)->name('afspraak.bevestigd');
+
 		// Juridische pagina's (generiek uit config/legal.php). noindex,follow.
 		Route::get('/privacybeleid', fn () => view('pages.legal.privacy'))->name('legal.privacy');
 		Route::get('/cookiebeleid', fn () => view('pages.legal.cookies'))->name('legal.cookies');

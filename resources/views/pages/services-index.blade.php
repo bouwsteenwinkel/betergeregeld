@@ -52,6 +52,24 @@
 			</div>
 		</a>
 
+		{{-- Kernaanbod (11-09-2026): eigen pagina's, alleen Nederlands, dus altijd /nl. --}}
+		<h2 class="font-bold text-lg mb-4">{{ $isEn ? 'What we build' : 'Wat we bouwen' }}</h2>
+		<div class="grid md:grid-cols-2 lg:grid-cols-5 gap-5 mb-14">
+			@foreach ([
+				['/nl/ai-telefoniste',           $isEn ? 'AI receptionist' : 'AI Telefoniste',                 $isEn ? 'Answers the phone, answers questions, transfers and reports.' : 'Neemt op, beantwoordt vragen, verbindt door en stuurt een verslag.'],
+				['/nl/maatwerk-webapplicatie',   $isEn ? 'Custom web application' : 'Maatwerk webapplicatie',  $isEn ? 'Software built around how you work.' : 'Software gebouwd rond hoe u werkt.'],
+				['/nl/klantportaal-laten-maken', $isEn ? 'Client portal' : 'Klantportaal',                     $isEn ? 'Clients see status, documents and invoices themselves.' : 'Klanten zien zelf status, documenten en facturen.'],
+				['/nl/api-koppelingen',          $isEn ? 'API integrations' : 'API-koppelingen',                $isEn ? 'Enter data once, correct everywhere.' : 'Gegevens één keer invoeren, overal kloppen.'],
+				['/nl/processen-automatiseren',  $isEn ? 'Process automation' : 'Processen automatiseren',      $isEn ? 'Reminders, follow-up and checks that run by themselves.' : 'Herinneringen, opvolging en controles die vanzelf lopen.'],
+			] as [$href, $titel, $sub])
+				<a href="{{ $href }}" class="card card-accent group block">
+					<h3 class="font-bold text-lg mb-2 leading-tight">{{ $titel }}</h3>
+					<p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed">{{ $sub }}</p>
+				</a>
+			@endforeach
+		</div>
+
+		<h2 class="font-bold text-lg mb-4">{{ $isEn ? 'Practical services' : 'Praktische diensten' }}</h2>
 		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
 			@foreach ($services as $slug => $s)
 				<a href="/{{ $locale }}/diensten/{{ $slug }}" class="card card-accent group block">

@@ -81,13 +81,17 @@ WAAROVER: vragen die zo iemand heeft vóór en tijdens zo'n keuze. Bijvoorbeeld:
 - hoe een bouwtraject verloopt, wat je zelf moet aanleveren, hoe je een bouwer kiest
 - beveiliging, toegang en websitebeheer, uitsluitend vanuit de vraag "wat moet ik als beslisser regelen of uitbesteden"
 
-NIET: stap-voor-stap handleidingen voor systeembeheerders (instellingen in M365, PowerShell, configuratiemenu's), algemene kantoortips, consumentenonderwerpen. Noem geen prijzen of doorlooptijden van Beter Geregeld; die staan op /nl/prijzen. Verzin geen klantcases, cijfers of onderzoeken.
+NIET: stap-voor-stap handleidingen voor systeembeheerders (instellingen in M365, PowerShell, configuratiemenu's), algemene kantoortips, consumentenonderwerpen. Noem geen prijzen of doorlooptijden van Beter Geregeld: die volgen na een adviesgesprek. Verzin geen klantcases, cijfers of onderzoeken.
 
 Toon: helder, eerlijk, geen jargon waar dat vermijdbaar is. Benoem ook wanneer maatwerk NIET de oplossing is. Geen marketing-frasen, geen "in een wereld waar...". Nederlands van mensen voor mensen.
 
-Pagina's waar de tekst naar MOET verwijzen (minstens één, in de lopende tekst waar het past):
-- /nl/slimmer-werken-met-ai
-- /nl/prijzen
+Pagina's waar de tekst naar MOET verwijzen (minstens één, in de lopende tekst waar het past). Kies bij voorkeur een van de eerste zes:
+- /nl/maatwerk-webapplicatie (maatwerk software laten bouwen)
+- /nl/klantportaal-laten-maken (klantportaal)
+- /nl/api-koppelingen (systemen koppelen)
+- /nl/processen-automatiseren (automatiseren met vaste regels)
+- /nl/slimmer-werken-met-ai (AI in werkprocessen)
+- /nl/ai-telefoniste (AI die de telefoon aanneemt)
 - /nl/contact
 $diensten
 
@@ -225,9 +229,10 @@ TXT;
 			throw new RuntimeException('BlogGenerator: body_html is te kort (< 800 chars). Mogelijk lege of placeholder content.');
 		}
 		// Een post zonder link naar iets wat we verkopen publiceren we niet: dat is precies
-		// de blog van vóór 11-09-2026, met lezers die nergens heen konden.
-		if (!preg_match('~href="(?:https://betergeregeld\.com)?/nl/(?:diensten/|slimmer-werken-met-ai|prijzen|contact)~', $d['body_html'])) {
-			throw new RuntimeException('BlogGenerator: body_html linkt niet naar een dienst-, prijs-, contact- of AI-pagina.');
+		// de blog van vóór 11-09-2026, met lezers die nergens heen konden. /nl/prijzen telt
+		// bewust NIET mee: die pagina gaat over de tool-abonnementen, niet over maatwerk.
+		if (!preg_match('~href="(?:https://betergeregeld\.com)?/nl/(?:diensten/|slimmer-werken-met-ai|maatwerk-webapplicatie|klantportaal-laten-maken|api-koppelingen|processen-automatiseren|ai-telefoniste|contact)~', $d['body_html'])) {
+			throw new RuntimeException('BlogGenerator: body_html linkt niet naar een dienst-, contact-, AI- of kernaanbodpagina.');
 		}
 	}
 

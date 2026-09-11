@@ -102,7 +102,9 @@
 					{{ $isEn ? 'Explore services' : 'Bekijk onze diensten' }}
 					<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
 				</a>
-				<a href="/{{ $locale }}/contact" class="btn-ghost-light">
+				{{-- Sinds 11-09-2026 naar de afsprakenpagina: "plan" belooft een moment kiezen,
+				     en dat kan nu ook op betergeregeld.com zelf. --}}
+				<a href="/nl/afspraak" class="btn-ghost-light">
 					{{ $isEn ? 'Book a free intro call' : 'Plan een gratis adviesgesprek' }}
 				</a>
 			</div>
@@ -123,6 +125,47 @@
 					<div class="text-3xl font-bold text-white">NL</div>
 					<div class="text-xs uppercase tracking-wider text-[color:var(--color-on-dark-soft)] mt-1">{{ $isEn ? 'Based in Bussum' : 'Gevestigd Bussum' }}</div>
 				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+{{-- ============ AI TELEFONISTE ============
+     Direct onder de hero, nog boven AI: "Ik wil onze AI Telefoniste heel prominent maken"
+     (Dennis, 11-09-2026). Het demonummer is de sterkste knop die we hebben: bellen
+     overtuigt meer dan lezen. Volledige uitleg op /nl/ai-telefoniste (alleen NL). --}}
+<section class="section-dark relative overflow-hidden border-t border-[color:var(--color-on-dark-line)]">
+	<div class="absolute inset-0 grid-pattern opacity-30"></div>
+	<div class="relative max-w-[1400px] mx-auto px-6 py-14 sm:py-16">
+		<div class="grid lg:grid-cols-12 gap-8 items-center">
+			<div class="lg:col-span-7">
+				<span class="pill pill-dark mb-4">
+					<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
+					{{ $isEn ? 'New · AI receptionist' : 'Nieuw · AI Telefoniste' }}
+				</span>
+				<h2 class="display-2 mb-4 text-white">
+					{{ $isEn ? 'Never miss' : 'Nooit meer een' }}
+					<span class="accent-word">{{ $isEn ? 'a call again.' : 'gemiste oproep.' }}</span>
+				</h2>
+				<p class="text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl mb-6">
+					{{ $isEn
+						? 'Our AI receptionist answers the phone, answers questions from your own knowledge base, transfers when needed and sends a summary after every call. In Dutch, and in English, German or Arabic on request.'
+						: 'Onze AI Telefoniste neemt de telefoon op, beantwoordt vragen uit uw eigen kennisbank, verbindt door als het nodig is en stuurt na elk gesprek een verslag. In het Nederlands, en op verzoek in het Engels, Duits of Arabisch.' }}
+				</p>
+				<div class="flex flex-wrap gap-3">
+					<a href="/nl/ai-telefoniste" class="btn-accent">
+						{{ $isEn ? 'How it works' : 'Zo werkt ze' }}
+						<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</a>
+					<a href="/nl/afspraak?onderwerp=ai-telefoniste" class="btn-ghost-light">{{ $isEn ? 'Book an intro call' : 'Plan een kennismaking' }}</a>
+				</div>
+			</div>
+			<div class="lg:col-span-5">
+				<a href="tel:+31882545150" class="block rounded-2xl border border-white/10 bg-white/5 p-7 hover:border-[color:var(--color-accent)] transition-colors">
+					<div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-on-dark-soft)] mb-2">{{ $isEn ? 'Call the demo yourself' : 'Bel zelf de demo' }}</div>
+					<div class="text-4xl font-black text-white tracking-tight mb-2">088 254 5150</div>
+					<div class="text-sm text-[color:var(--color-on-dark-muted)]">{{ $isEn ? 'A demo pharmacy with made-up data. Ask about opening hours or a repeat prescription.' : 'Een demo-apotheek met verzonnen gegevens. Vraag naar de openingstijden of een herhaalrecept.' }}</div>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -289,6 +332,30 @@
 					? 'Our strength is building custom web applications and integrations between systems. We connect websites to CRM, ATS, ERP, order or accounting systems, streamline workflows and make processes clearer.'
 					: 'Onze kracht ligt in maatwerk webapplicaties en koppelingen tussen systemen. We verbinden websites met CRM, ATS, ERP, order- of boekhoudsystemen, stroomlijnen workflows en maken processen overzichtelijker.' }}
 			</p>
+		</div>
+	</div>
+</section>
+
+{{-- ============ KERNAANBOD ============
+     De vier pagina's van het kernaanbod (11-09-2026). De sectie hierboven zegt al wat we
+     bouwen; tot die datum was er voor geen van de vier een pagina om naar door te klikken. --}}
+<section class="pb-20">
+	<div class="max-w-[1100px] mx-auto px-6">
+		<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+			@foreach ([
+				['/nl/maatwerk-webapplicatie',   $isEn ? 'Custom web applications' : 'Maatwerk webapplicatie',  $isEn ? 'Software that fits how you work' : 'Software die past bij hoe u werkt'],
+				['/nl/klantportaal-laten-maken', $isEn ? 'Client portals' : 'Klantportaal',                     $isEn ? 'Clients find everything themselves' : 'Klanten vinden zelf alles'],
+				['/nl/api-koppelingen',          $isEn ? 'API integrations' : 'API-koppelingen',                 $isEn ? 'Systems that talk to each other' : 'Systemen die met elkaar praten'],
+				['/nl/processen-automatiseren',  $isEn ? 'Process automation' : 'Processen automatiseren',       $isEn ? 'Work that handles itself' : 'Werk dat zichzelf afhandelt'],
+			] as [$href, $titel, $sub])
+				<a href="{{ $href }}" class="card card-accent group block">
+					<div class="font-bold mb-1 flex items-center justify-between gap-2">
+						{{ $titel }}
+						<svg class="w-4 h-4 text-[color:var(--color-ink-soft)] group-hover:text-[color:var(--color-accent)] transition" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</div>
+					<div class="text-sm text-[color:var(--color-ink-muted)]">{{ $sub }}</div>
+				</a>
+			@endforeach
 		</div>
 	</div>
 </section>
