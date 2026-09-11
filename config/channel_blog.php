@@ -43,8 +43,8 @@ return [
         ['slug' => 'koppel-agenda-boekhouding-website',    'product' => 'automatisering', 'title' => 'Koppel je website, agenda en boekhouding',          'angle' => 'geen dubbel werk, systemen die samenwerken, minder fouten'],
         // AI
         ['slug' => 'nooit-meer-een-aanvraag-missen',       'product' => 'ai',             'title' => 'Nooit meer een aanvraag missen met een AI-assistent', 'angle' => 'telefoon/chat 24/7 aannemen, buiten kantoortijd, doorvragen'],
-        ['pillar' => true, 'slug' => 'ai-bereidt-je-offerte-voor',           'product' => 'ai',             'title' => 'AI die je offerte voorbereidt',                    'angle' => 'uit foto\'s/vragen een eerste inschatting, jij houdt controle'],
-        ['slug' => 'automatisch-reviews-verzamelen',       'product' => 'ai',             'title' => 'Automatisch reviews verzamelen na oplevering',     'angle' => 'na de klus automatisch om een Google-review vragen'],
+        ['pillar' => true, 'slug' => 'ai-bereidt-je-offerte-voor',           'product' => 'ai',             'title' => 'Een complete aanvraag, voordat je belt',            'angle' => 'de AI-assistent neemt de telefoon op, stelt de standaardvragen uit je eigen kennisbank, noteert wat/waar/wanneer plus een terugbelverzoek en mailt na elk gesprek een samenvatting, zodat jij zelf sneller de offerte maakt. De assistent maakt GEEN prijsinschatting of offerte, vraagt niet om foto\'s en plant geen afspraken in'],
+        ['slug' => 'automatisch-reviews-verzamelen',       'product' => 'ai',             'title' => 'Meer reviews na oplevering: een routine die je volhoudt', 'angle' => 'zelf reviews vragen op het goede moment, directe link in je factuur of mail, reageren op elke review; los daarvan neemt een AI-assistent de telefoon op zodat geen klant onbeantwoord blijft. De assistent vraagt NIET om reviews en beantwoordt ze niet'],
         // Groei
         ['slug' => 'groeien-van-website-tot-ai',           'product' => 'groei',          'title' => 'Groeien met je :zaak: van website tot AI',        'angle' => 'de Groeidiamant, stap voor stap uitbreiden, nooit opnieuw beginnen'],
     ],
@@ -71,8 +71,8 @@ return [
         'facturen-en-herinneringen-automatisch' => 'een laptop met nette administratie/facturen op een opgeruimd, licht bureau',
         'koppel-agenda-boekhouding-website'     => 'een laptop en smartphone die samenwerken op een bureau, verbonden en overzichtelijk, modern',
         'nooit-meer-een-aanvraag-missen'        => 'een smartphone die in de avond oplicht met een binnenkomend bericht, warme moderne setting',
-        'ai-bereidt-je-offerte-voor'            => 'een ondernemer met een laptop op een moderne lichte werkplek, slimme technologie die meehelpt',
-        'automatisch-reviews-verzamelen'        => 'een tevreden klant die op een smartphone een beoordeling met sterren achterlaat, modern en positief',
+        'ai-bereidt-je-offerte-voor'            => 'een ondernemer die aan een lichte werkplek op zijn smartphone een overzichtelijke gesprekssamenvatting in zijn mail leest, notitieblok ernaast, modern',
+        'automatisch-reviews-verzamelen'        => 'een tevreden klant die na afloop van de klus zelf op een smartphone een beoordeling met sterren achterlaat, modern en positief',
         'groeien-van-website-tot-ai'            => 'een ondernemer die tevreden naar oplopende resultaten op een laptop kijkt, licht en eigentijds kantoor aan huis',
     ],
 ];

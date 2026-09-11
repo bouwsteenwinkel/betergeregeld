@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
  * Werkt de AI-fase van de badkamerspecialist-triggersite uit. Zelfde patroon als
  * de webshop-/portaal-/automatisering-seeder: content.facets.ai op de
  * basisblokken, zodat /voorbeeld/ai leest als een slimme assistent die opneemt,
- * meedenkt en offertes voorbereidt, i.p.v. de renovatie-website. Naast de
+ * doorvraagt en een samenvatting mailt, i.p.v. de renovatie-website. Naast de
  * bestaande ai-blokken (#ai-uitleg = capaciteiten, #ai-cta).
  *
  * AI raakt zowel de klant (chat/telefoon 24/7) als de ondernemer (nooit een
@@ -58,7 +58,7 @@ class SeedBadkamerAiFacet extends Command
             'hero' => [
                 'eyebrow'    => 'AI-assistent',
                 'title'      => 'Een assistent die opneemt en meedenkt, ook als jij aan het werk bent',
-                'sub'        => 'De assistent beantwoordt telefoon en chat, vraagt door naar wat je nodig hebt en bereidt een eerste offerte voor. Zo mis je nooit meer een klus omdat je handen onder de kit zitten.',
+                'sub'        => 'De assistent beantwoordt telefoon en chat, vraagt door naar wat je nodig hebt en mailt je na elk gesprek een samenvatting. Zo mis je nooit meer een klus omdat je handen onder de kit zitten.',
                 'cta_label'  => 'Bekijk je AI-voorbeeld',
                 'cta2_label' => 'Wat doet de assistent?',
                 'cta2_href'  => '#diensten',
@@ -69,8 +69,8 @@ class SeedBadkamerAiFacet extends Command
                 'items' => [
                     ['icon' => '📞', 'text' => 'Neemt telefoon en chat aan, 24 uur per dag'],
                     ['icon' => '✅', 'text' => 'Nooit meer een aanvraag missen buiten kantooruren'],
-                    ['icon' => '📐', 'text' => 'Bereidt een eerste offerte voor uit een paar foto\'s'],
-                    ['icon' => '⭐', 'text' => 'Vraagt na oplevering automatisch om een review'],
+                    ['icon' => '📐', 'text' => 'Vraagt door naar wat, waar en wanneer'],
+                    ['icon' => '📧', 'text' => 'Mailt je na elk gesprek een samenvatting'],
                 ],
             ],
 
@@ -82,8 +82,8 @@ class SeedBadkamerAiFacet extends Command
                 'items'   => [
                     ['icon' => '📵', 'title' => 'Geen gemiste aanvragen', 'text' => 'Ook buiten kantooruren staat er iemand klaar voor je klant.'],
                     ['icon' => '🎯', 'title' => 'Betere aanvragen', 'text' => 'De assistent vraagt door, zodat je alleen serieuze klussen terugbelt.'],
-                    ['icon' => '⚡', 'title' => 'Sneller een offerte', 'text' => 'De eerste inschatting ligt er al voordat je hebt teruggebeld.'],
-                    ['icon' => '⭐', 'title' => 'Meer 5-sterren reviews', 'text' => 'Automatisch gevraagd op het beste moment na oplevering.'],
+                    ['icon' => '⚡', 'title' => 'Sneller zelf je offerte', 'text' => 'Wat, waar en wanneer staat al in je mail, dus je hoeft niet eerst na te bellen.'],
+                    ['icon' => '📋', 'title' => 'Alles terug te zien', 'text' => 'Elk gesprek staat in je portaal, met een samenvatting in je mail.'],
                     ['icon' => '🔕', 'title' => 'Minder onderbrekingen', 'text' => 'De simpele vragen worden afgevangen, jij werkt door.'],
                     ['icon' => '🌙', 'title' => 'Altijd bereikbaar', 'text' => 'Ook als jij onder de kit zit of even vrij bent.'],
                 ],
@@ -94,10 +94,10 @@ class SeedBadkamerAiFacet extends Command
                 'eyebrow' => 'De assistent',
                 'heading' => 'Wat de assistent voor je oppakt',
                 'items'   => [
-                    ['name' => 'Inkomende telefoon', 'desc' => 'Neemt op, noteert de klus en schakelt door indien nodig.', 'price' => '24/7'],
-                    ['name' => 'Chatvraag op de site', 'desc' => 'Direct antwoord op prijs, planning en werkgebied.', 'price' => 'direct'],
+                    ['name' => 'Inkomende telefoon', 'desc' => 'Neemt op, noteert de klus en verbindt tijdens openingstijden door indien nodig.', 'price' => '24/7'],
+                    ['name' => 'Chatvraag op de site', 'desc' => 'Direct antwoord op vragen over werkwijze, doorlooptijd en werkgebied.', 'price' => 'direct'],
                     ['name' => 'Nieuwe aanvraag', 'desc' => 'Vraagt door en zet een nette samenvatting in je mail.', 'price' => 'meteen'],
-                    ['name' => 'Na oplevering', 'desc' => 'Vraagt netjes om een review met een directe link.', 'price' => 'automatisch'],
+                    ['name' => 'Buiten openingstijden', 'desc' => 'Noteert een terugbelverzoek of bericht, zodat jij weet wie je belt.', 'price' => 'altijd'],
                 ],
             ],
 
@@ -121,17 +121,17 @@ class SeedBadkamerAiFacet extends Command
                 'items'   => [
                     ['stars' => 5, 'text' => "'s Avonds via de chat meteen antwoord op mijn vraag over de doorlooptijd. Top.", 'author' => 'Wendy uit Soest'],
                     ['stars' => 5, 'text' => 'Belde buiten kantooruren en werd netjes teruggebeld met een voorstel.', 'author' => 'Ramon uit Baarn'],
-                    ['stars' => 5, 'text' => "Kreeg snel een eerste prijsindicatie op basis van mijn foto's.", 'author' => 'Ingrid uit Hilversum'],
+                    ['stars' => 5, 'text' => 'Kon mijn vraag gewoon in het Engels stellen en kreeg meteen een duidelijk antwoord.', 'author' => 'Ingrid uit Hilversum'],
                 ],
             ],
 
             'faq' => [
                 'heading' => 'Veelgestelde vragen over de AI-assistent',
                 'items'   => [
-                    ['q' => 'Merkt de klant dat het een assistent is?', 'a' => 'De assistent is duidelijk en behulpzaam. Voor lastige vragen schakelt hij netjes door naar jou.'],
-                    ['q' => 'Neemt de AI beslissingen voor mij?', 'a' => 'Nee. Hij verzamelt en bereidt voor. Jij bevestigt de offerte en de afspraak.'],
+                    ['q' => 'Merkt de klant dat het een assistent is?', 'a' => 'De assistent is duidelijk en behulpzaam. Voor lastige vragen verbindt hij tijdens openingstijden netjes door, of noteert hij een terugbelverzoek voor jou.'],
+                    ['q' => 'Neemt de AI beslissingen voor mij?', 'a' => 'Nee. Hij beantwoordt vragen uit jouw eigen informatie en noteert wat de klant wil. De offerte en de afspraak maak je zelf.'],
                     ['q' => 'Wat als de assistent iets niet weet?', 'a' => 'Dan noteert hij de vraag en zorgt dat jij of je team contact opneemt.'],
-                    ['q' => 'Werkt het in het Nederlands?', 'a' => 'Ja, gewoon in normaal Nederlands en in jouw eigen toon.'],
+                    ['q' => 'Werkt het in het Nederlands?', 'a' => 'Ja, gewoon in normaal Nederlands en in jouw eigen toon. Op verzoek ook in het Engels, Duits of Arabisch.'],
                 ],
             ],
 

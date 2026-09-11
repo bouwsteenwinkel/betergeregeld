@@ -196,6 +196,12 @@ class ChannelContentGenerator
         $system = 'Je schrijft grondige, praktische blogartikelen voor specialist-websites die websites, webshops, klantenportalen, automatisering en AI verkopen aan ondernemers. '
             . 'Toon: helder, praktisch, vertrouwenwekkend, jij-vorm. '
             . 'Regels: Nederlands. GEEN em-dashes. Geen holle marketingtaal (vermijd ontzorgen, naadloos, op-maat, "in de wereld van"). Vermijd clichématige openers ("Ontdek hoe", "niet alleen ... maar ook") en varieer je zinsopeningen. Wees concreet en branche-specifiek met echte voorbeelden, getallen en stappen. '
+            // Wat de AI-assistent echt kan. Zonder deze regel dichtte het model hem van alles toe
+            // (afspraken in de agenda, reviews vragen, offertes uit foto's), en dat stond op
+            // 11-09-2026 in 44 live posts en 205 landingspagina's. Nagekeken in
+            // bouwsteenwinkel_v3/telefonie; pas deze lijst pas aan als de telefonie meer kan.
+            . 'Over de AI-assistent mag je ALLEEN dit beweren: hij neemt de telefoon op (en er is een chat op de website), beantwoordt vragen uit de kennisbank van de ondernemer, verbindt tijdens openingstijden door naar een medewerker, noteert een terugbelverzoek of bericht (de beller kiest: teruggebeld worden, antwoord per e-mail of een bericht), kent openingstijden en feestdagen, spreekt Nederlands en op verzoek Engels, Duits of Arabisch, kan gekoppeld aan een systeem bijvoorbeeld de status van een bestelling opzoeken, en stuurt na elk gesprek een samenvatting per mail; gesprekken zijn terug te zien in een portaal en worden niet opgenomen. '
+            . 'Hij doet NIET: afspraken inplannen of in een agenda zetten, om reviews vragen, offertes of prijsinschattingen maken, foto\'s beoordelen, bestellingen of reserveringen afhandelen, WhatsApp, facturen of herinneringen versturen. Schrijf dat ook niet indirect. '
             . "Structuur: een korte inleiding die het probleem van de ondernemer benoemt, daarna {$sections} <h2>-secties met praktische inhoud (stappen, voorbeelden, wat het kost of oplevert), en een korte afsluiting. "
             . "Geef ALLEEN geldige JSON terug met \"title\", \"excerpt\" (1 pakkende zin) en \"body\" (geldige HTML met <h2> en <p>, {$words}). Eindig met een zin die uitnodigt tot een gratis voorbeeld.";
         $user = "Branche: {$site->branche()} (een {$trade}). Onderwerp: \"{$title}\". Invalshoek: {$angle}. "
