@@ -2,7 +2,7 @@
 
 @php $locale = app()->getLocale(); @endphp
 
-@section('title', ($post->meta_title ?: $post->title) . ', Blog, ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met($post->meta_title ?: $post->title))
 @section('description', $post->excerpt)
 @section('og_type', 'article')
 

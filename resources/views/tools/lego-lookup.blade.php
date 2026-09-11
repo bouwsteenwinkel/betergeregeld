@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('LEGO Element Finder') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('LEGO Element Finder')))
+@section('description', __('Voer een Element ID in (de 6- of 7-cijferige code op een LEGO Pick-a-Brick-tegoed of doosje) en bekijk het onderdeel, de kleur en een afbeelding.'))
 
 @php
 	$locale = app()->getLocale();

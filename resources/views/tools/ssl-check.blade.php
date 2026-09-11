@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('SSL/TLS certificaat checker') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('SSL/TLS certificaat checker')))
 @section('description', __('Bekijk uitgever, vervaldatum, SANs en sleutel-info van het SSL-certificaat van een domein.'))
 
 @section('content')

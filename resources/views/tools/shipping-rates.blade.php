@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Verzendtarieven') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('Verzendtarieven')))
+@section('description', __('Vergelijk tarieven van PostNL en DHL per zone en gewicht. Bereken snel de goedkoopste match, incl. eventuele handling.'))
 
 @php
 	$locale = app()->getLocale();

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('DNS records inspector') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('DNS records inspector')))
 @section('description', __('Bekijk alle DNS-records (A, AAAA, MX, NS, TXT, CNAME, SOA) van een domein in één keer.'))
 
 @section('content')

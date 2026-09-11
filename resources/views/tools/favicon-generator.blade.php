@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Favicon generator') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('Favicon generator')))
+@section('description', __('Upload een vierkant logo (PNG/JPG/WEBP, max 5 MB), krijg alle standaard favicon-formaten in één ZIP.'))
 
 @section('content')
 

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Postcode sanity check') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('Postcode sanity check')))
+@section('description', __('Controleer postcode, plaats, straat en huisnummer op formaat en opvallende invoer. Handig voor exports, fulfilment en administratie.'))
 
 @section('content')
 

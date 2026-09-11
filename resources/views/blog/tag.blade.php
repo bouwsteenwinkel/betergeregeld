@@ -6,7 +6,14 @@
      Alleen binnen het bereik — zie blog/index.blade.php. --}}
 @section('canonical', url('/' . $locale . '/blog/tag/' . $tag->slug) . ($posts->currentPage() > 1 && $posts->currentPage() <= $posts->lastPage() ? '?page=' . $posts->currentPage() : ''))
 
-@section('title', 'Artikelen met tag "' . $tag->name . '", Blog')
+{{-- Geen index. 312 tagpagina's stonden naast 572 artikelen in de sitemap en
+     haalden in 90 dagen samen 32 vertoningen (gemeten 11-09-2026): lijstjes met
+     dezelfde artikelen als de categoriepagina's, die Googles aandacht van de
+     artikelen zelf afhaalden. "follow" blijft, zodat de links naar de artikelen
+     wel meetellen. Ze staan ook niet meer in de sitemap. --}}
+@section('robots', 'noindex,follow')
+
+@section('title', \App\Support\PaginaTitel::met($tag->name . ' – Blog'))
 @section('description', 'Alle blog-artikelen met het onderwerp ' . $tag->name . '.')
 
 @section('content')

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('VAT Check (VIES)') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('BTW-nummer controleren (VIES)')))
+@section('description', __('Controleer gratis of een Europees btw-nummer geldig is, rechtstreeks in VIES van de Europese Commissie. Met naam en adres als het land die deelt. Zonder opslag.'))
 
 @section('content')
 
@@ -12,10 +13,17 @@
 			<span class="opacity-40">/</span>
 			<span class="text-[color:var(--color-on-dark-muted)]">Tools</span>
 			<span class="opacity-40">/</span>
-			<span class="text-[color:var(--color-on-dark-muted)]">VAT check</span>
+			<span class="text-[color:var(--color-on-dark-muted)]">{{ app()->getLocale() === 'nl' ? 'BTW-check' : 'VAT check' }}</span>
 		</nav>
 		<span class="pill pill-dark mb-5">Tool · {{ __('Gratis') }}</span>
-		<h1 class="display-1 mb-5">VAT <span class="accent-word">{{ __('check') }}</span></h1>
+		{{-- Nederlands op /nl. Hier stond op beide talen "VAT check", terwijl Nederlanders
+		     zoeken op "btw-nummer controleren" en "vies check" (11-09-2026: 341 vertoningen
+		     op positie 53). --}}
+		@if (app()->getLocale() === 'nl')
+			<h1 class="display-1 mb-5">BTW-nummer <span class="accent-word">controleren</span></h1>
+		@else
+			<h1 class="display-1 mb-5">VAT <span class="accent-word">{{ __('check') }}</span></h1>
+		@endif
 		<p class="text-lg text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl">
 			{{ __('Valideer EU BTW-nummers via VIES. Geen opslag, alleen check + resultaat.') }}
 		</p>

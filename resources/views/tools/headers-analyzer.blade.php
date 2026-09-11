@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('HTTP security headers analyzer') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('HTTP security headers analyzer')))
 @section('description', __('Krijg een A-F grade voor de security-headers van een website: HSTS, CSP, X-Frame-Options en meer.'))
 
 @section('content')

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Internet snelheidstest') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('Internet snelheidstest')))
+@section('description', __('Meet ping, downloadsnelheid en uploadsnelheid vanuit je browser.'))
 
 @section('content')
 

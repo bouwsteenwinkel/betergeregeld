@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Diff checker') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('Diff checker')))
+@section('description', __('Zie direct welke regels toegevoegd, verwijderd of ongewijzigd zijn. Werkt voor code, e-mails, logs of documenten.'))
 
 @section('content')
 

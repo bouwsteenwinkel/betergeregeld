@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Wat is mijn IP') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('Wat is mijn IP')))
+@section('description', __('Zie het IP-adres waarmee je het web bezoekt, inclusief geografie, provider en risicoprofiel.'))
 
 @section('content')
 

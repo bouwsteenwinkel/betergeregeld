@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('IBAN naamcheck & risico-analyse') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('IBAN naamcheck & risico-analyse')))
+@section('description', __('Controleer of een IBAN geldig is en detecteer mogelijke risico\'s op basis van naam en structuur.'))
 
 @section('content')
 

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('JSON formatter & validator') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('JSON formatter & validator')))
+@section('description', __('Valideer, formatteer of minify JSON. Toont de exacte positie van eventuele fouten.'))
 
 @section('content')
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Blog\BlogCategory;
 use App\Models\Blog\BlogPost;
-use App\Models\Blog\BlogTag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -13,8 +12,8 @@ use Illuminate\Http\Response;
  * state. No cached files on disk, so blog edits go live immediately.
  *
  * Sitemap covers all publicly reachable URLs: home + main pages in both
- * locales, tool landings, and the full blog graph (posts, categories,
- * tags). Google Search Console picks this up at /sitemap.xml.
+ * locales, tool landings, and the blog (posts and categories; tag pages
+ * are noindex and left out). Google Search Console picks this up at /sitemap.xml.
  *
  * RSS at /blog/rss — standards-compliant RSS 2.0 for feed readers and
  * third-party syndication.
@@ -82,16 +81,10 @@ class SitemapController extends Controller
 			}
 		}
 
-		foreach (BlogTag::query()->get(['slug', 'updated_at']) as $tag) {
-			foreach ($blogLocales as $locale) {
-				$xml .= $this->url(
-					url("/{$locale}/blog/tag/{$tag->slug}"),
-					'0.5',
-					'monthly',
-					$tag->updated_at,
-				);
-			}
-		}
+		// Tagpagina's staan er bewust niet in: ze dragen noindex (zie blog/tag.blade.php).
+		// Tot 11-09-2026 waren het er 312 naast 572 artikelen, met samen 32 vertoningen
+		// in 90 dagen. Een URL die zegt "indexeer mij niet" hoort niet in een lijst die
+		// Google vraagt om hem juist wel op te halen.
 
 		// Blog-posts per locale. Sinds 2026-05-22 zijn blog_posts
 		// multi-lingual (locale-veld + translation_of_post_id). De

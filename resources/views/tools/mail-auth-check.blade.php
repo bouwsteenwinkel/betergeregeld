@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('SPF / DKIM / DMARC checker') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('SPF / DKIM / DMARC checker')))
 @section('description', __('Controleer of de e-mailbeveiliging van een domein klopt: SPF, DKIM en DMARC in één keer.'))
 
 @section('content')

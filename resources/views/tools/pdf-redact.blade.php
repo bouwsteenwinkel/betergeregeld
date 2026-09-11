@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('PDF redact') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('PDF redact')))
+@section('description', __('Teken zwarte balken over gevoelige content. De PDF wordt per pagina geraster­iseerd zodat onderliggende tekst niet meer te extraheren is.'))
 
 @section('content')
 

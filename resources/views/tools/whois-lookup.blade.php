@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('WHOIS lookup + domain expiry') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('WHOIS lookup + domain expiry')))
 @section('description', __('Wie heeft dit domein geregistreerd, bij welke registrar, en wanneer verloopt het?'))
 
 @section('content')

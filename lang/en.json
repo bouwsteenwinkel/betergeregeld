@@ -81,6 +81,9 @@
 	"iban.disclaimer": "This tool only performs technical validation and heuristic risk checks. It does not connect to banks.",
 
 	"VAT Check (VIES)": "VAT check (VIES)",
+	"BTW-nummer controleren (VIES)": "EU VAT number check (VIES)",
+	"Controleer gratis of een Europees btw-nummer geldig is, rechtstreeks in VIES van de Europese Commissie. Met naam en adres als het land die deelt. Zonder opslag.": "Check for free whether a European VAT number is valid, directly in the European Commission's VIES. With name and address where the country shares them. Nothing is stored.",
+	"Meet ping, downloadsnelheid en uploadsnelheid vanuit je browser.": "Measure ping, download speed and upload speed from your browser.",
 	"Valideer EU BTW-nummers via VIES. Geen opslag, alleen check + resultaat.": "Validate EU VAT numbers via VIES. No storage, just a check + result.",
 	"check": "check",
 	"Landcode": "Country code",

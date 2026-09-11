@@ -7,7 +7,7 @@
      laten wijzen maakt van een typefout een oneindige reeks "echte" pagina's. --}}
 @section('canonical', url('/' . $locale . '/blog') . ($recent->currentPage() > 1 && $recent->currentPage() <= $recent->lastPage() ? '?page=' . $recent->currentPage() : ''))
 
-@section('title', 'Blog, ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met('Blog'))
 @section('description', 'Praktische gidsen over toegangsbeheer, IT-governance, compliance en MKB-administratie. Geschreven door het Betergeregeld-team.')
 
 @push('head')

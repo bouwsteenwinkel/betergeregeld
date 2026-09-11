@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('PDF merge') . ', ' . config('app.name'))
+@section('title', \App\Support\PaginaTitel::met(__('PDF merge')))
+@section('description', __('Voeg meerdere PDF\'s samen tot één bestand. Sleep om de volgorde aan te passen.'))
 
 @section('content')
 
