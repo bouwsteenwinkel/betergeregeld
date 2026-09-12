@@ -114,6 +114,21 @@
 				</div>
 			@endif
 
+			{{-- Lokvakje: onzichtbaar voor mensen, ingevuld door bots die blind alle velden
+			     vullen. Zie ContactController: is het gevuld, dan weigeren we stil. --}}
+			<div aria-hidden="true" class="absolute -left-[9999px] w-px h-px overflow-hidden">
+				<label for="bedrijfsnaam_2">{{ $isEn ? 'Leave this field empty' : 'Laat dit veld leeg' }}</label>
+				<input id="bedrijfsnaam_2" name="bedrijfsnaam_2" type="text" tabindex="-1" autocomplete="off" value="">
+			</div>
+
+			@if (app(\App\Services\Security\Turnstile::class)->enabled())
+				{{-- Cloudflare Turnstile: de mensencheck die we ook op de andere formulieren
+				     gebruiken. Geen tussenscherm zoals een WAF-challenge, dus het formulier
+				     raakt niet kwijt; de server controleert het token bij het verwerken. --}}
+				<div class="cf-turnstile" data-sitekey="{{ app(\App\Services\Security\Turnstile::class)->siteKey() }}" data-language="{{ $isEn ? 'en' : 'nl' }}" data-theme="light"></div>
+				<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+			@endif
+
 			<button type="submit" class="btn-accent w-full justify-center">
 				{{ $isEn ? 'Send message' : 'Bericht versturen' }}
 				<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>

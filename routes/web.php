@@ -741,6 +741,7 @@ Route::prefix('{locale}')
 		Route::get('/prijzen', [PricingController::class, 'show'])->name('pricing');
 
 		Route::get('/contact', [ContactController::class, 'show'])->name('contact');
-		Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+		// Snelheidslimiet op het versturen (12-09-2026): één IP stuurde 30 spamberichten.
+		Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact-form')->name('contact.store');
 		Route::get('/contact/sent', [ContactController::class, 'sent'])->name('contact.sent');
 	});

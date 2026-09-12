@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
+use App\Services\Security\Turnstile;
+use App\Support\ContactSpam;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +35,33 @@ class ContactController extends Controller
 			'phone' => ['nullable', 'string', 'max:60'],
 		]);
 
+		// Drie drempels tegen de spamstroom van 12-09-2026 (ruim 100 van de 648 berichten):
+		// het lokvakje, de Cloudflare-mensencheck en een inhoudelijke score. De snelheids-
+		// limiet per IP staat op de route.
+		if (trim((string) $request->input('bedrijfsnaam_2')) !== '') {
+			// Stil weigeren: een bot hoort niet te weten waaróm het niet werkte.
+			Log::info('contact_honeypot: ' . $request->ip());
+
+			return redirect(route('contact.sent'))->with('submitted', true);
+		}
+
+		$turnstile = app(Turnstile::class);
+		if (! $turnstile->verify($request->input('cf-turnstile-response'), $request->ip())) {
+			return back()
+				->withInput()
+				->withErrors(['contact' => __('Bevestig even dat je geen robot bent en verstuur het opnieuw.')]);
+		}
+
+		// Hoe vaak stuurde dit adres of dit IP in de afgelopen 24 uur iets? Alleen dat venster:
+		// over de hele geschiedenis tellen zou vaste klanten en kantoor-IP's raken.
+		$eerder = ContactMessage::query()
+			->where('created_at', '>=', now()->subDay())
+			->where(fn ($q) => $q->where('email', $data['email'])->orWhere('ip', (string) $request->ip()))
+			->count();
+
+		$oordeel = ContactSpam::beoordeel($data + ['eerdere_inzendingen_24u' => $eerder]);
+		$isSpam = $oordeel['score'] >= ContactSpam::DREMPEL;
+
 		$subject = $data['subject'] ?: ($data['topic'] ? __('Aanvraag:') . ' ' . $data['topic'] : __('Contact via website'));
 
 		$payload = [
@@ -49,7 +78,8 @@ class ContactController extends Controller
 		$bericht = ContactMessage::create([
 			'public_id' => 'BGR-' . strtoupper(Str::random(12)),
 			'created_at' => now(),
-			'status' => 'new',
+			// Spam blijft bewaard (vangnet en controleerbaar), maar met eigen status en zonder mail.
+			'status' => $isSpam ? 'spam' : 'new',
 			'name' => $data['name'],
 			'email' => $data['email'],
 			'topic' => ($data['topic'] ?? '') ?: null,
@@ -68,7 +98,11 @@ class ContactController extends Controller
 			'user_id' => Auth::id(),
 		]);
 
-		$this->meldIntern($bericht);
+		if ($isSpam) {
+			Log::info("contact_spam ({$bericht->public_id}): score {$oordeel['score']} — " . implode(', ', $oordeel['redenen']));
+		} else {
+			$this->meldIntern($bericht);
+		}
 
 		return redirect(route('contact.sent'))->with('submitted', true);
 	}

@@ -86,6 +86,13 @@ class AppServiceProvider extends ServiceProvider
         // preview), krap genoeg om hameren te stoppen.
         RateLimiter::for('preview-ai', fn (Request $request) => Limit::perMinute(12)->by($request->ip()));
 
+        // Contactformulier. Een mens stuurt er één, hooguit twee achter elkaar; de
+        // spamvlagen van 12-09-2026 kwamen met 20 tot 30 berichten van hetzelfde IP.
+        RateLimiter::for('contact-form', fn (Request $request) => [
+            Limit::perMinute(2)->by($request->ip()),
+            Limit::perDay(8)->by($request->ip()),
+        ]);
+
         // Bookkeeping audit log: every create/update/delete on these models
         // writes to bookkeeping_audit_log via the observer.
         BookkeepingTransaction::observe(BookkeepingAuditObserver::class);
