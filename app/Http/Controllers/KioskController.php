@@ -186,6 +186,40 @@ class KioskController extends Controller
                     ];
                 })->all(), []);
 
+        // --- Offerte-aanvragen (WebsiteLead — de echte leadpijplijn) ---
+        $leadLabel = array('new' => 'Nieuw', 'contacted' => 'Benaderd', 'appointment' => 'Afspraak',
+                           'quoted' => 'Offerte', 'won' => 'Klant', 'lost' => 'Verloren');
+        $out['lead_open'] = $this->poging(fn () =>
+            (int) DB::table('website_leads')->whereNotIn('status', array('won', 'lost'))->count(), 0);
+        $out['lead_week'] = $this->poging(fn () =>
+            (int) DB::table('website_leads')->where('created_at', '>=', $weekAgo)->count(), 0);
+        $out['lead_recent'] = $this->poging(fn () =>
+            DB::table('website_leads')->orderByDesc('created_at')->limit(6)
+                ->get(['created_at', 'contact_name', 'company', 'branche', 'status'])
+                ->map(fn ($r) => array(
+                    'wanneer' => Carbon::parse($r->created_at)->format('d-m'),
+                    'naam'    => $r->contact_name ?: ($r->company ?: '—'),
+                    'bedrijf' => $r->company,
+                    'branche' => $r->branche,
+                    'status'  => $leadLabel[$r->status] ?? $r->status,
+                ))->all(), []);
+
+        // --- Afspraken (Appointment — komende afspraken) ---
+        $afspType = array('meet' => 'Video', 'locatie' => 'Op locatie', 'telefoon' => 'Telefonisch', 'bussum' => 'Bussum');
+        $out['afspraak_komend'] = $this->poging(fn () =>
+            (int) DB::table('appointments')->where('starts_at', '>=', Carbon::now())
+                ->whereIn('status', array('booked', 'held'))->count(), 0);
+        $out['afspraak_recent'] = $this->poging(fn () =>
+            DB::table('appointments')->where('starts_at', '>=', Carbon::now())
+                ->whereIn('status', array('booked', 'held'))
+                ->orderBy('starts_at')->limit(6)
+                ->get(['starts_at', 'name', 'company', 'type'])
+                ->map(fn ($r) => array(
+                    'wanneer' => Carbon::parse($r->starts_at)->format('d-m H:i'),
+                    'naam'    => $r->name ?: ($r->company ?: '—'),
+                    'soort'   => $afspType[$r->type] ?? $r->type,
+                ))->all(), []);
+
         return $out;
     }
 }
