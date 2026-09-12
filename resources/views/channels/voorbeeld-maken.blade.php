@@ -200,6 +200,8 @@
                 <label>Laat dit veld leeg<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
             </div>
 
+            @include('channels.partials.turnstile', ['locale' => $site->locale()])
+
             <button type="submit" class="btn" style="width:100%;justify-content:center;font-size:1.05rem;padding:.95rem">
                 Maak mijn voorbeeld
             </button>

@@ -9,6 +9,7 @@ use App\Mail\VoorbeeldAanvraagKlant;
 use App\Models\Channel\Site;
 use App\Models\WebsiteLead;
 use App\Services\ChannelSites\PreviewSiteGenerator;
+use App\Services\Security\Turnstile;
 use App\Support\ChannelSite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -77,6 +78,15 @@ class PreviewToolController extends Controller
         // Honeypot, zelfde veldnaam als de tool.
         if (filled($request->input('website'))) {
             return redirect()->to($this->site()->url('voorbeeld-aangevraagd'));
+        }
+
+        // Mensencheck. Dit formulier kost geen AI-calls, maar wel een lead in de
+        // opvolglijst en twee mails. Hier gewoon terug naar het formulier met een
+        // melding: dit is een normale POST, geen fetch.
+        if (! app(Turnstile::class)->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            return back()
+                ->withInput()
+                ->withErrors(['voorbeeld' => 'vink even aan dat je geen robot bent.']);
         }
 
         $data = $request->validate([
@@ -185,6 +195,21 @@ class PreviewToolController extends Controller
         // Honeypot: bots vullen het verborgen 'website'-veld.
         if (filled($request->input('website'))) {
             return response()->json(['ok' => false, 'error' => 'ongeldig'], 422);
+        }
+
+        // Mensencheck (Cloudflare Turnstile). Anders dan bij het contactformulier
+        // kost misbruik hier per inzending geld: elke preview is 1 Claude-call plus
+        // 1 à 2 gpt-image-calls. Fail-closed, dus geen of een ongeldig token betekent
+        // niet bouwen. Zijn de sleutels leeg, dan staat de check UIT (zie
+        // config/turnstile.php) en verandert er niets.
+        if (! app(Turnstile::class)->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            return response()->json([
+                'ok'    => false,
+                'error' => 'mensencheck',
+                // 'message' wordt door het laadscherm als userMessage getoond (zie
+                // fail() in voorbeeld-maken.blade.php), dus dit is bezoekerstekst.
+                'message' => 'Vink even aan dat je geen robot bent en probeer het opnieuw.',
+            ], 422);
         }
 
         $data = $request->validate([

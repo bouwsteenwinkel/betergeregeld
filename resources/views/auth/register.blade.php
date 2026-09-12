@@ -47,6 +47,13 @@
 				</div>
 			@endif
 
+			{{-- Cloudflare Turnstile, zelfde opzet als op het contactformulier. Zonder
+			     sleutels in de .env rendert dit niets en verandert er dus niets. --}}
+			@if (app(\App\Services\Security\Turnstile::class)->enabled())
+				<div class="cf-turnstile" data-sitekey="{{ app(\App\Services\Security\Turnstile::class)->siteKey() }}" data-language="nl" data-theme="light"></div>
+				<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+			@endif
+
 			<button type="submit" class="btn-accent w-full justify-center">
 				{{ __('Account aanmaken') }}
 				<svg class="w-4 h-4" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>

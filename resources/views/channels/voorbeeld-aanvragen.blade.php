@@ -150,6 +150,8 @@
                        value="{{ old('email') }}" autocomplete="email">
             </div>
 
+            @include('channels.partials.turnstile', ['locale' => $site->locale()])
+
             <button class="btn" type="submit" style="width:100%">Vraag mijn gratis voorbeeld aan</button>
 
             <p class="va-hint" style="margin-top:.9rem;text-align:center">

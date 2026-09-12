@@ -8,6 +8,7 @@ use App\Mail\PreviewSavedMail;
 use App\Models\Channel\Site;
 use App\Models\SavedPreview;
 use App\Models\WebsiteLead;
+use App\Services\Security\Turnstile;
 use App\Support\ChannelSite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,17 @@ class SavePreviewController extends Controller
         }
         if (! $site->get('meta.preview.is_preview')) {
             return response()->json(['ok' => false, 'error' => 'geen-preview'], 404);
+        }
+
+        // Mensencheck: dit maakt een klant-account aan en mailt een persoonlijke
+        // maglink, dus het is het soort formulier dat bots graag misbruiken om
+        // mail via ons te laten versturen. Fail-closed; leeg = check uit.
+        if (! app(Turnstile::class)->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            return response()->json([
+                'ok'      => false,
+                'error'   => 'mensencheck',
+                'message' => 'Vink even aan dat je geen robot bent en probeer het opnieuw.',
+            ], 422);
         }
 
         $data = $request->validate([

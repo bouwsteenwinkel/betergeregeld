@@ -30,6 +30,17 @@ class RegisterController extends Controller
 			return redirect(route('register.sent'))->with('email', (string) $request->input('email'));
 		}
 
+		// Mensencheck (Cloudflare Turnstile). Een account aanmaken kost ons weinig,
+		// maar het stuurt wel een verificatiemail naar een adres dat de bot kiest,
+		// en dat is precies waar zo'n formulier als mailkanon voor misbruikt wordt.
+		// Fail-closed; zijn de sleutels leeg, dan staat de check uit en verandert
+		// er niets. De volledige klassenaam staat hier inline, zoals in de blades.
+		if (! app(\App\Services\Security\Turnstile::class)->verify($request->input('cf-turnstile-response'), $request->ip())) {
+			return back()
+				->withInput()
+				->withErrors(['register' => __('Bevestig even dat je geen robot bent en verstuur het opnieuw.')]);
+		}
+
 		$data = $request->validate([
 			'name' => ['required', 'string', 'max:190'],
 			'email' => ['required', 'email', 'max:190', 'unique:users,email'],
