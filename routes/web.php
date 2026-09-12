@@ -91,6 +91,13 @@ Route::post('/mijn-voorbeelden/{token}/favoriet', [\App\Http\Controllers\SavedPr
 Route::get('/mijn-voorbeelden/{token}/afmelden', [\App\Http\Controllers\SavedPreviewsController::class, 'unsubscribe'])
     ->where('token', '[A-Za-z0-9]+')->name('saved-previews.unsubscribe');
 
+// Kiosk-scherm (Raspberry Pi): alleen-lezen overzicht van bezoekers,
+// contactaanvragen en AI-telefonie. Buiten de locale-prefix en zonder login;
+// toegang via ?key=<geheime sleutel> (hash in config/kiosk.php). Controller,
+// geen closure, dus route:cache-veilig.
+Route::get('/scherm/betergeregeld', [\App\Http\Controllers\KioskController::class, 'betergeregeld'])
+    ->middleware('throttle:60,1')->name('kiosk.betergeregeld');
+
 // Google Ads OAuth-callback. Bewust publiek en buiten de Filament-admin-auth,
 // zodat de Google-redirect hier landt zonder loginmuur. De state-check ('ads')
 // is een lichte bescherming; de code is verder alleen bruikbaar met onze eigen
