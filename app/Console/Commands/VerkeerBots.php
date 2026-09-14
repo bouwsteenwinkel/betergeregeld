@@ -191,6 +191,33 @@ class VerkeerBots extends Command
                 $nieuwste ? date('Y-m-d H:i', $nieuwste) : '-'));
         }
         $this->line('  (* = valt binnen het pad-filter)');
+
+        // Plesk schermt vhosts van elkaar af: een glob over C:/inetpub/vhosts/* geeft dan
+        // niets, terwijl een direct pad binnen de eigen vhost wél leesbaar is. Laat zien
+        // wat er onder de opgegeven paden (en de eigen vhost-root) te vinden is.
+        $roots = array_merge((array) $this->option('pad'), [
+            'C:/inetpub/vhosts/betergeregeld.com', 'C:/inetpub/vhosts/betergeregeld.com/logs',
+            dirname(base_path()), dirname(base_path()).'/logs',
+        ]);
+        $this->line('');
+        $this->line('Directe paden:');
+        foreach (array_unique($roots) as $root) {
+            $root = rtrim(str_replace('\\', '/', $root), '/');
+            $items = @scandir($root);
+            if ($items === false) {
+                $this->line('  '.$root.'  → niet leesbaar/bestaat niet');
+
+                continue;
+            }
+            $items = array_values(array_diff($items, ['.', '..']));
+            $this->line('  '.$root.'  → '.count($items).' items: '.implode(', ', array_slice($items, 0, 25)));
+            foreach (['', '/*', '/*/*'] as $diep) {
+                foreach ((array) @glob($root.$diep.'/*.log') as $f) {
+                    $this->line(sprintf('      %-80s %6.1f MB  %s  %s', str_replace('\\', '/', $f), (int) @filesize($f) / 1048576,
+                        date('Y-m-d H:i', (int) @filemtime($f)), @is_readable($f) ? 'leesbaar' : 'NIET leesbaar'));
+                }
+            }
+        }
     }
 
     private function padMatch(string $pad, array $vhostFilter): bool
@@ -224,9 +251,12 @@ class VerkeerBots extends Command
         foreach ($extra as $p) {
             $p = str_replace('\\', '/', $p);
             if (is_dir($p)) {
-                foreach ((array) @glob(rtrim($p, '/').'/*.log') as $f) {
-                    if ((int) @filemtime($f) >= $sinds) {
-                        $uit[] = str_replace('\\', '/', $f);
+                // Een opgegeven map mag de vhost-root zijn: tot drie niveaus diep zoeken.
+                foreach (['', '/*', '/*/*', '/*/*/*'] as $diep) {
+                    foreach ((array) @glob(rtrim($p, '/').$diep.'/*.log') as $f) {
+                        if ((int) @filemtime($f) >= $sinds && @is_readable($f)) {
+                            $uit[] = str_replace('\\', '/', $f);
+                        }
                     }
                 }
             } elseif (is_file($p)) {
