@@ -199,6 +199,10 @@ class VerkeerBots extends Command
             'C:/inetpub/vhosts/betergeregeld.com', 'C:/inetpub/vhosts/betergeregeld.com/logs',
             dirname(base_path()), dirname(base_path()).'/logs',
         ]);
+        // Wie zijn we? Nodig om leesrechten op de logmap te kunnen geven (icacls).
+        $wie = function_exists('exec') ? trim((string) @exec('whoami')) : '';
+        $this->line('');
+        $this->line('Draait als: '.($wie !== '' ? $wie : '(onbekend, exec uit)'));
         $this->line('');
         $this->line('Directe paden:');
         foreach (array_unique($roots) as $root) {
