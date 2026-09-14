@@ -157,6 +157,12 @@ class VerkeerBots extends Command
             'C:/inetpub/vhosts/*/*/logs/iis/W3SVC*',
             'C:/inetpub/logs/LogFiles/W3SVC*',
         ];
+        // Plesk laat een glob over C:/inetpub/vhosts/* leeg; de eigen vhost-root
+        // (…/betergeregeld.com, één niveau boven httpdocs) is wél direct benaderbaar.
+        $eigen = str_replace('\\', '/', dirname(base_path()));
+        foreach (['/logs/W3SVC*', '/logs/iis/W3SVC*', '/logs/*/W3SVC*', '/logs/iis/*/W3SVC*'] as $sub) {
+            $patronen[] = $eigen.$sub;
+        }
         $mappen = [];
         foreach ($patronen as $p) {
             foreach ((array) @glob($p, GLOB_ONLYDIR) as $m) {
@@ -403,10 +409,12 @@ class VerkeerBots extends Command
             $methode = $iMethode !== null ? $d[$iMethode] : 'GET';
             $tijd = ($iDatum !== null && $iTijd !== null) ? ($d[$iDatum].' '.$d[$iTijd]) : '';
 
-            $r = &$perHost[$host][$ip];
+            // Sleutel = adres + user-agent: achter Cloudflare delen bezoekers een edge-adres,
+            // en ook achter een bedrijfs-NAT scheidt de user-agent mens en bot van elkaar.
+            $r = &$perHost[$host][$ip.'|'.$ua];
             if ($r === null) {
                 $r = [
-                    'ua' => $ua, 'n' => 0, 'html' => 0, 'asset' => 0, 'ev' => 0, 'cmp' => 0,
+                    'ip' => $ip, 'ua' => $ua, 'n' => 0, 'html' => 0, 'asset' => 0, 'ev' => 0, 'cmp' => 0,
                     'e4' => 0, 'scan' => 0, 'ref' => 0, 'paden' => [], 'eerste' => $tijd, 'laatste' => $tijd,
                     'dagen' => [],
                 ];
@@ -512,14 +520,15 @@ class VerkeerBots extends Command
         $beacon = [];
         $perDag = [];
 
-        foreach ($ips as $ip => $r) {
+        foreach ($ips as $sleutel => $r) {
+            $ip = $r['ip'];
             $k = $this->klasse($r);
             $klassen[$k]['ips'] = ($klassen[$k]['ips'] ?? 0) + 1;
             $klassen[$k]['html'] = ($klassen[$k]['html'] ?? 0) + $r['html'];
             $klassen[$k]['n'] = ($klassen[$k]['n'] ?? 0) + $r['n'];
             $totaal['klassen'][$k]['ips'] = ($totaal['klassen'][$k]['ips'] ?? 0) + 1;
             $totaal['klassen'][$k]['html'] = ($totaal['klassen'][$k]['html'] ?? 0) + $r['html'];
-            $totaal['ips'][$ip] = $k;
+            $totaal['ips'][$sleutel] = $k;
 
             foreach (array_keys($r['dagen']) as $dag) {
                 $perDag[$dag][$k === 'mens' ? 'mens' : ($k === 'mens?' ? 'mens?' : 'bot')] = ($perDag[$dag][$k === 'mens' ? 'mens' : ($k === 'mens?' ? 'mens?' : 'bot')] ?? 0) + 1;
@@ -530,14 +539,14 @@ class VerkeerBots extends Command
                 $beacon[$bk] = ($beacon[$bk] ?? 0) + $r['ev'];
             }
             if (str_starts_with($k, 'bot: browser-UA') || $k === 'scanner') {
-                $verdacht[$ip] = $r + ['klasse' => $k];
+                $verdacht[$sleutel] = $r + ['klasse' => $k];
             }
         }
 
         uasort($klassen, fn ($a, $b) => $b['html'] <=> $a['html']);
 
         $this->line(str_repeat('=', 96));
-        $this->line(strtoupper($host).'   ('.count($ips).' adressen)');
+        $this->line(strtoupper($host).'   ('.count($ips).' adres+user-agent-combinaties)');
         $this->line(str_repeat('=', 96));
         $this->line(sprintf('  %-34s %7s %10s %10s', 'klasse', 'adressen', 'pagina\'s', 'verzoeken'));
         foreach ($klassen as $k => $c) {
@@ -566,9 +575,9 @@ class VerkeerBots extends Command
             uasort($verdacht, fn ($a, $b) => $b['html'] <=> $a['html']);
             $this->line('');
             $this->line('  Verdachte adressen met browser-user-agent (top '.$top.'):');
-            foreach (array_slice($verdacht, 0, $top, true) as $ip => $r) {
+            foreach (array_slice($verdacht, 0, $top, true) as $r) {
                 $this->line(sprintf('    %-39s %-28s pag %5d  4xx %4d  scan %3d  assets %3d  %s → %s',
-                    $ip, $r['klasse'], $r['html'], $r['e4'], $r['scan'], $r['asset'],
+                    $r['ip'], $r['klasse'], $r['html'], $r['e4'], $r['scan'], $r['asset'],
                     substr($r['eerste'], 11, 5), substr($r['laatste'], 11, 5)));
                 $this->line('        UA: '.mb_substr((string) $r['ua'], 0, 110));
                 $this->line('        bv: '.implode('  ', array_slice(array_keys($r['paden']), 0, 4)));
