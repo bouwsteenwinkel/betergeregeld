@@ -33,9 +33,13 @@ class VerkeerBots extends Command
         {--vhost=* : Alleen logmappen waarvan het pad dit bevat (standaard: betergeregeld, jouw-)}
         {--pad=* : Extra logmap(pen) of bestand(en) om te lezen}
         {--top=15 : Aantal verdachte adressen per host in het rapport}
+        {--sinds= : Alleen logregels vanaf dit tijdstip, UTC, bv. "2026-09-14 13:11"}
         {--max-mb=48 : Per bestand maximaal dit aantal MB lezen (vanaf het einde)}';
 
     protected $description = 'Splits het verkeer in de IIS-logs uit naar mens, bekende bot, vermoedelijke bot en scanner';
+
+    /** Ondergrens (UTC, "Y-m-d H:i") waar de telling begint; leeg = alles. */
+    private string $sinds = '';
 
     /** Bekende crawlers/fetchers op user-agent, in volgorde van herkenning. */
     private const BOTS = [
@@ -85,6 +89,7 @@ class VerkeerBots extends Command
         $dagen = max(1, (int) $this->option('dagen'));
         $top = max(1, (int) $this->option('top'));
         $maxBytes = max(1, (int) $this->option('max-mb')) * 1024 * 1024;
+        $this->sinds = trim((string) $this->option('sinds'));
 
         $bestanden = $this->vindLogbestanden($vhostFilter, $dagen, (array) $this->option('pad'));
 
@@ -120,6 +125,9 @@ class VerkeerBots extends Command
             $this->line('  '.$g);
         }
         $this->line('');
+        if ($this->sinds !== '') {
+            $this->line('Alleen regels vanaf '.$this->sinds.' UTC.');
+        }
         $this->line('Adresveld: '.($ipVeld ?: 'c-ip').($ipVeld && $ipVeld !== 'c-ip'
             ? '  (echte client-IP achter Cloudflare)'
             : '  ⚠ achter Cloudflare is dit de edge-node, niet de bezoeker; per-adres-cijfers zijn dan een ONDERgrens van het aantal bezoekers'));
@@ -408,6 +416,9 @@ class VerkeerBots extends Command
             $status = (int) $d[$iStatus];
             $methode = $iMethode !== null ? $d[$iMethode] : 'GET';
             $tijd = ($iDatum !== null && $iTijd !== null) ? ($d[$iDatum].' '.$d[$iTijd]) : '';
+            if ($this->sinds !== '' && $tijd !== '' && strcmp($tijd, $this->sinds) < 0) {
+                continue;
+            }
 
             // Sleutel = adres + user-agent: achter Cloudflare delen bezoekers een edge-adres,
             // en ook achter een bedrijfs-NAT scheidt de user-agent mens en bot van elkaar.
