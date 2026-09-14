@@ -635,7 +635,7 @@ class VerkeerBots extends Command
             foreach ($beacon as $wie => $n) {
                 $st = $beaconStatus[$wie] ?? [];
                 ksort($st);
-                $this->line(sprintf('    %-30s %6d   status: %s', $wie, $n, implode(', ', array_map(fn ($k, $v) => "$k×$v", array_keys($st), $st))));
+                $this->line(sprintf('    %-30s %6d   status: %s', $wie, $n, implode(', ', array_map(fn ($k, $v) => $k.'×'.$v, array_keys($st), $st))));
             }
         }
 
