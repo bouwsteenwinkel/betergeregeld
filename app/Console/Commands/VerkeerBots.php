@@ -115,7 +115,7 @@ class VerkeerBots extends Command
             $gelezen[] = sprintf('%s  %s regels, %s', $this->kortPad($pad), number_format($res['regels'], 0, ',', '.'), $res['afgekapt'] ? 'AFGEKAPT op '.round($maxBytes / 1048576).' MB' : 'volledig');
         }
 
-        $this->line('Gelezen logbestanden ('.count($gelezen).', '.$overgeslagen.' onleesbaar):');
+        $this->line('Gelezen logbestanden ('.count($gelezen).'; '.$overgeslagen.' overgeslagen zonder W3C-kop, bv. Plesk-statistiekbestanden):');
         foreach ($gelezen as $g) {
             $this->line('  '.$g);
         }
@@ -414,9 +414,9 @@ class VerkeerBots extends Command
             $r = &$perHost[$host][$ip.'|'.$ua];
             if ($r === null) {
                 $r = [
-                    'ip' => $ip, 'ua' => $ua, 'n' => 0, 'html' => 0, 'asset' => 0, 'ev' => 0, 'cmp' => 0,
+                    'ip' => $ip, 'ua' => $ua, 'n' => 0, 'html' => 0, 'asset' => 0, 'ev' => 0, 'cmp' => 0, 'kiosk' => 0,
                     'e4' => 0, 'scan' => 0, 'ref' => 0, 'paden' => [], 'eerste' => $tijd, 'laatste' => $tijd,
-                    'dagen' => [],
+                    'dagen' => [], 'perDag' => [],
                 ];
             }
             $r['n']++;
@@ -432,14 +432,20 @@ class VerkeerBots extends Command
             }
             if ($methode === 'POST' && $uri === '/_ev') {
                 $r['ev']++;
-            } elseif (preg_match('~^/cmp(\.js|/)~', $uri)) {
+            } elseif (preg_match('~^/cmp/~', $uri)) {
                 $r['cmp']++;
+            } elseif (str_starts_with($uri, '/scherm/')) {
+                $r['kiosk']++;
             } elseif (preg_match(self::SCAN_PAD, $uri)) {
                 $r['scan']++;
             } elseif (preg_match(self::ASSET_PAD, $uri)) {
                 $r['asset']++;
             } elseif (! preg_match(self::ACHTERGROND_PAD, $uri) && $methode === 'GET') {
                 $r['html']++;
+                if ($tijd !== '') {
+                    $dag = substr($tijd, 0, 10);
+                    $r['perDag'][$dag] = ($r['perDag'][$dag] ?? 0) + 1;
+                }
                 if (count($r['paden']) < 6) {
                     $r['paden'][$uri] = true;
                 }
@@ -474,7 +480,15 @@ class VerkeerBots extends Command
      */
     private function klasse(array $r): string
     {
-        $bot = $this->botNaam((string) $r['ua']);
+        $ua = (string) $r['ua'];
+        // Eigen verkeer eerst: de cache-warm-up (ChannelPlacesWarm e.d.) en het kiosk-scherm.
+        if (str_contains($ua, 'BG+warm-up') || str_contains($ua, 'BG warm-up')) {
+            return 'eigen: warm-up';
+        }
+        if ($r['html'] === 0 && $r['kiosk'] > 0) {
+            return 'eigen: kiosk-scherm';
+        }
+        $bot = $this->botNaam($ua);
         if ($bot !== null) {
             return 'bot: '.$bot;
         }
@@ -485,26 +499,26 @@ class VerkeerBots extends Command
         if ($r['scan'] >= 2 || ($n >= 4 && $r['e4'] / $n >= 0.6)) {
             return 'scanner';
         }
-        // Mens: laadt pagina's én de scripts/assets die erbij horen (of vuurt de beacon).
+        // Omvang: 80+ pagina's op één dag vanaf één adres+UA is geen mens meer.
+        if ($html >= 80 && count($r['dagen']) <= 1) {
+            return 'bot: browser-UA, massaal';
+        }
+        // JS-bewijs: de beacon (POST /_ev) of /cmp/loader.js (niet door Cloudflare
+        // gecachet, dus bereikt IIS) is alleen door een echte browser-engine op te vragen.
         if ($html >= 1 && ($r['ev'] >= 1 || $r['cmp'] >= 1 || $r['asset'] >= 2)) {
-            // …tenzij het tempo of de omvang niet menselijk is.
-            if ($html >= 80 && count($r['dagen']) <= 1) {
-                return 'bot: browser-UA, massaal';
-            }
-
             return 'mens';
         }
-        // Alleen HTML, nooit een asset: bij 1-3 pagina's kan het een terugkerende
-        // bezoeker met alles in de cache zijn (of achter Cloudflare-cache); daarboven
-        // is het een crawler met een browser-user-agent.
-        if ($html >= 1 && $r['asset'] === 0 && $r['cmp'] === 0 && $r['ev'] === 0) {
-            return $html <= 3 ? 'mens?' : 'bot: browser-UA, geen assets';
+        // Alleen HTML. Achter Cloudflare zegt "geen assets" weinig: statische bestanden
+        // komen uit de edge-cache en de loader kan via een ander edge-adres binnenkomen.
+        // Tot 30 pagina's houden we het op "mens?", daarboven is het crawlgedrag.
+        if ($html >= 30) {
+            return 'bot: browser-UA, veel pagina\'s';
         }
-        if ($html === 0) {
-            return 'alleen assets/achtergrond';
+        if ($html >= 1) {
+            return 'mens?';
         }
 
-        return 'mens?';
+        return 'alleen assets/achtergrond';
     }
 
     // ── Rapport ───────────────────────────────────────────────────────────
@@ -519,6 +533,7 @@ class VerkeerBots extends Command
         $verdacht = [];
         $beacon = [];
         $perDag = [];
+        $js = 0;
 
         foreach ($ips as $sleutel => $r) {
             $ip = $r['ip'];
@@ -530,8 +545,17 @@ class VerkeerBots extends Command
             $totaal['klassen'][$k]['html'] = ($totaal['klassen'][$k]['html'] ?? 0) + $r['html'];
             $totaal['ips'][$sleutel] = $k;
 
-            foreach (array_keys($r['dagen']) as $dag) {
-                $perDag[$dag][$k === 'mens' ? 'mens' : ($k === 'mens?' ? 'mens?' : 'bot')] = ($perDag[$dag][$k === 'mens' ? 'mens' : ($k === 'mens?' ? 'mens?' : 'bot')] ?? 0) + 1;
+            $groep = match (true) {
+                $k === 'mens' => 'mens',
+                $k === 'mens?' => 'mens?',
+                str_starts_with($k, 'eigen') => 'eigen',
+                default => 'bot',
+            };
+            foreach ($r['perDag'] as $dag => $pag) {
+                $perDag[$dag][$groep] = ($perDag[$dag][$groep] ?? 0) + $pag;
+            }
+            if ($groep === 'mens' || $groep === 'mens?') {
+                $js += $r['cmp'];
             }
 
             if ($r['ev'] > 0) {
@@ -556,10 +580,11 @@ class VerkeerBots extends Command
         if ($perDag !== []) {
             ksort($perDag);
             $this->line('');
-            $this->line('  Adressen per dag (UTC-datum uit het log):');
+            $this->line('  Paginaweergaven per dag (UTC-datum uit het log):');
             foreach ($perDag as $dag => $c) {
-                $this->line(sprintf('    %s  mens %4d   mens? %4d   bot/scanner %4d', $dag, $c['mens'] ?? 0, $c['mens?'] ?? 0, $c['bot'] ?? 0));
+                $this->line(sprintf('    %s  mens %5d   mens? %5d   bot/scanner %5d   eigen %5d', $dag, $c['mens'] ?? 0, $c['mens?'] ?? 0, $c['bot'] ?? 0, $c['eigen'] ?? 0));
             }
+            $this->line(sprintf('  JS-bewijs: /cmp/loader.js opgehaald door browser-UA (≈ browsersessies; max 1 per 5 min per browser): %d', $js));
         }
 
         if ($beacon !== []) {
@@ -596,7 +621,8 @@ class VerkeerBots extends Command
 
         $mensPag = $som(fn ($naam, $c) => $naam === 'mens' ? $c['html'] : 0);
         $mensMisPag = $som(fn ($naam, $c) => $naam === 'mens?' ? $c['html'] : 0);
-        $botPag = $som(fn ($naam, $c) => ($naam === 'mens' || $naam === 'mens?') ? 0 : $c['html']);
+        $eigenPag = $som(fn ($naam, $c) => str_starts_with($naam, 'eigen') ? $c['html'] : 0);
+        $botPag = $som(fn ($naam, $c) => ($naam === 'mens' || $naam === 'mens?' || str_starts_with($naam, 'eigen')) ? 0 : $c['html']);
         $alle = max(1, $mensPag + $mensMisPag + $botPag);
 
         $uniek = array_count_values($totaal['ips']);
@@ -607,6 +633,7 @@ class VerkeerBots extends Command
         $this->line(sprintf('  mens          %7d  (%4.1f%%)   unieke adressen: %d', $mensPag, 100 * $mensPag / $alle, $uniek['mens'] ?? 0));
         $this->line(sprintf('  mens?         %7d  (%4.1f%%)   unieke adressen: %d   (1-3 pagina\'s zonder assets; kan cache zijn)', $mensMisPag, 100 * $mensMisPag / $alle, $uniek['mens?'] ?? 0));
         $this->line(sprintf('  bot/scanner   %7d  (%4.1f%%)', $botPag, 100 * $botPag / $alle));
+        $this->line(sprintf('  eigen verkeer %7d  (buiten de percentages: warm-up + kiosk-scherm)', $eigenPag));
         $this->line('');
         $this->line('  Leeswijzer: "mens" = browser-UA die pagina\'s én scripts/assets laadde of de beacon vuurde.');
         $this->line('  Achter Cloudflare zonder CF-Connecting-IP in het log delen bezoekers één adres → tel dan');
