@@ -121,7 +121,7 @@ class VerkeerBots extends Command
 
                 continue;
             }
-            $gelezen[] = sprintf('%s  %s regels, %s', $this->kortPad($pad), number_format($res['regels'], 0, ',', '.'), $res['afgekapt'] ? 'AFGEKAPT op '.round($maxBytes / 1048576).' MB' : 'volledig');
+            $gelezen[] = sprintf('%s  %s regels, %s, %s → %s UTC', $this->kortPad($pad), number_format($res['regels'], 0, ',', '.'), $res['afgekapt'] ? 'AFGEKAPT op '.round($maxBytes / 1048576).' MB' : 'volledig', $res['van'], $res['tot']);
         }
 
         $this->line('Gelezen logbestanden ('.count($gelezen).'; '.$overgeslagen.' overgeslagen zonder W3C-kop, bv. Plesk-statistiekbestanden):');
@@ -330,7 +330,7 @@ class VerkeerBots extends Command
      * Leest één IIS-log (W3C-formaat) en telt per host en adres.
      *
      * @param  array<string,array<string,array<string,mixed>>>  $perHost
-     * @return array{regels:int,afgekapt:bool}|null
+     * @return array{regels:int,afgekapt:bool,van:string,tot:string}|null
      */
     private function leesLog(string $pad, array $hosts, int $maxBytes, array &$perHost, ?string &$ipVeld): ?array
     {
@@ -392,6 +392,8 @@ class VerkeerBots extends Command
 
         $aantal = count($velden);
         $regels = 0;
+        $van = '';
+        $tot = '';
         $hostFilter = array_map('strtolower', $hosts);
 
         while (($regel = fgets($fh)) !== false) {
@@ -420,6 +422,12 @@ class VerkeerBots extends Command
                 continue;
             }
             $regels++;
+            if ($iDatum !== null && $iTijd !== null) {
+                $tot = $d[$iDatum].' '.substr($d[$iTijd], 0, 5);
+                if ($van === '') {
+                    $van = $tot;
+                }
+            }
 
             $host = $iHost !== null ? strtolower($d[$iHost]) : '?';
             if (str_starts_with($host, 'www.')) {
@@ -497,7 +505,7 @@ class VerkeerBots extends Command
         }
         fclose($fh);
 
-        return ['regels' => $regels, 'afgekapt' => $afgekapt];
+        return ['regels' => $regels, 'afgekapt' => $afgekapt, 'van' => $van, 'tot' => $tot];
     }
 
     // ── Classificatie ─────────────────────────────────────────────────────
