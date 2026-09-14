@@ -105,7 +105,7 @@ class PlaceBusinessFinder
      *
      * @return array<int,string>
      */
-    public function indexableSlugs(string $brancheKey, int $min): array
+    public function indexableSlugs(string $brancheKey, int $min, ?string $siteKey = null): array
     {
         $out = [];
         foreach (DB::table('channel_place_listings')->where('branche_key', $brancheKey)->get(['place_slug', 'listings']) as $row) {
@@ -117,7 +117,22 @@ class PlaceBusinessFinder
             }
         }
 
-        return array_values(array_filter($out, fn (string $slug) => $this->groteGenoegPlaats($slug)));
+        return array_values(array_filter($out, fn (string $slug) => $this->groteGenoegPlaats($slug, $siteKey)));
+    }
+
+    /**
+     * De adressen-drempel voor dit kanaal: de uitzondering uit
+     * `channel_places.index_min_addresses_per_site` als die er is, anders de algemene.
+     * Eén plek, zodat plaatspagina, sitemap en werkgebied-blok nooit uiteenlopen.
+     */
+    public function minAdressen(?string $siteKey = null): int
+    {
+        $perSite = (array) config('channel_places.index_min_addresses_per_site', []);
+        if ($siteKey !== null && array_key_exists($siteKey, $perSite)) {
+            return (int) $perSite[$siteKey];
+        }
+
+        return (int) config('channel_places.index_min_addresses', 0);
     }
 
     /**
@@ -136,9 +151,9 @@ class PlaceBusinessFinder
      * zetten. Eén query per verzoek, in het geheugen gehouden: dit wordt per plaats
      * aangeroepen tijdens het opbouwen van een sitemap van duizend URL's.
      */
-    public function groteGenoegPlaats(string $slug): bool
+    public function groteGenoegPlaats(string $slug, ?string $siteKey = null): bool
     {
-        $min = (int) config('channel_places.index_min_addresses', 0);
+        $min = $this->minAdressen($siteKey);
         if ($min <= 0) {
             return true;
         }

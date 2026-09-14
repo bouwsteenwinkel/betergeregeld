@@ -1,7 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Beter Geregeld ICT – maatwerk websites & automatisering')
-@section('description', 'Beter Geregeld ICT helpt bedrijven met maatwerk webapplicaties, klantportalen, API-koppelingen, procesautomatisering, beveiliging en technische SEO.')
+{{-- Title en description noemen de zoekterm. Tot 14-09-2026 stond hier "maatwerk websites &
+     automatisering" en had /en exact dezelfde Nederlandse tekst. Search Console, 90 dagen:
+     nul vertoningen op welke vorm van "website laten maken" dan ook (6.600 per maand). --}}
+@section('title', app()->getLocale() === 'nl'
+	? 'Website of maatwerk software laten maken | Beter Geregeld'
+	: 'Custom websites & software development | Beter Geregeld')
+@section('description', app()->getLocale() === 'nl'
+	? 'Website, webapplicatie of klantportaal laten maken? Wij bouwen maatwerk software, API-koppelingen en de AI Telefoniste. Plan een gratis adviesgesprek.'
+	: 'Custom websites, web applications and client portals, plus API integrations and process automation, built in the Netherlands. Book a free intro call.')
 
 @php
 	$locale = app()->getLocale();
@@ -87,10 +94,11 @@
 				<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
 				{{ $isEn ? 'Since 1989: VOS, ICM, now Beter Geregeld' : 'Sinds 1989: VOS, ICM, nu Beter Geregeld' }}
 			</span>
+			{{-- De H1 noemt wat we maken; "Wij bouwen wat werkt" had geen enkel zoekwoord. --}}
 			<h1 class="display-1 mb-6">
-				{{ $isEn ? 'We build what' : 'Wij bouwen wat' }}
+				{{ $isEn ? 'Websites and custom software that' : 'Website of maatwerk software laten maken die' }}
 				<span class="accent-word">{{ $isEn ? 'works.' : 'werkt.' }}</span><br>
-				{{ $isEn ? 'And stay reachable.' : 'En blijven bereikbaar.' }}
+				{{ $isEn ? 'And we stay reachable.' : 'En wij blijven bereikbaar.' }}
 			</h1>
 			<p class="text-lg sm:text-xl text-[color:var(--color-on-dark-muted)] leading-relaxed max-w-2xl mb-10">
 				{{ $isEn

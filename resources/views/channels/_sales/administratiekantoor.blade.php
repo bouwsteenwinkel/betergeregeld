@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je administratiekantoor laten maken')
-@section('description', 'Meer opdrachten en klanten uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je administratiekantoor, met een klantenportaal voor het aanleveren van stukken. Nieuwe ondernemers als klant. Gratis voorbeeld.')
 
 @if ($heroImg)
     @push('head')
@@ -23,7 +23,7 @@
             <div @if ($heroImg) class="grid cols-2" style="align-items:start;gap:2.6rem" @endif>
                 <div>
                     <span class="eyebrow">Voor jouw administratiekantoor</span>
-                    <h1>Meer opdrachten en klanten uit je eigen regio</h1>
+                    <h1>Meer ondernemers als klant voor je administratiekantoor</h1>
                     <p class="lead">Een strakke website, webshop of klantenportaal die klanten binnenhaalt terwijl jij aan het werk bent. Wij bouwen 'm, jij bepaalt hoe ver je gaat.</p>
                     <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
                     <p class="muted" style="margin-top:.8rem;font-size:.9rem">Gratis &middot; vrijblijvend &middot; voorbeeld van jóuw site, vaak binnen 1 à 2 dagen</p>

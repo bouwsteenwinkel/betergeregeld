@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
-@php $locale = app()->getLocale(); @endphp
+@php
+	$locale = app()->getLocale();
+	// De blog bestaat alleen in de talen van BlogPost::LOCALES; /en/blog 301't naar /nl/blog.
+	// Zonder deze regel beloofde de layout Google een Engelse versie die een omleiding is.
+	$hreflangLocales = \App\Models\Blog\BlogPost::LOCALES;
+@endphp
 
 {{-- Paginering: elke pagina verwijst naar zichzelf, niet naar pagina 1.
      Alleen binnen het bereik: ?page=999 bestaat niet, en die naar zichzelf

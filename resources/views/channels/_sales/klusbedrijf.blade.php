@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je klusbedrijf laten maken')
-@section('description', 'Meer klussen uit je eigen regio met een professionele website, online boeking of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je klusbedrijf: foto\'s van je werk, reviews en klussen die klanten online aanvragen. Meer werk in je regio. Vraag gratis een voorbeeld aan.')
 
 {{-- LCP: hero-afbeelding vroeg laden zodat de grootste afbeelding sneller in beeld staat. --}}
 @if ($heroImg)

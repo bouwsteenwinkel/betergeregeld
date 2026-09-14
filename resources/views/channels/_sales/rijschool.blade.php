@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je rijschool laten maken')
-@section('description', 'Meer leerlingen uit je eigen regio met een professionele website, online aanmelding of leerlingportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je rijschool, met lespakketten, online aanmelding en een leerlingportaal. Meer leerlingen uit je regio. Vraag gratis een voorbeeld aan.')
 
 {{-- LCP: hero-afbeelding vroeg laden zodat de grootste afbeelding sneller in beeld staat. --}}
 @if ($heroImg)

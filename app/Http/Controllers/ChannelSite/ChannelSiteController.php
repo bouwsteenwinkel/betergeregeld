@@ -293,7 +293,7 @@ class ChannelSiteController extends Controller
         // sitemap niet uiteen kunnen lopen — een pagina op noindex die tóch in de sitemap
         // staat is precies het signaal dat je niet wil geven.
         $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3)
-            && app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->groteGenoegPlaats($data['slug']);
+            && app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->groteGenoegPlaats($data['slug'], $site->key);
 
         return view($site->placeView('show'), [
             'site'       => $site,
@@ -370,7 +370,7 @@ class ChannelSiteController extends Controller
             $urls[] = ['loc' => $site->url('plaatsen/provincie/' . $prov['slug'])];
         }
         $min = (int) config('channel_places.index_min_businesses', 3);
-        $strong = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->indexableSlugs($site->brancheKey(), $min);
+        $strong = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->indexableSlugs($site->brancheKey(), $min, $site->key);
         // Geen cache-data (nog niet gewarmd)? Val terug op alle plaatsen zodat de
         // sitemap niet leeg is; anders alleen de sterke plaatsen.
         $placeSlugs = $strong ?: array_keys($resolver->places());

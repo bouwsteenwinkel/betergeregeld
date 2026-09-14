@@ -29,13 +29,14 @@
     // object": de eerste render vult de cache en werkt, de volgende leest 'm terug en
     // valt om met een 500. Precies dat gebeurde hier op /ai terwijl /website nog goed
     // ging (03-08-2026).
+    $minAdressen = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->minAdressen($site->key);
     $plaatsen = \Illuminate\Support\Facades\Cache::remember(
-        'facet_werkgebied_' . $site->key . '_' . $aantal,
+        'facet_werkgebied_' . $site->key . '_' . $aantal . '_' . $minAdressen,
         86400,
-        function () use ($aantal) {
+        function () use ($aantal, $minAdressen) {
             return \Illuminate\Support\Facades\DB::table('channel_place_facts')
                 ->whereNotNull('adressen')
-                ->where('adressen', '>=', (int) config('channel_places.index_min_addresses', 0))
+                ->where('adressen', '>=', $minAdressen)
                 ->orderByDesc('adressen')
                 ->limit($aantal)
                 ->get(['slug', 'naam'])

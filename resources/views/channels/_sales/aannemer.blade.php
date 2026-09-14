@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je aannemersbedrijf laten maken')
-@section('description', 'Meer bouw- en verbouwprojecten uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je aannemersbedrijf: projecten in beeld en offerteaanvragen voor bouw en verbouw uit je regio. Vraag gratis een voorbeeld van jouw site aan.')
 
 @if ($heroImg)
     @push('head')

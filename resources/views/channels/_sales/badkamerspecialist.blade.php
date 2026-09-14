@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je badkamerbedrijf laten maken')
-@section('description', 'Meer badkamerklussen uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je badkamerbedrijf: showroom en gerealiseerde badkamers in beeld, offerteaanvragen uit je regio. Vraag gratis een voorbeeld aan.')
 
 {{-- LCP: hero-afbeelding vroeg laden zodat de grootste afbeelding sneller in beeld staat. --}}
 @if ($heroImg)

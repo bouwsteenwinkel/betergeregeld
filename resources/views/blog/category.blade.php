@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
-@php $locale = app()->getLocale(); @endphp
+@php
+	$locale = app()->getLocale();
+	$hreflangLocales = \App\Models\Blog\BlogPost::LOCALES;   // zie blog/index.blade.php
+@endphp
 
 {{-- Paginering: elke pagina verwijst naar zichzelf, niet naar pagina 1.
      Alleen binnen het bereik — zie blog/index.blade.php. --}}

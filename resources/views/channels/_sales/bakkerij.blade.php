@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je bakkerij laten maken')
-@section('description', 'Meer klanten en verkoop uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website of webshop laten maken voor je bakkerij: assortiment en taarten online, bestellen voor afhalen of bezorgen. Meer klanten uit de buurt. Gratis voorbeeld.')
 
 @if ($heroImg)
     @push('head')

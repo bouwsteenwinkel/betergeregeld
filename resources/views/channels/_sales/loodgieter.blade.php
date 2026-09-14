@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je loodgietersbedrijf laten maken')
-@section('description', 'Meer loodgietersklussen uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je loodgietersbedrijf: je diensten en werkgebied duidelijk, en storingen en offerteaanvragen direct binnen. Vraag gratis een voorbeeld aan.')
 
 {{-- LCP: hero-afbeelding vroeg laden zodat de grootste afbeelding sneller in beeld staat. --}}
 @if ($heroImg)

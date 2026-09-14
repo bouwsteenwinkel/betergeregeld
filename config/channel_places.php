@@ -65,6 +65,29 @@ return [
     // hoort bij de ondernemer-pagina's (/website, /automatisering, ...) te liggen.
     'index_min_addresses' => 10000,
 
+    // Uitzondering per kanaal (site-key => minimaal aantal adressen). Geldt voor de
+    // plaatspagina, de sitemap én het werkgebied-blok, via
+    // PlaceBusinessFinder::minAdressen().
+    //
+    // bedrijfswebsite 14-09-2026 naar 1.000. De 10.000 hierboven is gemeten op de
+    // branche-sites, waar de plaatspagina's vooral consumenten trekken ("loodgieter
+    // amstelveen"). Op jouw-bedrijfswebsite.nl is dat andersom: daar komen de
+    // vertoningen van "website laten maken zelhem", "webshop maken gennep" -- 100%
+    // doelgroep, en juist uit dorpen. Search Console, 16 maanden: van de 228
+    // plaatspagina's met vertoningen stonden er na 23-08 188 op noindex, samen 82% van
+    // alle plaatsvertoningen (Kloosterhaar, Wemeldinge, Wamel, Zelhem, Abcoude, Mook).
+    //
+    //   drempel 10.000 -> 168 plaatspagina's
+    //   drempel  4.000 -> 384
+    //   drempel  1.000 -> 766   <- hier: dorpen blijven, buurtschappen (Kalenberg 195,
+    //                              Ezinge 433) niet
+    //   drempel      0 -> 969
+    //
+    // Nameten begin november: groeit "Gevonden, niet geïndexeerd" hard, dan naar 2.500.
+    'index_min_addresses_per_site' => [
+        'bedrijfswebsite' => 1000,
+    ],
+
     // Fallback-tokens als een branche (nog) geen eigen waarden heeft.
     'defaults' => [
         'trade'   => 'bedrijf',

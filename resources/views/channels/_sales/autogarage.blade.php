@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je garagebedrijf laten maken')
-@section('description', 'Meer reparatie- en onderhoudsklussen uit je eigen regio met een professionele website, webshop of klantenportaal. Vraag gratis en vrijblijvend een voorbeeld van jouw site aan.')
+@section('description', 'Website laten maken voor je garagebedrijf: onderhoud, APK en occasions overzichtelijk, en klanten die zelf een afspraak aanvragen. Vraag gratis een voorbeeld aan.')
 
 @if ($heroImg)
     @push('head')
