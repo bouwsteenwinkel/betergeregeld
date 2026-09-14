@@ -34,12 +34,16 @@ class VerkeerBots extends Command
         {--pad=* : Extra logmap(pen) of bestand(en) om te lezen}
         {--top=15 : Aantal verdachte adressen per host in het rapport}
         {--sinds= : Alleen logregels vanaf dit tijdstip, UTC, bv. "2026-09-14 13:11"}
+        {--ua-drempel=500 : Eén browser-user-agent met méér pagina’s dan dit, over alle hosts samen, is een crawler}
         {--max-mb=48 : Per bestand maximaal dit aantal MB lezen (vanaf het einde)}';
 
     protected $description = 'Splits het verkeer in de IIS-logs uit naar mens, bekende bot, vermoedelijke bot en scanner';
 
     /** Ondergrens (UTC, "Y-m-d H:i") waar de telling begint; leeg = alles. */
     private string $sinds = '';
+
+    /** User-agents die over alle hosts samen boven de drempel zitten: crawlers met browser-UA. */
+    private array $massaalUa = [];
 
     /** Bekende crawlers/fetchers op user-agent, in volgorde van herkenning. */
     private const BOTS = [
@@ -141,6 +145,33 @@ class VerkeerBots extends Command
 
         ksort($perHost);
         $totaal = ['klassen' => [], 'ips' => []];
+
+        // Achter Cloudflare is het adres waardeloos, maar de user-agent niet: een crawler
+        // die zich als browser voordoet gebruikt één vaste string en haalt daarmee over
+        // alle sites samen duizenden pagina's op. Echte bezoekers verdelen zich over
+        // tientallen versies/toestellen met elk een handvol pagina's.
+        $drempel = max(50, (int) $this->option('ua-drempel'));
+        $uaPag = [];
+        foreach ($perHost as $ips) {
+            foreach ($ips as $r) {
+                if ($this->botNaam((string) $r['ua']) === null && ! str_contains((string) $r['ua'], 'warm-up')) {
+                    $uaPag[$r['ua']] = ($uaPag[$r['ua']] ?? 0) + $r['html'];
+                }
+            }
+        }
+        arsort($uaPag);
+        foreach ($uaPag as $ua => $pag) {
+            if ($pag >= $drempel) {
+                $this->massaalUa[$ua] = $pag;
+            }
+        }
+        if ($this->massaalUa !== []) {
+            $this->line('Browser-user-agents met ≥ '.$drempel.' pagina’s over alle hosts samen → geteld als crawler:');
+            foreach ($this->massaalUa as $ua => $pag) {
+                $this->line(sprintf('  %6d  %s', $pag, mb_substr(str_replace('+', ' ', (string) $ua), 0, 110)));
+            }
+            $this->line('');
+        }
 
         foreach ($perHost as $host => $ips) {
             $this->rapporteerHost($host, $ips, $top, $totaal);
@@ -503,6 +534,9 @@ class VerkeerBots extends Command
         $bot = $this->botNaam($ua);
         if ($bot !== null) {
             return 'bot: '.$bot;
+        }
+        if (isset($this->massaalUa[$ua])) {
+            return 'bot: browser-UA, massaal';
         }
         $n = (int) $r['n'];
         $html = (int) $r['html'];
