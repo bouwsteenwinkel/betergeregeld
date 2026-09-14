@@ -425,7 +425,7 @@ class VerkeerBots extends Command
             $r = &$perHost[$host][$ip.'|'.$ua];
             if ($r === null) {
                 $r = [
-                    'ip' => $ip, 'ua' => $ua, 'n' => 0, 'html' => 0, 'asset' => 0, 'ev' => 0, 'cmp' => 0, 'kiosk' => 0,
+                    'ip' => $ip, 'ua' => $ua, 'n' => 0, 'html' => 0, 'asset' => 0, 'ev' => 0, 'cmp' => 0, 'kiosk' => 0, 'evStatus' => [],
                     'e4' => 0, 'scan' => 0, 'ref' => 0, 'paden' => [], 'eerste' => $tijd, 'laatste' => $tijd,
                     'dagen' => [], 'perDag' => [],
                 ];
@@ -443,6 +443,7 @@ class VerkeerBots extends Command
             }
             if ($methode === 'POST' && $uri === '/_ev') {
                 $r['ev']++;
+                $r['evStatus'][$status] = ($r['evStatus'][$status] ?? 0) + 1;
             } elseif (preg_match('~^/cmp/~', $uri)) {
                 $r['cmp']++;
             } elseif (str_starts_with($uri, '/scherm/')) {
@@ -543,6 +544,7 @@ class VerkeerBots extends Command
         $klassen = [];
         $verdacht = [];
         $beacon = [];
+        $beaconStatus = [];
         $perDag = [];
         $js = 0;
         $uaTop = [];
@@ -583,6 +585,9 @@ class VerkeerBots extends Command
             if ($r['ev'] > 0) {
                 $bk = $this->botNaam((string) $r['ua']) ?? (str_starts_with($k, 'eigen') ? $k : 'browser');
                 $beacon[$bk] = ($beacon[$bk] ?? 0) + $r['ev'];
+                foreach ($r['evStatus'] as $st => $aantal) {
+                    $beaconStatus[$bk][$st] = ($beaconStatus[$bk][$st] ?? 0) + $aantal;
+                }
             }
             if (str_starts_with($k, 'bot: browser-UA') || $k === 'scanner') {
                 $verdacht[$sleutel] = $r + ['klasse' => $k];
@@ -628,7 +633,9 @@ class VerkeerBots extends Command
             $this->line('');
             $this->line('  Wie vuurt de page_view-beacon (POST /_ev) — dit is wat het kiosk-scherm telt:');
             foreach ($beacon as $wie => $n) {
-                $this->line(sprintf('    %-30s %6d', $wie, $n));
+                $st = $beaconStatus[$wie] ?? [];
+                ksort($st);
+                $this->line(sprintf('    %-30s %6d   status: %s', $wie, $n, implode(', ', array_map(fn ($k, $v) => "$k×$v", array_keys($st), $st))));
             }
         }
 
