@@ -446,8 +446,8 @@ class VerkeerBots extends Command
                     $dag = substr($tijd, 0, 10);
                     $r['perDag'][$dag] = ($r['perDag'][$dag] ?? 0) + 1;
                 }
-                if (count($r['paden']) < 6) {
-                    $r['paden'][$uri] = true;
+                if (count($r['paden']) < 40 || isset($r['paden'][$uri])) {
+                    $r['paden'][$uri] = ($r['paden'][$uri] ?? 0) + 1;
                 }
             }
             unset($r);
@@ -534,6 +534,8 @@ class VerkeerBots extends Command
         $beacon = [];
         $perDag = [];
         $js = 0;
+        $uaTop = [];
+        $padTop = [];
 
         foreach ($ips as $sleutel => $r) {
             $ip = $r['ip'];
@@ -554,12 +556,21 @@ class VerkeerBots extends Command
             foreach ($r['perDag'] as $dag => $pag) {
                 $perDag[$dag][$groep] = ($perDag[$dag][$groep] ?? 0) + $pag;
             }
-            if ($groep === 'mens' || $groep === 'mens?') {
+            // Loader-ophalingen door een browser-UA, ongeacht de klasse van de combinatie:
+            // achter Cloudflare komt de loader vaak via een ander edge-adres dan de pagina.
+            if ($this->botNaam((string) $r['ua']) === null && ! str_starts_with($k, 'eigen')) {
                 $js += $r['cmp'];
+            }
+            if ($groep === 'mens' || $groep === 'mens?') {
+                $uaKort = preg_replace('~^Mozilla/5\.0\+~', '', (string) $r['ua']) ?? (string) $r['ua'];
+                $uaTop[$uaKort] = ($uaTop[$uaKort] ?? 0) + $r['html'];
+                foreach ($r['paden'] as $pad => $aantal) {
+                    $padTop[$pad] = ($padTop[$pad] ?? 0) + $aantal;
+                }
             }
 
             if ($r['ev'] > 0) {
-                $bk = $this->botNaam((string) $r['ua']) ?? ($k === 'mens' || $k === 'mens?' ? 'browser' : $k);
+                $bk = $this->botNaam((string) $r['ua']) ?? (str_starts_with($k, 'eigen') ? $k : 'browser');
                 $beacon[$bk] = ($beacon[$bk] ?? 0) + $r['ev'];
             }
             if (str_starts_with($k, 'bot: browser-UA') || $k === 'scanner') {
@@ -585,6 +596,20 @@ class VerkeerBots extends Command
                 $this->line(sprintf('    %s  mens %5d   mens? %5d   bot/scanner %5d   eigen %5d', $dag, $c['mens'] ?? 0, $c['mens?'] ?? 0, $c['bot'] ?? 0, $c['eigen'] ?? 0));
             }
             $this->line(sprintf('  JS-bewijs: /cmp/loader.js opgehaald door browser-UA (≈ browsersessies; max 1 per 5 min per browser): %d', $js));
+        }
+
+        if ($uaTop !== []) {
+            arsort($uaTop);
+            $this->line('');
+            $this->line('  Mens/mens?: user-agents met de meeste pagina\'s (één UA met honderden pagina\'s = crawler):');
+            foreach (array_slice($uaTop, 0, 8, true) as $ua => $n) {
+                $this->line(sprintf('    %6d  %s', $n, mb_substr(str_replace('+', ' ', $ua), 0, 100)));
+            }
+            arsort($padTop);
+            $this->line('  Mens/mens?: meest opgevraagde pagina\'s:');
+            foreach (array_slice($padTop, 0, 10, true) as $pad => $n) {
+                $this->line(sprintf('    %6d  %s', $n, mb_substr($pad, 0, 90)));
+            }
         }
 
         if ($beacon !== []) {
