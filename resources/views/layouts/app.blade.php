@@ -149,6 +149,9 @@
 	], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 	</script>
 
+	{{-- Bezoekers voor het kiosk-scherm; zie de partial. --}}
+	@include('partials.page-view-beacon')
+
 	@stack('head')
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col">

@@ -84,6 +84,8 @@
     };
 })();
 </script>
+{{-- Bezoekers voor het kiosk-scherm (page_view in channel_events); zie de partial. --}}
+@include('partials.page-view-beacon')
 @if ($gtmId !== '')
     {{-- Google Tag Manager. Laadt bewust vóór consent: GTM zet zelf geen cookies
          en beslist mét Consent Mode of tags mogen vuren. Zet GA4/Ads IN deze

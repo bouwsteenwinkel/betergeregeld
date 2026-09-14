@@ -16,6 +16,9 @@ use Illuminate\Support\Str;
  */
 class ChannelEventController extends Controller
 {
+    /** site_key voor events van betergeregeld.com zelf (geen channel-site in de container). */
+    public const HOOFDSITE = 'betergeregeld';
+
     public function store(Request $request): Response
     {
         $event = (string) $request->input('e', '');
@@ -33,11 +36,11 @@ class ChannelEventController extends Controller
             $request->session()->put('bg_ev_ref', $visitRef);
         }
 
-        // Site-key uit de opgeloste channel-site (indien beschikbaar).
-        $siteKey = null;
-        if (app()->bound(ChannelSite::class)) {
-            $siteKey = app(ChannelSite::class)->key;
-        }
+        // Site-key uit de opgeloste channel-site. Geen channel-site = het hoofddomein
+        // (routes/web.php), en dat heet op het kiosk-scherm gewoon 'betergeregeld'.
+        $siteKey = app()->bound(ChannelSite::class)
+            ? app(ChannelSite::class)->key
+            : self::HOOFDSITE;
 
         // Pad zonder query-string (geen gclid/utm/PII).
         $path = strtok((string) $request->input('p', ''), '?') ?: null;

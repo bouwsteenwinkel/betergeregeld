@@ -144,6 +144,12 @@ Route::get('/blok-voorbeeld/{type}', [\App\Http\Controllers\ChannelSite\BlockPre
 // Webhooks live outside the locale prefix and must not use CSRF.
 Route::post('/webhooks/mollie', [WebhookController::class, 'mollie'])->name('webhooks.mollie');
 
+// First-party event-beacon op betergeregeld.com zelf (page_view voor het kiosk-scherm).
+// De channel-domeinen hebben hun eigen /_ev in routes/channels.php; die groepen staan
+// vóór deze route en matchen dus eerst. CSRF-vrij via bootstrap/app.php ('_ev').
+Route::post('/_ev', [\App\Http\Controllers\ChannelSite\ChannelEventController::class, 'store'])
+    ->middleware('throttle:120,1');
+
 // Ops-endpoints: deploy (git pull + caches + OPcache) en één artisan-commando draaien.
 // Server-to-server, beschermd met DEPLOY_TOKEN in DeployController — geen sessie/CSRF.
 // Zonder token in de .env geven ze 404, dus ze staan standaard uit.

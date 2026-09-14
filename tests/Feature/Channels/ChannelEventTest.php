@@ -68,4 +68,29 @@ class ChannelEventTest extends TestCase
 
         $this->assertSame($ref, ChannelEvent::latest('id')->first()->visit_ref);
     }
+
+    /**
+     * Het kiosk-scherm telt page_view-rijen. Op betergeregeld.com zelf is er geen
+     * channel-site; die bezoeken moeten wel landen, onder een herkenbare site_key.
+     */
+    public function test_page_view_op_het_hoofddomein_wordt_opgeslagen_als_betergeregeld(): void
+    {
+        $this->postJson('/_ev', ['e' => 'page_view', 'p' => '/nl/ai-telefoniste?utm_source=x'])
+            ->assertNoContent();
+
+        $row = ChannelEvent::latest('id')->first();
+        $this->assertNotNull($row);
+        $this->assertSame('page_view', $row->event);
+        $this->assertSame('betergeregeld', $row->site_key);
+        $this->assertSame('/nl/ai-telefoniste', $row->path);
+    }
+
+    /** De beacon zelf: zonder dit script komt er nooit een page_view binnen. */
+    public function test_de_page_view_beacon_rendert(): void
+    {
+        $html = view('partials.page-view-beacon')->render();
+
+        $this->assertStringContainsString("e: 'page_view'", $html);
+        $this->assertStringContainsString('"\/_ev"', $html);
+    }
 }
