@@ -790,6 +790,16 @@ class ChannelSite
     }
 
     /**
+     * Plaatsenpagina's van dit kanaal buiten de index houden (noindex,follow + uit de
+     * sitemap). Opt-in per key via config/channel_places_noindex.php; de pagina's zelf
+     * blijven bestaan. Zie de toelichting in dat bestand.
+     */
+    public function placesNoindex(): bool
+    {
+        return in_array($this->key, (array) config('channel_places_noindex', []), true);
+    }
+
+    /**
      * Bespoke plaatsen-view voor deze site (index|province|show), of de gedeelde
      * fallback. Opt-in per site via het bestaan van
      * channels/_places/{key}/{name}.blade.php — laat andere kanalen ongemoeid.

@@ -13,7 +13,7 @@
 
 	{{-- Demo-/mockup-pagina's (/voorbeeld) nooit indexeren: het zijn voorbeelden,
 	     geen echte content, en anders concurreren ze met de trigger-pagina's. --}}
-	<meta name="robots" content="@yield('robots', $site->isLive() && ! $site->isDemoContext() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow')">
+	<meta name="robots" content="@yield('robots', $robotsOverride ?? ($site->isLive() && ! $site->isDemoContext() ? 'index,follow,max-image-preview:large' : 'noindex,nofollow'))">
 
 	<title>@yield('title', $site->homeTitle()) · {{ $site->displayName() }}</title>
 	<meta name="description" content="@yield('description', $site->metaDescription())">

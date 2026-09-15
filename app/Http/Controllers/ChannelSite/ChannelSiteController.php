@@ -200,8 +200,9 @@ class ChannelSiteController extends Controller
         $site = $this->site();
 
         return view($site->placeView('index'), [
-            'site'      => $site,
-            'provinces' => app(\App\Services\ChannelSiteResolver::class)->provinces(),
+            'site'           => $site,
+            'provinces'      => app(\App\Services\ChannelSiteResolver::class)->provinces(),
+            'robotsOverride' => $site->placesNoindex() ? 'noindex,follow' : null,
         ]);
     }
 
@@ -213,10 +214,11 @@ class ChannelSiteController extends Controller
         abort_if($name === null, 404);
 
         return view($this->site()->placeView('province'), [
-            'site'       => $this->site(),
-            'provName'   => $name,
-            'provSlug'   => $prov,
-            'provPlaces' => $resolver->provincePlaces($prov),
+            'site'           => $this->site(),
+            'provName'       => $name,
+            'provSlug'       => $prov,
+            'provPlaces'     => $resolver->provincePlaces($prov),
+            'robotsOverride' => $this->site()->placesNoindex() ? 'noindex,follow' : null,
         ]);
     }
 
@@ -292,7 +294,9 @@ class ChannelSiteController extends Controller
         // Dezelfde regel als in de sitemap, en bewust via dezelfde methode zodat pagina en
         // sitemap niet uiteen kunnen lopen — een pagina op noindex die tóch in de sitemap
         // staat is precies het signaal dat je niet wil geven.
-        $indexable = count($businesses) >= (int) config('channel_places.index_min_businesses', 3)
+        // Een kanaal in config/channel_places_noindex.php houdt élke plaats buiten de index.
+        $indexable = ! $site->placesNoindex()
+            && count($businesses) >= (int) config('channel_places.index_min_businesses', 3)
             && app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->groteGenoegPlaats($data['slug'], $site->key);
 
         return view($site->placeView('show'), [
@@ -362,18 +366,23 @@ class ChannelSiteController extends Controller
         if ($blocked = (array) config('channel_page_blocklist.' . $site->key, [])) {
             $paths = array_values(array_filter($paths, fn ($p) => ! in_array($p, $blocked, true)));
         }
+        // Kanaal met plaatsen op noindex (config/channel_places_noindex.php): dan ook het
+        // plaatsenoverzicht, de provincies en de plaatsen zelf niet in de sitemap.
+        if ($site->placesNoindex()) {
+            $paths = array_values(array_filter($paths, fn ($p) => $p !== 'plaatsen'));
+        }
         $urls = array_map(fn ($p) => ['loc' => $site->url($p)], $paths);
 
         // Provincie-overzichten + alleen "sterke" plaatsen (genoeg echte bedrijven);
         // dunne plaatsen staan op noindex en horen dus niet in de sitemap.
-        foreach ($resolver->provinces() as $prov) {
+        foreach ($site->placesNoindex() ? [] : $resolver->provinces() as $prov) {
             $urls[] = ['loc' => $site->url('plaatsen/provincie/' . $prov['slug'])];
         }
         $min = (int) config('channel_places.index_min_businesses', 3);
         $strong = app(\App\Services\ChannelSites\PlaceBusinessFinder::class)->indexableSlugs($site->brancheKey(), $min, $site->key);
         // Geen cache-data (nog niet gewarmd)? Val terug op alle plaatsen zodat de
         // sitemap niet leeg is; anders alleen de sterke plaatsen.
-        $placeSlugs = $strong ?: array_keys($resolver->places());
+        $placeSlugs = $site->placesNoindex() ? [] : ($strong ?: array_keys($resolver->places()));
         foreach ($placeSlugs as $slug) {
             $urls[] = ['loc' => $site->url('plaatsen/' . $slug)];
         }
