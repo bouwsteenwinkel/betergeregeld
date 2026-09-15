@@ -21,6 +21,21 @@
 return [
     'demo_nummer'      => '',                      // bv. '088 254 5170'
     'demo_bakkerij'    => 'Bakkerij Kruimel',      // naam van de fictieve demo-bakkerij
+
+    // De vaste bestellingen in de demo (bouwsteenwinkel_v3/scripts/_aitest-bakkerij-tabellen.php).
+    // Alleen zichtbaar als demo_nummer gevuld is. Dagen zijn afstanden vanaf vandaag.
+    'demo_kaartjes' => [
+        ['nummer' => 'K-1042', 'naam' => 'De Wit',    'hoor' => 'Twee appeltaarten staan klaar; vandaag ophalen, al betaald.'],
+        ['nummer' => 'K-1057', 'naam' => 'Jansen',    'hoor' => 'Slagroomtaart met "Sam 7", overmorgen om half twaalf ophalen.'],
+        ['nummer' => 'K-1063', 'naam' => 'El Amrani', 'hoor' => 'Veertig belegde broodjes, morgen bezorgd bij het notariskantoor, op rekening.'],
+        ['nummer' => 'K-1071', 'naam' => 'Bakker',    'hoor' => 'Chocoladetaart over vijf dagen; de vraag over een foto op de taart staat nog open.'],
+    ],
+    'demo_probeer' => [
+        'Bestel zelf een taart voor zaterdag: hij leest de bestelling terug en geeft een bestelnummer.',
+        'Vraag of die taart morgen al kan (twee dagen vooruit: hij zegt eerlijk wat de vroegste dag is).',
+        'Vraag of er noten in de amandelstaaf zitten (allergenen gaan altijd naar een medewerker).',
+        'Bel buiten openingstijden: hij neemt de bestelling gewoon aan.',
+    ],
     'kantoor_nummer'   => '088-2545101',
 
     'prijs' => [
@@ -56,11 +71,11 @@ return [
     'gesprekken_titel' => 'Zo klinkt dat, in gewoon Nederlands',
     'gesprekken' => [
         ['vraag' => 'Zijn jullie vandaag open?',                                        'antwoord' => 'Ja, vandaag zijn we open tot 17.00 uur. Morgen, zondag, zijn we gesloten.'],
-        ['vraag' => 'Kan ik nog een verjaardagstaart bestellen voor zaterdag?',        'antwoord' => 'Taarten bestellen we graag twee dagen vooruit, dus voor zaterdag kan dat tot donderdag. Zal ik uw naam, nummer en de wens noteren? Dan belt de bakkerij u terug om het precies af te stemmen.'],
+        ['vraag' => 'Kan ik nog een verjaardagstaart bestellen voor zaterdag?',        'antwoord' => 'Dat kan. Voor hoeveel personen, en wilt u er een tekst op? Dan noteer ik: een slagroomtaart voor tien personen met "Sam 7", zaterdag om half twaalf ophalen, op naam van Jansen. Uw bestelnummer is K, twee nul nul vier. De bakkerij bevestigt het nog; u betaalt bij het afhalen.'],
         ['vraag' => 'Tot hoe laat kan ik mijn bestelling ophalen?',                    'antwoord' => 'Bestellingen kunt u ophalen tot sluitingstijd, vandaag 17.00 uur. Lukt dat niet, dan kan ik dat doorgeven.'],
         ['vraag' => 'Bezorgen jullie?',                                                'antwoord' => 'We bezorgen in Hilversum en de dorpen eromheen, op dinsdag en vrijdag. Wilt u dat ik een bezorgverzoek noteer?'],
         ['vraag' => 'Hebben jullie glutenvrij brood?',                                  'antwoord' => 'We hebben een glutenvrij wit en een glutenvrij meergranen, op bestelling en meestal op vrijdag. Voor vragen over allergenen verbind ik u het liefst door met een medewerker, die weet precies wat er wel en niet in zit.'],
-        ['vraag' => 'Ik wil 40 belegde broodjes bestellen voor ons bedrijf.',          'antwoord' => 'Dat kan. Ik noteer uw naam, bedrijf, telefoonnummer, het aantal en de dag. De bakkerij belt u terug om het beleg en de levering af te stemmen.'],
+        ['vraag' => 'Ik wil 40 belegde broodjes bestellen voor ons bedrijf.',          'antwoord' => 'Dat kan, een dag vooruit. Wilt u ze laten bezorgen of komt u ze halen? Dan noteer ik veertig belegde broodjes, morgen bezorgen om kwart voor twaalf op het Stationsplein, op naam van het notariskantoor. U krijgt een bestelnummer en de bakkerij bevestigt het.'],
         ['vraag' => 'Kan ik een taart zonder noten bestellen?',                        'antwoord' => 'Voor allergieën wil ik niets verkeerd zeggen. Ik leg uw vraag vast en zorg dat een medewerker u terugbelt, of ik verbind u nu door als de winkel open is.'],
     ],
 
@@ -69,7 +84,8 @@ return [
         ['t' => 'Openingstijden en vestigingen',       'b' => 'Per dag, per winkel, met feestdagen en vakanties zoals jij ze doorgeeft.'],
         ['t' => 'Vragen over assortiment en bestellen', 'b' => 'Wat je hebt, wat op bestelling is, hoe ver vooruit, afhalen of bezorgen. Uit jouw eigen gegevens.'],
         ['t' => 'Terugbelverzoek',                      'b' => 'Naam en telefoonnummer, herhaald ter controle, met waar het over ging.'],
-        ['t' => 'Bestel- of aanvraagverzoek',           'b' => 'Een taart, een zakelijke bestelling, een groot aantal broodjes: vastgelegd als verzoek dat jij bevestigt. Geen betaling aan de telefoon.'],
+        ['t' => 'Bestellingen aannemen',                'b' => 'Een taart, een zakelijke bestelling, veertig broodjes: hij zoekt het product op, let op de besteltermijn, leest de bestelling terug en geeft een bestelnummer. Jij bevestigt; geen betaling aan de telefoon.'],
+        ['t' => '"Is mijn bestelling klaar?"',           'b' => 'Op bestelnummer en achternaam zegt hij wat erop staat, voor welke dag, en of er al betaald is.'],
         ['t' => 'Doorverbinden',                        'b' => 'Tijdens openingstijden naar de winkel of een collega, als de beller of de vraag daarom vraagt.'],
         ['t' => 'Samenvatting',                         'b' => 'Na elk gesprek een korte samenvatting per mail, en alles terug te lezen in je eigen portaal.'],
         ['t' => 'Dagberichten',                         'b' => 'Vandaag geen krentenbollen, morgen dicht: één bericht van jou en de assistent zegt het tegen iedere beller.'],
@@ -79,7 +95,7 @@ return [
     'niet_titel' => 'Wat we bewust níét laten doen',
     'niet' => [
         'Uitspraken over allergenen die niet uit jouw actuele productinformatie komen. Bij twijfel verwijst de assistent naar een medewerker.',
-        'Betalingen aannemen of bestellingen als afgerond behandelen. Een bestelling is een verzoek dat jij bevestigt.',
+        'Betalingen aannemen, of een bestelling wijzigen die vandaag al klaarstaat. Een bestelling die hij aanneemt bevestig jij; wijzigen en annuleren gaan via jou.',
         'Gesprekken opnemen. Er wordt een samenvatting gemaakt, geen geluidsopname.',
         'Afspraken in een agenda zetten. Dat kan wel via je website; aan de telefoon houden we het bij een verzoek.',
         'Iets verzinnen. Weet de assistent het niet, dan zegt hij dat en legt hij een terugbelverzoek vast.',
@@ -102,7 +118,7 @@ return [
     'faq' => [
         ['q' => 'Wat is AI-telefonie?',                                   'a' => 'Een computerprogramma dat de telefoon opneemt, luistert, in gewoon Nederlands antwoordt en vastlegt wat de beller wil. Het antwoordt uit gegevens die jij hebt aangeleverd, niet uit het internet.'],
         ['q' => 'Kan de assistent de telefoon opnemen voor mijn bakkerij?', 'a' => 'Ja. Hij neemt op met de naam van je bakkerij en handelt de veelvoorkomende vragen af. Wat hij niet weet, legt hij vast als terugbelverzoek.'],
-        ['q' => 'Kan hij bestellingen aannemen?',                         'a' => 'Hij legt een bestelverzoek vast met naam, nummer, wat en wanneer. Jij bevestigt het; er wordt niets afgerekend aan de telefoon. Wil je echt online laten bestellen en betalen, dan is de webshop daarvoor.'],
+        ['q' => 'Kan hij bestellingen aannemen?',                         'a' => 'Ja. Hij zoekt het product op in jouw assortiment, let op de besteltermijn (een taart twee dagen vooruit, brood vandaag nog), leest de bestelling terug en geeft de beller een bestelnummer. De bestelling staat direct in je portaal en in je mail; jij bevestigt hem. Er wordt niets afgerekend aan de telefoon. Wil je online laten bestellen en betalen, dan is de webshop daarvoor.'],
         ['q' => 'Kan hij openingstijden en productvragen beantwoorden?',   'a' => 'Ja, uit jouw eigen gegevens: openingstijden per vestiging, assortiment, bestelregels, bezorggebied. Verandert er iets, dan geef je dat door of zet je een dagbericht.'],
         ['q' => 'Kan hij vragen over allergenen beantwoorden?',            'a' => 'Alleen als jij daarvoor betrouwbare, actuele productinformatie hebt aangeleverd en dat wilt. Bij twijfel verwijst hij altijd naar een medewerker. Voedselveiligheid laten we niet aan een assistent over.'],
         ['q' => 'Wat gebeurt er als hij het antwoord niet weet?',           'a' => 'Dan zegt hij dat eerlijk, noteert naam en telefoonnummer en de vraag, en jij belt terug. Tijdens openingstijden kan hij ook doorverbinden.'],

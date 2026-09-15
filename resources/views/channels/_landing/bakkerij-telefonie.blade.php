@@ -125,6 +125,35 @@
         </div>
     </section>
 
+    {{-- De demo zelf: pas zichtbaar als er een nummer is (config demo_nummer). --}}
+    @if ($demo && ! empty($c['demo_kaartjes']))
+        <section data-section="demo" id="demo">
+            <div class="wrap">
+                <span class="kicker"><span class="kicker-line"></span> Probeer het zelf</span>
+                <h2>Bel {{ $c['demo_bakkerij'] ?? 'de demo' }} op {{ $demo }}</h2>
+                <p class="lead">{{ $c['demo_bakkerij'] ?? 'De demobakkerij' }} bestaat niet, het assortiment wel. Bestel iets, of bel met een van deze bestelnummers en vraag of je bestelling klaar is. Er wordt niets gebakken en niets afgerekend.</p>
+                <div class="grid cols-2 feature-grid" style="margin-top:1.6rem">
+                    @foreach ((array) $c['demo_kaartjes'] as $k)
+                        <div class="feature-card">
+                            <h3>Bestelnummer {{ $k['nummer'] }} &middot; {{ $k['naam'] }}</h3>
+                            <span class="feature-rule"></span>
+                            <p>{{ $k['hoor'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+                @if (! empty($c['demo_probeer']))
+                    <div class="card" style="margin-top:2rem">
+                        <h3 style="margin-top:0">Wat je verder kunt proberen</h3>
+                        <ul style="margin:0;padding-left:1.2rem;color:var(--c-muted);line-height:1.6">
+                            @foreach ((array) $c['demo_probeer'] as $p)<li>{{ $p }}</li>@endforeach
+                        </ul>
+                    </div>
+                @endif
+                <p style="margin-top:1.4rem"><a href="tel:{{ $demoTel }}" class="btn">Bel de demo: {{ $demo }}</a></p>
+            </div>
+        </section>
+    @endif
+
     <section data-section="kan">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Wat hij doet</span>
