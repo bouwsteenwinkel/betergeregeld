@@ -13,6 +13,9 @@
   .k-live { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#5c6270; font-weight:700; }
   .k-dot { width:8px; height:8px; border-radius:50%; background:#0a8a43; animation:kp 2s infinite; }
   @keyframes kp { 0%{box-shadow:0 0 0 0 rgba(10,138,67,.5);} 70%{box-shadow:0 0 0 7px rgba(10,138,67,0);} 100%{box-shadow:0 0 0 0 rgba(10,138,67,0);} }
+  /* Wandscherm-Pi (Chromium --force-prefers-reduced-motion): het pulserende bolletje kostte ~35% CPU
+     per venster en liet het cameravenster haperen (15-09-2026). Bolletje blijft, beweging niet. */
+  @media (prefers-reduced-motion: reduce) { .k-dot { animation:none; box-shadow:0 0 0 3px rgba(10,138,67,.25); } }
   .k-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
   .k-kpi { background:#fff; border:1px solid #e5e7eb; border-radius:11px; padding:8px 11px; box-shadow:0 1px 2px rgba(20,37,76,.04); }
   .k-kpi .lbl { font-size:9px; text-transform:uppercase; letter-spacing:.04em; color:#8a91a0; font-weight:700; }
