@@ -44,9 +44,9 @@ final class ContactSpam
             $redenen[] = $reden;
         };
 
-        // Cyrillisch in een Nederlands/Engels formulier: bijna altijd een bot.
-        if (preg_match('/\p{Cyrillic}{3,}/u', $alles)) {
-            $tel(3, 'cyrillisch schrift');
+        // Cyrillisch of Grieks in een Nederlands/Engels formulier: bijna altijd een bot.
+        if (preg_match('/\p{Cyrillic}{3,}|\p{Greek}{3,}/u', $alles)) {
+            $tel(3, 'cyrillisch of grieks schrift');
         }
 
         // Forum-opmaak die op een website niets betekent.
@@ -65,11 +65,18 @@ final class ContactSpam
         // Woorden die in onze aanvragen niet voorkomen.
         $woorden = ['casino', 'kazino', 'bonus', 'gambling', 'viagra', 'cialis', 'porn', 'sex dating',
                     'crypto', 'bitcoin', 'forex', 'binary option', 'loan offer', 'backlink', 'link building',
-                    'guest post', 'seo services', 'boost your ranking', 'increase your traffic', 'telegram'];
+                    'guest post', 'seo services', 'boost your ranking', 'increase your traffic', 'telegram',
+                    // 15-09-2026: gokreclame, 419-mails en SEO-pitches die hier nog tussendoor kwamen.
+                    'mega slots', 'slot of this year', 'spin once', 'prize expires', '500k', 'play t',
+                    'finds you well', 'head of equity', 'research head', 'investment opportunity',
+                    'indexing status', 'seo and aio', 'more visibility', 'test submission'];
+        $woordTreffers = 0;
         foreach ($woorden as $woord) {
             if (stripos($alles, $woord) !== false) {
                 $tel(2, "woord \"{$woord}\"");
-                break;
+                if (++$woordTreffers === 2) {
+                    break;
+                }
             }
         }
 
@@ -118,6 +125,67 @@ final class ContactSpam
             $tel(3, 'link in het naamveld');
         }
         unset($website);
+
+        // ── Aanvullingen 15-09-2026 ────────────────────────────────────────────────
+        // Van de 36 berichten die tussen 01-08 en 14-09 als 'new' doorkwamen was er niet
+        // één echt. Vier families die de regels hierboven misten:
+
+        // 1. Wartaal: een bericht of naam die één aaneengesloten reeks tekens is
+        //    ("ydpjsdneyqytokiwjnvurodwsltntw", "NAYUYUTY465753NERT"). Een mens typt een
+        //    spatie.
+        $berichtStrak = trim($bericht);
+        if ($berichtStrak !== '' && !str_contains($berichtStrak, ' ') && mb_strlen($berichtStrak) >= 10) {
+            $tel(3, 'bericht is één reeks tekens zonder spaties');
+        }
+        if ($naam !== '' && !str_contains($naam, ' ') && preg_match('/[a-z][A-Z].*[a-z][A-Z]|\d{4,}/', $naam)) {
+            $tel(2, 'naam is wartaal (wisselend hoofdlettergebruik of cijferreeks)');
+        }
+        //    Ook wartaal mét spaties ("Egjnjmfnefjwdifj fkmdkdwdwkdwjj"): twee keer zeven of
+        //    meer medeklinkers achter elkaar komt in geen taal van onze klanten voor
+        //    ("angstschreeuw" haalt er één, vandaar de eis van twee).
+        if (preg_match_all('/[b-df-hj-np-tv-z]{7,}/i', $naam . ' ' . $berichtStrak) >= 2) {
+            $tel(3, 'woorden zonder klinkers');
+        }
+
+        // 2. "Wat is uw prijs" in twaalf talen, telkens één zin, telkens dezelfde afzender
+        //    ("Hola, quería saber tu precio", "Szia, meg akartam tudni az árát"). Kort
+        //    bericht + het woord voor prijs in een taal die onze klanten niet schrijven.
+        if (mb_strlen($berichtStrak) <= 120
+            && preg_match('/\b(precio|prezzo|prys|cijenu|çmimin|harga|pretium|kainą|árát|prezioa|intengo|cena|preț|cenu|hinta|fiyat|pris)\b/iu', $berichtStrak)) {
+            $tel(3, 'prijsvraag in een vreemde taal');
+        }
+
+        // 3. Engelse verkoopmail en gokreclame. Eén zin is 2 punten; zulke berichten
+        //    stapelen er meestal twee ("I wanted to reach out ... ever considered").
+        $verkoop = ['i wanted to reach out', 'wanted to reach out', 'i just visited', 'ever considered',
+                    'hope you\'re doing well', 'hope you’re doing well', 'regional distributor', 'automated system that',
+                    'let you know about our new', 'try now', 'jackpot', 'spins', 'this slot', 'slot wins',
+                    'collecting customer reviews', 'quick growth audit', 'competitive edge for', 'enhance visibility',
+                    'automated system', "we've spent the last", 'thoughtful article', 'feel free to visit',
+                    'noted speaking with', 'one of our regional'];
+        $geraakt = 0;
+        foreach ($verkoop as $zin) {
+            if (stripos($alles, $zin) !== false) {
+                $geraakt++;
+                $tel(2, "verkooptekst \"{$zin}\"");
+                if ($geraakt === 2) {
+                    break;
+                }
+            }
+        }
+
+        // 4. Afzender doet zich voor als ons eigen domein. Wij mailen onszelf niet via
+        //    het contactformulier; een prospect met @betergeregeld.com bestaat niet.
+        if (preg_match('/@betergeregeld\.(com|nl|be)$/i', $email)) {
+            $tel(3, 'afzender gebruikt ons eigen domein');
+        }
+
+        // 5. Dezelfde naam die vaker terugkomt over een maand (12× "RobertDeeni" in zes weken).
+        //    Zwak op zichzelf, sterk in combinatie met de bot-naamregel hierboven.
+        $herhaaldeNaam = (int) ($data['zelfde_naam_30d'] ?? 0);
+        if ($naam !== '' && $herhaaldeNaam >= 3) {
+            $tel(1, "naam kwam {$herhaaldeNaam}× eerder voor in 30 dagen");
+        }
 
         return ['score' => $score, 'redenen' => $redenen];
     }

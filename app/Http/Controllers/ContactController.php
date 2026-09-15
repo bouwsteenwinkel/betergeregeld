@@ -59,7 +59,13 @@ class ContactController extends Controller
 			->where(fn ($q) => $q->where('email', $data['email'])->orWhere('ip', (string) $request->ip()))
 			->count();
 
-		$oordeel = ContactSpam::beoordeel($data + ['eerdere_inzendingen_24u' => $eerder]);
+		// Dezelfde naam in de afgelopen 30 dagen (12× "RobertDeeni"): zwak signaal, zie ContactSpam.
+		$zelfdeNaam = ContactMessage::query()
+			->where('created_at', '>=', now()->subDays(30))
+			->where('name', $data['name'])
+			->count();
+
+		$oordeel = ContactSpam::beoordeel($data + ['eerdere_inzendingen_24u' => $eerder, 'zelfde_naam_30d' => $zelfdeNaam]);
 		$isSpam = $oordeel['score'] >= ContactSpam::DREMPEL;
 
 		$subject = $data['subject'] ?: ($data['topic'] ? __('Aanvraag:') . ' ' . $data['topic'] : __('Contact via website'));
