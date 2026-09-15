@@ -374,6 +374,9 @@ Route::prefix('{locale}')
 			'api-koppelingen'          => 'api-koppelingen',
 			'processen-automatiseren'  => 'processen-automatiseren',
 			'ai-telefoniste'           => 'ai-telefoniste',
+			// 15-09-2026: het backup-zoekcluster ("backup mkb" e.d.) landde op één blogpost;
+			// zie de toelichting bovenin de view.
+			'backup-en-monitoring'     => 'backup-en-monitoring',
 		] as $__kernSlug => $__kernView) {
 			Route::get("/{$__kernSlug}", fn (string $locale) => $locale === 'nl'
 				? view("pages.kernaanbod.{$__kernView}")
