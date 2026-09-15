@@ -26,6 +26,8 @@
 		'klantportaal' => $isEn ? 'Client portal' : 'Klantportaal',
 		'api-koppelingen' => $isEn ? 'API integrations' : 'API-koppelingen',
 		'processen-automatiseren' => $isEn ? 'Process automation' : 'Processen automatiseren',
+		'backup-en-monitoring' => $isEn ? 'Backup & monitoring' : 'Backup en monitoring',
+		'backup-check' => $isEn ? 'Free backup check' : 'Gratis backup-check',
 		'maatwerk' => $isEn ? 'Custom / advice' : 'Maatwerk / advies',
 		'anders' => $isEn ? 'Other / not sure yet' : 'Anders / nog niet zeker',
 	];

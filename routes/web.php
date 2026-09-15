@@ -384,6 +384,12 @@ Route::prefix('{locale}')
 			)->name("kernaanbod.{$__kernView}");
 		}
 
+		// Gratis backup-check (15-09-2026): instapaanbod, post naar contact.store met topic=backup-check.
+		Route::get('/backup-check', fn (string $locale) => $locale === 'nl'
+			? view('pages.backup-check')
+			: redirect('/nl/backup-check', 301)
+		)->name('backup-check');
+
 		// Afspraak inplannen op betergeregeld.com zelf (11-09-2026). Boekt via dezelfde
 		// /afspraak/boeken als de channel-sites; zie pages/afspraak.blade.php.
 		Route::get('/afspraak', fn (string $locale) => $locale === 'nl'

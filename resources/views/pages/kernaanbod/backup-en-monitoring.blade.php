@@ -56,7 +56,7 @@
 			'Veel backup-oplossingen melden "geslaagd" terwijl het bestand leeg, onvolledig of onleesbaar is. Wij vertrouwen dat niet op de melding, maar controleren het bestand zelf. En we zetten hem af en toe echt terug, want dat is de enige test die telt.',
 			'Wat we niet doen: Microsoft 365, Google Workspace of andere clouddiensten beheren. We kunnen wel uitzoeken wat uw abonnement daar wel en niet bewaart, en of u een aparte backup nodig heeft. Dat zeggen we eerlijk, ook als het antwoord "nee" is.',
 		],
-		'eerlijk_link' => ['/nl/blog/backup-strategie-mkb', 'Lees: een backup-strategie die u ook echt test'],
+		'eerlijk_link' => ['/nl/backup-check', 'Eerst weten hoe u ervoor staat? Vraag de gratis backup-check aan'],
 
 		'stappen' => [
 			['t' => 'Wat er nu is',            'b' => 'We brengen in kaart wat er nu wordt bewaard, waar, hoe vaak, en wie een melding krijgt als het misgaat.'],
@@ -109,6 +109,7 @@
 		],
 
 		'verder' => [
+			['/nl/backup-check',                       'Gratis backup-check',      'Binnen vijf werkdagen weten of uw backup werkt'],
 			['/nl/diensten/website-backup-en-herstel', 'Website backup & herstel', 'Backup en herstel van uw website zelf'],
 			['/nl/diensten/website-beveiligen',        'Website beveiligen',       'Minder kans dat u een backup nodig heeft'],
 			['/nl/processen-automatiseren',            'Processen automatiseren',  'Controles die vanzelf lopen'],

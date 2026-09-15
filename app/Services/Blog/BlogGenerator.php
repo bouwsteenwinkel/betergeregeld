@@ -231,7 +231,7 @@ TXT;
 		// Een post zonder link naar iets wat we verkopen publiceren we niet: dat is precies
 		// de blog van vóór 11-09-2026, met lezers die nergens heen konden. /nl/prijzen telt
 		// bewust NIET mee: die pagina gaat over de tool-abonnementen, niet over maatwerk.
-		if (!preg_match('~href="(?:https://betergeregeld\.com)?/nl/(?:diensten/|slimmer-werken-met-ai|maatwerk-webapplicatie|klantportaal-laten-maken|api-koppelingen|processen-automatiseren|ai-telefoniste|backup-en-monitoring|contact)~', $d['body_html'])) {
+		if (!preg_match('~href="(?:https://betergeregeld\.com)?/nl/(?:diensten/|slimmer-werken-met-ai|maatwerk-webapplicatie|klantportaal-laten-maken|api-koppelingen|processen-automatiseren|ai-telefoniste|backup-en-monitoring|backup-check|contact)~', $d['body_html'])) {
 			throw new RuntimeException('BlogGenerator: body_html linkt niet naar een dienst-, contact-, AI- of kernaanbodpagina.');
 		}
 	}

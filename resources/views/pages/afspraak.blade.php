@@ -17,6 +17,8 @@
 		'klantportaal'            => 'Klantportaal',
 		'api-koppelingen'         => 'API-koppelingen',
 		'processen-automatiseren' => 'Processen automatiseren',
+		'backup-en-monitoring'    => 'Backup en monitoring',
+		'backup-check'            => 'Gratis backup-check',
 		'ai-procesanalyse'        => 'Slimmer werken met AI',
 		'website'                 => 'Website of webshop',
 		'anders'                  => 'Iets anders, of weet ik nog niet',
