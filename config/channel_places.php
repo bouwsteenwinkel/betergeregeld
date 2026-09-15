@@ -301,7 +301,66 @@ return [
      * Waddinxveen voor bedrijven" luidde.
      * Elke variant opent daarom met de zoekterm zelf.
      */
+    // Provinciepagina's: per branche een ondernemersgerichte titel/kop/lead (anders
+    // "Bakkerij in Drenthe" = bedrijvengids). Tokens :region, :trades, :trade.
+    'provincie' => [
+        'bakkerij' => [
+            'title'       => 'Website laten maken voor je bakkerij in :region',
+            'h1'          => 'Website, webshop en AI-telefonie voor bakkerijen in :region',
+            'lead'        => 'Voor bakkers in :region: gevonden worden op "bakkerij" plus je plaats, brood en taarten online laten bestellen, en een telefoon die wordt opgenomen als jij bakt. Kies je plaats, of vraag direct een gratis voorbeeld van jouw bakkerij aan.',
+            'description' => 'Website of webshop laten maken voor je bakkerij in :region? Gevonden worden, online bestellen en AI-telefonie. Kies je plaats en vraag een gratis voorbeeld aan.',
+        ],
+    ],
+
     'variants_per_branche' => [
+        /*
+         * Bakkerij (15-09-2026): de plaatsenpagina's haalden hun vertoningen op "bakker anjum"
+         * (consumenten die brood zoeken, positie 12) terwijl 66% van het zoekverkeer van dit
+         * kanaal ondernemersintentie heeft. Titel, kop en lead spreken daarom de bakker aan,
+         * en de lead zegt de broodzoeker meteen waar hij is. Zelfde slotvolgorde als de
+         * standaard, dus de variantkeuze per plaats blijft stabiel.
+         */
+        'bakkerij' => [
+            'meta_title' => [
+                'Website laten maken voor je bakkerij in :city',
+                'Website of webshop voor je bakkerij in :city? Eerst een gratis voorbeeld',
+                'Online bestellen en gevonden worden: website voor bakkerijen in :city',
+                'Website voor je bakkerij in :city, met assortiment en bestellen',
+                'Bakkerij in :city: website, webshop en AI-telefonie laten maken',
+                'Website laten maken voor bakkers in :city tegen een vaste prijs',
+                'Wat een website kost voor een bakkerij in :city',
+                'Meer bestellingen voor je bakkerij in :city',
+            ],
+            'meta_description' => [
+                'Heb je een bakkerij in :city? Wij maken een website of webshop waarop klanten je assortiment zien, online bestellen en bellen. Vooraf een gratis voorbeeld van jouw bakkerij.',
+                'Voor bakkerijen in :city (:region): gevonden worden op "bakkerij :city", taarten en brood online laten bestellen, en een telefoon die wordt opgenomen als jij bakt. Gratis voorbeeld vooraf.',
+                'Bakkerijen in :city en omgeving groeien online met een website, webshop en slimme automatisering van Beter Geregeld. Bekijk vooraf gratis een voorbeeld.',
+                'Een website voor je bakkerij in :city die bestellingen oplevert: vindbaar in Google, je assortiment in beeld, online bestellen met afhaaltijd. Vaste prijs vooraf.',
+                'Meer bestellingen voor je bakkerij in :city? Website, webshop, klantenportaal voor zakelijke klanten en AI-telefonie. Eerst een gratis voorbeeld.',
+                'Zoekt iemand in :city een bakkerij, dan wil je erbij staan. Wij bouwen bakkerijen een website die vindbaar is en bestellingen oplevert. Gratis voorbeeld vooraf.',
+                'Een website voor je bakkerij in :city, gemaakt om gevonden te worden en klanten te laten bestellen of bellen. Vaste prijs, één aanspreekpunt, eerst een gratis voorbeeld.',
+                'Bakken kun je al. Wij regelen de online kant voor bakkerijen in :city: vindbaar in Google, bestellingen online en een telefoon die wordt opgenomen.',
+            ],
+            'h1' => [
+                'Heb je een bakkerij in :city en wil je online meer bestellingen?',
+                'Website of webshop laten maken voor je bakkerij in :city?',
+                'Een website voor je bakkerij in :city die bestellingen oplevert',
+                'Toe aan een betere website voor je bakkerij in :city?',
+                'Je bakkerij in :city verdient een website die verkoopt',
+                'Bakkerij in :city: gevonden worden, online bestellen, telefoon opgenomen',
+                'Meer klanten voor je bakkerij in :city, zonder extra werk aan de balie',
+            ],
+            'hero_lead' => [
+                'Deze pagina is voor bakkers in :city die online meer bestellingen willen. (Zoek je een bakker in :city? Kijk dan in de lijst hieronder.) Wij maken een website of webshop met assortiment, openingstijden en online bestellen, en zorgen dat je gevonden wordt op "bakkerij :city".',
+                'Voor bakkerijen in :city en omgeving: een website waarop klanten je assortiment zien en bestellen, een webshop met afhaaltijd, en AI-telefonie die opneemt als jij bakt. Zoek je zelf een bakker in :city? Die staan hieronder.',
+                'Je bakkerij in :city verdient meer dan een Facebook-pagina. Wij bouwen een site waarop klanten je vinden, je taarten zien en online bestellen. Vooraf een gratis voorbeeld. (Op zoek naar een bakker in :city? Zie de lijst verderop.)',
+                'Gevonden worden in :city, taarten en brood online laten bestellen, zakelijke klanten zelf laten bestellen: dat regelen we voor bakkerijen. Eerst een gratis voorbeeld van jouw bakkerij. Consument op zoek naar een bakker? Kijk hieronder.',
+                'Wij helpen bakkerijen in :city online groeien: website, webshop, klantenportaal en AI-telefonie. Begin met wat je nu nodig hebt. Zoek je een bakkerij in :city om brood te kopen? Hieronder staan ze.',
+                'Voor de bakker in :city: minder telefoon aan de balie, meer bestellingen online. Wij maken de website en webshop en zorgen dat je gevonden wordt. (Klant op zoek naar een bakker in :city? Zie de lijst hieronder.)',
+                'Een website voor je bakkerij in :city die klanten laat vinden, kijken en bestellen. Vooraf gratis een voorbeeld, vaste prijs, maandelijks opzegbaar. Zoek je zelf een bakker? Die vind je hieronder.',
+                'Bakkerijen in :city die online gevonden willen worden en bestellingen willen aannemen zonder briefjes en WhatsApp: daar bouwen wij voor. Zoek je een bakker in :city als klant? Kijk in de lijst hieronder.',
+            ],
+        ],
         'bedrijfswebsite' => [
             'meta_title' => [
                 'Website laten maken in :city',

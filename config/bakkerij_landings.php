@@ -1,472 +1,238 @@
 <?php
 
 /**
- * Verkooplaag voor de bakkerij-triggersite (auto-gegenereerd, mode=retail).
- * Zelfde opzet als badkamer_landings.php: Beter Geregeld verkoopt een weboplossing
- * AAN de bakkerij. Copy is generiek-per-sector; verfijn per niche waar nodig.
+ * Verkooplaag voor jouw-bakkerij-website.nl: de vijf facetpagina's (website, webshop,
+ * klantenportaal, automatisering, ai). Beter Geregeld verkoopt een weboplossing AAN de bakker.
+ *
+ * Herschreven 15-09-2026. De vorige versie was het aannemer-sjabloon met alleen het branchewoord
+ * vervangen: "laat klanten hun klus zelf volgen", "garantiebewijzen", "kansrijke klussen",
+ * "bespaar tot wel 70% tijd" (audit: docs/bakkerij/SEO-CONTENT-AUDIT.md). Nu:
+ * - elke zin vanuit de dagelijkse praktijk van een bakkerij (balie, taartbestellingen,
+ *   zakelijke klanten, productielijst), geen ICT-taal;
+ * - het klantenportaal is voor zakelijke bestelklanten (horeca, kantoren), niet voor "opdrachten";
+ * - de ai-facet gaat over de telefoon en verwijst naar de landingspagina /ai-telefonie-bakkerij;
+ * - alleen wat aantoonbaar gebouwd kan worden; koppelingen als "kan indien gewenst";
+ * - geen getallen die we niet kunnen onderbouwen.
+ *
+ * Beeld-slots (imageSlot, gallery) zijn ongewijzigd: die verwijzen naar bestaande bestanden in
+ * public/channel-media/bakkerij/.
  */
 
-return array (
-  'website' => 
-  array (
-    'hero' => 
-    array (
-      'eyebrow' => 'Website laten maken',
-      'title' => 'Een website voor je bakkerij die klanten oplevert',
-      'sub' => 'Word gevonden als iemand een bakkerij zoekt in jouw regio, en laat met een strakke site je assortiment en sfeer zien.',
-      'note' => 'Gratis en vrijblijvend een voorbeeld van jóuw site, vaak binnen 1 à 2 dagen',
-      'usps' => 
-      array (
-        0 => 'Gevonden in Google in je eigen regio',
-        1 => 'Je assortiment en openingstijden meteen duidelijk',
-        2 => 'Bestellingen en klanten die vanzelf binnenkomen',
-      ),
-    ),
-    'pains' => 
-    array (
-      0 => 
-      array (
-        'title' => 'Je site is verouderd of je hebt er geen',
-        'text' => 'Alleen een Facebook-pagina of een site van jaren terug? Dan kiest een klant sneller voor een concurrent die er strak en betrouwbaar uitziet.',
-      ),
-      1 => 
-      array (
-        'title' => 'Je bent niet vindbaar in Google',
-        'text' => 'Wie een bakkerij zoekt in jouw plaats moet jóu vinden, niet de concurrent die wél bovenaan staat.',
-      ),
-      2 => 
-      array (
-        'title' => 'Aanvragen blijven uit',
-        'text' => 'Zonder duidelijke aanvraagknop haakt een geïnteresseerde af. Elke gemiste aanvraag is een misgelopen klus.',
-      ),
-    ),
-    'zkhw' => 
-    array (
-      'label' => 'Website',
-      'title' => 'Zo kan het worden: je assortiment 24/7 online',
-      'intro' => 'Winkelen begint online. Je site laat je assortiment, foto\'s en prijzen zien, zodat een klant al weet wat je hebt voordat hij langskomt of bestelt.',
-      'brand' => 'Kruimel',
-      'heroTitle' => 'Bekijk het assortiment en bestel of reserveer online',
-      'urlLabel' => 'jouw-bakkerij.nl',
-      'ctaLabel' => 'Bekijk het volledige voorbeeld',
-      'imageSlot' => 'website-preview',
-      'galleryLabel' => 'Een greep uit de winkel',
-      'gallery' => 
-      array (
-        0 => 
-        array (
-          'slot' => 'gallery1',
-        ),
-        1 => 
-        array (
-          'slot' => 'gallery2',
-        ),
-        2 => 
-        array (
-          'slot' => 'gallery3',
-        ),
-      ),
-      'bullets' => 
-      array (
-        0 => 
-        array (
-          'title' => 'Meer aanvragen en klanten',
-          'text' => 'Een professionele website die vertrouwen wekt en bezoekers omzet in klanten.',
-        ),
-        1 => 
-        array (
-          'title' => 'Tijdwinst en gemak',
-          'text' => 'Wij regelen ontwerp, teksten, foto\'s en techniek. Jij hoeft alleen goed te keuren.',
-        ),
-        2 => 
-        array (
-          'title' => 'Beter gevonden in Google',
-          'text' => 'Hogere posities in Google zorgen voor meer zichtbaarheid en lokale klanten.',
-        ),
-        3 => 
-        array (
-          'title' => 'Volledig verzorgd',
-          'text' => 'Hosting, beveiliging, updates en back-ups. Jij hebt er geen omkijken naar.',
-        ),
-        4 => 
-        array (
-          'title' => 'Kostenbesparend',
-          'text' => 'Geen dure bureaus of losse freelancers. Alles in één pakket, voor een vaste prijs.',
-        ),
-        5 => 
-        array (
-          'title' => 'Klaar om te groeien',
-          'text' => 'Uit te breiden met o.a. webshop, online afspraken en automations wanneer jij groeit.',
-        ),
-      ),
-    ),
-  ),
-  'webshop' => 
-  array (
-    'hero' => 
-    array (
-      'eyebrow' => 'Webshop laten maken',
-      'title' => 'Een webshop voor je bakkerij',
-      'sub' => 'Verkoop je hele assortiment online. Particulier en zakelijk, bezorgen of afhalen.',
-      'note' => 'Gekoppeld aan je site en voorraad, dus geen dubbele administratie',
-      'usps' => 
-      array (
-        0 => 'Verkoop dag en nacht door',
-        1 => 'Veilig betalen met iDEAL of op rekening',
-        2 => 'Bezorgen door heel Nederland of afhalen',
-      ),
-    ),
-    'pains' => 
-    array (
-      0 => 
-      array (
-        'title' => 'Je winkel is alleen overdag open',
-        'text' => 'Buiten openingstijden loop je omzet mis van klanten die juist \'s avonds oriënteren en bestellen.',
-      ),
-      1 => 
-      array (
-        'title' => 'Klanten kopen online bij een ander',
-        'text' => 'Zonder webshop gaat de online bestelling naar een concurrent die wél 24/7 open is.',
-      ),
-      2 => 
-      array (
-        'title' => 'Losse verkoop kost veel tijd',
-        'text' => 'Mailtjes, prijsopgaven en pinnen aan de balie. Online rekent de klant zelf af.',
-      ),
-    ),
-    'zkhw' => 
-    array (
-      'label' => 'Webshop',
-      'title' => 'Zo kan het worden: je assortiment 24/7 online',
-      'intro' => 'Je winkel is 24/7 open. Klanten bestellen zelf, betalen met iDEAL of op rekening en kiezen bezorgen of afhalen.',
-      'brand' => 'Kruimel',
-      'heroTitle' => 'Bestel online, bezorgd of afgehaald',
-      'urlLabel' => 'shop.jouw-bakkerij.nl',
-      'navCta' => 'Winkelmand',
-      'heroBtn' => 'In winkelmand',
-      'ctaLabel' => 'Bekijk het webshop-voorbeeld',
-      'imageSlot' => 'webshop-preview',
-      'galleryLabel' => 'Populair in de winkel',
-      'gallery' => 
-      array (
-        0 => 
-        array (
-          'slot' => 'gallery4',
-          'price' => 'vanaf € 24,95',
-        ),
-        1 => 
-        array (
-          'slot' => 'gallery5',
-          'price' => 'vanaf € 39',
-        ),
-        2 => 
-        array (
-          'slot' => 'gallery6',
-          'price' => '€ 25',
-        ),
-      ),
-      'bullets' => 
-      array (
-        0 => 
-        array (
-          'title' => 'Verkoop dag en nacht door',
-          'text' => 'Klanten bestellen ook \'s avonds en in het weekend, zonder dat jij er iets voor hoeft te doen.',
-        ),
-        1 => 
-        array (
-          'title' => 'Veilig betalen met iDEAL',
-          'text' => 'Direct afgerekend. Vaste klanten en bedrijven kunnen op rekening bestellen.',
-        ),
-        2 => 
-        array (
-          'title' => 'Bezorgen of afhalen',
-          'text' => 'Wat op voorraad ligt, is binnen twee werkdagen bezorgd of ligt klaar in je loods.',
-        ),
-        3 => 
-        array (
-          'title' => 'Vaste klanten kopen makkelijk terug',
-          'text' => 'Herhaalaankopen in een paar klikken, met hun gegevens al bewaard.',
-        ),
-      ),
-    ),
-  ),
-  'klantenportaal' => 
-  array (
-    'hero' => 
-    array (
-      'eyebrow' => 'Klantenportaal laten maken',
-      'title' => 'Laat klanten hun klus zelf volgen',
-      'sub' => 'Klanten plannen zelf hun afspraak, volgen de status en vinden alle documenten op één plek. Jij belt en mailt minder.',
-      'note' => 'Eigen inlog voor elke klant, gekoppeld aan hun opdracht',
-      'usps' => 
-      array (
-        0 => 'Afspraken zelf inplannen, ook buiten kantooruren',
-        1 => 'Altijd inzicht in de status van de klus',
-        2 => 'Minder telefoontjes en heen-en-weer gemail',
-      ),
-    ),
-    'pains' => 
-    array (
-      0 => 
-      array (
-        'title' => 'Veel gebel over de afspraak',
-        'text' => 'Klanten willen weten wanneer je komt en hoe ver het is. Dat kost je elke week uren aan de telefoon.',
-      ),
-      1 => 
-      array (
-        'title' => 'Documenten raken kwijt',
-        'text' => 'Offerte, facturen en garantie zwerven door de mailbox van je klant. Zet ze op één plek.',
-      ),
-      2 => 
-      array (
-        'title' => 'Afspraken maken kost heen-en-weer',
-        'text' => 'Laat de klant zelf een moment kiezen dat ook in jouw agenda past.',
-      ),
-    ),
-    'zkhw' => 
-    array (
-      'label' => 'Portaal & afspraken',
-      'title' => 'Zo kan het worden: klanten regelen het zelf',
-      'intro' => 'Klanten plannen zelf hun afspraak in, volgen de klus en vinden alle documenten in een eigen omgeving. Dat scheelt jou telefoontjes en heen-en-weer gemail. Bekijk het voorbeeld van zo\'n klantenportaal.',
-      'brand' => 'Kruimel',
-      'heroTitle' => 'Plan je afspraak en volg je klus in je eigen omgeving',
-      'urlLabel' => 'mijn.jouw-bakkerij.nl',
-      'navCta' => 'Inloggen',
-      'heroBtn' => 'Mijn omgeving',
-      'ctaLabel' => 'Bekijk het portaal-voorbeeld',
-      'imageSlot' => 'klantenportaal-preview',
-      'galleryLabel' => 'Je opdracht in beeld',
-      'gallery' => 
-      array (
-        0 => 
-        array (
-          'slot' => 'gallery1',
-        ),
-        1 => 
-        array (
-          'slot' => 'gallery2',
-        ),
-        2 => 
-        array (
-          'slot' => 'gallery3',
-        ),
-      ),
-      'bullets' => 
-      array (
-        0 => 
-        array (
-          'title' => 'Alles overzichtelijk op één plek',
-          'text' => 'Opdrachten, afspraken, documenten en berichten centraal en altijd beschikbaar.',
-        ),
-        1 => 
-        array (
-          'title' => 'Altijd up-to-date',
-          'text' => 'Je ziet in real-time de status, planning en belangrijke updates.',
-        ),
-        2 => 
-        array (
-          'title' => 'Snelle en duidelijke communicatie',
-          'text' => 'Direct contact met je aanspreekpunt via het portaal, zonder ruis of vertraging.',
-        ),
-        3 => 
-        array (
-          'title' => 'Alle documenten binnen handbereik',
-          'text' => 'Offertes, facturen en garantiebewijzen eenvoudig terugvinden.',
-        ),
-        4 => 
-        array (
-          'title' => 'Acties en taken helder',
-          'text' => 'Je weet precies wat er van je verwacht wordt en wat de volgende stap is.',
-        ),
-        5 => 
-        array (
-          'title' => 'Meer controle en grip',
-          'text' => 'Inzicht in kosten, planningen en beslissingen, voor een soepel en zorgeloos proces.',
-        ),
-      ),
-    ),
-  ),
-  'automatisering' => 
-  array (
-    'hero' => 
-    array (
-      'eyebrow' => 'Administratie automatiseren',
-      'title' => 'Minder papierwerk in je bakkerij',
-      'sub' => 'Offertes, planning en facturen die zichzelf doen. Een aanvraag wordt een offerte, facturen en herinneringen gaan vanzelf, en alles staat gekoppeld.',
-      'note' => 'Gekoppeld aan je site, agenda en boekhouding',
-      'usps' => 
-      array (
-        0 => 'Een offerte klaar in 10 minuten',
-        1 => 'Facturen en herinneringen gaan automatisch',
-        2 => 'Website, agenda en boekhouding werken samen',
-      ),
-    ),
-    'pains' => 
-    array (
-      0 => 
-      array (
-        'title' => 'Offertes maken kost je avonden',
-        'text' => 'Elke offerte opnieuw uittypen. Met standaardposten staat hij binnen 10 minuten klaar.',
-      ),
-      1 => 
-      array (
-        'title' => 'Je zit achter je geld aan',
-        'text' => 'Facturen en herinneringen vergeten kost geld. Laat ze automatisch op tijd de deur uit gaan.',
-      ),
-      2 => 
-      array (
-        'title' => 'Dubbel werk tussen je systemen',
-        'text' => 'Alles twee keer invoeren? Je website, agenda en boekhouding kunnen met elkaar praten.',
-      ),
-    ),
-    'zkhw' => 
-    array (
-      'label' => 'Automatisering',
-      'title' => 'Zo kan het worden: papierwerk dat zichzelf doet',
-      'intro' => 'Offertes, planning en facturen kosten je nu uren. Laat de techniek dat overnemen: een aanvraag wordt een offerte, facturen en herinneringen gaan vanzelf, en alles staat gekoppeld. Bekijk hoe de back-office voor je werkt.',
-      'brand' => 'Kruimel',
-      'heroTitle' => 'Minder tijd achter de laptop, meer tijd op de klus',
-      'urlLabel' => 'app.jouw-bakkerij.nl',
-      'navCta' => 'Dashboard',
-      'heroBtn' => 'Bekijk demo',
-      'ctaLabel' => 'Bekijk het automatisering-voorbeeld',
-      'imageSlot' => 'automatisering-preview',
-      'galleryLabel' => 'Loopt automatisch',
-      'gallery' => 
-      array (
-        0 => 
-        array (
-          'slot' => 'gallery4',
-          'price' => 'Offerte ✓',
-        ),
-        1 => 
-        array (
-          'slot' => 'gallery5',
-          'price' => 'Factuur ✓',
-        ),
-        2 => 
-        array (
-          'slot' => 'gallery6',
-          'price' => 'Review ✓',
-        ),
-      ),
-      'bullets' => 
-      array (
-        0 => 
-        array (
-          'title' => 'Minder handmatig werk',
-          'text' => 'Automatiseer terugkerende taken en bespaar tot wel 70% tijd.',
-        ),
-        1 => 
-        array (
-          'title' => 'Minder fouten, meer kwaliteit',
-          'text' => 'Gestandaardiseerde workflows zorgen voor consistente en foutloze processen.',
-        ),
-        2 => 
-        array (
-          'title' => 'Snellere opvolging',
-          'text' => 'Automatische acties en herinneringen zorgen dat niets tussen wal en schip valt.',
-        ),
-        3 => 
-        array (
-          'title' => 'Inzicht en controle',
-          'text' => 'Realtime overzicht van al je processen, prestaties en besparingen.',
-        ),
-        4 => 
-        array (
-          'title' => 'Schaalbaar en toekomstbestendig',
-          'text' => 'Groei zonder extra personeel. Jouw processen groeien gewoon mee.',
-        ),
-      ),
-    ),
-  ),
-  'ai' => 
-  array (
-    'hero' => 
-    array (
-      'eyebrow' => 'AI-assistent',
-      'title' => 'Een assistent voor je bakkerij die nooit een aanvraag mist',
-      'sub' => 'De assistent neemt telefoon en chat aan, beantwoordt productvragen en zoekt de status van een bestelling op. Dag en nacht, in gewoon Nederlands.',
-      'note' => 'Praat in jouw eigen toon, jij houdt de controle',
-      'usps' => 
-      array (
-        0 => 'Neemt telefoon en chat aan, 24 uur per dag',
-        1 => 'Nooit meer een aanvraag missen buiten kantooruren',
-        2 => 'Beantwoordt vragen over producten en levertijden',
-      ),
-    ),
-    'pains' => 
-    array (
-      0 => 
-      array (
-        'title' => 'Je kunt niet altijd opnemen',
-        'text' => 'Sta je klanten in de winkel te helpen, dan blijft een vraag liggen. De assistent vangt dat op en helpt meteen.',
-      ),
-      1 => 
-      array (
-        'title' => 'Veel vragen, weinig serieuze klussen',
-        'text' => 'De assistent vraagt door, zodat je alleen de kansrijke aanvragen terugbelt.',
-      ),
-      2 => 
-      array (
-        'title' => 'Terugbellen schiet erbij in',
-        'text' => 'Na een drukke dag staat elk terugbelverzoek in je overzicht, met waar het over ging.',
-      ),
-    ),
-    'zkhw' => 
-    array (
-      'label' => 'AI',
-      'title' => 'Zo kan het worden: een assistent die nooit een aanvraag mist',
-      'intro' => 'Een vraag die blijft liggen is een gemiste verkoop. Een slimme assistent neemt telefoon en chat aan, beantwoordt vragen over producten en levertijden, dag en nacht. Bekijk hoe dat werkt op een bakkerij.',
-      'brand' => 'Kruimel',
-      'heroTitle' => 'Altijd bereikbaar, ook als jij aan het werk bent',
-      'urlLabel' => 'jouw-bakkerij.nl',
-      'navCta' => 'Chat',
-      'heroBtn' => 'Stel je vraag',
-      'ctaLabel' => 'Bekijk het AI-voorbeeld',
-      'imageSlot' => 'ai-preview',
-      'galleryLabel' => 'De assistent aan het werk',
-      'gallery' => 
-      array (
-        0 => 
-        array (
-          'slot' => 'gallery1',
-          'price' => 'Chat ✓',
-        ),
-        1 => 
-        array (
-          'slot' => 'gallery2',
-          'price' => 'Orderstatus ✓',
-        ),
-        2 => 
-        array (
-          'slot' => 'gallery3',
-          'price' => 'Vraag ✓',
-        ),
-      ),
-      'bullets' => 
-      array (
-        0 => 
-        array (
-          'title' => 'Neemt op als jij niet kan',
-          'text' => 'Telefoon en chat worden 24/7 beantwoord, ook \'s avonds en in het weekend.',
-        ),
-        1 => 
-        array (
-          'title' => 'Helpt met productvragen',
-          'text' => 'Beantwoordt vragen over producten en zoekt de status van een bestelling op.',
-        ),
-        2 => 
-        array (
-          'title' => 'Filtert serieuze aanvragen',
-          'text' => 'De assistent vraagt door, zodat jij alleen de kansrijke klussen terugbelt.',
-        ),
-        3 => 
-        array (
-          'title' => 'Stuurt een verslag',
-          'text' => 'Na elk gesprek een samenvatting per mail, en alles terug te zien in je portaal.',
-        ),
-      ),
-    ),
-  ),
-);
+return [
+
+    'website' => [
+        'hero' => [
+            'eyebrow' => 'Website voor bakkerijen',
+            'title'   => 'Een website voor je bakkerij die klanten laat vinden, kijken en bestellen',
+            'sub'     => 'Openingstijden, assortiment, taarten en bestellen op één plek. Gevonden worden als iemand in jouw plaats een bakkerij zoekt, en op een telefoon net zo goed als op een laptop.',
+            'note'    => 'Gratis en vrijblijvend een voorbeeld van jóuw site, vaak binnen 1 à 2 dagen',
+            'usps'    => [
+                'Gevonden in Google op "bakkerij" plus jouw plaats',
+                'Openingstijden, vestigingen en assortiment meteen duidelijk',
+                'Bestellen of contact opnemen met één knop, ook op mobiel',
+            ],
+        ],
+        'pains' => [
+            ['title' => 'Alleen een Facebook-pagina, of een site van jaren terug',
+             'text'  => 'Wie je opzoekt vindt oude foto\'s, verkeerde openingstijden of helemaal niets. Dan gaat de klant naar de bakker die wél netjes online staat.'],
+            ['title' => 'Elke dag dezelfde vragen aan de balie',
+             'text'  => 'Tot hoe laat zijn jullie open? Hebben jullie speltbrood? Kan ik een taart bestellen? Dat hoort op je site te staan, dan hoef jij het niet twintig keer per dag te zeggen.'],
+            ['title' => 'Je bent niet vindbaar in Google',
+             'text'  => 'Wie zoekt op "bakkerij" en jouw plaats, moet jou zien. Nu staan daar de supermarkt en een concurrent uit het dorp ernaast.'],
+        ],
+        'zkhw' => [
+            'label'        => 'Website',
+            'title'        => 'Zo kan het worden: je bakkerij 24/7 open om te bekijken',
+            'intro'        => 'Klanten zien je assortiment, foto\'s van je brood en taarten, de openingstijden per vestiging en hoe ze kunnen bestellen. Voordat ze langskomen weten ze al wat je hebt.',
+            'brand'        => 'Kruimel',
+            'heroTitle'    => 'Bekijk het assortiment en bestel of reserveer online',
+            'urlLabel'     => 'jouw-bakkerij.nl',
+            'ctaLabel'     => 'Bekijk het volledige voorbeeld',
+            'imageSlot'    => 'website-preview',
+            'galleryLabel' => 'Een greep uit de winkel',
+            'gallery'      => [['slot' => 'gallery1'], ['slot' => 'gallery2'], ['slot' => 'gallery3']],
+            'bullets'      => [
+                ['title' => 'Gevonden op je eigen plaats',          'text' => 'Teksten en pagina\'s die ingericht zijn op "bakkerij" plus jouw plaats en de dorpen eromheen.'],
+                ['title' => 'Openingstijden die kloppen',          'text' => 'Per vestiging, met feestdagen en vakanties. Jij past ze zelf aan, zonder ons te bellen.'],
+                ['title' => 'Assortiment met foto\'s',              'text' => 'Brood, banket, taarten, lunch. Met prijzen als je dat wilt, en een knop om te bestellen.'],
+                ['title' => 'Taarten en speciale bestellingen',    'text' => 'Een duidelijke pagina voor verjaardagstaarten, bruidstaarten en bestellingen op maat, met wat je moet weten en hoe ver vooruit.'],
+                ['title' => 'Goed op een telefoon',                 'text' => 'De meeste klanten zoeken je op hun telefoon, vaak onderweg. De site is daarop gebouwd: snel, leesbaar, één tik om te bellen.'],
+                ['title' => 'Zelf bijhouden, of wij doen het',      'text' => 'Nieuw seizoensassortiment of een gewijzigde openingstijd zet je zelf erop. Kom je er niet aan toe, dan doen wij het.'],
+            ],
+        ],
+    ],
+
+    'webshop' => [
+        'hero' => [
+            'eyebrow' => 'Webshop voor bakkerijen',
+            'title'   => 'Online bestellen bij je bakkerij, voor afhalen of bezorgen',
+            'sub'     => 'Brood, banket, taarten en belegde broodjes online laten bestellen, met een afhaaldatum en -tijd die past bij je productie. Vooraf betaald, dus geen bestellingen die blijven liggen.',
+            'note'    => 'Gratis en vrijblijvend een voorbeeld van jóuw webshop, vaak binnen 1 à 2 dagen',
+            'usps'    => [
+                'Klant kiest zelf afhaaldatum en -tijd, binnen jouw grenzen',
+                'Vooraf betalen met iDEAL; zakelijke klanten op rekening',
+                'Bestellingen komen binnen op een lijst, niet via briefjes en WhatsApp',
+            ],
+        ],
+        'pains' => [
+            ['title' => 'Taartbestellingen via WhatsApp, mail en briefjes',
+             'text'  => 'Wie heeft wat besteld voor zaterdag, en is er al betaald? Dat hoort niet in drie verschillende apps en een schrift naast de kassa te staan.'],
+            ['title' => 'Bestellingen die niet worden opgehaald',
+             'text'  => 'Een taart die wel is gemaakt en niet is afgehaald, is gewoon verlies. Met vooraf betalen gebeurt dat niet meer.'],
+            ['title' => 'Feestdagen zijn chaos',
+             'text'  => 'Rond Sinterklaas, kerst en Pasen loopt de telefoon over. Een webshop neemt die bestellingen aan terwijl jij bakt, en sluit vanzelf als de productie vol is.'],
+        ],
+        'zkhw' => [
+            'label'        => 'Webshop',
+            'title'        => 'Zo kan het worden: bestellen zonder dat jij aan de telefoon hangt',
+            'intro'        => 'Klanten bestellen brood, gebak of een taart, kiezen wanneer ze het ophalen of laten bezorgen en rekenen af. Jij ziet elke ochtend wat er gemaakt moet worden.',
+            'brand'        => 'Kruimel',
+            'heroTitle'    => 'Bestel online, bezorgd of afgehaald',
+            'urlLabel'     => 'shop.jouw-bakkerij.nl',
+            'navCta'       => 'Winkelmand',
+            'heroBtn'      => 'In winkelmand',
+            'ctaLabel'     => 'Bekijk het webshop-voorbeeld',
+            'imageSlot'    => 'webshop-preview',
+            'galleryLabel' => 'Populair in de winkel',
+            'gallery'      => [['slot' => 'gallery4', 'price' => 'vanaf € 24,95'], ['slot' => 'gallery5', 'price' => 'vanaf € 39'], ['slot' => 'gallery6', 'price' => '€ 25']],
+            'bullets'      => [
+                ['title' => 'Afhaaldatum en -tijd',          'text' => 'De klant kiest een moment dat jij toestaat: minimaal een dag vooruit voor taarten, tot de ochtend zelf voor brood. Per product instelbaar.'],
+                ['title' => 'Vooraf betalen met iDEAL',       'text' => 'Direct afgerekend via Mollie. Vaste zakelijke klanten kunnen op rekening bestellen als jij dat toestaat.'],
+                ['title' => 'Bezorgen in je eigen gebied',    'text' => 'Bezorgen op postcode of afhalen in de winkel. Bezorgkosten en -dagen bepaal jij.'],
+                ['title' => 'Vaste klanten bestellen opnieuw', 'text' => 'Eerdere bestelling herhalen in een paar tikken; gegevens en voorkeuren staan al klaar.'],
+            ],
+        ],
+    ],
+
+    'klantenportaal' => [
+        'hero' => [
+            'eyebrow' => 'Klantenportaal voor zakelijke klanten',
+            'title'   => 'Klantenportaal voor je bakkerij: zakelijke klanten bestellen zelf',
+            'sub'     => 'Zonder bellen, mailen of WhatsApp: horeca, kantoren, lunchrooms en andere vaste klanten loggen in, zien hun vaste bestelling, passen aantallen aan, bestellen extra en vinden hun facturen. Jij typt niets meer over.',
+            'note'    => 'Gratis en vrijblijvend een voorbeeld van jóuw portaal, vaak binnen 1 à 2 dagen',
+            'usps'    => [
+                'Vaste bestelling bekijken, aanpassen en herhalen',
+                'Facturen en bestelhistorie op één plek',
+                'Eigen assortiment en prijzen per klant, als jij dat wilt',
+            ],
+        ],
+        'pains' => [
+            ['title' => 'Het restaurant belt elke avond de bestelling door',
+             'text'  => 'Zes stokbroden, twintig bolletjes, morgen twee extra. Aan de telefoon, half verstaanbaar, en jij schrijft het op een briefje.'],
+            ['title' => 'Elke wijziging is een mailtje',
+             'text'  => 'Vrijdag geen levering, maandag dubbel. Dat komt per mail, WhatsApp of via een medewerker, en niet altijd bij degene die de productielijst maakt.'],
+            ['title' => 'Facturen zoeken kost tijd',
+             'text'  => 'De zakelijke klant belt om een factuur van twee maanden terug. Die hoort hij zelf te kunnen vinden.'],
+        ],
+        'zkhw' => [
+            'label'        => 'Klantenportaal',
+            'title'        => 'Zo kan het worden: je zakelijke klanten regelen het zelf',
+            'intro'        => 'Elke zakelijke klant heeft een eigen inlog. Daar staat de vaste bestelling, daar past hij aantallen aan of bestelt extra, en daar staan zijn facturen. Wat hij invoert, staat bij jou op de lijst.',
+            'brand'        => 'Kruimel',
+            'heroTitle'    => 'Uw vaste bestelling, aanpassen en herhalen',
+            'urlLabel'     => 'mijn.jouw-bakkerij.nl',
+            'navCta'       => 'Inloggen',
+            'heroBtn'      => 'Mijn bestellingen',
+            'ctaLabel'     => 'Bekijk het portaal-voorbeeld',
+            'imageSlot'    => 'klantenportaal-preview',
+            'galleryLabel' => 'Wat een zakelijke klant ziet',
+            'gallery'      => [['slot' => 'gallery1'], ['slot' => 'gallery2'], ['slot' => 'gallery3']],
+            'bullets'      => [
+                ['title' => 'Vaste bestelling',              'text' => 'De standaardbestelling per leverdag staat klaar. Aanpassen tot een tijdstip dat jij bepaalt.'],
+                ['title' => 'Extra bestellen of overslaan',  'text' => 'Een feest op het kantoor of een week dicht: de klant regelt het zelf, jij ziet het op de lijst.'],
+                ['title' => 'Aflevermoment',                 'text' => 'De klant ziet wanneer er geleverd wordt en kan een afwijkende dag vragen.'],
+                ['title' => 'Facturen en historie',          'text' => 'Alle facturen en eerdere bestellingen om te bekijken en te downloaden.'],
+                ['title' => 'Eigen prijzen per klant',       'text' => 'Zakelijke prijzen of een eigen assortiment per klant, als jouw administratie dat zo heeft ingericht.'],
+                ['title' => 'Maatwerk op jouw proces',       'text' => 'Hoe het portaal werkt hangt af van hoe jij levert en factureert. Dat richten we samen in; het is geen standaardpakket.'],
+            ],
+        ],
+    ],
+
+    'automatisering' => [
+        'hero' => [
+            'eyebrow' => 'Automatisering voor bakkerijen',
+            'title'   => 'Minder overtypen, minder fouten, minder terugkerend werk',
+            'sub'     => 'Een bestelling komt binnen en staat vanzelf op de productielijst, bij de juiste vestiging en in de administratie. Niet drie keer overtypen, niet vergeten.',
+            'note'    => 'We beginnen met wat jou nu de meeste tijd kost; de rest komt later',
+            'usps'    => [
+                'Webshopbestelling → betaling → bevestiging → productielijst',
+                'Zakelijke bestelling → factuur, zonder handwerk',
+                'Bestelling voor morgen → pick- of afhaallijst per vestiging',
+            ],
+        ],
+        'pains' => [
+            ['title' => 'Dezelfde bestelling drie keer overgetypt',
+             'text'  => 'Eén keer uit de mail, één keer op de productielijst, één keer in de boekhouding. Elke keer kan er een nul te veel of een datum verkeerd in.'],
+            ['title' => 'De ochtendlijst klopt niet',
+             'text'  => 'Een bestelling van gisteravond laat staat er niet op, of staat bij de verkeerde winkel. Dat merk je pas als de klant voor de balie staat.'],
+            ['title' => 'Facturen achteraf inkloppen',
+             'text'  => 'Aan het eind van de week alle zakelijke leveringen alsnog in de administratie zetten. Werk dat een systeem beter en op tijd kan doen.'],
+        ],
+        'zkhw' => [
+            'label'        => 'Automatisering',
+            'title'        => 'Zo kan het worden: de bestelling loopt vanzelf door',
+            'intro'        => 'Een bestelling komt binnen via je webshop, portaal of telefoon en loopt door naar bevestiging, productie, aflevering en factuur. Jij kijkt op één lijst wat er vandaag gemaakt moet worden.',
+            'brand'        => 'Kruimel',
+            'heroTitle'    => 'Bestellingen, productie en facturen in één overzicht',
+            'urlLabel'     => 'app.jouw-bakkerij.nl',
+            'navCta'       => 'Dashboard',
+            'heroBtn'      => 'Bekijk demo',
+            'ctaLabel'     => 'Bekijk het automatisering-voorbeeld',
+            'imageSlot'    => 'automatisering-preview',
+            'galleryLabel' => 'Wat er automatisch loopt',
+            'gallery'      => [['slot' => 'gallery4', 'price' => 'Productielijst ✓'], ['slot' => 'gallery5', 'price' => 'Factuur ✓'], ['slot' => 'gallery6', 'price' => 'Bevestiging ✓']],
+            'bullets'      => [
+                ['title' => 'Van bestelling naar productielijst', 'text' => 'Alles wat voor morgen besteld is, per product en per vestiging, elke ochtend klaar. Ook wat via de telefoon is aangenomen.'],
+                ['title' => 'Bevestiging naar de klant',           'text' => 'Bestelling ontvangen, betaling gelukt, staat klaar om af te halen: de klant krijgt vanzelf bericht, jij belt niet.'],
+                ['title' => 'Zakelijke bestelling wordt factuur',  'text' => 'Leveringen aan vaste klanten worden per week of per maand gebundeld tot een factuur, zonder dat iemand ze intikt.'],
+                ['title' => 'Klantgegevens op één plek',           'text' => 'Nieuwe klanten uit de webshop en het portaal komen in je administratie terecht; geen dubbele adressen.'],
+                ['title' => 'Koppelingen met wat je al gebruikt',  'text' => 'Betalingen via Mollie werken standaard. Voor je kassasysteem of boekhouding (zoals Exact Online, e-Boekhouden of Moneybird) bekijken we wat er mogelijk is; dat verschilt per pakket.'],
+            ],
+        ],
+    ],
+
+    // De ai-facet is de korte pagina in het groeipad. De volledige uitleg, voorbeeldgesprekken,
+    // prijs en demo staan op /ai-telefonie-bakkerij (config/bakkerij_telefonie.php).
+    'ai' => [
+        'hero' => [
+            'eyebrow' => 'AI-telefonie',
+            'title'   => 'De telefoon wordt opgenomen, ook als jij in de bakkerij staat',
+            'sub'     => 'Een telefonische assistent die openingstijden geeft, vragen over je assortiment en bestellen beantwoordt, een terugbelverzoek vastlegt en doorverbindt als het moet. Ook buiten openingstijden.',
+            'note'    => 'Werkt naast je huidige nummer; je hoeft niets te veranderen aan je website',
+            'usps'    => [
+                'Neemt op tijdens de ochtenddrukte en buiten openingstijden',
+                'Beantwoordt de vragen die je elke dag krijgt',
+                'Na elk gesprek een samenvatting per mail',
+            ],
+        ],
+        'pains' => [
+            ['title' => 'De telefoon gaat als je met deeg in je handen staat',
+             'text'  => 'Zaterdagochtend, rij tot de deur, en de telefoon blijft gaan. Wie niet wordt opgenomen belt de volgende bakker.'],
+            ['title' => 'Steeds dezelfde vragen',
+             'text'  => '"Zijn jullie vandaag open?", "Hebben jullie glutenvrij brood?", "Tot hoe laat kan ik ophalen?" Vragen die een assistent net zo goed kan beantwoorden.'],
+            ['title' => 'Terugbellen schiet erbij in',
+             'text'  => 'Na sluitingstijd staan er drie gemiste oproepen zonder naam. De assistent noteert wie belde en waarover, zodat jij weet wie je terugbelt.'],
+        ],
+        'zkhw' => [
+            'label'        => 'AI-telefonie',
+            'title'        => 'Zo kan het worden: opgenomen, beantwoord, samengevat',
+            'intro'        => 'De assistent neemt op met de naam van je bakkerij, beantwoordt praktische vragen uit jouw eigen gegevens, legt een terugbelverzoek of bestelverzoek vast met naam en nummer, en verbindt door als een medewerker nodig is. Jij krijgt na elk gesprek een samenvatting.',
+            'brand'        => 'Kruimel',
+            'heroTitle'    => 'Goedemorgen, bakkerij Kruimel. Waarmee kan ik u helpen?',
+            'urlLabel'     => 'jouw-bakkerij.nl',
+            'navCta'       => 'Bel ons',
+            'heroBtn'      => 'Terugbelverzoek',
+            'ctaLabel'     => 'Alles over AI-telefonie voor bakkerijen',
+            'ctaUrl'       => 'ai-telefonie-bakkerij',
+            'imageSlot'    => 'ai-preview',
+            'galleryLabel' => 'Wat de assistent afhandelt',
+            'gallery'      => [['slot' => 'gallery1', 'price' => 'Openingstijden ✓'], ['slot' => 'gallery2', 'price' => 'Terugbelverzoek ✓'], ['slot' => 'gallery3', 'price' => 'Doorverbinden ✓']],
+            'bullets'      => [
+                ['title' => 'Neemt op als jij niet kunt',      'text' => 'Tijdens de drukte, tijdens het bakken en buiten openingstijden. In het Nederlands; Engels kan erbij als je dat wilt.'],
+                ['title' => 'Antwoordt uit jouw gegevens',      'text' => 'Openingstijden, vestigingen, assortiment, bestellen en afhalen: wat jij aanlevert, kan de assistent vertellen. Weet hij iets niet, dan zegt hij dat en legt hij een terugbelverzoek vast.'],
+                ['title' => 'Legt vast wie belde en waarom',    'text' => 'Naam, telefoonnummer en de vraag, herhaald ter controle. Een bestelverzoek voor een taart komt zo netjes bij jou terecht.'],
+                ['title' => 'Verbindt door als het moet',       'text' => 'Tijdens openingstijden kan de assistent doorverbinden naar de winkel. Na elk gesprek krijg jij een samenvatting per mail.'],
+            ],
+        ],
+    ],
+];

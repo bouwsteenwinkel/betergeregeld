@@ -86,6 +86,8 @@ $channelRoutes = function () use ($facetKeys) {
     // conversiemeting). De booking-widget redirect hierheen; zie partials/booking.
     Route::get('/afspraak-bevestigd', [ChannelSiteController::class, 'appointmentConfirmed']);
     Route::get('/diensten', [ChannelSiteController::class, 'services']);
+    // AI-telefonie als zelfstandige dienst, alleen voor kanalen in config/channel_telefonie.php.
+    Route::get('/ai-telefonie-{branche}', [ChannelSiteController::class, 'telefonie'])->where('branche', '[a-z0-9-]+');
     Route::get('/groeidiamant', [ChannelSiteController::class, 'groeidiamant']);
     Route::get('/prijzen', [ChannelSiteController::class, 'pricing']);
     Route::get('/werkwijze', [ChannelSiteController::class, 'werkwijze']);

@@ -18,7 +18,9 @@
     $galleryLabel = $galleryLabel ?? null;   // bv. "Recente badkamers", toont de esthetische kant
     // Thumbnails: string (url) of ['img' => url, 'price' => '€ ...'] voor shop-tegels.
     $gallery   = $gallery   ?? [];
-    $href      = $site->url('voorbeeld/' . $facet);
+    // ctaUrl: optioneel eigen doel (pad binnen de site). Bakkerij-ai wijst naar de
+    // telefonie-landingspagina in plaats van naar de demolaag (15-09-2026).
+    $href      = ! empty($ctaUrl ?? null) ? $site->url($ctaUrl) : $site->url('voorbeeld/' . $facet);
     $img       = $site->image('hero');
     // Optionele, kant-en-klare voorbeeld-afbeelding (bv. een echte webshop-mockup
     // mét eigen browser-frame). Staat die er, dan tonen we die i.p.v. de CSS-mockup.

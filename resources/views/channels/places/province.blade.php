@@ -5,18 +5,24 @@
 	$trade  = $t['trade'] ?? 'bedrijf';
 	$trades = $t['trades'] ?? 'bedrijven';
 	$provPlaces = (array) ($provPlaces ?? []);
+	// Per branche een ondernemersgerichte titel/kop (config channel_places.provincie.<branche>);
+	// "Bakkerij in Drenthe" las als een bedrijvengids en trok consumenten (15-09-2026).
+	$provCfg   = (array) config('channel_places.provincie.' . $site->brancheKey(), []);
+	$provTitle = strtr((string) ($provCfg['title'] ?? (ucfirst($trade) . ' in :region')), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
+	$provH1    = strtr((string) ($provCfg['h1'] ?? (ucfirst($trade) . ' in :region')), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
+	$provLead  = strtr((string) ($provCfg['lead'] ?? ('Wij helpen :trades in heel :region aan een website die gevonden wordt en aanvragen oplevert. Kies je plaats voor de details, of vraag direct een gratis voorbeeld aan.')), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
 @endphp
 @extends('channels.layout')
 
-@section('title', ucfirst($trade) . ' in ' . $provName)
-@section('description', 'Wij helpen ' . $trades . ' in heel ' . $provName . ' online groeien. Kies je plaats en vraag een gratis voorbeeld van jouw bedrijf aan.')
+@section('title', $provTitle)
+@section('description', strtr((string) ($provCfg['description'] ?? 'Wij helpen :trades in heel :region online groeien. Kies je plaats en vraag een gratis voorbeeld van jouw bedrijf aan.'), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]))
 
 @section('content')
 	<section class="hero">
 		<div class="wrap">
 			<span class="eyebrow">{{ $provName }}</span>
-			<h1>{{ ucfirst($trade) }} in {{ $provName }}</h1>
-			<p class="lead" style="max-width:60ch">Wij helpen {{ $trades }} in heel {{ $provName }} aan een website die gevonden wordt en aanvragen oplevert. Kies je plaats voor de details, of vraag direct een gratis voorbeeld aan.</p>
+			<h1>{{ $provH1 }}</h1>
+			<p class="lead" style="max-width:60ch">{{ $provLead }}</p>
 			<a href="#contact" class="btn">Gratis voorbeeld aanvragen</a>
 		</div>
 	</section>

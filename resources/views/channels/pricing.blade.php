@@ -1,6 +1,10 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $p        = (array) config('channel_pricing', []);
+    // Per branche eigen pakketteksten (config/channel_pricing_per_branche.php); generiek als er niets is.
+    if ($eigenP = (array) config('channel_pricing_per_branche.' . $site->brancheKey(), [])) {
+        $p = array_replace_recursive($p, $eigenP);
+    }
     $packages = (array) ($p['packages'] ?? []);
     // Branche-tokens (zelfde bron als de plaatsen-content), zodat deze pagina in de
     // taal van de ondernemer staat i.p.v. op alle 17 sites woordelijk gelijk te zijn.
@@ -64,6 +68,18 @@
             @if (!empty($p['note']))<p class="muted" style="font-size:.88rem;margin-top:1.6rem;max-width:70ch">{{ $p['note'] }}</p>@endif
         </div>
     </section>
+
+    @if (($telCfg = config('channel_telefonie.' . $site->key)) && ($telPrijs = (array) config($telCfg . '.prijs', [])))
+        {{-- AI-telefonie los af te nemen; prijs uit de telefonie-config van dit kanaal (15-09-2026). --}}
+        <section style="background:var(--c-tint,var(--c-surface))">
+            <div class="wrap">
+                <span class="kicker"><span class="kicker-line"></span> Los af te nemen</span>
+                <h2>AI-telefonie: vanaf {{ $telPrijs['vanaf'] ?? '' }} {{ $telPrijs['periode'] ?? '' }}</h2>
+                <p class="lead" style="max-width:60ch">Een telefonische assistent die opneemt als jij niet kunt, ook zonder website of webshop van ons. Inbegrepen: {{ $telPrijs['inbegrepen'] ?? '' }}. Daarboven {{ $telPrijs['extra'] ?? '' }}; eenmalig {{ $telPrijs['eenmalig'] ?? '' }}. {{ ucfirst($telPrijs['opzeg'] ?? '') }}.</p>
+                <a href="{{ $site->url('ai-telefonie-' . $site->key) }}" class="btn btn-ghost">Bekijk AI-telefonie voor {{ $t['trades'] ?? 'bedrijven' }} →</a>
+            </div>
+        </section>
+    @endif
 
     {{-- Echte marktcijfers voor deze branche: geeft de prijs een maatstaf --}}
     @include('channels.partials.marktcijfers', ['site' => $site, 'variant' => 'prijzen'])

@@ -148,6 +148,20 @@ class ChannelSiteController extends Controller
         return view('channels.services', ['site' => $this->site()]);
     }
 
+    /**
+     * /ai-telefonie-{branche}: de AI-telefonie-landingspagina van dit kanaal (15-09-2026).
+     * Alleen voor kanalen met een configbestand in config/channel_telefonie.php, en alleen
+     * onder de eigen key, zodat /ai-telefonie-kapper op de bakkerijsite een 404 is.
+     */
+    public function telefonie(Request $request): View
+    {
+        $site = $this->site();
+        $cfg  = config('channel_telefonie.' . $site->key);
+        abort_if(! $cfg || (string) $request->route('branche') !== $site->key, 404);
+
+        return view('channels._landing.' . $site->key . '-telefonie', ['site' => $site]);
+    }
+
     public function groeidiamant(): View
     {
         return view('channels.groeidiamant', ['site' => $this->site()]);
@@ -358,6 +372,9 @@ class ChannelSiteController extends Controller
         // (/voorbeeld-maken staat er bewust NIET in: die is noindex,nofollow.)
         $paths = ['', 'over-ons', 'contact', 'diensten', 'groeidiamant', 'prijzen', 'werkwijze', 'cases',
             'veelgestelde-vragen', 'vergelijken', 'plaatsen', 'blog', 'afspraak'];
+        if (config('channel_telefonie.' . $site->key)) {
+            $paths[] = 'ai-telefonie-' . $site->key;
+        }
         foreach (array_keys((array) config('groeidiamant.facets', [])) as $facet) {
             $paths[] = $facet;
         }
@@ -448,6 +465,9 @@ class ChannelSiteController extends Controller
         $md[] = '## Diensten';
         foreach ($facets as $key => $f) {
             $md[] = "- [{$f['label']}]({$base}/{$key}): " . ($f['tagline'] ?? '');
+        }
+        if (config('channel_telefonie.' . $site->key)) {
+            $md[] = "- [AI-telefonie]({$base}/ai-telefonie-{$site->key}): een telefonische assistent die opneemt, vragen beantwoordt, terugbel- en bestelverzoeken vastlegt en doorverbindt";
         }
         $md[] = '';
         $md[] = '## Meer informatie';

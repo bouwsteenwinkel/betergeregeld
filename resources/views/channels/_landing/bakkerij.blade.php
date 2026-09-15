@@ -32,7 +32,15 @@
                     @if (! empty($hero['eyebrow']))<span class="eyebrow">{{ $hero['eyebrow'] }}</span>@endif
                     <h1>{{ $hero['title'] ?? $fLabel }}</h1>
                     @if (! empty($hero['sub']))<p class="lead">{{ $hero['sub'] }}</p>@endif
-                    <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
+                    @if ($facet === 'ai')
+                        {{-- AI-telefonie: geen "gratis voorbeeld" (dat is een website-mockup) maar de landingspagina en een demo. --}}
+                        <div style="display:flex;flex-wrap:wrap;gap:.7rem">
+                            <a href="{{ $site->url('ai-telefonie-bakkerij') }}" class="btn">Alles over AI-telefonie voor bakkerijen</a>
+                            <a href="{{ $site->url('afspraak') }}?onderwerp=ai-telefonie" class="btn btn-ghost">Vraag een demo aan</a>
+                        </div>
+                    @else
+                        <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
+                    @endif
                     @if (! empty($hero['note']))<p class="muted" style="margin-top:.8rem;font-size:.9rem">{{ $hero['note'] }}</p>@endif
                     @if (! empty($hero['usps']))
                         <ul class="hero-usps">
@@ -78,8 +86,8 @@
         'facets'  => $facets,
         'facet'   => $facet,
         'kicker'  => 'De Groeidiamant',
-        'title'   => 'Je site groeit met je mee',
-        'lead'    => 'Begin waar je nu staat, je hoeft nooit opnieuw te beginnen. Elke stap bouwt voort op de vorige, in je eigen tempo.',
+        'title'   => 'Begin waar jouw bakkerij het meeste aan heeft',
+        'lead'    => 'Website, webshop, klantenportaal, automatisering en AI-telefonie sluiten op elkaar aan, maar je hoeft ze niet in deze volgorde te doen. Elke dienst is ook los af te nemen; later uitbreiden kan altijd zonder opnieuw te beginnen.',
     ])
 
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe dit voor jou zou werken?'])

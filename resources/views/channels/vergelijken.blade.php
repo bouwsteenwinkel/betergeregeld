@@ -16,7 +16,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'Zelf een website bouwen of laten maken voor ' . ($t['trades'] ?? 'ondernemers') . '?')
+@section('title', config('channel_vergelijken_titel.' . $site->brancheKey(), 'Zelf een website bouwen of laten maken voor ' . ($t['trades'] ?? 'ondernemers') . '?'))
 @section('description', 'Zelf bouwen met een website-bouwer of je website laten maken? Een eerlijke vergelijking voor je ' . $trade . '.')
 
 @section('content')

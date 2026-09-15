@@ -1,6 +1,10 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $cfg      = (array) config('channel_services', []);
+    // Per branche een eigen versie (config/channel_services_per_branche.php); generiek als er niets is.
+    if ($eigen = (array) config('channel_services_per_branche.' . $site->brancheKey(), [])) {
+        $cfg = array_replace_recursive($cfg, $eigen);
+    }
     $services = (array) ($cfg['services'] ?? []);
 
     // Trade-tokens (zelfde bron als de plaatsen-content) zodat de teksten per niche kloppen.
@@ -10,7 +14,7 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', $r('Wat we bouwen voor :trades: website, webshop, portaal, automatisering en AI'))
+@section('title', $r($cfg['title'] ?? 'Wat we bouwen voor :trades: website, webshop, portaal, automatisering en AI'))
 @section('description', $r($cfg['intro'] ?? 'Alles wat we voor je bouwen, van een professionele website tot slimme automatisering en AI.'))
 
 @push('head')
@@ -127,7 +131,7 @@
                                 </div>
                             @endif
                             <p style="margin:1.3rem 0 0">
-                                <a href="{{ $site->url($key) }}" class="btn btn-ghost">Bekijk {{ strtolower($s['label'] ?? $key) }} in detail →</a>
+                                <a href="{{ $site->url($s['url'] ?? $key) }}" class="btn btn-ghost">Bekijk {{ strtolower($s['label'] ?? $key) }} in detail →</a>
                             </p>
                         </div>
                     </details>

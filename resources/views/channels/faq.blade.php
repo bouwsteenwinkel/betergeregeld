@@ -4,6 +4,10 @@
     $map = \App\Support\ChannelTokens::map((array) $site->get('places', []), $site->brancheKey());
     $r = fn ($s) => strtr((string) $s, $map);
     $items = array_map(fn ($x) => ['q' => $r($x['q'] ?? ''), 'a' => $r($x['a'] ?? '')], (array) config('channel_faq.items', []));
+    // Per branche extra vragen (config/channel_faq_per_branche.php), bv. webshop en telefonie bij bakkerij.
+    foreach ((array) config('channel_faq_per_branche.' . $site->brancheKey(), []) as $x) {
+        $items[] = ['q' => $r($x['q'] ?? ''), 'a' => $r($x['a'] ?? '')];
+    }
 
     $ld = ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => array_map(fn ($f) => [
         '@type' => 'Question', 'name' => $f['q'],

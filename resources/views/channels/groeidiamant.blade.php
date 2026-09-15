@@ -12,6 +12,8 @@
         'automatisering' => 'Offertes, facturen en planning die zichzelf doen. Koppelingen tussen je website, agenda en boekhouding, zodat je niets dubbel invoert.',
         'ai'             => 'Een slimme assistent die telefoon en chat aanneemt, aanvragen filtert en je offerte voorbereidt. Altijd bereikbaar, ook als jij aan het werk bent.',
     ];
+    // Per branche eigen uitleg (config/channel_groeidiamant_per_branche.php); generiek als er niets is.
+    $uitleg = array_replace($uitleg, (array) config('channel_groeidiamant_per_branche.' . $site->brancheKey(), []));
 @endphp
 @extends('channels.layout')
 
