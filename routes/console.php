@@ -37,6 +37,13 @@ Schedule::command('previews:send-reminders')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Weekoverzicht van échte aanvragen per bron (15-09-2026): zonder dit moest het antwoord
+// op "wat komt er binnen?" met de hand uit drie tabellen worden gereconstrueerd.
+Schedule::command('aanvragen:overzicht --weken=6 --mail')
+    ->mondays()->at('08:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Afspraak-herinneringen (2 dagen vooraf en de ochtend van de afspraak) tegen no-show
 // op het gratis gesprek.
 // Bewust NIET dailyAt zoals de previews-reminder hierboven: die stuurt "ergens op
