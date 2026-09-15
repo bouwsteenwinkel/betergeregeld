@@ -113,7 +113,7 @@
 		body{font-family:var(--font);color:var(--c-ink);background:var(--c-bg);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
 		a{color:inherit;text-decoration:none}
 		img{max-width:100%;display:block}
-		.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+		.wrap{max-width:var(--wrap-max,1140px);margin:0 auto;padding:0 22px}
 		/* ankers niet onder de sticky nav laten verdwijnen */
 		section[id],.scroll-anchor{scroll-margin-top:88px}
 		/* toegankelijkheid: skip-link, zichtbare focus, reduced-motion */

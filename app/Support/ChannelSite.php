@@ -395,6 +395,9 @@ class ChannelSite
             '--font'         => $t['font'],
             '--font-display' => $t['font_display'] ?: $t['font'],
             '--radius'      => $t['radius'],
+            // Contentbreedte (.wrap). Standaard 1140px; per kanaal in theme.wrap_max, bv. "1400px"
+            // (bakkerij, 15-09-2026: de breedte die we bij de meeste projecten aanhouden).
+            '--wrap-max'    => $t['wrap_max'] ?? '1140px',
         ];
         return implode(';', array_map(fn ($k, $v) => "$k:$v", array_keys($map), $map));
     }
