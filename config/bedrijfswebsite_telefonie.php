@@ -26,6 +26,7 @@ return [
         'Onderbreek hem midden in een zin: hij stopt en luistert.',
     ],
     'kantoor_nummer' => '088-2545101',
+    'infoblad'       => 'garage',           // config/telefonie_infobladen.php, knop naast het demonummer
 
     'woorden' => [
         'bedrijf'   => 'je bedrijf',

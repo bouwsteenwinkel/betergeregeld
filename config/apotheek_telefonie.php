@@ -17,6 +17,7 @@
 return [
     'demo_nummer'    => '',
     'kantoor_nummer' => '088-2545101',
+    'infoblad'         => 'apotheek',         // config/telefonie_infobladen.php, knop naast het demonummer
 
     'woorden' => [
         'bedrijf'   => 'je apotheek',

@@ -30,6 +30,7 @@ return [
         'Vraag of hij de auto morgen kan inplannen: hij noteert het als verzoek, de garage bevestigt.',
     ],
     'kantoor_nummer' => '088-2545101',
+    'infoblad'       => 'garage',           // config/telefonie_infobladen.php, knop naast het demonummer
 
     'woorden' => [
         'bedrijf'   => 'je garage',

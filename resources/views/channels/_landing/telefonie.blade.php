@@ -15,6 +15,8 @@
     $heroImg  = $site->image('facet-ai') ?: $site->image('ai-preview');
     $heroSet  = $site->image('facet-ai') ? $site->imageSrcset('facet-ai') : $site->imageSrcset('ai-preview');
     $pad      = 'ai-telefonie-' . $site->key;
+    // Infoblad (PDF) bij de demo: alleen als er een demonummer én een blad is.
+    $infoblad = ($demo && ! empty($c['infoblad'])) ? $site->url($pad . '/infoblad.pdf') : '';
 
     $faqLd = [
         '@context' => 'https://schema.org',
@@ -76,6 +78,9 @@
                             <a href="{{ $contact }}" class="btn btn-ghost">Stel een vraag</a>
                         @endif
                     </div>
+                    @if ($infoblad)
+                        @include('channels.partials.telefonie-infoblad-knop', ['url' => $infoblad])
+                    @endif
                     @if ($demo && ! empty($c['demo_noot']))
                         <p class="muted" style="font-size:.9rem">{{ $c['demo_noot'] }}</p>
                     @endif
@@ -152,7 +157,10 @@
                         </ul>
                     </div>
                 @endif
-                <p style="margin-top:1.4rem"><a href="tel:{{ $demoTel }}" class="btn">Bel de demo: {{ $demo }}</a></p>
+                <div style="margin-top:1.4rem;display:flex;flex-wrap:wrap;gap:1rem 1.4rem;align-items:center">
+                    <a href="tel:{{ $demoTel }}" class="btn">Bel de demo: {{ $demo }}</a>
+                    @if ($infoblad)@include('channels.partials.telefonie-infoblad-knop', ['url' => $infoblad, 'inline' => true])@endif
+                </div>
             </div>
         </section>
     @endif

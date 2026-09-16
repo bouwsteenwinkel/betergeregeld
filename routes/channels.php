@@ -88,6 +88,8 @@ $channelRoutes = function () use ($facetKeys) {
     Route::get('/diensten', [ChannelSiteController::class, 'services']);
     // AI-telefonie als zelfstandige dienst, alleen voor kanalen in config/channel_telefonie.php.
     Route::get('/ai-telefonie-{branche}', [ChannelSiteController::class, 'telefonie'])->where('branche', '[a-z0-9-]+');
+    // Infoblad (PDF) bij de openbare demo van dit kanaal; 404 zonder 'infoblad' in de telefonieconfig.
+    Route::get('/ai-telefonie-{branche}/infoblad.pdf', [\App\Http\Controllers\ChannelSite\TelefonieInfobladController::class, 'download'])->where('branche', '[a-z0-9-]+');
     Route::get('/groeidiamant', [ChannelSiteController::class, 'groeidiamant']);
     Route::get('/prijzen', [ChannelSiteController::class, 'pricing']);
     Route::get('/werkwijze', [ChannelSiteController::class, 'werkwijze']);

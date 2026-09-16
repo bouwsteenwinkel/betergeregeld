@@ -42,6 +42,7 @@ return [
         'Bel buiten openingstijden: hij neemt de bestelling gewoon aan.',
     ],
     'kantoor_nummer'   => '088-2545101',
+    'infoblad'         => 'bakkerij',         // config/telefonie_infobladen.php, knop naast het demonummer
 
     'woorden' => [
         'bedrijf'   => 'je bakkerij',

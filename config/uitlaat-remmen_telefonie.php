@@ -27,6 +27,7 @@ return [
         'Bel buiten openingstijden: hij legt je verzoek vast en verbindt niet door.',
     ],
     'kantoor_nummer' => '088-2545101',
+    'infoblad'       => 'garage',           // config/telefonie_infobladen.php, knop naast het demonummer
 
     'woorden' => [
         'bedrijf'   => 'je uitlaat- en remmenspecialist',
