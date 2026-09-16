@@ -17,6 +17,7 @@
     $pad      = 'ai-telefonie-' . $site->key;
     // Infoblad (PDF) bij de demo: alleen als er een demonummer én een blad is.
     $infoblad = ($demo && ! empty($c['infoblad'])) ? $site->url($pad . '/infoblad.pdf') : '';
+    $blad     = $infoblad ? (array) config('telefonie_infobladen.' . $c['infoblad'], []) : [];
 
     $faqLd = [
         '@context' => 'https://schema.org',
@@ -276,5 +277,10 @@
             @if ($kantoor)<p class="muted" style="margin-top:1rem">Liever eerst iemand spreken? Bel {{ $kantoor }}.</p>@endif
         </div>
     </section>
+
+    {{-- Het spiekbriefje als paneel op de pagina (lade rechts / sheet onderaan); de knoppen openen dit. --}}
+    @if ($infoblad && $blad)
+        @include('channels.partials.telefonie-infoblad-paneel', ['blad' => $blad, 'url' => $infoblad, 'demo' => $demo, 'demoTel' => $demoTel])
+    @endif
 
 @endsection

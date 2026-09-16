@@ -1,18 +1,18 @@
 @php
     // Opvallende "spiekbriefje"-knop naar het infoblad (PDF) bij een telefoniedemo
     // (16-09-2026). Bewust geen rechte knop: een scheef geplakt kaartje met een
-    // omgevouwen hoek, in de CTA-kleur van het kanaal, met een lichte wiebel bij hover
-    // (uit bij verminderde beweging). Verwacht $url; $inline = true zet hem naast een
-    // knop in plaats van eronder.
+    // omgevouwen hoek, met een lichte wiebel (uit bij verminderde beweging). Opent het
+    // paneel uit telefonie-infoblad-paneel; zonder JavaScript opent de href de PDF.
+    // Verwacht $url; $inline = true zet hem naast een knop in plaats van eronder.
     $inline = $inline ?? false;
 @endphp
-<a href="{{ $url }}" class="spiek {{ $inline ? 'spiek-inline' : '' }}" target="_blank" rel="noopener">
+<a href="{{ $url }}" class="spiek {{ $inline ? 'spiek-inline' : '' }}">
     <span class="spiek-ico" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
     </span>
     <span class="spiek-tekst">
         <strong>Spiekbriefje voor de demo</strong>
-        <span>Wat je kunt vragen en welke gegevens je mag gebruiken · PDF, 2 pagina's</span>
+        <span>Wat je kunt vragen en welke gegevens je mag gebruiken</span>
     </span>
 </a>
 @once
