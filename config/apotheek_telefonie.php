@@ -35,6 +35,28 @@ return [
     'kantoor_nummer' => '088-2545101',
     'infoblad'         => 'apotheek',         // config/telefonie_infobladen.php, knop naast het demonummer
 
+    // CTA op de homepage (channels/partials/telefonie-home-cta): een telefoonscherm waarop
+    // de assistent opneemt en dit gesprek zich uittikt. 'b' = beller, 'a' = assistent.
+    'home_cta' => [
+        'kicker'      => 'Nieuw: AI-telefonie voor apotheken',
+        'kop'         => 'De telefoon gaat. Niemand hoeft van de balie weg.',
+        'lead'        => 'Een digitale assistent die opneemt met de naam van je apotheek, eerst geboortedatum en postcode vraagt, zegt of het recept klaarligt en een herhaalverzoek noteert. Bij een vraag over dosering stopt hij en gaat het naar de apotheker. Bel de demo en hoor het zelf.',
+        'bel_label'   => 'Bel de demo',
+        'meer_label'  => 'Zo werkt het voor apotheken',
+        'noot'        => 'Apotheek De Linde bestaat niet; je sluit niets af door te bellen. Vanaf € 89 per maand.',
+        'toestel_naam'=> 'Apotheek De Linde',
+        'toestel_sub' => 'Inkomend gesprek · de assistent neemt op',
+        'tijd'        => '08:12',
+        'gesprek' => [
+            ['b', 'Ligt mijn recept al klaar?'],
+            ['a', 'Dat kijk ik na. Mag ik uw geboortedatum?'],
+            ['b', 'Twee november 1978.'],
+            ['a', 'En uw postcode?'],
+            ['b', '3823 CD.'],
+            ['a', 'Dank u, meneer Yilmaz. Uw recept ligt klaar in de afhaalkluis.'],
+        ],
+    ],
+
     'woorden' => [
         'bedrijf'   => 'je apotheek',
         'bedrijven' => 'apotheken',
