@@ -47,6 +47,14 @@ return [
         'toestel_naam'=> 'Apotheek De Linde',
         'toestel_sub' => 'Inkomend gesprek · de assistent neemt op',
         'tijd'        => '08:12',
+        // Luisterstrook onder de band: de ingesproken demo op telefonie.betergeregeld.com.
+        'luister' => [
+            'url'          => 'https://telefonie.betergeregeld.com/demo/apotheek',
+            'titel'        => 'Liever eerst luisteren?',
+            'sub'          => 'Vijf ingesproken gesprekken met Apotheek De Linde, naast het portaal dat live meebeweegt',
+            'duur'         => '± 6 min',
+            'hoofdstukken' => ['Herhaalrecept en bezorgen', 'Klaarliggen en eigen risico', 'Een bijwerking', 'Inschrijven en de dienstapotheek', 'Spoed'],
+        ],
         'gesprek' => [
             ['b', 'Ligt mijn recept al klaar?'],
             ['a', 'Dat kijk ik na. Mag ik uw geboortedatum?'],

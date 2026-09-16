@@ -51,11 +51,31 @@
                 </div>
             </div>
         </div>
+
+        @php $lu = (array) ($hc['luister'] ?? []); @endphp
+        @if (! empty($lu['url']))
+            {{-- Luisterstrook: een "speler" die naar de ingesproken demo linkt. De golf beweegt
+                 zachtjes; bij hover speelt hij op. Hoofdstukken = de gesprekken op die pagina. --}}
+            <a href="{{ $lu['url'] }}" class="luister" aria-label="{{ $lu['titel'] ?? 'Luister naar de ingesproken gesprekken' }}">
+                <span class="luister-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+                <span class="luister-tekst">
+                    <strong>{{ $lu['titel'] ?? 'Liever eerst luisteren?' }}</strong>
+                    <span>{{ $lu['sub'] ?? '' }}</span>
+                </span>
+                <span class="luister-golf" aria-hidden="true">@for ($i = 0; $i < 64; $i++)<i></i>@endfor</span>
+                @if (! empty($lu['hoofdstukken']))
+                    <span class="luister-hoofdstukken" aria-hidden="true">
+                        @foreach ((array) $lu['hoofdstukken'] as $i => $hs)<span><b>{{ $i + 1 }}</b>{{ $hs }}</span>@endforeach
+                    </span>
+                @endif
+                <span class="luister-duur">{{ $lu['duur'] ?? '' }} <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </a>
+        @endif
     </div>
 </section>
 @once
 <style>
-.belcta{padding:56px 0;background:linear-gradient(135deg,var(--c-primary) 0%,color-mix(in srgb,var(--c-primary) 70%,#0b1020) 100%);color:#fff;overflow:hidden;position:relative}
+.belcta{padding:56px 0;background:linear-gradient(135deg,var(--c-primary) 0%,color-mix(in srgb,var(--c-primary) 70%,#0b1020) 100%);color:#fff;overflow:clip;position:relative}
 .belcta::before{content:"";position:absolute;inset:-40% auto auto -10%;width:60%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c-accent) 35%,transparent),transparent 65%);pointer-events:none}
 .belcta-grid{display:grid;gap:2.4rem;align-items:center;position:relative}
 @media(min-width:860px){.belcta-grid{grid-template-columns:1.15fr .85fr}}
@@ -91,6 +111,26 @@
 .tel-bubbel.is-typt::after{content:"…";animation:tel-typt 1s steps(3) infinite}
 @keyframes tel-typt{to{opacity:.3}}
 .tel-onder{text-align:center;font-size:.7rem;color:rgba(255,255,255,.45);padding-top:4px;border-top:1px solid rgba(255,255,255,.08)}
+/* luisterstrook */
+.luister{position:relative;display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"play tekst duur" "play golf duur" "play hs duur";align-items:center;gap:.25rem 1.1rem;margin-top:2.2rem;padding:1rem 1.3rem;border-radius:calc(var(--radius) + 6px);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;text-decoration:none;backdrop-filter:blur(6px);transition:background .2s,border-color .2s,transform .2s}
+.luister:hover,.luister:focus-visible{background:rgba(255,255,255,.14);border-color:color-mix(in srgb,var(--c-accent) 70%,#fff);transform:translateY(-2px);outline:none}
+.luister-play{grid-area:play;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--c-cta);color:var(--c-on-cta);box-shadow:0 10px 24px -10px rgba(0,0,0,.6);transition:transform .2s}
+.luister:hover .luister-play{transform:scale(1.08)}
+.luister-tekst{grid-area:tekst;display:flex;flex-wrap:wrap;gap:.2rem .7rem;align-items:baseline;line-height:1.3}
+.luister-tekst strong{font-family:var(--font-display);font-size:1.05rem}
+.luister-tekst span{font-size:.88rem;color:rgba(255,255,255,.7)}
+.luister-golf{grid-area:golf;display:flex;align-items:center;justify-content:space-between;height:34px;margin:.25rem 0;max-width:640px}
+.luister-golf i{display:block;flex:0 0 5px;height:30%;border-radius:2px;background:color-mix(in srgb,var(--c-accent) 85%,#fff);opacity:.8;transform-origin:center;animation:golf 1.8s ease-in-out infinite}
+.luister-golf i:nth-child(3n){height:70%;animation-duration:2.3s}.luister-golf i:nth-child(4n){height:50%;animation-duration:1.5s}.luister-golf i:nth-child(5n){height:90%;animation-duration:2.7s}.luister-golf i:nth-child(7n){height:40%;animation-duration:2s}.luister-golf i:nth-child(11n){height:100%}
+.luister-golf i:nth-child(2n){animation-delay:-.6s}.luister-golf i:nth-child(3n+1){animation-delay:-1.1s}
+@keyframes golf{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.luister:hover .luister-golf i{animation-duration:.55s!important}
+.luister-hoofdstukken{grid-area:hs;display:flex;flex-wrap:wrap;gap:.35rem .5rem;font-size:.74rem;color:rgba(255,255,255,.72)}
+.luister-hoofdstukken span{display:inline-flex;align-items:center;gap:.35rem;padding:.15rem .55rem .15rem .25rem;border-radius:999px;background:rgba(0,0,0,.22)}
+.luister-hoofdstukken b{display:inline-flex;width:16px;height:16px;border-radius:50%;background:color-mix(in srgb,var(--c-accent) 85%,#fff);color:#0b0f1a;font-size:.65rem;align-items:center;justify-content:center}
+.luister-duur{grid-area:duur;display:inline-flex;align-items:center;gap:.4rem;font-weight:700;font-size:.9rem;white-space:nowrap;color:color-mix(in srgb,var(--c-accent) 80%,#fff)}
+@media(max-width:640px){.luister{grid-template-columns:auto 1fr;grid-template-areas:"play tekst" "golf golf" "hs hs" "duur duur";gap:.5rem .9rem}.luister-duur{justify-content:flex-end}}
+@media(prefers-reduced-motion:reduce){.luister-golf i{animation:none;transform:scaleY(.7)}.luister:hover{transform:none}.luister-play{transition:none}}
 @media(prefers-reduced-motion:reduce){.belcta-dot,.tel-ring span{animation:none}.tel-ring span{opacity:.35;transform:scale(1.2)}.tel-bubbel.is-wacht{opacity:1;transform:none}}
 </style>
 <script>
