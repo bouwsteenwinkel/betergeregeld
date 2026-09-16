@@ -42,10 +42,10 @@ return [
         'vanaf'        => '€ 89',
         'periode'      => 'per maand',
         'inbegrepen'   => 'tot 200 gesprekken per maand, inrichting van je kennisbank, dagberichten en de samenvattingen per mail',
-        'extra'        => '€ 0,30 per gesprek daarboven',
+        'extra'        => '€ 0,45 per gesprek daarboven',
         'eenmalig'     => '€ 295 voor het inrichten en samen testen',
         'opzeg'        => 'maandelijks opzegbaar, geen contract',
-        'toelichting'  => 'Een gesprek kost ons zelf gemiddeld enkele dubbeltjes aan spraak en rekentijd; wat je betaalt is vooral de inrichting en het bijhouden van jouw gegevens.',
+        'toelichting'  => 'Een gemiddeld gesprek van anderhalve minuut kost ons zelf ongeveer twintig cent aan spraak en rekentijd; een lang bestelgesprek het dubbele. Wat je betaalt is vooral de inrichting, het nummer en het bijhouden van jouw gegevens. Je assortiment mag zo groot zijn als je wilt: de assistent zoekt erin op, hij leert het niet uit zijn hoofd, dus dat kost niets extra.',
     ],
 
     'hero' => [
@@ -125,7 +125,7 @@ return [
         ['q' => 'Kan ik mijn huidige telefoonnummer behouden?',             'a' => 'Ja. Je schakelt je bestaande nummer door naar de assistent, altijd of alleen bij geen gehoor of buiten openingstijden. Stoppen is de doorschakeling uitzetten.'],
         ['q' => 'Werkt hij buiten openingstijden?',                         'a' => 'Ja, 24 uur per dag. Buiten openingstijden verbindt hij niet door maar legt hij verzoeken vast; die staan de volgende ochtend in je mail.'],
         ['q' => 'Krijg ik een samenvatting van gesprekken?',                'a' => 'Na elk gesprek een korte samenvatting per mail, en alle gesprekken terug te lezen in je eigen portaal. Geen geluidsopnames.'],
-        ['q' => 'Wat kost AI-telefonie?',                                   'a' => 'Vanaf € 89 per maand tot 200 gesprekken, daarboven € 0,30 per gesprek, en eenmalig € 295 voor het inrichten en samen testen. Maandelijks opzegbaar.'],
+        ['q' => 'Wat kost AI-telefonie?',                                   'a' => 'Vanaf € 89 per maand tot 200 gesprekken, daarboven € 0,45 per gesprek, en eenmalig € 295 voor het inrichten en samen testen. Maandelijks opzegbaar.'],
         ['q' => 'Hoe snel kan het worden ingericht?',                       'a' => 'Meestal binnen een week na het eerste gesprek, afhankelijk van hoe snel jouw gegevens compleet zijn. Het testbellen doen we samen.'],
         ['q' => 'Moet ik een nieuwe website hebben?',                       'a' => 'Nee. AI-telefonie werkt los van je website. Je kunt hem ook als enige dienst afnemen.'],
     ],

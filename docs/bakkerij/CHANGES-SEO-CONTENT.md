@@ -71,16 +71,26 @@ KANALEN, `beleid/bakkerij/`, fictieve "Bakkerij Kruimel"), het nummer invullen e
 knoppen "Bel de demo" verschijnen op de telefoniepagina, de homepage en de facetpagina vanzelf.
 
 **Prijsadvies (verwerkt op de pagina, aan te passen in dezelfde config):**
-vanaf **€ 89 per maand** tot 200 gesprekken, **€ 0,30** per gesprek daarboven, eenmalig **€ 295**
+vanaf **€ 89 per maand** tot 200 gesprekken, **€ 0,45** per gesprek daarboven, eenmalig **€ 295**
 inrichten en samen testen, maandelijks opzegbaar.
-Onderbouwing: het kioskscherm laat zien dat een gesprek ons ± $0,11-0,16 aan OpenAI Realtime
-kost (5 gesprekken = $0,54; 44 gesprekken deze maand = $6,81) plus een fractie van het
-ElevenLabs-quotum (7% van 124k tekens gebruikt). 200 gesprekken ≈ € 30 aan directe kosten; de
-€ 89 dekt dat, het nummer en het bijhouden van de kennisbank. De € 295 dekt het inrichtgesprek,
-het omzetten van de gegevens en het testbellen (2-3 uur). Marktreferentie: NL-aanbieders van
-AI-receptionisten zitten tussen € 49 en € 199 per maand; € 89 is midden in dat veld met een
-duidelijk inbegrepen volume. Wil je scherper instappen: € 69 met 100 gesprekken werkt ook, maar
-laat de eenmalige inrichting staan — daar zit ons echte werk.
+
+Onderbouwing (hermeten 16-09-2026 over 50 gesprekken uit het journal van de telefoniemachine,
+niet meer uit het kioskscherm): een gesprek duurt gemiddeld 100 s (mediaan 63 s) en kost
+gemiddeld $0,145 aan OpenAI Realtime (tekst uit, audio in; cache 80-97%), $0,08 aan
+ElevenLabs (926 tekens, turbo = 0,5 credit/teken, Creator $0,18 per 1.000 credits) en
+±$0,01 aan transcriptie die NIET in het logcijfer zit. Samen ≈ $0,24 ≈ **€ 0,21 per
+gesprek**, ≈ € 0,125 per minuut. De eerste beurt van elk gesprek betaalt de hele opdracht
+(±13k tokens, $0,05) onverkort; de cache werkt alleen binnen het gesprek.
+
+200 gesprekken ≈ € 42 aan directe kosten; de € 89 dekt dat, het nummer, het aandeel in de
+droplet en ElevenLabs-basis en het bijhouden van de kennisbank. **De extra-gesprekprijs stond op
+€ 0,30 en is op 16-09 naar € 0,45 gezet:** een bestelgesprek van drie minuten kost ≈ € 0,38 en
+zou anders met verlies gaan. Voorbeeldberekeningen (ook wat een grotere opdracht of een groot
+assortiment doet) staan in het artifact "Rekenvoorbeelden AI-telefonie". De € 295 dekt het
+inrichtgesprek, het omzetten van de gegevens en het testbellen (2-3 uur). Marktreferentie:
+NL-aanbieders van AI-receptionisten zitten tussen € 49 en € 199 per maand; € 89 is midden in dat
+veld met een duidelijk inbegrepen volume. Wil je scherper instappen: € 69 met 100 gesprekken werkt
+ook, maar laat de eenmalige inrichting staan — daar zit ons echte werk.
 
 ## 6. Koppelingen: wat er genoemd wordt
 Als "werkt standaard": Mollie (betalingen) — bewezen op Bouwsteenwinkel. Als "we bekijken wat

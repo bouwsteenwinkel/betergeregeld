@@ -19,6 +19,6 @@ return [
         ['q' => 'Kan de assistent vragen over allergenen beantwoorden?',
          'a' => 'Alleen als jij daarvoor betrouwbare, actuele productinformatie hebt aangeleverd en dat wilt. Bij twijfel verwijst hij altijd naar een medewerker. Voedselveiligheid laten we niet aan een assistent over.'],
         ['q' => 'Wat kost AI-telefonie?',
-         'a' => 'Vanaf € 89 per maand tot 200 gesprekken, daarboven € 0,30 per gesprek, en eenmalig € 295 voor het inrichten en samen testen. Maandelijks opzegbaar. Alle details staan op de pagina AI-telefonie voor bakkerijen.'],
+         'a' => 'Vanaf € 89 per maand tot 200 gesprekken, daarboven € 0,45 per gesprek, en eenmalig € 295 voor het inrichten en samen testen. Maandelijks opzegbaar. Alle details staan op de pagina AI-telefonie voor bakkerijen.'],
     ],
 ];
