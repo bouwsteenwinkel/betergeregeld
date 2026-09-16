@@ -221,7 +221,7 @@ return [
 
         'snippet' => ['header' => 'Types', 'values' => ['Kleine sets', 'Grote sets', 'Themasets', 'Voor bedrijven']],
 
-        'call_phone' => '035 201 1720',
+        'call_phone' => '088 2545100',
     ],
 
     // Directe tegenhanger van Bouwersbende (maandelijkse LEGO-box per leeftijd,
@@ -340,7 +340,7 @@ return [
 
         'snippet' => ['header' => 'Types', 'values' => ['Kleine sets', 'Grote sets', 'Themasets', 'Verrassingssets']],
 
-        'call_phone' => '035 201 1720',
+        'call_phone' => '088 2545100',
     ],
 
     // LEGO-kinderfeestje OP LOCATIE in Bussum ('t Gooi) — géén pakket-aan-huis
@@ -462,7 +462,7 @@ return [
         // Fragment: feest-TYPES (geen leeftijd-ladder — die vlagt Google's classifier).
         'snippet' => ['header' => 'Types', 'values' => ['Bouwfeestje', 'Verjaardagsfeest', 'Schooluitje', 'Groepsuitje']],
 
-        'call_phone' => '035 201 1720',
+        'call_phone' => '088 2545133',
     ],
 
 ];
