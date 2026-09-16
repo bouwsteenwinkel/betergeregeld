@@ -36,6 +36,7 @@ class VerkeerBots extends Command
         {--top=15 : Aantal verdachte adressen per host in het rapport}
         {--sinds= : Alleen logregels vanaf dit tijdstip, UTC, bv. "2026-09-14 13:11"}
         {--ua-drempel=500 : Eén browser-user-agent met méér pagina’s dan dit, over alle hosts samen, is een crawler}
+        {--beacon : Elke adres+user-agent die de page_view-beacon vuurde apart tonen, met UA, pagina’s en tijd}
         {--max-mb=48 : Per bestand maximaal dit aantal MB lezen (vanaf het einde)}';
 
     protected $description = 'Splits het verkeer in de IIS-logs uit naar mens, bekende bot, vermoedelijke bot en scanner';
@@ -551,6 +552,7 @@ class VerkeerBots extends Command
         $verdacht = [];
         $beacon = [];
         $beaconStatus = [];
+        $beaconDetail = [];
         $perDag = [];
         $js = 0;
         $uaTop = [];
@@ -594,6 +596,7 @@ class VerkeerBots extends Command
                 foreach ($r['evStatus'] as $st => $aantal) {
                     $beaconStatus[$bk][$st] = ($beaconStatus[$bk][$st] ?? 0) + $aantal;
                 }
+                $beaconDetail[$sleutel] = $r + ['klasse' => $k, 'wie' => $bk];
             }
             if (str_starts_with($k, 'bot: browser-UA') || $k === 'scanner') {
                 $verdacht[$sleutel] = $r + ['klasse' => $k];
@@ -642,6 +645,19 @@ class VerkeerBots extends Command
                 $st = $beaconStatus[$wie] ?? [];
                 ksort($st);
                 $this->line(sprintf('    %-30s %6d   status: %s', $wie, $n, implode(', ', array_map(fn ($k, $v) => $k.'×'.$v, array_keys($st), $st))));
+            }
+            // Per combinatie: wie zit er achter een "browser"-beacon? Eén UA die op
+            // tien hosts telkens één pagina laadt en de beacon vuurt is een crawler
+            // die JS draait; een UA met pagina's, assets én een referrer is een mens.
+            if ($this->option('beacon')) {
+                uasort($beaconDetail, fn ($a, $b) => strcmp($a['eerste'], $b['eerste']));
+                foreach ($beaconDetail as $r) {
+                    $this->line(sprintf('      %s→%s  %-15s beacon %2d  pag %3d  assets %3d  ref %3d  %s',
+                        substr($r['eerste'], 11, 5), substr($r['laatste'], 11, 5), $r['wie'],
+                        $r['ev'], $r['html'], $r['asset'], $r['ref'], $r['ip']));
+                    $this->line('          UA: '.mb_substr((string) $r['ua'], 0, 120));
+                    $this->line('          pag: '.implode('  ', array_slice(array_keys($r['paden']), 0, 4)));
+                }
             }
         }
 
