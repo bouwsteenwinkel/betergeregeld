@@ -19,7 +19,7 @@
  */
 
 return [
-    'demo_nummer'      => '',                      // bv. '088 254 5170'
+    'demo_nummer'      => '088 254 5170',          // lijn staat sinds 15-09 op de telefoniemachine (KANALEN 31882545170)
     'demo_bakkerij'    => 'Bakkerij Kruimel',      // naam van de fictieve demo-bakkerij
 
     // De vaste bestellingen in de demo (bouwsteenwinkel_v3/scripts/_aitest-bakkerij-tabellen.php).
