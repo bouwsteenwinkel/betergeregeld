@@ -67,6 +67,9 @@
         </div>
     </section>
 
+    {{-- AI-telefonie: inkomend gesprek als CTA (config bakkerij_telefonie.home_cta); verving op 16-09 de tekstsectie verderop. --}}
+    @include('channels.partials.telefonie-home-cta', ['site' => $site])
+
     <section data-section="herkenning">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Herken je dit?</span>
@@ -106,30 +109,6 @@
     ])
 
     {{-- AI-telefonie als zelfstandige dienst, niet alleen als vijfde stap (15-09-2026). --}}
-    <section data-section="ai-telefonie" style="background:var(--c-tint,var(--c-surface))">
-        <div class="wrap">
-            <div class="grid cols-2" style="gap:2.4rem;align-items:center">
-                <div>
-                    <span class="kicker"><span class="kicker-line"></span> AI-telefonie</span>
-                    <h2>Te druk om steeds de telefoon op te nemen?</h2>
-                    <p>Een telefonische assistent neemt op met de naam van je bakkerij. Hij beantwoordt de vragen die je elke dag krijgt, zoals openingstijden, of je glutenvrij brood hebt en tot hoe laat een bestelling opgehaald kan worden. Wil iemand een taart of veertig belegde broodjes bestellen, dan legt hij naam, nummer en de wens vast, en bel jij terug op een moment dat het uitkomt. Verbindt door als het moet, werkt ook buiten openingstijden, en na elk gesprek krijg je een samenvatting per mail.</p>
-                    <p class="muted">Werkt naast je bestaande nummer en los van je website. Je kunt hem ook als enige dienst afnemen.</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1rem">
-                        <a href="{{ $site->url('ai-telefonie-bakkerij') }}" class="btn">Bekijk AI-telefonie voor bakkerijen</a>
-                        @if ($demo)
-                            <a href="tel:{{ $demoTel }}" class="btn btn-ghost">Bel de demo: {{ $demo }}</a>
-                        @endif
-                    </div>
-                </div>
-                <div class="card">
-                    <p style="margin:0 0 .6rem;font-weight:700">"Kan ik nog een verjaardagstaart bestellen voor zaterdag?"</p>
-                    <p style="margin:0 0 1rem;color:var(--c-muted)">"Taarten bestellen we graag twee dagen vooruit, dus voor zaterdag kan dat tot donderdag. Zal ik uw naam, nummer en de wens noteren? Dan belt de bakkerij u terug om het precies af te stemmen."</p>
-                    <p style="margin:0 0 .6rem;font-weight:700">"Tot hoe laat kan ik mijn bestelling ophalen?"</p>
-                    <p style="margin:0;color:var(--c-muted)">"Bestellingen kunt u ophalen tot sluitingstijd, vandaag 17.00 uur. Lukt dat niet, dan kan ik dat doorgeven."</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe jouw bakkerij er online uit zou zien?'])
 

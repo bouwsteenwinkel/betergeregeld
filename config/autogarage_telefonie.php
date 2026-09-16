@@ -32,6 +32,28 @@ return [
     'kantoor_nummer' => '088-2545101',
     'infoblad'       => 'garage',           // config/telefonie_infobladen.php, knop naast het demonummer
 
+    // CTA op de homepage (channels/partials/telefonie-home-cta): een telefoonscherm waarop
+    // de assistent opneemt en dit gesprek zich uittikt. 'b' = beller, 'a' = assistent.
+    'home_cta' => [
+        'kicker'      => 'Nieuw: AI-telefonie voor autogarages',
+        'kop'         => 'De telefoon gaat. Niemand hoeft onder de brug vandaan.',
+        'lead'        => 'Een digitale assistent die opneemt met de naam van je garage, op kenteken en achternaam zegt of de auto klaar is, wat een APK kost en wanneer de keuring verloopt, en een afspraakverzoek noteert. Bij een technische vraag verbindt hij door. Bel de demo en vraag of de Golf al klaar is.',
+        'bel_label'   => 'Bel de demo',
+        'meer_label'  => 'Zo werkt het voor garages',
+        'noot'        => 'Autobedrijf De Wissel bestaat niet; er wordt niets gerepareerd en niets afgerekend. Vanaf € 89 per maand.',
+        'toestel_naam'=> 'Autobedrijf De Wissel',
+        'toestel_sub' => 'Inkomend gesprek · de assistent neemt op',
+        'tijd'        => '08:03',
+        'gesprek' => [
+            ['b', 'Is mijn auto al klaar? Kenteken 12-KLM-3.'],
+            ['a', 'Dat kijk ik na. Mag ik uw achternaam?'],
+            ['b', 'De Wit.'],
+            ['a', 'Dank u, mevrouw De Wit. De grote beurt en de APK zijn klaar; het bedrag is € 386,40.'],
+            ['b', 'Tot hoe laat kan ik hem ophalen?'],
+            ['a', 'Vandaag tot half zes. Betalen kan aan de balie met pin.'],
+        ],
+    ],
+
     'woorden' => [
         'bedrijf'   => 'je garage',
         'bedrijven' => 'autogarages',

@@ -44,6 +44,28 @@ return [
     'kantoor_nummer'   => '088-2545101',
     'infoblad'         => 'bakkerij',         // config/telefonie_infobladen.php, knop naast het demonummer
 
+    // CTA op de homepage (channels/partials/telefonie-home-cta): een telefoonscherm waarop
+    // de assistent opneemt en dit gesprek zich uittikt. 'b' = beller, 'a' = assistent.
+    'home_cta' => [
+        'kicker'      => 'Nieuw: AI-telefonie voor bakkerijen',
+        'kop'         => 'De telefoon gaat. Jij hebt deeg aan je handen.',
+        'lead'        => 'Een digitale assistent die opneemt met de naam van je bakkerij, openingstijden en assortimentsvragen beantwoordt en een bestelling aanneemt: product opzoeken, besteltermijn bewaken, terugvoorlezen, bestelnummer geven. Bij een allergievraag verwijst hij naar een medewerker. Bel de demo en bestel zelf een taart.',
+        'bel_label'   => 'Bel de demo',
+        'meer_label'  => 'Zo werkt het voor bakkerijen',
+        'noot'        => 'Bakkerij Kruimel bestaat niet; er wordt niets gebakken en niets afgerekend. Vanaf € 89 per maand.',
+        'toestel_naam'=> 'Bakkerij Kruimel',
+        'toestel_sub' => 'Inkomend gesprek · de assistent neemt op',
+        'tijd'        => '07:48',
+        'gesprek' => [
+            ['b', 'Kan ik een slagroomtaart bestellen voor zaterdag?'],
+            ['a', 'Dat kan. Voor hoeveel personen, en wilt u er een tekst op?'],
+            ['b', 'Tien personen, met "Sam 7" erop.'],
+            ['a', 'Genoteerd: slagroomtaart voor tien met "Sam 7", zaterdag afhalen. Mag ik uw naam en nummer?'],
+            ['b', 'Jansen, 06 1234 5678.'],
+            ['a', 'Dank u. Uw bestelnummer is K, twee nul nul vier. De bakkerij bevestigt het nog.'],
+        ],
+    ],
+
     'woorden' => [
         'bedrijf'   => 'je bakkerij',
         'bedrijven' => 'bakkerijen',

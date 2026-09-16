@@ -45,6 +45,9 @@
         </div>
     </section>
 
+    {{-- AI-telefonie: inkomend gesprek als CTA (config autogarage_telefonie.home_cta). --}}
+    @include('channels.partials.telefonie-home-cta', ['site' => $site])
+
     <section data-section="herkenning">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Herken je dit?</span>
