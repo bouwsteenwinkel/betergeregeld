@@ -434,8 +434,15 @@ class ChannelSiteController extends Controller
     {
         $site = $this->site();
 
+        // De technische endpoints horen niet in de index en niet in de crawl: Googlebot
+        // volgde /_ev (POST-beacon) en /afspraak/boeken (form-action) als gewone links en
+        // meldde ze in Search Console als 404 en 4xx (dietist, golfschool, apotheek,
+        // 16-09-2026). Disallow scheelt bovendien crawlbudget op /cmp/ en de widget-data.
         $lines = $site->isLive()
-            ? ['User-agent: *', 'Allow: /', '', 'Sitemap: ' . $site->url('sitemap.xml')]
+            ? ['User-agent: *', 'Allow: /',
+               'Disallow: /_ev', 'Disallow: /afspraak/boeken', 'Disallow: /afspraak/beschikbaarheid',
+               'Disallow: /afspraak/annuleren/', 'Disallow: /cmp/',
+               '', 'Sitemap: ' . $site->url('sitemap.xml')]
             : ['User-agent: *', 'Disallow: /'];
 
         return response(implode("\n", $lines) . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
