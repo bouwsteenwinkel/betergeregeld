@@ -14,21 +14,26 @@
  * telefoniemachine staat (zelfde recept als de garagedemo 5160: DID op trunk Steenbouw,
  * KANALEN + beleid/bakkerij/). Tot die tijd blijft de knop weg — geen nepnummer.
  *
- * prijs: advies 15-09-2026, zie docs/bakkerij/CHANGES-SEO-CONTENT.md voor de onderbouwing.
- * Dennis stelt het definitieve bedrag vast; tekst hieronder is wat de pagina toont.
+ * Sinds 16-09-2026 staat alleen het bakkerij-eigen deel hier; prijs, eigen nummer, privacy,
+ * stappen, algemene FAQ en de rekenhulpcijfers komen uit config/telefonie_basis.php
+ * (samengevoegd door App\Support\TelefonieConfig). Prijsonderbouwing:
+ * docs/bakkerij/CHANGES-SEO-CONTENT.md.
  */
 
 return [
     'demo_nummer'      => '088 254 5170',          // lijn staat sinds 15-09 op de telefoniemachine (KANALEN 31882545170)
-    'demo_bakkerij'    => 'Bakkerij Kruimel',      // naam van de fictieve demo-bakkerij
+    'demo_naam'        => 'Bakkerij Kruimel',      // naam van de fictieve demo-bakkerij
+    'demo_noot'        => 'Het demonummer is Bakkerij Kruimel: een bakkerij die niet bestaat, zodat je vrij kunt vragen wat je wilt. Je sluit niets af door te bellen.',
+    'demo_titel'       => 'Bel Bakkerij Kruimel op 088 254 5170',
+    'demo_lead'        => 'Bakkerij Kruimel bestaat niet, het assortiment wel. Bestel iets, of bel met een van deze bestelnummers en vraag of je bestelling klaar is. Er wordt niets gebakken en niets afgerekend.',
 
     // De vaste bestellingen in de demo (bouwsteenwinkel_v3/scripts/_aitest-bakkerij-tabellen.php).
     // Alleen zichtbaar als demo_nummer gevuld is. Dagen zijn afstanden vanaf vandaag.
     'demo_kaartjes' => [
-        ['nummer' => 'K-1042', 'naam' => 'De Wit',    'hoor' => 'Twee appeltaarten staan klaar; vandaag ophalen, al betaald.'],
-        ['nummer' => 'K-1057', 'naam' => 'Jansen',    'hoor' => 'Slagroomtaart met "Sam 7", overmorgen om half twaalf ophalen.'],
-        ['nummer' => 'K-1063', 'naam' => 'El Amrani', 'hoor' => 'Veertig belegde broodjes, morgen bezorgd bij het notariskantoor, op rekening.'],
-        ['nummer' => 'K-1071', 'naam' => 'Bakker',    'hoor' => 'Chocoladetaart over vijf dagen; de vraag over een foto op de taart staat nog open.'],
+        ['kop' => 'Bestelnummer K-1042 · De Wit', 'hoor' => 'Twee appeltaarten staan klaar; vandaag ophalen, al betaald.'],
+        ['kop' => 'Bestelnummer K-1057 · Jansen', 'hoor' => 'Slagroomtaart met "Sam 7", overmorgen om half twaalf ophalen.'],
+        ['kop' => 'Bestelnummer K-1063 · El Amrani', 'hoor' => 'Veertig belegde broodjes, morgen bezorgd bij het notariskantoor, op rekening.'],
+        ['kop' => 'Bestelnummer K-1071 · Bakker', 'hoor' => 'Chocoladetaart over vijf dagen; de vraag over een foto op de taart staat nog open.'],
     ],
     'demo_probeer' => [
         'Bestel zelf een taart voor zaterdag: hij leest de bestelling terug en geeft een bestelnummer.',
@@ -38,34 +43,35 @@ return [
     ],
     'kantoor_nummer'   => '088-2545101',
 
-    'prijs' => [
-        'vanaf'        => '€ 89',
-        'periode'      => 'per maand',
-        'inbegrepen'   => 'tot 200 gesprekken per maand, inrichting van je kennisbank, dagberichten en de samenvattingen per mail',
-        'extra'        => '€ 0,45 per gesprek daarboven',
-        'eenmalig'     => '€ 295 voor het inrichten en samen testen',
-        'opzeg'        => 'maandelijks opzegbaar, geen contract',
-        'toelichting'  => 'Een gemiddeld gesprek van anderhalve minuut kost ons zelf ongeveer twintig cent aan spraak en rekentijd; een lang bestelgesprek het dubbele. Wat je betaalt is vooral de inrichting, het nummer en het bijhouden van jouw gegevens. Je assortiment mag zo groot zijn als je wilt: de assistent zoekt erin op, hij leert het niet uit zijn hoofd, dus dat kost niets extra.',
+    'woorden' => [
+        'bedrijf'   => 'je bakkerij',
+        'bedrijven' => 'bakkerijen',
+        'klant'     => 'klant',
+        'klanten'   => 'klanten',
+        'gegevens'  => 'openingstijden, vestigingen, assortiment, bestelregels en bezorggebied',
     ],
+    'prijs_combi_facet' => 'webshop',
+    'prijs_combi_label' => 'webshop',
 
-    // Rekenhulp op de telefoniepagina ("wat levert het op"). De prijzen hier moeten
-    // gelijk blijven aan 'prijs' hierboven; de standaardwaarden zijn de startstand van de
-    // schuiven en bewust bescheiden gekozen. Het is een rekenvoorbeeld, geen belofte:
-    // de tekst op de pagina zegt dat ook.
+    // Rekenhulp: startstand en teksten voor een bakkerij; de cijfers (prijs, bundel) komen
+    // uit telefonie_basis. Een gemiste bestelling van € 18 is het bakkerij-equivalent van
+    // een gemiste opdracht.
     'rekenhulp' => [
-        'maandprijs'           => 89,
-        'inbegrepen_gesprekken'=> 200,
-        'extra_per_gesprek'    => 0.45,
         'standaard' => [
-            'per_dag'        => 12,   // telefoontjes per werkdag
-            'dagen'          => 6,    // werkdagen per week
-            'minuten'        => 2,    // gemiddelde duur per gesprek
-            'uurloon'        => 22,   // loonkosten per uur, alles erin
-            'oppakken'       => 3,    // minuten om de draad weer op te pakken na een onderbreking
-            'gemist_per_week'=> 8,    // gesprekken die nu niet opgenomen worden (druk, gesloten)
-            'bestelling_pct' => 25,   // deel daarvan dat een bestelling was
-            'bestelwaarde'   => 18,   // gemiddelde bestelling aan de telefoon
-            'afhandel_pct'   => 70,   // deel van de gesprekken dat de assistent zelf afrondt
+            'per_dag'         => 12,
+            'dagen'           => 6,
+            'minuten'         => 2,
+            'uurloon'         => 22,
+            'gemist_per_week' => 8,
+            'bestelling_pct'  => 25,
+            'bestelwaarde'    => 18,
+            'afhandel_pct'    => 70,
+        ],
+        'teksten' => [
+            'lead'         => 'Een rekenvoorbeeld, geen belofte. Zet de schuiven op jouw bakkerij en zie wat de telefoon je nu per maand kost aan tijd en onderbrekingen, en welke omzet er in gemiste telefoontjes zit.',
+            'deel_label'   => 'Deel daarvan dat een bestelling was',
+            'waarde_label' => 'Gemiddelde bestelling aan de telefoon',
+            'tijd_tegel'   => 'aan loonkosten die vrijkomen voor de winkel en de bakkerij',
         ],
     ],
 
@@ -73,6 +79,7 @@ return [
         'eyebrow' => 'AI-telefonie voor bakkerijen',
         'title'   => 'AI-telefonie voor je bakkerij: de telefoon wordt opgenomen, ook als jij geen tijd hebt',
         'sub'     => 'Een telefonische assistent die opneemt met de naam van je bakkerij, openingstijden en assortimentsvragen beantwoordt, een bestel- of terugbelverzoek vastlegt en doorverbindt als het moet. Tijdens de ochtenddrukte, tijdens het bakken en buiten openingstijden.',
+        'alt'     => 'De telefonische assistent van een bakkerij',
         'usps'    => [
             'Neemt altijd op, ook buiten openingstijden',
             'Antwoordt uit jouw eigen gegevens, niet uit het internet',
@@ -90,6 +97,7 @@ return [
     ],
 
     'gesprekken_titel' => 'Zo klinkt dat, in gewoon Nederlands',
+    'gesprekken_lead'  => 'De antwoorden hieronder komen uit de gegevens die de bakkerij zelf heeft aangeleverd. Zo praat de assistent ook over jouw bakkerij: alleen wat jij hebt doorgegeven.',
     'gesprekken' => [
         ['vraag' => 'Zijn jullie vandaag open?',                                        'antwoord' => 'Ja, vandaag zijn we open tot 17.00 uur. Morgen, zondag, zijn we gesloten.'],
         ['vraag' => 'Kan ik nog een verjaardagstaart bestellen voor zaterdag?',        'antwoord' => 'Dat kan. Voor hoeveel personen, en wilt u er een tekst op? Dan noteer ik: een slagroomtaart voor tien personen met "Sam 7", zaterdag om half twaalf ophalen, op naam van Jansen. Uw bestelnummer is K, twee nul nul vier. De bakkerij bevestigt het nog; u betaalt bij het afhalen.'],
@@ -104,51 +112,30 @@ return [
     'kan' => [
         ['t' => 'Openingstijden en vestigingen',       'b' => 'Per dag, per winkel, met feestdagen en vakanties zoals jij ze doorgeeft.'],
         ['t' => 'Vragen over assortiment en bestellen', 'b' => 'Wat je hebt, wat op bestelling is, hoe ver vooruit, afhalen of bezorgen. Uit jouw eigen gegevens.'],
-        ['t' => 'Terugbelverzoek',                      'b' => 'Naam en telefoonnummer, herhaald ter controle, met waar het over ging.'],
         ['t' => 'Bestellingen aannemen',                'b' => 'Een taart, een zakelijke bestelling, veertig broodjes: hij zoekt het product op, let op de besteltermijn, leest de bestelling terug en geeft een bestelnummer. Jij bevestigt; geen betaling aan de telefoon.'],
         ['t' => '"Is mijn bestelling klaar?"',           'b' => 'Op bestelnummer en achternaam zegt hij wat erop staat, voor welke dag, en of er al betaald is.'],
-        ['t' => 'Doorverbinden',                        'b' => 'Tijdens openingstijden naar de winkel of een collega, als de beller of de vraag daarom vraagt.'],
-        ['t' => 'Samenvatting',                         'b' => 'Na elk gesprek een korte samenvatting per mail, en alles terug te lezen in je eigen portaal.'],
         ['t' => 'Dagberichten',                         'b' => 'Vandaag geen krentenbollen, morgen dicht: één bericht van jou en de assistent zegt het tegen iedere beller.'],
-        ['t' => 'Nederlands, en Engels als je dat wilt', 'b' => 'Standaard Nederlands. Engels kan erbij worden ingericht voor bellers die geen Nederlands spreken.'],
     ],
 
     'niet_titel' => 'Wat we bewust níét laten doen',
     'niet' => [
         'Uitspraken over allergenen die niet uit jouw actuele productinformatie komen. Bij twijfel verwijst de assistent naar een medewerker.',
-        'Betalingen aannemen, of een bestelling wijzigen die vandaag al klaarstaat. Een bestelling die hij aanneemt bevestig jij; wijzigen en annuleren gaan via jou.',
-        'Gesprekken opnemen. Er wordt een samenvatting gemaakt, geen geluidsopname.',
-        'Afspraken in een agenda zetten. Dat kan wel via je website; aan de telefoon houden we het bij een verzoek.',
-        'Iets verzinnen. Weet de assistent het niet, dan zegt hij dat en legt hij een terugbelverzoek vast.',
+        'Een bestelling wijzigen of annuleren die al is aangenomen. Een bestelling die hij aanneemt bevestig jij; wijzigen en annuleren gaan via jou.',
     ],
 
-    'nummer_titel' => 'Je houdt je eigen telefoonnummer',
-    'nummer_tekst' => 'De assistent krijgt een eigen nummer. Jouw bestaande nummer schakel je door: altijd, alleen bij geen gehoor, of alleen buiten openingstijden. Dat stel je in bij je telefoonaanbieder; wij helpen daarbij. Wil je later stoppen, dan zet je de doorschakeling uit en is alles weer zoals het was.',
-
-    'stappen_titel' => 'Zo richten we het in',
-    'stappen' => [
-        ['t' => 'Gesprek van een half uur',   'b' => 'Wat bellen mensen nu, wat wil je dat de assistent zegt, en wanneer moet hij doorverbinden?'],
-        ['t' => 'Jouw gegevens erin',          'b' => 'Openingstijden, vestigingen, assortiment, bestelregels, bezorggebied. Jij levert aan, wij zetten het om in de kennisbank.'],
-        ['t' => 'Samen testbellen',            'b' => 'Je belt zelf en hoort hoe hij reageert. Wat niet klopt passen we aan, tot jij tevreden bent.'],
-        ['t' => 'Doorschakelen en meekijken',  'b' => 'Je zet de doorschakeling aan. De eerste weken kijken we mee naar de samenvattingen en scherpen we bij.'],
-    ],
-
-    'privacy_titel' => 'Privacy en AVG',
-    'privacy_tekst' => 'De assistent bewaart wat nodig is om een verzoek af te handelen: naam, telefoonnummer en de inhoud van het verzoek. Geen geluidsopnames. De samenvattingen staan in je eigen portaal en worden niet gebruikt om iets te trainen. Wil je dat bellers aan het begin horen dat ze met een assistent spreken, dan richten we dat zo in.',
-
+    'faq_titel' => 'Wat bakkers ons vragen over AI-telefonie',
     'faq' => [
-        ['q' => 'Wat is AI-telefonie?',                                   'a' => 'Een computerprogramma dat de telefoon opneemt, luistert, in gewoon Nederlands antwoordt en vastlegt wat de beller wil. Het antwoordt uit gegevens die jij hebt aangeleverd, niet uit het internet.'],
         ['q' => 'Kan de assistent de telefoon opnemen voor mijn bakkerij?', 'a' => 'Ja. Hij neemt op met de naam van je bakkerij en handelt de veelvoorkomende vragen af. Wat hij niet weet, legt hij vast als terugbelverzoek.'],
         ['q' => 'Kan hij bestellingen aannemen?',                         'a' => 'Ja. Hij zoekt het product op in jouw assortiment, let op de besteltermijn (een taart twee dagen vooruit, brood vandaag nog), leest de bestelling terug en geeft de beller een bestelnummer. De bestelling staat direct in je portaal en in je mail; jij bevestigt hem. Er wordt niets afgerekend aan de telefoon. Wil je online laten bestellen en betalen, dan is de webshop daarvoor.'],
         ['q' => 'Kan hij openingstijden en productvragen beantwoorden?',   'a' => 'Ja, uit jouw eigen gegevens: openingstijden per vestiging, assortiment, bestelregels, bezorggebied. Verandert er iets, dan geef je dat door of zet je een dagbericht.'],
         ['q' => 'Kan hij vragen over allergenen beantwoorden?',            'a' => 'Alleen als jij daarvoor betrouwbare, actuele productinformatie hebt aangeleverd en dat wilt. Bij twijfel verwijst hij altijd naar een medewerker. Voedselveiligheid laten we niet aan een assistent over.'],
-        ['q' => 'Wat gebeurt er als hij het antwoord niet weet?',           'a' => 'Dan zegt hij dat eerlijk, noteert naam en telefoonnummer en de vraag, en jij belt terug. Tijdens openingstijden kan hij ook doorverbinden.'],
-        ['q' => 'Kan ik mijn huidige telefoonnummer behouden?',             'a' => 'Ja. Je schakelt je bestaande nummer door naar de assistent, altijd of alleen bij geen gehoor of buiten openingstijden. Stoppen is de doorschakeling uitzetten.'],
-        ['q' => 'Werkt hij buiten openingstijden?',                         'a' => 'Ja, 24 uur per dag. Buiten openingstijden verbindt hij niet door maar legt hij verzoeken vast; die staan de volgende ochtend in je mail.'],
-        ['q' => 'Krijg ik een samenvatting van gesprekken?',                'a' => 'Na elk gesprek een korte samenvatting per mail, en alle gesprekken terug te lezen in je eigen portaal. Geen geluidsopnames.'],
-        ['q' => 'Wat kost AI-telefonie?',                                   'a' => 'Vanaf € 89 per maand tot 200 gesprekken, daarboven € 0,45 per gesprek, en eenmalig € 295 voor het inrichten en samen testen. Maandelijks opzegbaar.'],
-        ['q' => 'Hoe snel kan het worden ingericht?',                       'a' => 'Meestal binnen een week na het eerste gesprek, afhankelijk van hoe snel jouw gegevens compleet zijn. Het testbellen doen we samen.'],
-        ['q' => 'Moet ik een nieuwe website hebben?',                       'a' => 'Nee. AI-telefonie werkt los van je website. Je kunt hem ook als enige dienst afnemen.'],
+    ],
+
+    'verder_titel' => 'Telefoon, webshop en administratie op elkaar aansluiten',
+    'verder' => [
+        ['facet' => 'webshop',        't' => 'Webshop voor bakkerijen',              'b' => 'Laat klanten die nu bellen om te bestellen, dat online doen met een afhaaltijd en vooraf betalen.'],
+        ['facet' => 'automatisering', 't' => 'Bestellingen automatisch verwerken',   'b' => 'Een verzoek dat de assistent vastlegt, komt op dezelfde productielijst als een webshopbestelling.'],
+        ['facet' => 'klantenportaal', 't' => 'Klantenportaal voor zakelijke klanten', 'b' => 'Horeca en kantoren die nu elke avond bellen, bestellen zelf.'],
     ],
 
     'cta_titel' => 'Hoor het zelf, of vraag een demo aan',

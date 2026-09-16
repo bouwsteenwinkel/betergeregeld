@@ -159,7 +159,8 @@ class ChannelSiteController extends Controller
         $cfg  = config('channel_telefonie.' . $site->key);
         abort_if(! $cfg || (string) $request->route('branche') !== $site->key, 404);
 
-        return view('channels._landing.' . $site->key . '-telefonie', ['site' => $site]);
+        // Eén view voor alle kanalen; de inhoud komt uit config/{key}_telefonie.php + telefonie_basis.php.
+        return view('channels._landing.telefonie', ['site' => $site]);
     }
 
     public function groeidiamant(): View

@@ -8,6 +8,10 @@
     foreach ((array) config('channel_faq_per_branche.' . $site->brancheKey(), []) as $x) {
         $items[] = ['q' => $r($x['q'] ?? ''), 'a' => $r($x['a'] ?? '')];
     }
+    // Heeft dit kanaal een AI-telefoniepagina, dan de twee telefonievragen erbij (16-09-2026).
+    foreach ((array) (\App\Support\TelefonieConfig::for($site)['faq_site'] ?? []) as $x) {
+        $items[] = ['q' => $r($x['q'] ?? ''), 'a' => $r($x['a'] ?? '')];
+    }
 
     $ld = ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => array_map(fn ($f) => [
         '@type' => 'Question', 'name' => $f['q'],

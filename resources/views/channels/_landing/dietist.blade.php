@@ -32,7 +32,15 @@
                     @if (! empty($hero['eyebrow']))<span class="eyebrow">{{ $hero['eyebrow'] }}</span>@endif
                     <h1>{{ $hero['title'] ?? $fLabel }}</h1>
                     @if (! empty($hero['sub']))<p class="lead">{{ $hero['sub'] }}</p>@endif
-                    <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
+                    @if ($facet === 'ai' && config('channel_telefonie.' . $site->key))
+                        {{-- AI-telefonie: geen "gratis voorbeeld" (dat is een website-mockup) maar de landingspagina en een demo. --}}
+                        <div style="display:flex;flex-wrap:wrap;gap:.7rem">
+                            <a href="{{ $site->url('ai-telefonie-' . $site->key) }}" class="btn">Alles over AI-telefonie voor {{ $site->get('places.trades', 'bedrijven') }}</a>
+                            <a href="{{ $site->url('afspraak') }}?onderwerp=ai-telefonie" class="btn btn-ghost">Vraag een demo aan</a>
+                        </div>
+                    @else
+                        <a href="#gratis-voorbeeld" class="btn">Gratis voorbeeld aanvragen</a>
+                    @endif
                     @if (! empty($hero['note']))<p class="muted" style="margin-top:.8rem;font-size:.9rem">{{ $hero['note'] }}</p>@endif
                     @if (! empty($hero['usps']))
                         <ul class="hero-usps">

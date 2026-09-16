@@ -1,8 +1,10 @@
 @php
     /** @var \App\Support\ChannelSite $site */
-    // Landingspagina AI-telefonie voor bakkerijen (15-09-2026). Inhoud uit
-    // config/bakkerij_telefonie.php; zie de toelichting daar over wat wel/niet geclaimd wordt.
-    $c        = (array) config('bakkerij_telefonie', []);
+    // Landingspagina AI-telefonie van een kanaal (/ai-telefonie-{key}). Inhoud uit
+    // config/{key}_telefonie.php samengevoegd met config/telefonie_basis.php, zie
+    // App\Support\TelefonieConfig. De bakkerij was de eerste (15-09-2026); sinds 16-09 delen
+    // alle kanalen deze view en verschilt alleen de inhoud.
+    $c        = \App\Support\TelefonieConfig::for($site);
     $hero     = (array) ($c['hero'] ?? []);
     $prijs    = (array) ($c['prijs'] ?? []);
     $demo     = trim((string) ($c['demo_nummer'] ?? ''));
@@ -12,6 +14,7 @@
     $contact  = $site->url('contact');
     $heroImg  = $site->image('facet-ai') ?: $site->image('ai-preview');
     $heroSet  = $site->image('facet-ai') ? $site->imageSrcset('facet-ai') : $site->imageSrcset('ai-preview');
+    $pad      = 'ai-telefonie-' . $site->key;
 
     $faqLd = [
         '@context' => 'https://schema.org',
@@ -24,13 +27,13 @@
     $svcLd = [
         '@context'    => 'https://schema.org',
         '@type'       => 'Service',
-        'name'        => 'AI-telefonie voor bakkerijen',
+        'name'        => $c['service_naam'] ?? ('AI-telefonie voor ' . ($c['woorden']['bedrijven'] ?? 'bedrijven')),
         'serviceType' => 'Telefonische AI-assistent',
         'description' => $hero['sub'] ?? '',
         'provider'    => ['@id' => rtrim($site->baseUrl(), '/') . '#org'],
         'areaServed'  => ['@type' => 'Country', 'name' => 'Nederland'],
-        'audience'    => ['@type' => 'BusinessAudience', 'name' => 'Bakkerijen'],
-        'url'         => $site->url('ai-telefonie-bakkerij'),
+        'audience'    => ['@type' => 'BusinessAudience', 'name' => ucfirst((string) ($c['woorden']['bedrijven'] ?? 'Bedrijven'))],
+        'url'         => $site->url($pad),
     ];
     if (! empty($prijs['vanaf'])) {
         $svcLd['offers'] = ['@type' => 'Offer', 'price' => preg_replace('/[^0-9,]/', '', $prijs['vanaf']), 'priceCurrency' => 'EUR', 'description' => 'vanaf, ' . ($prijs['periode'] ?? 'per maand')];
@@ -38,8 +41,8 @@
 @endphp
 @extends('channels.layout')
 
-@section('title', 'AI telefonie voor bakkerijen | AI telefoonassistent die opneemt als jij bakt')
-@section('description', 'AI-telefonie voor je bakkerij: neemt op, beantwoordt vragen over openingstijden en assortiment, legt bestel- en terugbelverzoeken vast en verbindt door. Ook buiten openingstijden. Vanaf ' . ($prijs['vanaf'] ?? '') . ' ' . ($prijs['periode'] ?? '') . '.')
+@section('title', $c['seo_titel'] ?? ($hero['title'] ?? 'AI-telefonie'))
+@section('description', ($c['seo_omschrijving'] ?? ($hero['sub'] ?? '')) . ' Vanaf ' . ($prijs['vanaf'] ?? '') . ' ' . ($prijs['periode'] ?? '') . '.')
 
 @push('head')
     <script type="application/ld+json">{!! json_encode($svcLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
@@ -62,7 +65,7 @@
             <div @if ($heroImg) class="grid cols-2" style="align-items:start;gap:2.6rem" @endif>
                 <div>
                     <span class="eyebrow">{{ $hero['eyebrow'] ?? 'AI-telefonie' }}</span>
-                    <h1>{{ $hero['title'] ?? 'AI-telefonie voor je bakkerij' }}</h1>
+                    <h1>{{ $hero['title'] ?? 'AI-telefonie' }}</h1>
                     <p class="lead">{{ $hero['sub'] ?? '' }}</p>
                     <div style="display:flex;flex-wrap:wrap;gap:.7rem;margin:.4rem 0 .9rem">
                         @if ($demo)
@@ -73,8 +76,8 @@
                             <a href="{{ $contact }}" class="btn btn-ghost">Stel een vraag</a>
                         @endif
                     </div>
-                    @if ($demo)
-                        <p class="muted" style="font-size:.9rem">Het demonummer is {{ $c['demo_bakkerij'] ?? 'een verzonnen bakkerij' }}: een bakkerij die niet bestaat, zodat je vrij kunt vragen wat je wilt. Je sluit niets af door te bellen.</p>
+                    @if ($demo && ! empty($c['demo_noot']))
+                        <p class="muted" style="font-size:.9rem">{{ $c['demo_noot'] }}</p>
                     @endif
                     @if (! empty($hero['usps']))
                         <ul class="hero-usps">
@@ -85,7 +88,7 @@
                 @if ($heroImg)
                     <div>
                         <img src="{{ $heroImg }}" @if ($heroSet) srcset="{{ $heroSet }}" sizes="(max-width:760px) 92vw, 46vw" @endif
-                             alt="De telefonische assistent van een bakkerij" loading="eager" decoding="async" width="1536" height="1024"
+                             alt="{{ $hero['alt'] ?? 'De telefonische assistent' }}" loading="eager" decoding="async" width="1536" height="1024"
                              style="width:100%;height:auto;border-radius:var(--radius);display:block;box-shadow:0 24px 60px -24px rgba(0,0,0,.4)">
                     </div>
                 @endif
@@ -96,7 +99,7 @@
     <section data-section="wanneer">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Herken je dit?</span>
-            <h2>{{ $c['wanneer_titel'] ?? '' }}</h2>
+            <h2>{{ $c['wanneer_titel'] ?? 'Wanneer de telefoon het meeste stoort' }}</h2>
             <div class="grid cols-2 feature-grid" style="margin-top:1.6rem">
                 @foreach ((array) ($c['wanneer'] ?? []) as $w)
                     <div class="feature-card">
@@ -112,8 +115,8 @@
     <section data-section="gesprekken" style="background:var(--c-tint,var(--c-surface))">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Voorbeeldgesprekken</span>
-            <h2>{{ $c['gesprekken_titel'] ?? '' }}</h2>
-            <p class="section-lead">De antwoorden hieronder komen uit de gegevens die de bakkerij zelf heeft aangeleverd. Zo praat de assistent ook over jouw bakkerij: alleen wat jij hebt doorgegeven.</p>
+            <h2>{{ $c['gesprekken_titel'] ?? 'Zo klinkt dat, in gewoon Nederlands' }}</h2>
+            <p class="section-lead">{{ $c['gesprekken_lead'] ?? '' }}</p>
             <div class="grid cols-2" style="gap:1rem">
                 @foreach ((array) ($c['gesprekken'] ?? []) as $g)
                     <div class="card">
@@ -125,17 +128,17 @@
         </div>
     </section>
 
-    {{-- De demo zelf: pas zichtbaar als er een nummer is (config demo_nummer). --}}
+    {{-- De demo zelf: pas zichtbaar als er een nummer én kaartjes zijn. --}}
     @if ($demo && ! empty($c['demo_kaartjes']))
         <section data-section="demo" id="demo">
             <div class="wrap">
                 <span class="kicker"><span class="kicker-line"></span> Probeer het zelf</span>
-                <h2>Bel {{ $c['demo_bakkerij'] ?? 'de demo' }} op {{ $demo }}</h2>
-                <p class="lead">{{ $c['demo_bakkerij'] ?? 'De demobakkerij' }} bestaat niet, het assortiment wel. Bestel iets, of bel met een van deze bestelnummers en vraag of je bestelling klaar is. Er wordt niets gebakken en niets afgerekend.</p>
+                <h2>{{ $c['demo_titel'] ?? ('Bel de demo op ' . $demo) }}</h2>
+                <p class="lead">{{ $c['demo_lead'] ?? '' }}</p>
                 <div class="grid cols-2 feature-grid" style="margin-top:1.6rem">
                     @foreach ((array) $c['demo_kaartjes'] as $k)
                         <div class="feature-card">
-                            <h3>Bestelnummer {{ $k['nummer'] }} &middot; {{ $k['naam'] }}</h3>
+                            <h3>{{ $k['kop'] }}</h3>
                             <span class="feature-rule"></span>
                             <p>{{ $k['hoor'] }}</p>
                         </div>
@@ -157,7 +160,7 @@
     <section data-section="kan">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Wat hij doet</span>
-            <h2>{{ $c['kan_titel'] ?? '' }}</h2>
+            <h2>{{ $c['kan_titel'] ?? 'Wat de assistent afhandelt' }}</h2>
             <div class="grid cols-2 feature-grid" style="margin-top:1.6rem">
                 @foreach ((array) ($c['kan'] ?? []) as $k)
                     <div class="feature-card">
@@ -224,33 +227,35 @@
                             <li>{{ ucfirst($prijs['opzeg'] ?? '') }}</li>
                         </ul>
                     </div>
-                    <p class="muted">{{ $prijs['toelichting'] ?? '' }} Wil je AI-telefonie samen met een <a href="{{ $site->url('webshop') }}">webshop</a> of <a href="{{ $site->url('automatisering') }}">automatisering</a>, dan maken we één prijs voor het geheel.</p>
+                    <p class="muted">{{ $prijs['toelichting'] ?? '' }} Wil je AI-telefonie samen met een <a href="{{ $site->url($c['prijs_combi_facet'] ?? 'website') }}">{{ $c['prijs_combi_label'] ?? 'website' }}</a> of <a href="{{ $site->url('automatisering') }}">automatisering</a>, dan maken we één prijs voor het geheel.</p>
                 </div>
             </div>
         </section>
     @endif
 
-    @include('channels.partials.bakkerij-telefonie-rekenhulp')
+    @include('channels.partials.telefonie-rekenhulp', ['site' => $site, 'c' => $c])
 
     <section data-section="faq">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Veelgestelde vragen</span>
-            <h2>Wat bakkers ons vragen over AI-telefonie</h2>
+            <h2>{{ $c['faq_titel'] ?? 'Veelgestelde vragen over AI-telefonie' }}</h2>
             @include('channels.partials.faq-accordion', ['items' => (array) ($c['faq'] ?? [])])
         </div>
     </section>
 
-    <section data-section="verder" style="background:var(--c-tint,var(--c-surface))">
-        <div class="wrap">
-            <span class="kicker"><span class="kicker-line"></span> Hoort erbij</span>
-            <h2>Telefoon, webshop en administratie op elkaar aansluiten</h2>
-            <div class="grid cols-3" style="gap:1rem">
-                <a class="card" href="{{ $site->url('webshop') }}"><strong>Webshop voor bakkerijen</strong><br><span class="muted">Laat klanten die nu bellen om te bestellen, dat online doen met een afhaaltijd en vooraf betalen.</span></a>
-                <a class="card" href="{{ $site->url('automatisering') }}"><strong>Bestellingen automatisch verwerken</strong><br><span class="muted">Een verzoek dat de assistent vastlegt, komt op dezelfde productielijst als een webshopbestelling.</span></a>
-                <a class="card" href="{{ $site->url('klantenportaal') }}"><strong>Klantenportaal voor zakelijke klanten</strong><br><span class="muted">Horeca en kantoren die nu elke avond bellen, bestellen zelf.</span></a>
+    @if (! empty($c['verder']))
+        <section data-section="verder" style="background:var(--c-tint,var(--c-surface))">
+            <div class="wrap">
+                <span class="kicker"><span class="kicker-line"></span> Hoort erbij</span>
+                <h2>{{ $c['verder_titel'] ?? '' }}</h2>
+                <div class="grid cols-3" style="gap:1rem">
+                    @foreach ((array) $c['verder'] as $v)
+                        <a class="card" href="{{ $site->url($v['facet'] ?? '') }}"><strong>{{ $v['t'] }}</strong><br><span class="muted">{{ $v['b'] }}</span></a>
+                    @endforeach
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     <section data-section="cta">
         <div class="wrap" style="text-align:center">

@@ -1,14 +1,16 @@
 @php
-    // Rekenhulp "wat levert AI-telefonie op" voor de bakkerij-telefoniepagina (16-09-2026).
-    // Cijfers uit config/bakkerij_telefonie.php -> rekenhulp. De eerste stand wordt hier in
-    // PHP uitgerekend zodat de pagina zonder JavaScript al een compleet voorbeeld toont;
+    // Rekenhulp "wat levert AI-telefonie op" op de telefoniepagina van een kanaal (16-09-2026,
+    // eerst alleen bakkerij). Verwacht $c = TelefonieConfig::for($site); cijfers en teksten
+    // staan in $c['rekenhulp'] (basis + kanaal). De eerste stand wordt hier in PHP
+    // uitgerekend zodat de pagina zonder JavaScript al een compleet voorbeeld toont;
     // de schuiven rekenen daarna in de browser met dezelfde formule (zie script onderaan).
     //
     // WAT ER BEWUST NIET IN ZIT: winst uit gemiste bestellingen (we tonen omzet en zeggen
     // dat), en een claim dat de assistent personeel vervangt. De uitkomst heet "vrij"
     // en "misgelopen", nooit "besparing op personeel".
-    $rk   = (array) config('bakkerij_telefonie.rekenhulp', []);
+    $rk   = (array) ($c['rekenhulp'] ?? []);
     $st   = (array) ($rk['standaard'] ?? []);
+    $tk   = (array) ($rk['teksten'] ?? []);
     $maand = (float) ($rk['maandprijs'] ?? 89);
     $inbeg = (int) ($rk['inbegrepen_gesprekken'] ?? 200);
     $extra = (float) ($rk['extra_per_gesprek'] ?? 0.45);
@@ -33,13 +35,16 @@
     $gesprAI    = $perMaand + $gemistWk * $weken;
     $eurKosten  = $maand + max(0, $gesprAI - $inbeg) * $extra;
     $eur = fn ($x) => '€ ' . number_format($x, 0, ',', '.');
-    $eenmalig = preg_replace('/ voor .*/', '', (string) config('bakkerij_telefonie.prijs.eenmalig', '€ 295'));
+    // Bereik van de waardeschuif volgt het vak: € 18 voor een taart, € 6.000 voor een architect.
+    $wrdMax  = max(120, (int) ceil($bestWrd * 3));
+    $wrdStep = $wrdMax > 1000 ? 50 : ($wrdMax > 300 ? 5 : 1);
+    $eenmalig = preg_replace('/ voor .*/', '', (string) ($c['prijs']['eenmalig'] ?? '€ 295'));
 @endphp
 <section data-section="rekenhulp">
     <div class="wrap">
         <span class="kicker"><span class="kicker-line"></span> Wat het je oplevert</span>
         <h2>Reken het na met je eigen cijfers</h2>
-        <p class="lead muted" style="max-width:62ch">Een rekenvoorbeeld, geen belofte. Zet de schuiven op jouw bakkerij en zie wat de telefoon je nu per maand kost aan tijd en onderbrekingen, en welke omzet er in gemiste telefoontjes zit.</p>
+        <p class="lead muted" style="max-width:62ch">{{ $tk['lead'] ?? 'Een rekenvoorbeeld, geen belofte.' }}</p>
 
         <form class="rk" id="rk" onsubmit="return false">
             <div class="rk-in">
@@ -60,10 +65,10 @@
                     <input type="range" id="rk_oppakken" name="oppakken" min="0" max="10" step="0.5" value="{{ $oppakken }}">
                     <label for="rk_gemist">Telefoontjes per week die niemand opneemt <output id="rk_gemist_o">{{ $gemistWk }}</output></label>
                     <input type="range" id="rk_gemist" name="gemist" min="0" max="50" step="1" value="{{ $gemistWk }}">
-                    <label for="rk_best_pct">Deel daarvan dat een bestelling was <output id="rk_best_pct_o">{{ $bestPct }}%</output></label>
+                    <label for="rk_best_pct">{{ $tk['deel_label'] ?? 'Deel daarvan dat een opdracht was' }} <output id="rk_best_pct_o">{{ $bestPct }}%</output></label>
                     <input type="range" id="rk_best_pct" name="best_pct" min="0" max="100" step="5" value="{{ $bestPct }}">
-                    <label for="rk_best_wrd">Gemiddelde bestelling aan de telefoon <output id="rk_best_wrd_o">€ {{ $bestWrd }}</output></label>
-                    <input type="range" id="rk_best_wrd" name="best_wrd" min="5" max="120" step="1" value="{{ $bestWrd }}">
+                    <label for="rk_best_wrd">{{ $tk['waarde_label'] ?? 'Gemiddelde waarde van een opdracht' }} <output id="rk_best_wrd_o">€ {{ $bestWrd }}</output></label>
+                    <input type="range" id="rk_best_wrd" name="best_wrd" min="0" max="{{ $wrdMax }}" step="{{ $wrdStep }}" value="{{ $bestWrd }}">
                     <label for="rk_afh">Deel van de gesprekken dat de assistent zelf afrondt <output id="rk_afh_o">{{ $afhPct }}%</output></label>
                     <input type="range" id="rk_afh" name="afh" min="30" max="95" step="5" value="{{ $afhPct }}">
                 </div>
@@ -71,9 +76,9 @@
 
             <div class="rk-uit card" aria-live="polite">
                 <div class="rk-tegels">
-                    <div><b id="rk_u_uren">{{ number_format($urenTel + $urenOnderb, 0, ',', '.') }} uur</b><span>per maand niet meer aan de telefoon of erdoor onderbroken</span></div>
-                    <div><b id="rk_u_tijd">{{ $eur($eurTijd) }}</b><span>aan loonkosten die vrijkomen voor de winkel en de bakkerij</span></div>
-                    <div><b id="rk_u_omzet">{{ $eur($eurOmzet) }}</b><span>omzet per maand in telefoontjes die nu niemand opneemt</span></div>
+                    <div><b id="rk_u_uren">{{ number_format($urenTel + $urenOnderb, 0, ',', '.') }} uur</b><span>{{ $tk['uren_tegel'] ?? 'per maand niet meer aan de telefoon of erdoor onderbroken' }}</span></div>
+                    <div><b id="rk_u_tijd">{{ $eur($eurTijd) }}</b><span>{{ $tk['tijd_tegel'] ?? 'aan loonkosten die vrijkomen voor het werk zelf' }}</span></div>
+                    <div><b id="rk_u_omzet">{{ $eur($eurOmzet) }}</b><span>{{ $tk['omzet_tegel'] ?? 'omzet per maand in telefoontjes die nu niemand opneemt' }}</span></div>
                     <div><b id="rk_u_kosten">{{ $eur($eurKosten) }}</b><span>kost de assistent per maand bij <em id="rk_u_gespr">{{ number_format($gesprAI, 0, ',', '.') }}</em> gesprekken</span></div>
                 </div>
                 <p class="rk-som">Per maand: <strong id="rk_u_saldo">{{ $eur($eurTijd + $eurOmzet - $eurKosten) }}</strong> <span id="rk_u_saldo_t">aan vrijgekomen tijd en niet-gemiste omzet, na aftrek van de assistent.</span></p>

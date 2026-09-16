@@ -69,7 +69,7 @@
         </div>
     </section>
 
-    @if (($telCfg = config('channel_telefonie.' . $site->key)) && ($telPrijs = (array) config($telCfg . '.prijs', [])))
+    @if ($telPrijs = (array) (\App\Support\TelefonieConfig::for($site)['prijs'] ?? []))
         {{-- AI-telefonie los af te nemen; prijs uit de telefonie-config van dit kanaal (15-09-2026). --}}
         <section style="background:var(--c-tint,var(--c-surface))">
             <div class="wrap">
