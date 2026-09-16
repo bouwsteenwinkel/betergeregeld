@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ChannelSite;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChannelEvent;
+use App\Support\BotUa;
 use App\Support\ChannelSite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -25,6 +26,14 @@ class ChannelEventController extends Controller
 
         // Allowlist: onbekende/micro-events stil laten vallen (204), geen ruis of misbruik.
         if (! in_array($event, ChannelEvent::ALLOWED, true)) {
+            return response('', 204);
+        }
+
+        // Crawlers die JavaScript renderen (Bingbot, Meta, Lighthouse, headless
+        // Chrome) vuren deze beacon net als een browser en stonden zo als
+        // "bezoeker" op het kiosk-scherm. Zelfde lijst als verkeer:bots; de UA
+        // wordt alleen gelezen, niet bewaard.
+        if (BotUa::isBot($request->userAgent())) {
             return response('', 204);
         }
 

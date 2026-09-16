@@ -54,7 +54,9 @@
   <div class="k-kpi">
     <div class="lbl">Bezoekers vandaag</div>
     <div class="val" id="k-bezoek">{{ bg_num($d['bezoek_vandaag']) }}</div>
-    <div class="sub"><span id="k-pv">{{ bg_num($d['pageviews_vandaag']) }}</span> paginaweergaven</div>
+    {{-- Pagina's per bezoeker: rond de 1 = crawlers die per pagina een nieuwe sessie
+         beginnen; echte mensen klikken door. Zie verkeer:bots. --}}
+    <div class="sub"><span id="k-pv">{{ bg_num($d['pageviews_vandaag']) }}</span> paginaweergaven · <span id="k-ppb">{{ $d['bezoek_vandaag'] > 0 ? number_format($d['pageviews_vandaag'] / $d['bezoek_vandaag'], 1, ',', '.') : '–' }}</span> per bezoeker</div>
   </div>
   <div class="k-kpi">
     <div class="lbl">Offerte-aanvragen</div>
@@ -158,6 +160,7 @@
         set('k-tijd', d.tijd);
         set('k-bezoek', num(d.bezoek_vandaag));
         set('k-pv', num(d.pageviews_vandaag));
+        set('k-ppb', d.bezoek_vandaag > 0 ? (d.pageviews_vandaag / d.bezoek_vandaag).toFixed(1).replace('.', ',') : '–');
         set('k-lead', num(d.lead_open));
         set('k-leadweek', num(d.lead_week));
         set('k-afspraak', num(d.afspraak_komend));

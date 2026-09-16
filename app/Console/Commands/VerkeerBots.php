@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\BotUa;
 use Illuminate\Console\Command;
 
 /**
@@ -45,37 +46,9 @@ class VerkeerBots extends Command
     /** User-agents die over alle hosts samen boven de drempel zitten: crawlers met browser-UA. */
     private array $massaalUa = [];
 
-    /** Bekende crawlers/fetchers op user-agent, in volgorde van herkenning. */
-    private const BOTS = [
-        'Googlebot' => '~Googlebot|Google-InspectionTool|Storebot-Google|GoogleOther|APIs-Google|AdsBot-Google|Mediapartners-Google~i',
-        'Bingbot' => '~bingbot|BingPreview|msnbot~i',
-        'Applebot' => '~Applebot~i',
-        'ClaudeBot' => '~ClaudeBot|anthropic-ai~i',
-        'Claude-User' => '~Claude-User|Claude-SearchBot~i',
-        'GPTBot' => '~GPTBot~i',
-        'OpenAI-zoek' => '~OAI-SearchBot|ChatGPT-User~i',
-        'Perplexity' => '~Perplexity~i',
-        'Amazonbot' => '~Amazonbot~i',
-        'Meta' => '~meta-externalagent|meta-externalfetcher|facebookexternalhit|FacebookBot|meta-webindexer~i',
-        'CCBot' => '~CCBot~i',
-        'Bytespider' => '~Bytespider|TikTokSpider~i',
-        'Ahrefs' => '~AhrefsBot|AhrefsSiteAudit~i',
-        'Semrush' => '~SemrushBot|SiteAuditBot~i',
-        'Majestic' => '~MJ12bot~i',
-        'DotBot' => '~DotBot~i',
-        'Barkrowler' => '~Barkrowler~i',
-        'DataForSeo' => '~DataForSeoBot~i',
-        'Yandex' => '~YandexBot|YandexImages~i',
-        'PetalBot' => '~PetalBot~i',
-        'Seznam' => '~SeznamBot~i',
-        'DuckDuck' => '~DuckDuckBot|DuckAssistBot~i',
-        'Baidu' => '~Baiduspider~i',
-        'Headless' => '~HeadlessChrome|PhantomJS|Puppeteer|Playwright|Selenium~i',
-        'Lighthouse' => '~Chrome-Lighthouse|Lighthouse|PageSpeed|GTmetrix|PSI~',
-        'Uptime' => '~UptimeRobot|Pingdom|StatusCake|Site24x7|BetterUptime|Uptime-Kuma|monitor~i',
-        'gereedschap' => '~curl/|Wget/|python-requests|python-urllib|aiohttp|Go-http-client|Java/|okhttp|axios/|node-fetch|undici|libwww|Scrapy|HttpClient|Apache-HttpClient|PostmanRuntime|Faraday|Ruby|PHP/|Guzzle|Symfony|Laravel~i',
-        'overige-bot' => '~bot|crawl|spider|scrap|fetch|slurp|archive\.org|ia_archiver|Screaming|SiteCheck|LinkCheck|Validator|Dataprovider|Netcraft|censys|shodan|zgrab|masscan|nmap~i',
-    ];
+    // De crawlerlijst staat in App\Support\BotUa: dezelfde lijst houdt live de
+    // event-beacon (/_ev) schoon, zodat het kiosk-scherm en dit rapport één
+    // definitie van "bot" delen.
 
     /** Adressen die alleen een scanner opvraagt op een Laravel-site zonder WordPress. */
     private const SCAN_PAD = '~\.(php|asp|aspx|jsp|cgi|env|git|sql|bak|zip|rar|tar|gz)$|/wp-|/wordpress|/xmlrpc|/administrator|/phpmyadmin|/pma|/\.git|/\.env|/vendor/|/cgi-bin|/proc/self|/etc/passwd|/console$|/actuator|/telescope|/_ignition|/\.well-known/(?!acme)|/boaform|/HNAP1|/shell|/config\.(json|yml|yaml)$~i';
@@ -512,16 +485,7 @@ class VerkeerBots extends Command
 
     private function botNaam(string $ua): ?string
     {
-        if ($ua === '-' || $ua === '') {
-            return 'leeg';
-        }
-        foreach (self::BOTS as $naam => $re) {
-            if (preg_match($re, $ua)) {
-                return $naam;
-            }
-        }
-
-        return null;
+        return BotUa::naam($ua);
     }
 
     /**

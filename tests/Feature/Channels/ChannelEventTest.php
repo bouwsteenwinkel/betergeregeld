@@ -26,6 +26,10 @@ class ChannelEventTest extends TestCase
             $this->fail('Deze test mag alleen op de sqlite-wegwerpdatabase draaien.');
         }
         (require database_path('migrations/2026_07_18_120000_create_channel_events_table.php'))->up();
+
+        // Symfony's test-UA is letterlijk "Symfony" en telt (terecht) als gereedschap;
+        // de beacon telt alleen browsers. Dus: als browser aanmelden.
+        $this->withHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36');
     }
 
     public function test_allowlisted_event_wordt_opgeslagen(): void
@@ -47,6 +51,16 @@ class ChannelEventTest extends TestCase
         // Alleen scalaire params; geneste rommel valt weg.
         $this->assertSame(['seconds' => 7], $row->params);
         $this->assertNotEmpty($row->visit_ref);
+    }
+
+    public function test_bot_user_agent_wordt_stil_genegeerd(): void
+    {
+        foreach (['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)', 'pc', ''] as $ua) {
+            $res = $this->withHeaders(['User-Agent' => $ua])
+                ->postJson($this->url, ['e' => 'page_view', 'p' => '/']);
+            $res->assertNoContent();
+        }
+        $this->assertSame(0, ChannelEvent::count());
     }
 
     public function test_onbekend_event_wordt_stil_genegeerd(): void
