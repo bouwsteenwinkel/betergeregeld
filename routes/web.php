@@ -74,7 +74,10 @@ Route::prefix('afspraak')->group(function () {
     // meldde dat op 16-09-2026 als "geblokkeerd vanwege ander 4xx-probleem" (apotheek).
     // Een GET op de boekings-URL is nooit een pagina: terug naar de afspraakpagina van
     // hetzelfde domein (channel-sites: /afspraak; betergeregeld.com: /nl/afspraak).
-    Route::get('/boeken', fn () => redirect(app()->bound(\App\Support\ChannelSite::class) ? '/afspraak' : '/nl/afspraak', 302));
+    Route::get('/boeken', function (\Illuminate\Http\Request $request) {
+        $channel = app(\App\Services\ChannelSiteResolver::class)->byHost($request->getHost());
+        return redirect($channel ? '/afspraak' : '/nl/afspraak', 302);
+    });
 
     // Annuleren/verzetten via de persoonlijke cancel_token-link uit de bevestigingsmail.
     // Staat hier (buiten de locale-prefix) zodat de mail-link schoon en stabiel is, net
