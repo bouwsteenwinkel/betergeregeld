@@ -44,6 +44,14 @@ return [
         'toestel_naam'=> 'Autobedrijf De Wissel',
         'toestel_sub' => 'Inkomend gesprek · de assistent neemt op',
         'tijd'        => '08:03',
+        // Luisterstrook onder de band: de ingesproken demo op telefonie.betergeregeld.com.
+        'luister' => [
+            'url'          => 'https://telefonie.betergeregeld.com/demo/garage',
+            'titel'        => 'Liever eerst luisteren?',
+            'sub'          => 'Vijf ingesproken gesprekken met Autobedrijf De Wissel, naast het portaal dat live meebeweegt',
+            'duur'         => '± 6 min',
+            'hoofdstukken' => ['Is mijn auto klaar?', 'APK verloopt, afspraak en leenauto', 'Wachten op een onderdeel', 'Piepende remmen', 'Pech langs de weg'],
+        ],
         'gesprek' => [
             ['b', 'Is mijn auto al klaar? Kenteken 12-KLM-3.'],
             ['a', 'Dat kijk ik na. Mag ik uw achternaam?'],

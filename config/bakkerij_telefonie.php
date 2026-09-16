@@ -56,6 +56,14 @@ return [
         'toestel_naam'=> 'Bakkerij Kruimel',
         'toestel_sub' => 'Inkomend gesprek · de assistent neemt op',
         'tijd'        => '07:48',
+        // Luisterstrook onder de band: de ingesproken demo op telefonie.betergeregeld.com.
+        'luister' => [
+            'url'          => 'https://telefonie.betergeregeld.com/demo/bakkerij',
+            'titel'        => 'Liever eerst luisteren?',
+            'sub'          => 'Vijf ingesproken gesprekken met Bakkerij Kruimel, naast het portaal dat live meebeweegt',
+            'duur'         => '± 7 min',
+            'hoofdstukken' => ['Verjaardagstaart voor zaterdag', 'Veertig broodjes in de avond', 'Bestelling klaar en een allergievraag', 'Zondagavond: brood en bruidstaart', 'Taart wijzigen en een klacht'],
+        ],
         'gesprek' => [
             ['b', 'Kan ik een slagroomtaart bestellen voor zaterdag?'],
             ['a', 'Dat kan. Voor hoeveel personen, en wilt u er een tekst op?'],
