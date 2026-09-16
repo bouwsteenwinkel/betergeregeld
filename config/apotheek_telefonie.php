@@ -9,13 +9,29 @@
  * noteren, dienstwaarneming buiten openingstijden, en STOPPEN bij werking, bijwerking,
  * dosering of interactie. Rode woorden (spoed) gaan altijd door naar een mens.
  *
- * demo_nummer: bewust leeg. 5150 is de demo voor een concrete lead en de patiëntgegevens
- * veranderen door een gesprek (herhaalverzoeken landen echt); pas openbaar zetten als die
- * demo, net als de garage, na elk gesprek weer schoon is.
+ * demo_nummer: 088 254 5150 is de apotheekdemo (Dennis, 16-09-2026: "de bestaande 5150 is
+ * de demo voor apothekers"). De drie patiënten zijn de vaste rijen uit
+ * scripts/_aitest-apotheek-tabellen.php; herhaalverzoeken landen in het demoportaal.
  */
 
 return [
-    'demo_nummer'    => '',
+    'demo_nummer'    => '088 254 5150',
+    'demo_naam'      => 'Apotheek De Linde',
+    'demo_noot'      => 'Het demonummer is Apotheek De Linde: een apotheek die niet bestaat, met drie verzonnen patiënten, zodat je vrij kunt vragen wat je wilt. Je sluit niets af door te bellen.',
+    'demo_titel'     => 'Bel Apotheek De Linde op 088 254 5150',
+    'demo_lead'      => 'De Linde bestaat niet, de drie patiënten ook niet. Bel als een van hen, met geboortedatum en postcode, en vraag of het recept klaarligt of vraag een herhaling aan. Stel gerust een vraag over dosering: dan hoor je precies waar hij stopt. Er wordt niets bereid en niets bezorgd.',
+    'demo_kaartjes' => [
+        ['kop' => 'Willemien de Groot · 14 maart 1951 · 3817 GH', 'hoor' => 'Bloeddrukverlager, herhaalbaar. Er ligt niets klaar; hij biedt aan een herhaalverzoek te noteren.'],
+        ['kop' => 'Ahmed Yilmaz · 2 november 1978 · 3823 CD',     'hoor' => 'Maagbeschermer, klaar sinds gisteren. Hij zegt dat het in de afhaalkluis ligt.'],
+        ['kop' => 'Trees Bakker · 27 juli 1943 · 3817 GH',        'hoor' => 'Bloedverdunner, vandaag klaar aan de balie. Zelfde postcode als Willemien: alleen een postcode is nooit genoeg.'],
+        ['kop' => 'Iemand die niet bestaat',                       'hoor' => 'Noem een andere geboortedatum: hij vindt niemand, zegt dat eerlijk en raadt niet.'],
+    ],
+    'demo_probeer' => [
+        'Vraag of je een middel samen met paracetamol mag nemen: hij stopt en verbindt door naar de apotheker.',
+        'Vraag welke apotheek vanavond dienst heeft: Dienstapotheek Eemland, dag en nacht open.',
+        'Bel voor je moeder zonder haar gegevens: hij zegt niets, ook niet dat ze patiënt is.',
+        'Bel na half zes: hij verbindt niet door maar noemt de dienstapotheek en legt je verzoek vast.',
+    ],
     'kantoor_nummer' => '088-2545101',
     'infoblad'         => 'apotheek',         // config/telefonie_infobladen.php, knop naast het demonummer
 
