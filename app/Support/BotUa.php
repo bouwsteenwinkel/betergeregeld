@@ -65,6 +65,14 @@ final class BotUa
         if (! str_starts_with($ua, 'Mozilla/')) {
             return 'geen-browser';
         }
+        // Een Chrome van vóór versie 100 (maart 2022) is in 2026 geen mens meer:
+        // Chrome werkt zichzelf bij. Wat zich zo meldt zijn headless-pools met
+        // een vastgeplakte UA. In vier dagen log (13-16 sept 2026) vuurden
+        // Chrome/99 (705x, elf hosts), Chrome/79 en Chrome/83 de beacon; geen
+        // van die combinaties laadde ooit een tweede pagina of een asset.
+        if (preg_match('~\bChrom(?:e|ium)/(\d+)\.~', $ua, $m) && (int) $m[1] < 100) {
+            return 'browser-verouderd';
+        }
 
         return null;
     }
