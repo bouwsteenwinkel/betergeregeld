@@ -230,6 +230,8 @@
         </section>
     @endif
 
+    @include('channels.partials.bakkerij-telefonie-rekenhulp')
+
     <section data-section="faq">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Veelgestelde vragen</span>

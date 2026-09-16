@@ -48,6 +48,27 @@ return [
         'toelichting'  => 'Een gemiddeld gesprek van anderhalve minuut kost ons zelf ongeveer twintig cent aan spraak en rekentijd; een lang bestelgesprek het dubbele. Wat je betaalt is vooral de inrichting, het nummer en het bijhouden van jouw gegevens. Je assortiment mag zo groot zijn als je wilt: de assistent zoekt erin op, hij leert het niet uit zijn hoofd, dus dat kost niets extra.',
     ],
 
+    // Rekenhulp op de telefoniepagina ("wat levert het op"). De prijzen hier moeten
+    // gelijk blijven aan 'prijs' hierboven; de standaardwaarden zijn de startstand van de
+    // schuiven en bewust bescheiden gekozen. Het is een rekenvoorbeeld, geen belofte:
+    // de tekst op de pagina zegt dat ook.
+    'rekenhulp' => [
+        'maandprijs'           => 89,
+        'inbegrepen_gesprekken'=> 200,
+        'extra_per_gesprek'    => 0.45,
+        'standaard' => [
+            'per_dag'        => 12,   // telefoontjes per werkdag
+            'dagen'          => 6,    // werkdagen per week
+            'minuten'        => 2,    // gemiddelde duur per gesprek
+            'uurloon'        => 22,   // loonkosten per uur, alles erin
+            'oppakken'       => 3,    // minuten om de draad weer op te pakken na een onderbreking
+            'gemist_per_week'=> 8,    // gesprekken die nu niet opgenomen worden (druk, gesloten)
+            'bestelling_pct' => 25,   // deel daarvan dat een bestelling was
+            'bestelwaarde'   => 18,   // gemiddelde bestelling aan de telefoon
+            'afhandel_pct'   => 70,   // deel van de gesprekken dat de assistent zelf afrondt
+        ],
+    ],
+
     'hero' => [
         'eyebrow' => 'AI-telefonie voor bakkerijen',
         'title'   => 'AI-telefonie voor je bakkerij: de telefoon wordt opgenomen, ook als jij geen tijd hebt',
