@@ -168,6 +168,36 @@
 	</div>
 </section>
 
+{{-- ============ LUISTER MEE ============ --}}
+{{-- De drie ingesproken luisterdemo's op telefonie.betergeregeld.com (config/telefonie_basis.php). --}}
+@php $luisterdemos = (array) config('telefonie_basis.luisterdemos', []); @endphp
+@if ($luisterdemos)
+<section class="py-20 border-b border-[color:var(--color-line)]">
+	<div class="max-w-[1400px] mx-auto px-6">
+		<div class="max-w-3xl mb-10">
+			<span class="pill pill-teal mb-3">Luister mee</span>
+			<h2 class="display-2 mb-5">Hoor hoe ze klinkt, voordat u belt.</h2>
+			<p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed">Drie verzonnen bedrijven, drie echte assistenten. Per demo vijf ingesproken gesprekken, met ernaast het portaal dat live meebeweegt: u ziet wat de ondernemer ervan terugziet.</p>
+		</div>
+		<div class="grid md:grid-cols-3 gap-5">
+			@foreach ($luisterdemos as $d)
+				<a href="{{ $d['url'] }}" class="card flex flex-col gap-3">
+					<div class="flex items-center gap-3">
+						<span class="w-11 h-11 rounded-full bg-[color:var(--color-accent)] text-white flex items-center justify-center shrink-0"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+						<span><span class="block text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent-hover)]">{{ $d['vak'] }} · demo</span><span class="block font-bold text-lg leading-tight">{{ $d['bedrijf'] }}</span></span>
+					</div>
+					<p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed" style="margin:0">{{ $d['waarom'] }}</p>
+					<ol class="text-sm space-y-1" style="margin:0;padding:0;list-style:none">
+						@foreach ((array) $d['hoofdstukken'] as $i => $h)<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent-hover)] font-bold flex items-center justify-center shrink-0" style="font-size:11px">{{ $i + 1 }}</span><span>{{ $h }}</span></li>@endforeach
+					</ol>
+					<span class="mt-auto pt-3 border-t border-[color:var(--color-line)] flex justify-between items-center text-sm"><span class="font-semibold text-[color:var(--color-accent-hover)]">Luister mee →</span><span class="text-[color:var(--color-ink-muted)]">{{ $d['duur'] }} · bel {{ $d['nummer'] }}</span></span>
+				</a>
+			@endforeach
+		</div>
+	</div>
+</section>
+@endif
+
 {{-- ============ PRIVACY ============ --}}
 <section class="section-dark relative overflow-hidden">
 	<div class="absolute inset-0 grid-pattern opacity-40"></div>

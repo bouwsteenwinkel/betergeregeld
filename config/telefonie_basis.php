@@ -115,6 +115,34 @@ return [
         ['facet' => 'klantenportaal', 't' => 'Klantenportaal',                 'b' => 'Vaste :klanten die nu bellen om iets op te vragen, regelen het zelf.'],
     ],
 
+    // De drie ingesproken luisterdemo's op telefonie.betergeregeld.com (V3, page-demo.php).
+    // Elke telefoniepagina, Groeidiamant en channel-home toont ze; 'luister_voorkeur' zegt
+    // welke het dichtst bij dít vak ligt en dus vooraan staat. Een kanaal kan dat
+    // overschrijven met 'luister_demo' in zijn eigen config.
+    'luisterdemos' => [
+        'apotheek' => [
+            'url' => 'https://telefonie.betergeregeld.com/demo/apotheek', 'vak' => 'Apotheek', 'bedrijf' => 'Apotheek De Linde', 'nummer' => '088 254 5150', 'duur' => '± 6 min',
+            'waarom' => 'Identificeren, een recept nakijken, een terugbelverzoek en precies zien waar hij stopt.',
+            'hoofdstukken' => ['Herhaalrecept en bezorgen', 'Klaarliggen en eigen risico', 'Een bijwerking', 'Inschrijven en de dienstapotheek', 'Spoed'],
+        ],
+        'garage' => [
+            'url' => 'https://telefonie.betergeregeld.com/demo/garage', 'vak' => 'Garage', 'bedrijf' => 'Autobedrijf De Wissel', 'nummer' => '088 254 5160', 'duur' => '± 6 min',
+            'waarom' => 'Status van een klus, een afspraak inplannen en een technische vraag netjes doorzetten.',
+            'hoofdstukken' => ['Is mijn auto klaar?', 'APK verloopt, afspraak en leenauto', 'Wachten op een onderdeel', 'Piepende remmen', 'Pech langs de weg'],
+        ],
+        'bakkerij' => [
+            'url' => 'https://telefonie.betergeregeld.com/demo/bakkerij', 'vak' => 'Bakkerij', 'bedrijf' => 'Bakkerij Kruimel', 'nummer' => '088 254 5170', 'duur' => '± 7 min',
+            'waarom' => 'Bestellingen aannemen, een volle zaak, en een klacht die netjes wordt opgevangen.',
+            'hoofdstukken' => ['Verjaardagstaart voor zaterdag', 'Veertig broodjes in de avond', 'Bestelling klaar en een allergievraag', 'Zondagavond: brood en bruidstaart', 'Taart wijzigen en een klacht'],
+        ],
+    ],
+    'luister_voorkeur' => [
+        'apotheek' => 'apotheek', 'acupuncturist' => 'apotheek', 'dietist' => 'apotheek', 'advocaat' => 'apotheek',
+        'administratiekantoor' => 'apotheek', 'architect' => 'apotheek', 'yogastudio' => 'apotheek', 'golfschool' => 'apotheek', 'rijschool' => 'apotheek',
+        'autogarage' => 'garage', 'uitlaat-remmen' => 'garage', 'aannemer' => 'garage', 'klusbedrijf' => 'garage', 'loodgieter' => 'garage', 'badkamerspecialist' => 'garage',
+        'bakkerij' => 'bakkerij', 'bedrijfswebsite' => 'apotheek',
+    ],
+
     'cta_titel' => 'Hoor het zelf, of vraag een demo aan',
     'cta_tekst' => 'Plan een gesprek van een half uur; dan richten we een proefversie in met jouw :gegevens en bel je zelf om te horen hoe hij reageert.',
 ];

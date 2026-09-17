@@ -92,6 +92,11 @@
          op de eigen landingspagina (/{facet}). De home funnelt via de kaarten hierboven. --}}
 
     {{-- Gedeelde aanpak / waarom / CTA --}}
+    {{-- Luisterstrook: de ingesproken demo die het dichtst bij dit vak ligt (telefonie.betergeregeld.com/demo/*). --}}
+    <div class="wrap" style="padding-top:0">
+        @include('channels.partials.telefonie-luisterdemos', ['site' => $site, 'modus' => 'strook'])
+    </div>
+
     @include('channels.partials.sales-trust', ['site' => $site, 'ctaTitle' => 'Benieuwd hoe jouw site eruit zou zien?'])
 
     {{-- Funnel: gratis-voorbeeld-wizard --}}

@@ -172,6 +172,9 @@
         </section>
     @endif
 
+    {{-- De drie ingesproken luisterdemo's, de dichtstbijzijnde vooraan. --}}
+    @include('channels.partials.telefonie-luisterdemos', ['site' => $site])
+
     <section data-section="kan">
         <div class="wrap">
             <span class="kicker"><span class="kicker-line"></span> Wat hij doet</span>

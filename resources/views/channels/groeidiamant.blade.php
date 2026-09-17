@@ -328,6 +328,7 @@
                         @if ($telNr)
                             <a href="{{ $telHref }}" class="btn btn-ghost">Bel de demo: {{ $telNr }}</a>
                         @endif
+                        <a href="#luisteren" class="btn btn-ghost">Luister mee</a>
                     </div>
                     @if ($telNr)
                         <p class="demo" style="margin-top:.9rem">De demo is een verzonnen bedrijf uit jouw vak. Bel en vraag wat je wilt; je hoort waar hij stopt.</p>
@@ -341,6 +342,9 @@
             </div>
         </div>
     </section>
+
+    {{-- 7b. De ingesproken luisterdemo's (telefonie.betergeregeld.com/demo/*). --}}
+    @include('channels.partials.telefonie-luisterdemos', ['site' => $site, 'titel' => 'Luister hoe stap 5 klinkt'])
 
     {{-- 8. Waarom de Groeidiamant --}}
     <section data-section="waarom">
