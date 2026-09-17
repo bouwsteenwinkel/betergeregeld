@@ -281,6 +281,8 @@
                 <a href="{{ $afspraak }}?onderwerp=ai-telefonie" class="btn {{ $demo ? 'btn-ghost' : '' }}">Vraag een demo aan</a>
             </div>
             @if ($kantoor)<p class="muted" style="margin-top:1rem">Liever eerst iemand spreken? Bel {{ $kantoor }}.</p>@endif
+            {{-- Hub in twee richtingen: de Groeidiamant linkt hierheen als stap 5, en terug. --}}
+            <p class="muted" style="margin-top:.6rem;font-size:.92rem">AI-telefonie is stap 5 van <a href="{{ $site->url('groeidiamant') }}#fase-ai" style="font-weight:700">de Groeidiamant</a>, ons groeimodel van website tot AI. Ook los af te nemen.</p>
         </div>
     </section>
 

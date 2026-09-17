@@ -50,8 +50,10 @@ return [
         ],
         'ai' => [
             'nr'      => 5,
-            'label'   => 'AI',
-            'tagline' => 'Slimme assistentie die met je meewerkt',
+            // 17-09-2026: was "AI". AI-telefonie is de concrete dienst (eigen pagina en demo
+            // op elk live kanaal); de key blijft 'ai' zodat URL's en leads niet breken.
+            'label'   => 'AI-telefonie',
+            'tagline' => 'De telefoon wordt opgenomen als jij geen tijd hebt',
             'icon'    => '✨',
         ],
     ],

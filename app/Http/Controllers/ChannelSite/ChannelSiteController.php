@@ -165,7 +165,11 @@ class ChannelSiteController extends Controller
 
     public function groeidiamant(): View
     {
-        return view('channels.groeidiamant', ['site' => $this->site()]);
+        $site = $this->site();
+
+        // Eén view voor alle kanalen; inhoud = basis + landings-terugval + branche-laag
+        // (App\Support\GroeidiamantConfig, config/groeidiamant_basis.php, {key}_groeidiamant.php).
+        return view('channels.groeidiamant', ['site' => $site, 'c' => \App\Support\GroeidiamantConfig::for($site)]);
     }
 
     public function pricing(): View

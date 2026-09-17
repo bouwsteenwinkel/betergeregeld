@@ -22,8 +22,11 @@
     // Feature-checklist (branche-specifiek). Key => label.
     $featureOpts = (array) ($ch['features'] ?? []);
 
-    // Doel → bepaalt de Groeidiamant-fase (facet) waarin de lead instapt.
-    $goals = [
+    // Doel → bepaalt de Groeidiamant-fase (facet) waarin de lead instapt. Een pagina mag
+    // eigen opties en een eigen vraag meegeven (de Groeidiamant: "Waar wil je mee beginnen?"
+    // met de vijf diensten); de backend leest goal als vrije tekst en normaliseert facet.
+    $goalVraag = $goalVraag ?? 'Wat wil je vooral bereiken?';
+    $goals = ! empty($goals) && is_array($goals) ? $goals : [
         ['value' => 'meer_klanten',  'label' => 'Meer klanten & afspraken',   'icon' => 'chart',  'facet' => 'website'],
         ['value' => 'professioneel', 'label' => 'Professioneler overkomen',    'icon' => 'spark',  'facet' => 'website'],
         ['value' => 'vindbaar',      'label' => 'Beter vindbaar in Google',    'icon' => 'search', 'facet' => 'website'],
@@ -72,7 +75,7 @@
 
             {{-- 1 ─ Doel (opener, bepaalt de groeifase) --}}
             <div class="lwz-step is-active" data-step="1">
-                <p class="lwz-q">Wat wil je vooral bereiken?</p>
+                <p class="lwz-q">{{ $goalVraag }}</p>
                 <div class="lwz-opts" data-choice="goal" data-required data-advance>
                     @foreach ($goals as $g)
                         <button type="button" class="lwz-opt" data-value="{{ $g['value'] }}" data-facet="{{ $g['facet'] }}">
