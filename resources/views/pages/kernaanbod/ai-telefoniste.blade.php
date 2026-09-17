@@ -143,6 +143,8 @@
 			<p>Midden in een klant, een behandeling of een klus. Of na sluitingstijd. Een gemiste oproep is vaak een klant die het ergens anders probeert, of een vraag die morgen alsnog op uw bureau ligt.</p>
 			<p>En een groot deel van de telefoontjes gaat over hetzelfde: hoe laat bent u open, is mijn bestelling al verstuurd, kan iemand mij terugbellen. Vragen waarvoor niemand zijn werk hoeft te onderbreken.</p>
 		</div>
+		{{-- Leesstuk op het demoplatform: zeven van die momenten uitgeschreven. --}}
+		<a href="https://telefonie.betergeregeld.com/praktijk" class="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--color-accent-hover)]">Zeven van die momenten, uitgeschreven: De telefoon dringt voor &rarr;</a>
 	</div>
 </section>
 

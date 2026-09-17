@@ -115,6 +115,12 @@
                     </div>
                 @endforeach
             </div>
+            {{-- Leesstuk op het demoplatform: de zeven situaties uitgeschreven (zelfde verhaal als de offertebijlage). --}}
+            <a class="card" href="https://telefonie.betergeregeld.com/praktijk" style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.2rem;margin-top:1.4rem">
+                <strong>Lees: De telefoon dringt voor</strong>
+                <span class="muted">Zeven situaties uit een gewone werkdag, ook de klant die vóór je staat en ziet dat de telefoon steeds voorgaat.</span>
+                <span style="margin-left:auto;font-weight:700">Lezen &rarr;</span>
+            </a>
         </div>
     </section>
 
