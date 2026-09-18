@@ -55,7 +55,12 @@ class ChannelEventTest extends TestCase
 
     public function test_bot_user_agent_wordt_stil_genegeerd(): void
     {
-        foreach (['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)', 'pc', ''] as $ua) {
+        foreach ([
+            'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)', 'pc', '',
+            // proxy-pool met browser uit 2023 en headless Chromium op X11 (gemeten 18-09-2026)
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.132 Safari/537.36',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36',
+        ] as $ua) {
             $res = $this->withHeaders(['User-Agent' => $ua])
                 ->postJson($this->url, ['e' => 'page_view', 'p' => '/']);
             $res->assertNoContent();

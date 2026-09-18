@@ -65,13 +65,24 @@ final class BotUa
         if (! str_starts_with($ua, 'Mozilla/')) {
             return 'geen-browser';
         }
-        // Een Chrome van vóór versie 100 (maart 2022) is in 2026 geen mens meer:
-        // Chrome werkt zichzelf bij. Wat zich zo meldt zijn headless-pools met
-        // een vastgeplakte UA. In vier dagen log (13-16 sept 2026) vuurden
-        // Chrome/99 (705x, elf hosts), Chrome/79 en Chrome/83 de beacon; geen
-        // van die combinaties laadde ooit een tweede pagina of een asset.
-        if (preg_match('~\bChrom(?:e|ium)/(\d+)\.~', $ua, $m) && (int) $m[1] < 100) {
+        // Een browser van vóór versie 130 (Chrome oktober 2024) is in 2026 geen
+        // mens meer: Chrome, Edge en Firefox werken zichzelf bij. Wat zich zo
+        // meldt zijn proxy-pools met een vastgeplakte UA. Gemeten 13-16 sept 2026:
+        // Chrome/99 (705x, elf hosts), Chrome/79 en Chrome/83; op 18-09 dezelfde
+        // Chrome/117.0.5938.132 op vijf sites en een "Chrome/125 … Safari/537.36
+        // Edge" zonder Edge-versienummer. Geen van die combinaties laadde ooit een
+        // tweede pagina of een asset. Zelfde grens als bouwsteenwinkel_v3.
+        if (preg_match('~(?<![A-Za-z])(?:Chrome|CriOS|Edg|Firefox|FxiOS)/(\d+)\.~', $ua, $m) && (int) $m[1] < 130) {
             return 'browser-verouderd';
+        }
+        // Desktop-Chrome op X11/Linux zonder verdere kenmerken is de UA van
+        // headless Chromium (Puppeteer/Playwright zonder "Headless"). Gemeten
+        // 16-09 (Chrome/150) en 18-09-2026 00:16 (Chrome/152): één homepage per
+        // site, alfabetisch, via Cloudflare-edges en Google Cloud NL. Een echte
+        // Linux-desktopgebruiker telt hierdoor ook niet mee; die zijn op deze
+        // sites zeldzamer dan de pool.
+        if (preg_match('~^Mozilla/5\.0 \(X11; Linux x86_64\) AppleWebKit/537\.36 \(KHTML, like Gecko\) Chrome/\d+\.0\.0\.0 Safari/537\.36$~', $ua)) {
+            return 'linux-pool';
         }
 
         return null;
