@@ -188,13 +188,16 @@ class KioskController extends Controller
 
         // --- Offerte-aanvragen (WebsiteLead — de echte leadpijplijn) ---
         $leadLabel = array('new' => 'Nieuw', 'contacted' => 'Benaderd', 'appointment' => 'Afspraak',
-                           'quoted' => 'Offerte', 'won' => 'Klant', 'lost' => 'Verloren');
+                           'quoted' => 'Offerte', 'won' => 'Klant', 'lost' => 'Verloren', 'cancelled' => 'Geannuleerd');
+        $gesloten = \App\Models\WebsiteLead::GESLOTEN;
         $out['lead_open'] = $this->poging(fn () =>
-            (int) DB::table('website_leads')->whereNotIn('status', array('won', 'lost'))->count(), 0);
+            (int) DB::table('website_leads')->whereNotIn('status', $gesloten)->count(), 0);
         $out['lead_week'] = $this->poging(fn () =>
             (int) DB::table('website_leads')->where('created_at', '>=', $weekAgo)->count(), 0);
         $out['lead_recent'] = $this->poging(fn () =>
-            DB::table('website_leads')->orderByDesc('created_at')->limit(6)
+            // Alleen de open pijplijn: geannuleerde/verloren/gewonnen aanvragen
+            // horen niet op het wandscherm (Dennis, 18-09-2026).
+            DB::table('website_leads')->whereNotIn('status', $gesloten)->orderByDesc('created_at')->limit(6)
                 ->get(['created_at', 'contact_name', 'company', 'branche', 'status'])
                 ->map(fn ($r) => array(
                     'wanneer' => Carbon::parse($r->created_at)->format('d-m'),

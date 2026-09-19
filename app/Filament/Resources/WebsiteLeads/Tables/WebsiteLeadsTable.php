@@ -22,7 +22,7 @@ class WebsiteLeadsTable
     {
         $statusColors = [
             'new' => 'gray', 'contacted' => 'info', 'appointment' => 'warning',
-            'quoted' => 'primary', 'won' => 'success', 'lost' => 'danger',
+            'quoted' => 'primary', 'won' => 'success', 'lost' => 'danger', 'cancelled' => 'gray',
         ];
 
         // Kanaal-opties: 'intake' (algemeen) + alle promotie-kanalen uit config/promo.php.

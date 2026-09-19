@@ -118,7 +118,7 @@
           <span class="r">{{ $c['wanneer'] }}</span>
         </div>
       @empty
-        <div class="k-empty">Geen (echte) contactaanvragen — spam is eruit gefilterd.</div>
+        <div class="k-empty">Geen contactaanvragen.</div>
       @endforelse
     </div>
   </div>
@@ -178,7 +178,7 @@
           return '<div class="k-row"><span class="l">' + esc(a.naam) + '<small>  ' + esc(a.soort) +
             '</small></span><span class="r">' + esc(a.wanneer) + '</span></div>';
         });
-        lijst('k-contactlijst', d.contact_recent, 'Geen (echte) contactaanvragen — spam is eruit gefilterd.', function (c) {
+        lijst('k-contactlijst', d.contact_recent, 'Geen contactaanvragen.', function (c) {
           return '<div class="k-row"><span class="l">' + esc(c.naam) +
             (c.bedrijf ? ' · ' + esc(c.bedrijf) : '') + ' — ' + esc(c.onderwerp) +
             '</span><span class="r">' + esc(c.wanneer) + '</span></div>';

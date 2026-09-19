@@ -33,7 +33,7 @@ class WebsiteLeadResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         // Aantal openstaande leads (nog geen klant/verloren) — opvolg-signaal.
-        $n = WebsiteLead::query()->whereNotIn('status', ['won', 'lost'])->count();
+        $n = WebsiteLead::query()->whereNotIn('status', WebsiteLead::GESLOTEN)->count();
         return $n > 0 ? (string) $n : null;
     }
 

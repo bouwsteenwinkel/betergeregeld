@@ -200,7 +200,13 @@ class WebsiteLead extends Model
         'quoted'      => 'Offerte',
         'won'         => 'Klant',
         'lost'        => 'Verloren',
+        // Niet verloren maar ook geen lead (test, dubbel, niet serieus). Telt
+        // niet mee als open, staat niet op het wandscherm (18-09-2026).
+        'cancelled'   => 'Geannuleerd',
     ];
+
+    /** Statussen waarmee een lead uit de pijplijn is (niet meer 'open'). */
+    public const GESLOTEN = ['won', 'lost', 'cancelled'];
 
     /** Voorbeeldsite-status. */
     public const PREVIEW_STATUSES = [
