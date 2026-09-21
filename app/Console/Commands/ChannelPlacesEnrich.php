@@ -90,7 +90,7 @@ class ChannelPlacesEnrich extends Command
         if (! $this->option('refresh')) {
             $query->whereNull('adressen');
         }
-        $rijen = $query->orderBy('slug')->get(['slug', 'naam']);
+        $rijen = $query->orderBy('slug')->get(['slug', 'naam', 'provincie']);
 
         if ($rijen->isEmpty()) {
             $this->info('Adressen: niets te doen (gebruik --refresh om alles opnieuw te tellen).');
@@ -109,13 +109,27 @@ class ChannelPlacesEnrich extends Command
 
         $gezet = 0; $nul = 0; $mislukt = 0;
         foreach ($rijen as $r) {
+            // Tellen op woonplaatsCODE, niet op naam. Een naam-phrase als
+            // woonplaatsnaam:"Alphen aan den Rijn" levert bij PDOK 0 op: Solr gooit
+            // "aan" en "den" als stopwoorden weg en de phrase past dan nergens meer.
+            // Gemeten 21-09-2026: twaalf "aan de(n) …"-plaatsen stonden zo op 0 adressen,
+            // waaronder Alphen aan den Rijn (40.696), Capelle aan den IJssel (37.166),
+            // Krimpen en Nieuwerkerk aan den IJssel — allemaal ten onrechte op noindex.
+            // Zonder code (plaats is geen BAG-woonplaats) valt de oude naam-telling
+            // terug, die dan terecht 0 geeft.
+            $doc = $this->pdok($r->naam, (string) $r->provincie);
+            $fq  = ! empty($doc['woonplaatscode'])
+                ? 'woonplaatscode:' . $doc['woonplaatscode']
+                : 'woonplaatsnaam:"' . $r->naam . '"';
+            usleep(120000);
+
             // De query-string bouwen we zelf. Solr wil `fq` TWEE KEER zien, en een array
             // meegeven aan Http::get() levert `fq[0]=…&fq[1]=…` op — dat begrijpt PDOK
             // niet, elk verzoek faalde en er werd niets opgeslagen (gemeten 03-08-2026).
             $url = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/free'
                 . '?q=' . urlencode('*:*')
                 . '&fq=' . urlencode('type:adres')
-                . '&fq=' . urlencode('woonplaatsnaam:"' . $r->naam . '"')
+                . '&fq=' . urlencode($fq)
                 . '&rows=0&wt=json';
 
             try {
@@ -266,7 +280,17 @@ class ChannelPlacesEnrich extends Command
         $this->info("Opgehaald: {$gedaan} plaatsen ({$gevonden} gevonden, {$gemist} onbekend bij PDOK).");
     }
 
-    /** Eén plaats opzoeken; provincie erbij zodat dubbele namen goed vallen. */
+    /**
+     * Eén plaats opzoeken; provincie erbij zodat dubbele namen goed vallen.
+     *
+     * De eerste hit is NIET automatisch onze plaats: PDOK zoekt fuzzy en geeft voor
+     * een naam die geen BAG-woonplaats is (Scheveningen, Leerdam-buurtschappen,
+     * Boekelo) gewoon de best scorende andere woonplaats terug — "Scheveningen
+     * Zuid-Holland" werd Hoek van Holland (gemeente Rotterdam), met de coördinaten,
+     * de buren en het inwonertal van dáár op onze pagina. Gemeten 21-09-2026: 82 van
+     * de 1.195 plaatsen. Daarom vragen we vijf hits en nemen de eerste waarvan de
+     * woonplaatsnaam echt past; anders 'onbekend', dat is eerlijker dan fout.
+     */
     private function pdok(string $naam, string $provincie): ?array
     {
         try {
@@ -279,19 +303,60 @@ class ChannelPlacesEnrich extends Command
                 $opties['verify'] = \Composer\CaBundle\CaBundle::getSystemCaRootBundlePath();
             }
 
-            $res = Http::withOptions($opties)->timeout(15)->get('https://api.pdok.nl/bzk/locatieserver/search/v3_1/free', [
-                'q'    => trim($naam . ' ' . $provincie),
-                'fq'   => 'type:woonplaats',
-                'rows' => 1,
-                'fl'   => 'weergavenaam,centroide_ll,gemeentenaam,provincienaam',
-            ]);
-            if (! $res->ok()) return null;
-            $docs = (array) data_get($res->json(), 'response.docs', []);
+            // Eerst mét provincie (dubbele namen: Bergen, Beers, Elst), dan zonder:
+            // Leerdam hoort sinds 2019 bij Utrecht en met "Zuid-Holland" erachter
+            // verdringen Hoek van Holland en Zuid-Beijerland de echte hit.
+            foreach (array_unique([trim($naam . ' ' . $provincie), $naam]) as $q) {
+                $res = Http::withOptions($opties)->timeout(15)->get('https://api.pdok.nl/bzk/locatieserver/search/v3_1/free', [
+                    'q'    => $q,
+                    'fq'   => 'type:woonplaats',
+                    'rows' => 5,
+                    'fl'   => 'weergavenaam,woonplaatsnaam,woonplaatscode,centroide_ll,gemeentenaam,provincienaam',
+                ]);
+                if (! $res->ok()) return null;
+                foreach ((array) data_get($res->json(), 'response.docs', []) as $doc) {
+                    if ($this->naamPast($naam, (string) ($doc['woonplaatsnaam'] ?? ''))) {
+                        return (array) $doc;
+                    }
+                }
+                usleep(120000);
+            }
 
-            return $docs ? (array) $docs[0] : null;
+            return null;
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Past de BAG-woonplaatsnaam bij onze plaatsnaam? Exact na normalisatie, of
+     * BAG met een onderscheidend achtervoegsel ("Beers NB", "Hengelo (Gld)",
+     * "Bergen L", "Elst Ut", "'t Loo Oldebroek"), of onze naam als los deel van een
+     * samengestelde woonplaats ("Bunschoten-Spakenburg", "Son en Breugel",
+     * "Burgh-Haamstede") en andersom ("Oost-Vlieland" in Vlieland). Wat overblijft
+     * — "Achterberg" tegenover "Utrecht" — is een andere plaats.
+     */
+    private function naamPast(string $onze, string $bag): bool
+    {
+        $norm = function (string $s): string {
+            $s = mb_strtolower(trim($s));
+            $s = str_replace(['st.-', 'st. ', 'st.'], 'sint-', $s);
+            $s = strtr($s, ['den haag' => "'s-gravenhage", 'den bosch' => "'s-hertogenbosch", 'dronrijp' => 'dronryp']);
+            $s = preg_replace("/['\x{2019}.]/u", '', $s);
+
+            return trim((string) preg_replace('/[\s\-]+/u', ' ', $s));
+        };
+        $a = $norm($onze);
+        $b = $norm($bag);
+        if ($a === '' || $b === '') return false;
+        if ($a === $b) return true;
+        // BAG-naam = onze naam + achtervoegsel: "beers nb", "hengelo (gld)", "bergen l".
+        if (str_starts_with($b, $a . ' ') && mb_strlen($b) - mb_strlen($a) <= 12) return true;
+        // Onze naam als heel woord in een samengestelde BAG-naam, of andersom.
+        $delen = fn (string $s) => array_filter(explode(' ', $s), fn ($d) => mb_strlen($d) >= 4 && ! in_array($d, ['sint', 'nieuw', 'oud', 'oost', 'west', 'noord', 'zuid', 'aan', 'den', 'van'], true));
+        if (in_array($a, $delen($b), true) || in_array($b, $delen($a), true)) return true;
+
+        return false;
     }
 
     /** Stap 2: afstand tot de vestiging + de vijf dichtstbijzijnde plaatsen. */
