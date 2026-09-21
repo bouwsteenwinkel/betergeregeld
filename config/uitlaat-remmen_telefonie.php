@@ -30,7 +30,7 @@ return [
     'infoblad'       => 'garage',           // config/telefonie_infobladen.php, knop naast het demonummer
 
     'woorden' => [
-        'bedrijf'   => 'je uitlaat- en remmenspecialist',
+        'bedrijf'   => 'je uitlaat- en remmenbedrijf',
         'bedrijven' => 'uitlaat- en remmenspecialisten',
         'klant'     => 'klant',
         'klanten'   => 'klanten',
@@ -40,7 +40,7 @@ return [
     'seo_titel' => 'AI telefonie voor uitlaat- en remmenspecialisten | AI telefoonassistent die opneemt terwijl jij de auto op de brug hebt',
     'hero' => [
         'eyebrow' => 'AI-telefonie voor uitlaat- en remmenspecialisten',
-        'title'   => 'AI-telefonie voor je uitlaat- en remmenspecialist: de telefoon wordt opgenomen, ook als de auto op de brug staat',
+        'title'   => 'AI-telefonie voor je uitlaat- en remmenbedrijf: de telefoon wordt opgenomen, ook als de auto op de brug staat',
         'sub'     => 'Een telefonische assistent die opneemt met de naam van je bedrijf, zegt wat een uitlaat of set remblokken kost, of de klant kan wachten, of de auto klaar is, en een afspraakverzoek noteert. Tijdens de klus, in de ochtendpiek en buiten openingstijden.',
         'alt'     => 'De telefonische assistent van een uitlaat- en remmenspecialist',
         'usps'    => [

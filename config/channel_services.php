@@ -20,7 +20,7 @@ return [
             'label'   => 'Website',
             'icon'    => 'globe',
             'tagline' => 'Je professionele uithangbord dat dag en nacht voor je werkt.',
-            'intro'   => 'Je website is vaak het eerste wat een klant van je ziet. Wij bouwen een strakke, snelle site die vertrouwen wekt en meteen duidelijk maakt wat je doet en voor wie. Geen standaard sjabloon, maar een site die past bij jouw :trade en je eigen regio. Zo word je gevonden door mensen die nú op zoek zijn, en weten ze direct hoe ze je bereiken.',
+            'intro'   => 'Je website is vaak het eerste wat een klant van je ziet. Wij bouwen een strakke, snelle site die vertrouwen wekt en meteen duidelijk maakt wat je doet en voor wie. Geen standaard sjabloon, maar een site die past bij jouw :zaak en je eigen regio. Zo word je gevonden door mensen die nú op zoek zijn, en weten ze direct hoe ze je bereiken.',
             'bullets' => [
                 'Een professioneel ontwerp op maat, geen sjabloon van de plank',
                 'Vindbaar in Google als iemand in jouw regio een :niche zoekt',
@@ -98,5 +98,5 @@ return [
 
     ],
 
-    'cta_title' => 'Benieuwd wat dit voor jouw :trade zou betekenen?',
+    'cta_title' => 'Benieuwd wat dit voor jouw :zaak zou betekenen?',
 ];

@@ -8,7 +8,7 @@
 @extends('channels.layout')
 
 @section('title', 'Website of webshop voor je uitlaat- en remmenbedrijf laten maken')
-@section('description', 'Website laten maken voor je uitlaat- en remmenspecialist: uitlaten, remmen en schokdempers helder op een rij, en afspraken die zo binnenkomen. Gratis voorbeeld.')
+@section('description', 'Website laten maken voor je uitlaat- en remmenbedrijf: uitlaten, remmen en schokdempers helder op een rij, en afspraken die zo binnenkomen. Gratis voorbeeld.')
 
 @if ($heroImg)
     @push('head')

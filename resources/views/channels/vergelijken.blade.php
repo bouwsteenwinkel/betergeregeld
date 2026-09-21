@@ -1,7 +1,8 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
-    $trade = $t['trade'] ?? 'bedrijf';
+    // :zaak, niet :trade: bij een beroep-branche leest "voor je advocaat" als de advocaat van de klant.
+    $zaak = \App\Support\ChannelTokens::map((array) $site->get('places', []), $site->brancheKey())[':zaak'];
 
     // [onderwerp, zelf bouwen, laten maken]
     $rows = [
@@ -17,7 +18,7 @@
 @extends('channels.layout')
 
 @section('title', config('channel_vergelijken_titel.' . $site->brancheKey(), 'Zelf een website bouwen of laten maken voor ' . ($t['trades'] ?? 'ondernemers') . '?'))
-@section('description', 'Zelf bouwen met een website-bouwer of je website laten maken? Een eerlijke vergelijking voor je ' . $trade . '.')
+@section('description', 'Zelf bouwen met een website-bouwer of je website laten maken? Een eerlijke vergelijking voor ' . ($t['trades'] ?? 'ondernemers') . '.')
 
 @section('content')
     @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Zelf bouwen of laten maken']]])
@@ -83,7 +84,7 @@
             <div class="prose" style="margin-top:1rem">
                 <p>Wil je vooral tijd besparen en zeker weten dat je gevonden wordt en aanvragen binnenhaalt, dan is laten maken de logische keuze. Je houdt tijd over voor je echte werk en betaalt een vast bedrag per maand.</p>
                 <p>Vind je het leuk om er zelf mee te stoeien en heb je de tijd, dan kun je met een website-bouwer een eind komen. Houd er rekening mee dat vindbaarheid, onderhoud en een professionele uitstraling dan jouw taak blijven.</p>
-                <p>Twijfel je? Vraag een gratis voorbeeld aan. Dan zie je vrijblijvend wat wij voor je {{ $trade }} zouden maken, en kun je zelf vergelijken.</p>
+                <p>Twijfel je? Vraag een gratis voorbeeld aan. Dan zie je vrijblijvend wat wij voor je {{ $zaak }} zouden maken, en kun je zelf vergelijken.</p>
             </div>
             <a href="#contact" class="btn" style="margin-top:1.2rem">Gratis voorbeeld aanvragen</a>
         </div>

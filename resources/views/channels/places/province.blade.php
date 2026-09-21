@@ -7,9 +7,11 @@
 	$provPlaces = (array) ($provPlaces ?? []);
 	// Per branche een ondernemersgerichte titel/kop (config channel_places.provincie.<branche>);
 	// "Bakkerij in Drenthe" las als een bedrijvengids en trok consumenten (15-09-2026).
+	// De terugval was tot 21-09-2026 nog steeds "Loodgieter in Drenthe" — op 15 van de 17
+	// live sites, 12 provincies elk. Nu ook zonder eigen config de ondernemer aanspreken.
 	$provCfg   = (array) config('channel_places.provincie.' . $site->brancheKey(), []);
-	$provTitle = strtr((string) ($provCfg['title'] ?? (ucfirst($trade) . ' in :region')), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
-	$provH1    = strtr((string) ($provCfg['h1'] ?? (ucfirst($trade) . ' in :region')), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
+	$provTitle = strtr((string) ($provCfg['title'] ?? 'Website laten maken voor :trades in :region'), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
+	$provH1    = strtr((string) ($provCfg['h1'] ?? 'Website laten maken voor :trades in :region'), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
 	$provLead  = strtr((string) ($provCfg['lead'] ?? ('Wij helpen :trades in heel :region aan een website die gevonden wordt en aanvragen oplevert. Kies je plaats voor de details, of vraag direct een gratis voorbeeld aan.')), [':region' => $provName, ':trades' => $trades, ':trade' => $trade]);
 @endphp
 @extends('channels.layout')

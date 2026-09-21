@@ -1,10 +1,11 @@
 @php
     /** @var \App\Support\ChannelSite $site */
     $t = array_merge((array) config('channel_places.defaults', []), array_filter((array) $site->get('places', []), fn ($v) => is_scalar($v) && $v !== ''));
-    $trade = $t['trade'] ?? 'bedrijf';
+    // :zaak, niet :trade: bij een beroep-branche leest "voor je loodgieter" als de loodgieter van de klant.
+    $zaak = \App\Support\ChannelTokens::map((array) $site->get('places', []), $site->brancheKey())[':zaak'];
 
     $steps = [
-        ['n' => '1', 'h' => 'Gratis voorbeeld', 'p' => 'Je beantwoordt een paar korte vragen over je bedrijf. Wij zetten binnen 1 à 2 werkdagen een voorbeeld van jóuw ' . $trade . ' klaar, zodat je meteen ziet hoe het eruit kan zien. Gratis en vrijblijvend, je zit nergens aan vast.'],
+        ['n' => '1', 'h' => 'Gratis voorbeeld', 'p' => 'Je beantwoordt een paar korte vragen over je bedrijf. Wij zetten binnen 1 à 2 werkdagen een voorbeeld van jóuw ' . $zaak . ' klaar, zodat je meteen ziet hoe het eruit kan zien. Gratis en vrijblijvend, je zit nergens aan vast.'],
         ['n' => '2', 'h' => 'Samen scherpstellen', 'p' => 'We bespreken het voorbeeld, bij jou op locatie in de regio of gewoon online. Jij bepaalt wat er wel en niet in moet, welke teksten en foto\'s erbij komen, tot het helemaal klopt.'],
         ['n' => '3', 'h' => 'Live en vindbaar', 'p' => 'We zetten je site live en zorgen dat je gevonden wordt in Google in je eigen regio. Aanvragen komen vanaf dat moment rechtstreeks in je mailbox binnen.'],
         ['n' => '4', 'h' => 'Groeit met je mee', 'p' => 'Later uitbreiden met een webshop, klantenportaal, automatisering of AI? Dat bouwen we er gewoon op voort. Je hoeft nooit opnieuw te beginnen.'],
@@ -19,7 +20,7 @@
 @extends('channels.layout')
 
 @section('title', 'Zo werken we voor ' . ($t['trades'] ?? 'ondernemers'))
-@section('description', 'Van gratis voorbeeld tot een website die voor je werkt. Zo pakken we het aan voor je ' . $trade . ', zonder technisch gedoe.')
+@section('description', 'Van gratis voorbeeld tot een website die voor je werkt. Zo pakken we het aan voor ' . ($t['trades'] ?? 'ondernemers') . ', zonder technisch gedoe.')
 
 @section('content')
     @include('channels.partials.breadcrumb', ['items' => [['label' => 'Home', 'url' => $site->url('')], ['label' => 'Onze werkwijze']]])

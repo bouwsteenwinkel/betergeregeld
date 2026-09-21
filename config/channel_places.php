@@ -229,7 +229,7 @@ return [
         'autoruit-specialist'       => 'bedrijf', 'cv-installateur'          => 'bedrijf',
         'dakkapel-specialist'       => 'bedrijf', 'garagedeuren-specialist'  => 'bedrijf',
         'hovenier'                  => 'bedrijf', 'keukenmonteur'            => 'bedrijf',
-        'metselaar'                 => 'bedrijf', 'uitlaat-remmen'           => 'bedrijf',
+        'metselaar'                 => 'bedrijf', 'uitlaat-remmen'           => 'uitlaat- en remmenbedrijf',
         'warmtepomp-installateur'   => 'bedrijf', 'zonnepanelen-installateur' => 'bedrijf',
         'zonwering-specialist'      => 'bedrijf',
     ],
@@ -446,7 +446,7 @@ return [
         'intro' => [
             'Steeds meer :trades in :city ontdekken dat online gevonden worden het verschil maakt tussen een volle en een lege agenda. Wie een :niche zoekt, kijkt eerst op zijn telefoon en kiest het bedrijf dat er professioneel uitziet en makkelijk te bereiken is. Daar helpen wij je mee.',
             'In :city en de rest van :region is de concurrentie tussen :trades groot. Een verouderde site of alleen een social-pagina kost je klussen. Met een strakke :service, je mooiste projecten in beeld en een duidelijke aanvraagknop val je op tussen de rest.',
-            'Een :trade runnen in :city betekent dat je het druk hebt met het echte werk, niet met techniek. Daarom nemen wij de online kant uit handen: een :service die vindbaar is, aanvragen die vanzelf binnenkomen en tools die je administratie lichter maken. Jij bouwt, wij zorgen dat de klanten je vinden.',
+            'Een :trade runnen in :city betekent dat je het druk hebt met het echte werk, niet met techniek. Daarom nemen wij de online kant uit handen: een :service die vindbaar is, aanvragen die vanzelf binnenkomen en tools die je administratie lichter maken. Jij doet het werk, wij zorgen dat de klanten je vinden.',
             'Klanten in :city verwachten dat ze een :trade online kunnen vinden, bekijken en aanvragen, het liefst \'s avonds vanaf de bank. Wij bouwen een :service die daarop is gemaakt: snel, vindbaar in :city en omgeving, en gericht op het binnenhalen van aanvragen.',
             // Vier extra varianten (03-08-2026). Met vier stuks deelden twee plaatsen een
             // op de vier keer dezelfde intro; met acht is dat een op de acht. Elke variant

@@ -5,7 +5,7 @@
 // komen uit config/uitlaat-remmen_telefonie.php (gesprekken).
 return [
     'woorden' => [
-        'bedrijf' => 'je uitlaat- en remmenspecialist',
+        'bedrijf' => 'je uitlaat- en remmenbedrijf',
         'bedrijven' => 'uitlaat- en remmenspecialisten',
     ],
     'seo_titel' => 'Digitale groei voor uitlaat- en remmenspecialisten: website, online afspraken & AI-telefonie | Groeidiamant',
