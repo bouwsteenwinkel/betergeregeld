@@ -269,6 +269,13 @@ class ChannelPlacesEnrich extends Command
                 $waarden['lon'] = round((float) $m[1], 6);
                 $waarden['lat'] = round((float) $m[2], 6);
             }
+            // Geen (passende) woonplaats: ook de afgeleiden weg. Afstand, buren en
+            // inwoners kwamen anders van de vorige, verkeerde hit (Scheveningen hield
+            // 41 km en 670.610 inwoners van Rotterdam over) en de stappen hierna slaan
+            // een plaats zonder coördinaten of gemeente over.
+            if (! $doc) {
+                $waarden += ['afstand_km' => null, 'buren' => null, 'inwoners' => null, 'adressen' => 0];
+            }
 
             DB::table('channel_place_facts')->updateOrInsert(['slug' => $slug], $waarden);
             $doc ? $gevonden++ : $gemist++;
