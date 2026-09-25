@@ -137,7 +137,9 @@
     style.id = 'cmp-style';
     style.textContent =
       '#cmp-banner{position:fixed;left:16px;right:16px;bottom:16px;max-width:780px;margin:0 auto;background:' + (col.banner_bg || '#1F1F1D') + ';color:' + (col.banner_text || '#F5F1E6') + ';padding:18px 20px;border-radius:' + rad + ';border:1px solid ' + (col.banner_border || 'transparent') + ';font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;line-height:1.5;box-shadow:0 8px 30px rgba(0,0,0,.25);z-index:2147483000;display:flex;flex-direction:column;gap:12px;animation:cmpFade .3s ease-out}' +
-      '#cmp-banner h2{margin:0;font-size:15px;font-weight:700}' +
+      // color/font-family expliciet overerven: anders wint de h2-stijl van de site zelf (bouwsteenwinkel.nl: navy
+      // op de donkere banner = onleesbaar, 25-09-2026). Specifieker dan elke gewone h2-regel van een site.
+      '#cmp-banner h2{margin:0;font-size:15px;font-weight:700;color:inherit!important;font-family:inherit;letter-spacing:normal;text-transform:none;line-height:1.3}' +
       '#cmp-banner p{margin:0}' +
       '#cmp-banner a{color:' + (col.link || '#F5B400') + ';text-decoration:underline}' +
       '#cmp-banner-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}' +
