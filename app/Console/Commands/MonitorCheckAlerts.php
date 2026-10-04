@@ -51,6 +51,7 @@ class MonitorCheckAlerts extends Command
 		$this->info("Klaar — {$changes} overgang(en) van " . $servers->count() . ' server(s).');
 
 		$this->checkTrends($to);
+		$this->checkGroei($to);
 		$this->checkSeoFreshness($to);
 		$this->checkUptimeChecks();
 		$this->checkSecurity();
@@ -448,6 +449,105 @@ class MonitorCheckAlerts extends Command
 				Mail::raw($body, fn ($m) => $m->to($recipients)->subject($subject));
 			}
 		}
+	}
+
+	/**
+	 * Groei-alarm: de schijf groeit NU harder dan config('monitor.growth_gb_per_hour') GB/uur,
+	 * gemeten over het laatste uur. Aanvulling op checkTrends(), dat op dagwaarden over weken
+	 * rekent en dus een schijf die in één avond volloopt niet ziet.
+	 *
+	 * Eigen toestand (growth_alert_state), los van alert_state en trend_alert_state: op
+	 * 04-10-2026 stonden die allebei al weken 'aan' toen de productieschijf in zeven uur van
+	 * 93% naar 100% ging — een overgang-alarm dat al aan staat, mailt niets nieuws.
+	 *
+	 * Herstel pas onder growth_recover_gb_per_hour, zodat een groei rond de drempel niet elke
+	 * vijf minuten alarm/hersteld pendelt. Ontbrekende data = geen oordeel, toestand blijft staan.
+	 */
+	private function checkGroei(?string $to): void
+	{
+		$drempel = (float) config('monitor.growth_gb_per_hour', 2);
+		$herstel = min($drempel, (float) config('monitor.growth_recover_gb_per_hour', $drempel / 2));
+		$analyse = TrendAnalyzer::make();
+
+		$servers = Server::query()->where('is_active', true)->where('alerts_enabled', true)->get();
+
+		foreach ($servers as $server) {
+			$groei = $analyse->schijfGroeiPerUur($server);
+			if ($groei === null) {
+				continue;
+			}
+
+			$vorige = $server->growth_alert_state ?? 'ok';
+			$conditie = $vorige === 'groei'
+				? ($groei['per_uur'] >= $herstel ? 'groei' : 'ok')
+				: ($groei['per_uur'] > $drempel ? 'groei' : 'ok');
+
+			if ($conditie === $vorige) {
+				continue;
+			}
+
+			$server->forceFill([
+				'growth_alert_state' => $conditie,
+				'growth_alerted_at'  => now(),
+			])->save();
+
+			if ($to) {
+				[$onderwerp, $tekst] = $this->groeiBericht($server, $conditie, $groei, $drempel);
+				Mail::raw($tekst, fn ($m) => $m->to($to)->subject($onderwerp));
+			}
+
+			$this->info("{$server->name} (groei): {$vorige} → {$conditie} ({$groei['per_uur']} GB/uur)");
+		}
+	}
+
+	/**
+	 * @param array{per_uur:float,uren_tot_vol:?float,gebruikt_gb:float,totaal_gb:float,vrij_gb:float,minuten:int} $groei
+	 * @return array{0:string,1:string}
+	 */
+	private function groeiBericht(Server $server, string $conditie, array $groei, float $drempel): array
+	{
+		$gb = fn (float $v, int $dec = 1) => number_format($v, $dec, ',', '.');
+		$url = route('filament.admin.resources.monitor-servers.index');
+		$pct = $groei['totaal_gb'] > 0 ? $gb($groei['gebruikt_gb'] / $groei['totaal_gb'] * 100) . '%' : 'onbekend';
+		$stand = "Schijf: {$gb($groei['gebruikt_gb'])} van {$gb($groei['totaal_gb'])} GB gebruikt ({$pct}), "
+			. "{$gb($groei['vrij_gb'])} GB vrij.";
+		$tempo = ($groei['per_uur'] >= 0 ? '+' : '') . $gb($groei['per_uur']) . ' GB per uur';
+
+		if ($conditie === 'ok') {
+			return [
+				"[Monitoring] HERSTELD: {$server->name} — schijfgroei weer normaal",
+				"De schijf van '{$server->name}' groeit niet langer snel: nu {$tempo} "
+					. "(gemeten over de laatste {$groei['minuten']} minuten).
+
+{$stand}
+
+{$url}",
+			];
+		}
+
+		$uren = $groei['uren_tot_vol'];
+		$prognose = $uren === null
+			? 'Totale schijfgrootte onbekend — geen prognose mogelijk.'
+			: 'In dit tempo vol over ongeveer ' . $gb($uren, $uren < 10 ? 1 : 0) . ' uur'
+				. ' (rond ' . now()->addMinutes((int) round($uren * 60))->format('d-m H:i') . ').';
+
+		return [
+			"[Monitoring] ALERT: {$server->name} — SCHIJF GROEIT SNEL ({$tempo})",
+			"Server '{$server->name}' ({$server->ip_address}) schrijft zijn schijf in hoog tempo vol.
+
+"
+				. "Groei: {$tempo}, gemeten over de laatste {$groei['minuten']} minuten "
+				. '(drempel ' . $gb($drempel) . " GB per uur).
+"
+				. "{$stand}
+{$prognose}
+
+"
+				. 'Zoek nu wat er schrijft (logs, backups, tijdelijke bestanden, MySQL-binlogs). '
+				. "Loopt de schijf vol, dan valt MySQL om en ligt alles plat.
+
+Bekijk: {$url}",
+		];
 	}
 
 	/**

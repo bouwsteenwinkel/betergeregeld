@@ -50,6 +50,7 @@ class Server extends Model
 		'agent_last_seen_at' => 'datetime',
 		'alerted_at' => 'datetime',
 		'trend_alerted_at' => 'datetime',
+		'growth_alerted_at' => 'datetime',
 		'last_cpu_percent' => 'float',
 		'last_mem_percent' => 'float',
 		'last_disk_percent' => 'float',

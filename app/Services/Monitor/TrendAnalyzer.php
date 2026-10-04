@@ -44,7 +44,9 @@ final class TrendAnalyzer
 	public function schijf(Server $server): ?array
 	{
 		// Per dag de LAATSTE meting: dat is de stand aan het eind van die dag.
-		$rijen = DB::table('monitor_metrics')
+		$rijen = DB::connection()->getDriverName() === 'sqlite'
+			? $this->schijfDagwaardenDraagbaar($server)
+			: DB::table('monitor_metrics')
 			->selectRaw('DATE(collected_at) AS d')
 			->selectRaw('SUBSTRING_INDEX(GROUP_CONCAT(disk_used_gb ORDER BY collected_at DESC), ",", 1) + 0 AS gebruikt')
 			->selectRaw('MAX(disk_total_gb) AS totaal')
@@ -72,6 +74,99 @@ final class TrendAnalyzer
 			'gebruikt_gb' => round($gebruikt, 1),
 			'totaal_gb'   => round($totaal, 1),
 			'punten'      => $rijen->count(),
+		];
+	}
+
+	/**
+	 * Zelfde dagwaarden als de MySQL-query in schijf(), maar zonder GROUP_CONCAT/SUBSTRING_INDEX
+	 * (bestaan niet in SQLite). Alleen voor de testdatabase; productie blijft op de MySQL-query.
+	 *
+	 * @return \Illuminate\Support\Collection<int,object{d:string,gebruikt:float,totaal:float}>
+	 */
+	private function schijfDagwaardenDraagbaar(Server $server): \Illuminate\Support\Collection
+	{
+		return DB::table('monitor_metrics')
+			->select(['collected_at', 'disk_used_gb', 'disk_total_gb'])
+			->where('server_id', $server->id)
+			->where('collected_at', '>=', now()->subDays($this->terugkijkDagen)->startOfDay())
+			->whereNotNull('disk_used_gb')
+			->orderBy('collected_at')
+			->get()
+			->groupBy(fn ($r) => substr((string) $r->collected_at, 0, 10))
+			->map(fn ($dag, $d) => (object) [
+				'd'        => $d,
+				'gebruikt' => (float) $dag->last()->disk_used_gb,
+				'totaal'   => (float) $dag->max('disk_total_gb'),
+			])
+			->values();
+	}
+
+	/**
+	 * Schijfgroei in GB per UUR over het laatste venster (standaard 60 min), plus hoe lang het
+	 * bij dat tempo duurt tot de schijf vol is.
+	 *
+	 * Waar schijf() op dagwaarden werkt en ruis wegdempt, is dit juist de snelle meting: op
+	 * 04-10-2026 liep de productieschijf in zeven uur van 93% naar 100% — dat zie je niet in
+	 * een dagtrend, wel in een uurvergelijking.
+	 *
+	 * Vergelijkt de MEDIAAN van de monsters aan het begin van het venster (rond nu-60 min) met
+	 * de mediaan van de laatste monsters (nu-10 min .. nu). Een mediaan in plaats van één losse
+	 * meting, zodat één uitschieter (tijdelijk backupbestand) geen alarm geeft. Te weinig
+	 * monsters aan een van beide kanten (agent stil, net toegevoegd) = null: geen oordeel.
+	 *
+	 * @return array{per_uur:float,uren_tot_vol:?float,gebruikt_gb:float,totaal_gb:float,vrij_gb:float,minuten:int}|null
+	 */
+	public function schijfGroeiPerUur(Server $server): ?array
+	{
+		$venster = max(10, (int) config('monitor.growth_window_minutes', 60));
+		$rand = max(1, (int) config('monitor.growth_edge_minutes', 10));
+		$minimaal = max(1, (int) config('monitor.growth_min_samples', 3));
+
+		$nu = now();
+		$beginVan = $nu->copy()->subMinutes($venster)->subSeconds((int) ($rand * 30))->getTimestamp();
+		$beginTot = $nu->copy()->subMinutes($venster)->addSeconds((int) ($rand * 30))->getTimestamp();
+		$eindVan = $nu->copy()->subMinutes($rand)->getTimestamp();
+
+		$rijen = DB::table('monitor_metrics')
+			->select(['collected_at', 'disk_used_gb', 'disk_total_gb'])
+			->where('server_id', $server->id)
+			->where('collected_at', '>=', $nu->copy()->subMinutes($venster)->subSeconds((int) ($rand * 30)))
+			->where('collected_at', '<=', $nu)
+			->whereNotNull('disk_used_gb')
+			->orderBy('collected_at')
+			->get()
+			->map(fn ($r) => [
+				't'      => \Illuminate\Support\Carbon::parse($r->collected_at)->getTimestamp(),
+				'used'   => (float) $r->disk_used_gb,
+				'totaal' => $r->disk_total_gb !== null ? (float) $r->disk_total_gb : null,
+			]);
+
+		$begin = $rijen->filter(fn ($r) => $r['t'] >= $beginVan && $r['t'] <= $beginTot)->values();
+		$eind = $rijen->filter(fn ($r) => $r['t'] >= $eindVan)->values();
+
+		if ($begin->count() < $minimaal || $eind->count() < $minimaal) {
+			return null;
+		}
+
+		$seconden = $eind->avg('t') - $begin->avg('t');
+		if ($seconden < $venster * 30) { // minder dan half het venster ertussen: geen betrouwbare meting
+			return null;
+		}
+
+		$gebruiktBegin = (float) $begin->pluck('used')->median();
+		$gebruiktNu = (float) $eind->pluck('used')->median();
+		$totaal = (float) ($eind->pluck('totaal')->filter(fn ($v) => $v !== null)->last() ?? 0.0);
+
+		$perUur = ($gebruiktNu - $gebruiktBegin) / ($seconden / 3600);
+		$vrij = max(0.0, $totaal - $gebruiktNu);
+
+		return [
+			'per_uur'      => round($perUur, 2),
+			'uren_tot_vol' => ($perUur > 0.0 && $totaal > 0.0) ? round($vrij / $perUur, 1) : null,
+			'gebruikt_gb'  => round($gebruiktNu, 1),
+			'totaal_gb'    => round($totaal, 1),
+			'vrij_gb'      => round($vrij, 1),
+			'minuten'      => (int) round($seconden / 60),
 		];
 	}
 

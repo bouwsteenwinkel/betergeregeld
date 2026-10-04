@@ -30,7 +30,9 @@ return [
 	 */
 	'cpu_warn'  => (int) env('MONITOR_CPU_WARN', 85),
 	'mem_warn'  => (int) env('MONITOR_MEM_WARN', 90),
-	'disk_warn' => (int) env('MONITOR_DISK_WARN', 90),
+	// Ook de ALARMdrempel voor de schijf (Server::currentCondition). Was 90; verlaagd naar 85
+	// na de storing van 04-10-2026, toen de productieschijf dagen op ~90% stond en daarna vol liep.
+	'disk_warn' => (int) env('MONITOR_DISK_WARN', 85),
 
 	/*
 	 * Ondergrens in VRIJE GIGABYTES, naast het percentage hierboven.
@@ -57,6 +59,27 @@ return [
 	'trend_min_days'      => (int) env('MONITOR_TREND_MIN_DAYS', 7),
 	'trend_warn_days'     => (int) env('MONITOR_TREND_WARN_DAYS', 45),
 	'mem_full_percent'    => (int) env('MONITOR_MEM_FULL_PERCENT', 95),
+
+	/*
+	 * Groei-alarm: de schijf groeit NU hard, gemeten over het laatste uur.
+	 *
+	 * Aanleiding (04-10-2026): de productieschijf stond dagen op ~90% en groeide vanaf
+	 * ~18:30 met 3,5-4,5 GB per uur tot hij om ~01:30 vol was. MySQL viel om, alles lag
+	 * ~8 uur plat. De drempel- en trendalarmen stonden toen al weken op 'disk'/'trend' en
+	 * mailen alleen bij een overgang — er kwam dus niets. Dit alarm heeft een eigen
+	 * toestand (growth_alert_state) en kijkt naar uren, niet naar dagen.
+	 *
+	 *   growth_gb_per_hour          alarm boven deze groei (GB/uur)
+	 *   growth_recover_gb_per_hour  pas HERSTELD onder deze groei (marge tegen pendelen)
+	 *   growth_window_minutes       afstand tussen begin- en eindmeting
+	 *   growth_edge_minutes         breedte van de meetrand aan beide kanten
+	 *   growth_min_samples          minimaal aantal monsters per rand, anders geen oordeel
+	 */
+	'growth_gb_per_hour'         => (float) env('MONITOR_GROWTH_GB_PER_HOUR', 2),
+	'growth_recover_gb_per_hour' => (float) env('MONITOR_GROWTH_RECOVER_GB_PER_HOUR', 1),
+	'growth_window_minutes'      => (int) env('MONITOR_GROWTH_WINDOW_MINUTES', 60),
+	'growth_edge_minutes'        => (int) env('MONITOR_GROWTH_EDGE_MINUTES', 10),
+	'growth_min_samples'         => (int) env('MONITOR_GROWTH_MIN_SAMPLES', 3),
 
 	'retention_days' => (int) env('MONITOR_RETENTION_DAYS', 30),
 
