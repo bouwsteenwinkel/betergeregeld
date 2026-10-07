@@ -69,7 +69,7 @@
 	@if ($pillars->isNotEmpty())
 		<div class="blog-section">
 			<div class="blog-section-title">
-				<h2>★ Pillar-gidsen</h2>
+				<h2>★ Complete gidsen</h2>
 				<p style="margin:0; font-size: 13px; color: var(--bl-ink-muted);">Diepgaande overzichten per thema</p>
 			</div>
 			<div class="blog-grid">

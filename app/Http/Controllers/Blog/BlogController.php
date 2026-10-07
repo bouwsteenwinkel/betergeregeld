@@ -89,6 +89,8 @@ class BlogController extends Controller
 
 		return view('blog.show', compact('post', 'related', 'categoryPillar') + [
 			'hreflangLocales' => $this->beschikbareLocales($slug),
+			// Naar de tool of dienst die bij het onderwerp hoort (config/blog_cta.php). Alleen NL: de rest 301't.
+			'cta' => $locale === 'nl' ? \App\Support\BlogCta::voor($post->slug, $post->category?->slug) : null,
 		]);
 	}
 

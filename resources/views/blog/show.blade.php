@@ -92,7 +92,7 @@
 			@endif
 			@if ($post->is_pillar)
 				<span>·</span>
-				<span style="color: var(--bl-accent); font-weight: 700;">★ Pillar-gids</span>
+				<span style="color: var(--bl-accent); font-weight: 700;">★ Complete gids</span>
 			@endif
 		</div>
 
@@ -100,6 +100,14 @@
 		<p style="font-size: 18px; color: var(--bl-ink-muted); font-weight: 500; margin-bottom: 32px;">{{ $post->excerpt }}</p>
 
 		{!! $post->body !!}
+
+		@if (! empty($cta))
+			<div class="blog-cta-inline blog-cta-tool">
+				<h4>{{ $cta['title'] }}</h4>
+				<p>{{ $cta['text'] }}</p>
+				<a href="{{ $cta['url'] }}">{{ $cta['button'] }} →</a>
+			</div>
+		@endif
 
 		@if ($post->tags->isNotEmpty())
 			<div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--bl-border);">
@@ -113,8 +121,8 @@
 		@if ($categoryPillar)
 			<div class="blog-cta-inline">
 				<h4>Volledige gids: {{ $categoryPillar->title }}</h4>
-				<p>Dit artikel is onderdeel van onze uitgebreide {{ $post->category->name }}-gids. Lees de pillar voor het complete plaatje.</p>
-				<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => $categoryPillar->slug]) }}">Lees de pillar →</a>
+				<p>Dit artikel hoort bij onze gids over {{ $post->category->name }}. Daar staat het hele verhaal op één plek.</p>
+				<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => $categoryPillar->slug]) }}">Lees de volledige gids →</a>
 			</div>
 		@endif
 	</article>

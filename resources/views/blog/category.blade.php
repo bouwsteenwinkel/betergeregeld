@@ -35,7 +35,7 @@
 	@if ($pillar)
 		<div class="blog-section">
 			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => $pillar->slug]) }}" class="blog-featured-card">
-				<span class="blog-card-cat">★ Pillar-gids</span>
+				<span class="blog-card-cat">★ Complete gids</span>
 				<h3>{{ $pillar->title }}</h3>
 				<p>{{ $pillar->excerpt }}</p>
 				<div class="blog-card-meta" style="color: rgba(255,255,255,.55);">

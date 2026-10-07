@@ -750,7 +750,7 @@
 		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px;">
 			<a href="{{ route('blog.show', ['locale' => $locale, 'slug' => 'toegangsbeheer-mkb-complete-gids']) }}"
 				style="background: #fff; border: 1px solid rgba(15,23,42,.10); border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px;">
-				<span class="ag-kicker" style="align-self: flex-start;">★ {{ __('Pillar-gids') }}</span>
+				<span class="ag-kicker" style="align-self: flex-start;">★ {{ __('Complete gids') }}</span>
 				<strong style="font-size: 1.0625rem; line-height: 1.3;">{{ __('Toegangsbeheer voor het MKB, complete gids') }}</strong>
 				<span style="font-size: 13px; color: rgba(15,23,42,.62);">{{ __('Van je eerste matrix tot directory-sync, reviews en automatisering.') }}</span>
 			</a>
