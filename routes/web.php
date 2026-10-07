@@ -339,6 +339,17 @@ foreach (['nl', 'en'] as $__loc) {
 	Route::redirect("/{$__loc}/over-ons", "/{$__loc}/over", 301);
 	Route::redirect("/{$__loc}/over-betergeregeld", "/{$__loc}/over", 301);
 	Route::redirect("/{$__loc}/support", "/{$__loc}/contact", 301);
+	Route::redirect("/{$__loc}/about", "/{$__loc}/over", 301);
+	// Hernoemde dienst-slugs; GSC meldde ze als 404 (07-10-2026).
+	Route::redirect("/{$__loc}/diensten/mail-beveiliging-spf-dkim-dmarc", "/{$__loc}/diensten/mail-beveiliging-fix", 301);
+	Route::redirect("/{$__loc}/diensten/website-beveiliging", "/{$__loc}/diensten/website-beveiligen", 301);
+	Route::redirect("/{$__loc}/diensten/access-check", "/{$__loc}/diensten/toegang-check", 301);
+	// Oude Engelse padnaam /services/ → /diensten/ (zelfde slugs als de catalogus).
+	Route::redirect("/{$__loc}/services", "/{$__loc}/diensten", 301);
+	Route::redirect("/{$__loc}/services/access-check", "/{$__loc}/diensten/toegang-check", 301);
+	foreach ($__legacyServices as $__s) {
+		Route::redirect("/{$__loc}/services/{$__s}", "/{$__loc}/diensten/{$__s}", 301);
+	}
 	foreach (['business', 'teams', 'freelancers'] as $__seg) {
 		Route::redirect("/{$__loc}/solutions/{$__seg}", "/{$__loc}/prijzen", 301);
 	}
