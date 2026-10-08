@@ -83,6 +83,7 @@ class BlogPost extends Model
 
 		$scored = static::query()
 			->published()
+			->forChannel($this->channel)   // alleen posts van dezelfde site (hoofdsite of hetzelfde kanaal)
 			->where('locale', $locale)
 			->where('id', '!=', $this->id)
 			->with('category')
@@ -100,6 +101,7 @@ class BlogPost extends Model
 		$seenIds = $scored->pluck('id')->push($this->id)->all();
 		$fill = static::query()
 			->published()
+			->forChannel($this->channel)
 			->where('locale', $locale)
 			->whereNotIn('id', $seenIds)
 			->where('category_id', $this->category_id)

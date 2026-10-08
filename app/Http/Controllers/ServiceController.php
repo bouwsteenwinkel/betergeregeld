@@ -46,6 +46,7 @@ class ServiceController extends Controller
 
 		return BlogPost::query()
 			->published()
+			->forChannel(null)
 			->with('category')
 			->where(function ($q) use ($categories, $tags) {
 				if (!empty($categories)) {

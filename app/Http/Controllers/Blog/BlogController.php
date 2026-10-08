@@ -7,6 +7,7 @@ use App\Http\Middleware\SetLocale;
 use App\Models\Blog\BlogCategory;
 use App\Models\Blog\BlogPost;
 use App\Models\Blog\BlogTag;
+use App\Support\ChannelNetwork;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -15,13 +16,13 @@ class BlogController extends Controller
 {
 	public function index(Request $request, string $locale): View
 	{
-		$featured = BlogPost::query()->published()->where('locale', $locale)->where('featured', true)
+		$featured = BlogPost::query()->published()->forChannel(null)->where('locale', $locale)->where('featured', true)
 			->with('category')->orderByDesc('published_at')->limit(3)->get();
 
-		$pillars = BlogPost::query()->published()->where('locale', $locale)->where('is_pillar', true)
+		$pillars = BlogPost::query()->published()->forChannel(null)->where('locale', $locale)->where('is_pillar', true)
 			->with('category')->orderBy('category_id')->get();
 
-		$recent = BlogPost::query()->published()->where('locale', $locale)
+		$recent = BlogPost::query()->published()->forChannel(null)->where('locale', $locale)
 			->whereNotIn('id', $featured->pluck('id'))
 			->with('category')
 			->orderByDesc('published_at')
@@ -40,9 +41,9 @@ class BlogController extends Controller
 	{
 		$category = BlogCategory::query()->where('slug', $categorySlug)->firstOrFail();
 
-		$pillar = $category->posts()->where('locale', $locale)->where('is_pillar', true)->first();
+		$pillar = $category->posts()->whereNull('channel')->where('locale', $locale)->where('is_pillar', true)->first();
 
-		$posts = BlogPost::query()->published()->where('locale', $locale)
+		$posts = BlogPost::query()->published()->forChannel(null)->where('locale', $locale)
 			->where('category_id', $category->id)
 			->where('is_pillar', false)
 			->with('category')
@@ -70,7 +71,9 @@ class BlogController extends Controller
 			return redirect()->route('blog.show', ['locale' => 'en', 'slug' => $canonical], 301);
 		}
 
-		$post = BlogPost::query()->published()
+		// Alleen posts van de hoofdsite. Tot 08-10-2026 stonden hier ook de 357 blogs van de channel-sites
+		// (loodgieter, advocaat, ...) als dubbele content; die 301'en nu naar hun eigen site (resolveMissingPost).
+		$post = BlogPost::query()->published()->forChannel(null)
 			->where('locale', $locale)
 			->where('slug', $slug)
 			->with('category', 'tags')
@@ -111,7 +114,7 @@ class BlogController extends Controller
 	 */
 	private function beschikbareLocales(string $slug): array
 	{
-		return BlogPost::query()->published()
+		return BlogPost::query()->published()->forChannel(null)
 			->where('slug', $slug)
 			->whereIn('locale', BlogPost::LOCALES)
 			->pluck('locale')
@@ -160,6 +163,22 @@ class BlogController extends Controller
 			}
 		}
 
+		// Tot 08-10-2026 stonden de blogs van de channel-sites (loodgieter, advocaat, ...) óók hier, als
+		// dubbele content van hun eigen site. Zo'n URL 301't naar dezelfde post op de site van dat kanaal,
+		// zodat wat Google eraan heeft opgebouwd meeverhuist. Staat de slug bij meer kanalen, dan het
+		// oudste live kanaal (dat was ook de versie die hier getoond werd: de eerste treffer).
+		if ($locale === 'nl') {
+			$kanalen = BlogPost::query()->published()->whereNotNull('channel')
+				->where('slug', $slug)->where('locale', 'nl')
+				->orderBy('published_at')->pluck('channel');
+			foreach ($kanalen as $kanaal) {
+				$basis = ChannelNetwork::url((string) $kanaal);
+				if ($basis !== null) {
+					return redirect()->away(rtrim($basis, '/') . '/blog/' . rawurlencode($slug), 301);
+				}
+			}
+		}
+
 		abort(410);
 	}
 
@@ -184,6 +203,7 @@ class BlogController extends Controller
 	{
 		$tag = BlogTag::query()->where('slug', $tagSlug)->firstOrFail();
 		$posts = $tag->posts()
+			->whereNull('channel')
 			->whereNotNull('published_at')
 			->where('locale', $locale)
 			->with('category')

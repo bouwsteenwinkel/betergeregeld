@@ -101,4 +101,31 @@ class BlogMissingPostTest extends TestCase
 
         $this->get('/nl/blog/concept-post')->assertStatus(410);
     }
+
+    public function test_blog_van_een_channel_site_301t_naar_die_site(): void
+    {
+        // Tot 08-10-2026 stonden de channel-blogs ook op betergeregeld.com (dubbele content).
+        \Illuminate\Support\Facades\Cache::put('channel_network_live', [
+            ['key' => 'loodgieter', 'name' => 'Loodgieter', 'domain' => 'jouw-loodgieter-website.nl', 'url' => 'https://jouw-loodgieter-website.nl'],
+        ], 60);
+        BlogPost::create([
+            'locale' => 'nl', 'channel' => 'loodgieter', 'slug' => 'nooit-meer-een-gemiste-oproep',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/nl/blog/nooit-meer-een-gemiste-oproep')
+            ->assertStatus(301)
+            ->assertRedirect('https://jouw-loodgieter-website.nl/blog/nooit-meer-een-gemiste-oproep');
+    }
+
+    public function test_blog_van_een_kanaal_dat_niet_live_is_geeft_410(): void
+    {
+        \Illuminate\Support\Facades\Cache::put('channel_network_live', [], 60);
+        BlogPost::create([
+            'locale' => 'nl', 'channel' => 'architect', 'slug' => 'ontwerp-tekening-uitleg',
+            'title' => 'x', 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/nl/blog/ontwerp-tekening-uitleg')->assertStatus(410);
+    }
 }

@@ -18,6 +18,6 @@ class BlogCategory extends Model
 
 	public function pillarPost(): ?BlogPost
 	{
-		return $this->posts()->where('is_pillar', true)->first();
+		return $this->posts()->whereNull('channel')->where('is_pillar', true)->first();
 	}
 }
