@@ -47,7 +47,8 @@ return [
 		'button' => 'Gratis backup-check',
 	],
 	[
-		'slug' => '/telefoon|telefonie|bereikbaar|spookoproep|voicemail|gemiste-oproep/',
+		'categories' => ['bereikbaarheid'],
+		'slug' => '/telefoon|telefonie|telefonist|terugbel|bereikbaar|spookoproep|voicemail|gemiste-oproep/',
 		'title' => 'Geen gemiste bellers meer',
 		'text' => 'Onze AI-telefoniste neemt op als jij niet kunt, beantwoordt vragen uit je eigen kennisbank, verbindt door of noteert een terugbelverzoek, en stuurt na elk gesprek een verslag.',
 		'url' => '/nl/ai-telefoniste',
@@ -77,7 +78,7 @@ return [
 		'button' => 'Bekijk de toegang check',
 	],
 	[
-		'categories' => ['boekhouding'],
+		'categories' => ['boekhouding', 'automatiseren'],
 		'title' => 'Minder handwerk in je administratie',
 		'text' => 'Betalingsherinneringen, opvolging en vaste rapportages: wat nu met de hand gaat, laten we volgens vaste regels automatisch lopen.',
 		'url' => '/nl/processen-automatiseren',

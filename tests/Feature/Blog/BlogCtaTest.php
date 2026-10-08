@@ -18,6 +18,15 @@ class BlogCtaTest extends TestCase
         $this->assertSame('/nl/ai-telefoniste', BlogCta::voor('telefoonnummer-op-website-hoe-voorkom-je-spookoproepen', 'online-groeien')['url']);
     }
 
+    public function test_nieuwe_clusters_bereikbaarheid_en_automatiseren(): void
+    {
+        $this->assertSame('/nl/ai-telefoniste', BlogCta::voor('kennisbank-voor-je-telefoniste', 'bereikbaarheid')['url']);
+        $this->assertSame('/nl/ai-telefoniste', BlogCta::voor('ai-telefoniste-en-privacy', 'bereikbaarheid')['url']);
+        $this->assertSame('/nl/processen-automatiseren', BlogCta::voor('klanten-automatisch-op-de-hoogte-houden', 'automatiseren')['url']);
+        // Out-of-office-antwoorden zijn een security-onderwerp, geen procesautomatisering.
+        $this->assertSame('/nl/tools', BlogCta::voor('automatische-antwoorden-uit-office-wat-zet-je-er-wel-en-niet-in', 'security')['url']);
+    }
+
     public function test_achteraan_bellen_is_boekhouding_geen_telefonie(): void
     {
         $this->assertSame('/nl/processen-automatiseren', BlogCta::voor('van-facturen-achteraan-bellen-naar-automatisch', 'boekhouding')['url']);
