@@ -104,6 +104,19 @@ class ChannelEventTest extends TestCase
         $this->assertSame('/nl/ai-telefoniste', $row->path);
     }
 
+    /** Knopklik op de homepage (12-10-2026): komt binnen met de knopnaam, niet als bezoek. */
+    public function test_cta_click_op_de_homepage_wordt_opgeslagen_met_de_knopnaam(): void
+    {
+        $this->postJson('/_ev', ['e' => 'cta_click', 'p' => '/nl', 'd' => ['cta' => 'homepage_process_scan_hero']])
+            ->assertNoContent();
+
+        $row = ChannelEvent::latest('id')->first();
+        $this->assertNotNull($row);
+        $this->assertSame('cta_click', $row->event);
+        $this->assertSame('betergeregeld', $row->site_key);
+        $this->assertSame(['cta' => 'homepage_process_scan_hero'], $row->params);
+    }
+
     /** De beacon zelf: zonder dit script komt er nooit een page_view binnen. */
     public function test_de_page_view_beacon_rendert(): void
     {

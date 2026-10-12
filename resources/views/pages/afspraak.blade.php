@@ -12,6 +12,7 @@
 	// eerste regel in de notitie, zodat je vóór het gesprek weet waar het over gaat.
 	$hreflangLocales = ['nl'];
 	$onderwerpen = [
+		'processcan'              => 'Gratis ProcesScan',
 		'ai-telefoniste'          => 'AI Telefoniste',
 		'maatwerk-webapplicatie'  => 'Maatwerk webapplicatie',
 		'klantportaal'            => 'Klantportaal',

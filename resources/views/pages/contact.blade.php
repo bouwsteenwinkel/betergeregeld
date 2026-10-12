@@ -19,6 +19,8 @@
 		'website-migratie-zonder-gedoe' => $isEn ? 'Website migration' : 'Website migratie',
 		'website-structuur-check' => $isEn ? 'Website structure check' : 'Structuur check',
 		'iban-check' => 'IBAN check',
+		// ProcesScan (12-10-2026): de knoppen op de homepage komen hier binnen met ?topic=processcan.
+		'processcan' => $isEn ? 'Free process scan' : 'Gratis ProcesScan',
 		'ai-procesanalyse' => $isEn ? 'Process analysis: AI & automation' : 'Procesanalyse: AI & automatisering',
 		// Kernaanbod-pagina's (11-09-2026): hun knoppen komen hier binnen met ?topic=.
 		'ai-telefoniste' => $isEn ? 'AI receptionist' : 'AI Telefoniste',

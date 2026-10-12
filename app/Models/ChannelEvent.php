@@ -31,5 +31,8 @@ class ChannelEvent extends Model
         'planner_opened',
         'lead_submit',
         'appointment_booked',
+        // Knopklik op de homepage (12-10-2026), met de knopnaam in params.cta. Telt niet als
+        // bezoek: kiosk en weekoverzicht filteren op page_view.
+        'cta_click',
     ];
 }

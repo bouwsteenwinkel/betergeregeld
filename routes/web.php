@@ -379,7 +379,9 @@ Route::prefix('{locale}')
 	->whereIn('locale', SetLocale::SUPPORTED)
 	->middleware(SetLocale::class)
 	->group(function () {
-		Route::get('/', fn () => view('welcome'))->name('home');
+		// /nl: ProcesScan-homepage (12-10-2026, zie de kop van home.blade.php). /en houdt de
+		// oude welcome tot er een Engelse versie van de nieuwe tekst is.
+		Route::get('/', fn (string $locale) => view($locale === 'nl' ? 'home' : 'welcome'))->name('home');
 		Route::get('/over', fn () => view('pages.about'))->name('about');
 		Route::get('/slimmer-werken-met-ai', fn () => view('pages.ai'))->name('ai.landing');
 
