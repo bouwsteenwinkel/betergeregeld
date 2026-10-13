@@ -159,39 +159,82 @@
 		$currentLocale = app()->getLocale();
 		$pathParts = explode('/', ltrim(request()->path(), '/'));
 		$pathTail = count($pathParts) > 1 ? '/' . implode('/', array_slice($pathParts, 1)) : '';
+
+		// Hoofdmenu rond de positionering van 13-10-2026 (homepage = ProcesScan): eerst het
+		// probleem (Oplossingen, Praktijkvoorbeelden, ProcesScan), daarna de rest. De losse
+		// diensten en producten zitten in het Oplossingen-uitklapmenu in plaats van ieder een
+		// eigen plek bovenin; ook de AI Telefoniste, die daar sinds 11-09 apart stond.
+		// De kernpagina's zijn alleen Nederlands, dus die linken altijd naar /nl.
+		$en = $currentLocale === 'en';
+		$navOplossingen = [
+			($en ? 'Automate' : 'Automatiseren') => [
+				['/nl/processen-automatiseren', $en ? 'Process automation' : 'Processen automatiseren', $en ? 'Recurring work that runs by itself' : 'Terugkerend werk dat vanzelf loopt'],
+				['/nl/api-koppelingen', $en ? 'System integrations' : 'Systeemkoppelingen', $en ? 'CRM, webshop and accounting in sync' : 'CRM, webshop en administratie gekoppeld'],
+				['/nl/maatwerk-webapplicatie', $en ? 'Custom software' : 'Maatwerksoftware', $en ? 'When off-the-shelf does not fit' : 'Als standaardsoftware niet past'],
+				['/nl/klantportaal-laten-maken', $en ? 'Client portal' : 'Klantportaal', $en ? 'Information and actions in one place' : 'Informatie en acties op één plek'],
+				['/' . $currentLocale . '/slimmer-werken-met-ai', $en ? 'Working smarter with AI' : 'Slimmer werken met AI', $en ? 'Analysis, classification, preparation' : 'Analyseren, sorteren, voorbereiden'],
+			],
+			($en ? 'Ready-made' : 'Kant-en-klaar') => [
+				['/nl/ai-telefoniste', $en ? 'AI receptionist' : 'AI Telefoniste', $en ? 'Answers the phone 24/7' : 'Neemt 24/7 de telefoon op'],
+				['/' . $currentLocale . '/accessguard', 'AccessGuard', $en ? 'Who has access to what' : 'Wie heeft waar toegang toe'],
+				['/nl/backup-en-monitoring', $en ? 'Backup & monitoring' : 'Backup & monitoring', $en ? 'Know it works, every day' : 'Elke dag weten dat het werkt'],
+				['/' . $currentLocale . '/tools', $en ? 'Free tools' : 'Gratis tools', $en ? 'IBAN, VAT, PDF and more' : 'IBAN, btw, PDF en meer'],
+				['/' . $currentLocale . '/diensten', $en ? 'All services' : 'Alle diensten', $en ? 'Websites, security, cookies and more' : 'Websites, beveiliging, cookies en meer'],
+			],
+		];
+		// Oplossingen is "actief" op elke pagina uit het uitklapmenu.
+		$oplossingenActief = request()->is('*diensten*', '*processen-automatiseren*', '*api-koppelingen*', '*maatwerk-webapplicatie*', '*klantportaal*', '*slimmer-werken-met-ai*', '*ai-telefoniste*', '*accessguard*', '*backup-en-monitoring*');
+		// Praktijkvoorbeelden is een sectie van de NL-homepage; de ProcesScan is de knop rechts.
+		$navScan = '/nl/afspraak?onderwerp=processcan';
+		$linkKlasse = fn (bool $actief) => $actief ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]';
 	@endphp
 
 	<header class="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-[color:var(--color-line)]">
 		<div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between gap-6">
-			<a href="{{ route('home') }}" class="flex items-center gap-3 group">
+			<a href="{{ route('home') }}" class="flex items-center gap-3 group shrink-0">
 				<span class="flex items-center justify-center w-9 h-9 rounded-lg bg-[color:var(--color-ink)] text-white font-black text-sm tracking-tight">BG</span>
 				<span class="flex flex-col leading-tight">
 					<span class="font-bold text-[color:var(--color-ink)] whitespace-nowrap">Beter Geregeld ICT</span>
-					<span class="text-[11px] text-[color:var(--color-ink-soft)] hidden sm:inline">{{ __('Tools & automatisering') }}</span>
+					<span class="text-[11px] text-[color:var(--color-ink-soft)] hidden sm:inline">{{ $en ? 'Less manual work' : 'Minder handmatig werk' }}</span>
 				</span>
 			</a>
 
-			<nav class="hidden md:flex items-center gap-6 text-sm" aria-label="{{ __('Hoofdnavigatie') }}">
-				<div class="flex items-center gap-6 font-medium">
-					<a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Home') }}</a>
-					<a href="/{{ $currentLocale }}/diensten" class="{{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Diensten') }}</a>
-					{{-- AI staat bewust náást Diensten en niet erin: het is de dienst waar we op
-					     willen binnenkomen, en in de dienstencatalogus zou hij één kaartje van
-					     veertien worden. Accentkleur maakt hem vindbaar zonder extra breedte. --}}
-					<a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="inline-flex items-center gap-1.5 {{ request()->is('*slimmer-werken-met-ai*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-accent-hover)] hover:text-[color:var(--color-accent)]' }}">
-						<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
-						{{ __('AI') }}
-					</a>
-					{{-- AI Telefoniste prominent in het menu (besluit Dennis 11-09-2026), om dezelfde
-					     reden als AI hierboven. De pagina is alleen Nederlands, dus altijd /nl. --}}
-					<a href="/nl/ai-telefoniste" class="inline-flex items-center gap-1.5 {{ request()->is('*ai-telefoniste*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-accent-hover)] hover:text-[color:var(--color-accent)]' }}">
-						<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-						{{ $currentLocale === 'en' ? 'AI receptionist' : 'AI Telefoniste' }}
-					</a>
-					<a href="/{{ $currentLocale }}/tools" class="{{ request()->is('*tools*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Tools') }}</a>
-					<a href="/{{ $currentLocale }}/prijzen" class="{{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Prijzen') }}</a>
-					<a href="/{{ $currentLocale }}/over" class="{{ request()->is('*over*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Over ons') }}</a>
-					<a href="/{{ $currentLocale }}/contact" class="{{ request()->is('*contact*') ? 'text-[color:var(--color-ink)]' : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]' }}">{{ __('Contact') }}</a>
+			{{-- Desktop vanaf lg: tussen 768 en ~1100 px liep de rij eerder over. --}}
+			<nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-sm" aria-label="{{ __('Hoofdnavigatie') }}">
+				<div class="flex items-center gap-4 xl:gap-6 font-medium whitespace-nowrap">
+					<div class="relative" id="bg-oplossingen">
+						<button type="button" id="bg-oplossingen-knop" class="inline-flex items-center gap-1 font-medium {{ $linkKlasse($oplossingenActief) }}" aria-expanded="false" aria-controls="bg-oplossingen-paneel">
+							{{ $en ? 'Solutions' : 'Oplossingen' }}
+							<svg class="w-3 h-3 transition-transform" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						</button>
+						<div id="bg-oplossingen-paneel" class="hidden absolute left-1/2 -translate-x-1/2 top-full pt-3 w-[560px]">
+							<div class="rounded-2xl border border-[color:var(--color-line)] bg-white shadow-xl p-5 grid grid-cols-2 gap-6 whitespace-normal">
+								@foreach ($navOplossingen as $groep => $items)
+									<div>
+										<p class="text-[11px] font-semibold uppercase tracking-wider text-[color:var(--color-ink-soft)] mb-2">{{ $groep }}</p>
+										<ul class="space-y-0.5">
+											@foreach ($items as [$href, $label, $sub])
+												<li>
+													<a href="{{ $href }}" class="block rounded-lg px-3 py-2 hover:bg-[color:var(--color-surface-2)] focus-visible:bg-[color:var(--color-surface-2)]">
+														<span class="block text-[color:var(--color-ink)] font-semibold">{{ $label }}</span>
+														<span class="block text-xs text-[color:var(--color-ink-muted)] font-normal">{{ $sub }}</span>
+													</a>
+												</li>
+											@endforeach
+										</ul>
+									</div>
+								@endforeach
+							</div>
+						</div>
+					</div>
+					@unless ($en)
+						<a href="/nl#praktijkvoorbeelden" class="{{ $linkKlasse(false) }}">Praktijkvoorbeelden</a>
+						@endunless
+					{{-- Tools pas vanaf xl in de rij; daaronder via Oplossingen (anders past de rij op 1024 px niet). --}}
+					<a href="/{{ $currentLocale }}/tools" class="hidden xl:inline {{ $linkKlasse(request()->is('*tools*')) }}">{{ __('Tools') }}</a>
+					<a href="/{{ $currentLocale }}/prijzen" class="{{ $linkKlasse(request()->is('*prijzen*')) }}">{{ __('Prijzen') }}</a>
+					<a href="/{{ $currentLocale }}/over" class="{{ $linkKlasse(request()->is('*/over')) }}">{{ __('Over ons') }}</a>
+					<a href="/{{ $currentLocale }}/contact" class="{{ $linkKlasse(request()->is('*contact*')) }}">{{ __('Contact') }}</a>
 				</div>
 
 				<div class="flex items-center gap-1.5 text-xs font-semibold">
@@ -205,45 +248,45 @@
 
 				@auth
 					<a href="{{ route('dashboard') }}" class="text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] font-medium">{{ __('Dashboard') }}</a>
-					<span class="hidden lg:inline text-[color:var(--color-ink-muted)] text-xs">{{ Auth::user()->email }}</span>
 					<form method="POST" action="{{ route('logout') }}">
 						@csrf
 						<button type="submit" class="text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">{{ __('Uitloggen') }}</button>
 					</form>
 				@else
-					<a href="{{ route('login') }}" class="hidden sm:inline text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">{{ __('Inloggen') }}</a>
-					{{-- "Plan gesprek" gaat sinds 11-09-2026 naar de afsprakenpagina (alleen NL). --}}
-					<a href="/nl/afspraak" class="btn-accent text-sm">
-						{{ __('Plan gesprek') }}
+					<a href="{{ route('login') }}" class="hidden xl:inline text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">{{ __('Inloggen') }}</a>
+					{{-- Was "Plan gesprek" naar /nl/afspraak; sinds 13-10 de ProcesScan op dezelfde afsprakenpagina. --}}
+					<a href="{{ $navScan }}" class="btn-accent text-sm whitespace-nowrap" data-track="nav_process_scan">
+						{{ $en ? 'Free process scan' : 'Gratis ProcesScan' }}
 						<svg class="w-3.5 h-3.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
 					</a>
 				@endauth
 			</nav>
 
-			{{-- Mobiel: hamburger-knop --}}
-			<button type="button" id="bg-nav-toggle" class="md:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 rounded-lg text-[color:var(--color-ink)] hover:bg-[color:var(--color-surface-2)]" aria-label="{{ __('Menu') }}" aria-expanded="false" aria-controls="bg-mobile-nav">
+			{{-- Mobiel en tablet: hamburger-knop --}}
+			<button type="button" id="bg-nav-toggle" class="lg:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 rounded-lg text-[color:var(--color-ink)] hover:bg-[color:var(--color-surface-2)]" aria-label="{{ __('Menu') }}" aria-expanded="false" aria-controls="bg-mobile-nav">
 				<svg id="bg-nav-icon-open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
 				<svg id="bg-nav-icon-close" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
 			</button>
 		</div>
 
 		{{-- Mobiel uitklap-menu --}}
-		<div id="bg-mobile-nav" class="md:hidden hidden border-t border-[color:var(--color-line)] bg-white">
+		<div id="bg-mobile-nav" class="lg:hidden hidden border-t border-[color:var(--color-line)] bg-white max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
 			<nav class="px-6 py-4 flex flex-col gap-1 text-[15px]" aria-label="{{ __('Mobiele navigatie') }}">
-				<a href="{{ route('home') }}" class="py-2 {{ request()->routeIs('home') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Home') }}</a>
-				<a href="/{{ $currentLocale }}/diensten" class="py-2 {{ request()->is('*diensten*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Diensten') }}</a>
-				<a href="/{{ $currentLocale }}/slimmer-werken-met-ai" class="py-2 inline-flex items-center gap-2 {{ request()->is('*slimmer-werken-met-ai*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-accent-hover)] font-semibold' }}">
-					<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
-					{{ $currentLocale === 'en' ? 'Working smarter with AI' : 'Slimmer werken met AI' }}
-				</a>
-				<a href="/nl/ai-telefoniste" class="py-2 inline-flex items-center gap-2 {{ request()->is('*ai-telefoniste*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-accent-hover)] font-semibold' }}">
-					<span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-accent)]"></span>
-					{{ $currentLocale === 'en' ? 'AI receptionist' : 'AI Telefoniste' }}
-				</a>
-				<a href="/{{ $currentLocale }}/tools" class="py-2 {{ request()->is('*tools*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Tools') }}</a>
-				<a href="/{{ $currentLocale }}/prijzen" class="py-2 {{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Prijzen') }}</a>
-				<a href="/{{ $currentLocale }}/over" class="py-2 {{ request()->is('*over*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Over ons') }}</a>
-				<a href="/{{ $currentLocale }}/contact" class="py-2 {{ request()->is('*contact*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Contact') }}</a>
+				@unless ($en)
+					<a href="/nl#processcan" class="py-2 text-[color:var(--color-ink)] font-semibold">ProcesScan</a>
+					<a href="/nl#praktijkvoorbeelden" class="py-2 text-[color:var(--color-ink-muted)]">Praktijkvoorbeelden</a>
+				@endunless
+				@foreach ($navOplossingen as $groep => $items)
+					<p class="pt-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-[color:var(--color-ink-soft)]">{{ $groep }}</p>
+					@foreach ($items as [$href, $label])
+						<a href="{{ $href }}" class="py-2 text-[color:var(--color-ink-muted)]">{{ $label }}</a>
+					@endforeach
+				@endforeach
+				<div class="mt-2 pt-2 border-t border-[color:var(--color-line)] flex flex-col">
+					<a href="/{{ $currentLocale }}/prijzen" class="py-2 {{ request()->is('*prijzen*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Prijzen') }}</a>
+					<a href="/{{ $currentLocale }}/over" class="py-2 {{ request()->is('*/over') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Over ons') }}</a>
+					<a href="/{{ $currentLocale }}/contact" class="py-2 {{ request()->is('*contact*') ? 'text-[color:var(--color-ink)] font-semibold' : 'text-[color:var(--color-ink-muted)]' }}">{{ __('Contact') }}</a>
+				</div>
 
 				<div class="flex items-center gap-1.5 text-xs font-semibold pt-3 mt-2 border-t border-[color:var(--color-line)]">
 					@foreach (\App\Http\Middleware\SetLocale::SUPPORTED as $loc)
@@ -259,8 +302,8 @@
 					</form>
 				@else
 					<a href="{{ route('login') }}" class="py-2 text-[color:var(--color-ink-muted)] mt-1">{{ __('Inloggen') }}</a>
-					<a href="/{{ $currentLocale }}/contact" class="btn-accent text-sm justify-center mt-2">
-						{{ __('Plan gesprek') }}
+					<a href="{{ $navScan }}" class="btn-accent text-sm justify-center mt-2" data-track="nav_process_scan_mobiel">
+						{{ $en ? 'Free process scan' : 'Gratis ProcesScan' }}
 						<svg class="w-3.5 h-3.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M7 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
 					</a>
 				@endauth
@@ -283,6 +326,31 @@
 			}
 			btn.addEventListener('click', function () { set(panel.classList.contains('hidden')); });
 			panel.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+		})();
+
+		// Oplossingen-uitklapmenu: open op hover (muis) en op klik/Enter (toetsenbord, touch);
+		// Escape of focus buiten het menu sluit het weer.
+		(function () {
+			var wrap = document.getElementById('bg-oplossingen');
+			var knop = document.getElementById('bg-oplossingen-knop');
+			var paneel = document.getElementById('bg-oplossingen-paneel');
+			if (!wrap || !knop || !paneel) return;
+			var pijl = knop.querySelector('svg');
+			var sluitTimer;
+			function set(open) {
+				clearTimeout(sluitTimer);
+				paneel.classList.toggle('hidden', !open);
+				knop.setAttribute('aria-expanded', open ? 'true' : 'false');
+				if (pijl) pijl.classList.toggle('rotate-180', open);
+			}
+			knop.addEventListener('click', function () { set(paneel.classList.contains('hidden')); });
+			wrap.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') set(true); });
+			wrap.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'mouse') return; sluitTimer = setTimeout(function () { set(false); }, 150); });
+			wrap.addEventListener('focusout', function (e) { if (!wrap.contains(e.relatedTarget)) set(false); });
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && knop.getAttribute('aria-expanded') === 'true') { set(false); knop.focus(); }
+			});
+			document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) set(false); });
 		})();
 	</script>
 
